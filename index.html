@@ -1,0 +1,2700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Planificador">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Planificador de Horarios</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .app {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.95);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    backdrop-filter: blur(10px);
+  }
+
+  h1 {
+    text-align: center;
+    color: #1a252f;
+    cursor: default;
+    font-size: 1.6em;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .sub { text-align: center; color: #888; font-size: 0.8em; margin-bottom: 12px; }
+
+  /* ========== DEMO / LICENCIA ========== */
+  .demo-banner {
+    display: none; text-align: center; padding: 10px;
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    color: #856404; font-size: 0.75em; font-weight: bold;
+    border-radius: 8px; margin-bottom: 10px; border: 1px solid #ffc107;
+  }
+  .demo-mode .demo-banner { display: block; }
+  .demo-mode .table-wrap { border: 2px dashed #ffc107 !important; }
+  .demo-mode footer .demo-texto { display: inline; }
+  .demo-mode footer .lic-texto { display: none; }
+  .licenciado footer .lic-texto { display: inline; color: #27ae60; }
+  .licenciado footer .demo-texto { display: none; }
+  .licenciado .demo-banner { display: none; }
+
+  /* ========== TOOLBAR ========== */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 10px; }
+  .toolbar button {
+    padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer;
+    font-size: 0.72em; background: #fff; transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    font-weight: 500;
+  }
+  .toolbar button:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  .toolbar .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+  .toolbar .btn-primary:hover { background: linear-gradient(135deg, #5a6fd6, #6a4192); }
+  .toolbar .btn-danger { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
+  .toolbar .btn-danger:hover { background: linear-gradient(135deg, #d63a2a, #b03224); }
+  .toolbar .btn-yape { background: linear-gradient(135deg, #6a1b9a, #4a148c); color: #fff; }
+  .toolbar .btn-yape:hover { background: linear-gradient(135deg, #5a158a, #3a107c); }
+
+  .dropdown { position: relative; display: inline-block; }
+  .dropdown-content {
+    display: none; position: absolute; background: #fff; min-width: 160px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15); border-radius: 8px; z-index: 100;
+    top: 100%; left: 0; overflow: hidden;
+  }
+  .dropdown-content a {
+    display: block; padding: 10px 14px; text-decoration: none; color: #333;
+    font-size: 0.78em; cursor: pointer; transition: 0.1s;
+  }
+  .dropdown-content a:hover { background: linear-gradient(135deg, #667eea11, #764ba211); }
+  .dropdown:hover > .dropdown-content { display: block; }
+  .dropdown-content.open { display: block; }
+
+  /* ========== INFO ========== */
+  .info-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 10px; }
+  .info-row .campo { position: relative; }
+  .info-row select, .info-row input {
+    padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px;
+    font-size: 0.75em; min-width: 120px; text-align: center; background: #f8f9fa;
+    transition: 0.2s;
+  }
+  .info-row select:focus, .info-row input:focus { border-color: #667eea; outline: none; box-shadow: 0 0 0 2px #667eea33; }
+  .info-row select { cursor: pointer; }
+  .info-row input.oculto { display: none; }
+  .info-row input.visible { display: inline-block; }
+
+  /* ========== TABLA ========== */
+  .table-wrap {
+    overflow: auto; background: #fff; border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 8px;
+    resize: both; min-height: 200px; min-width: 400px; max-width: 100%;
+    border: 2px solid transparent; transition: border-color 0.2s;
+  }
+  .table-wrap:hover { border-color: #667eea44; }
+  table { width: 100%; border-collapse: collapse; min-width: 600px; table-layout: fixed; }
+  th, td {
+    border: 1px solid #e0e0e0; padding: 5px 3px;
+    text-align: center; vertical-align: middle;
+    font-size: 0.72em; line-height: 1.25; overflow: hidden; word-wrap: break-word;
+  }
+  th {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #fff; padding: 6px 3px; font-size: 0.74em; position: relative;
+    letter-spacing: 0.3px;
+  }
+  .resizer { position: absolute; right: 0; top: 0; bottom: 0; width: 4px; cursor: col-resize; }
+  .resizer:hover { background: #667eea; }
+  .hora-cell {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    font-weight: bold; color: #2c3e50; width: 55px; font-size: 0.65em;
+    cursor: pointer; position: relative;
+  }
+  .hora-cell input {
+    width: 100%; border: none; background: transparent;
+    text-align: center; font-weight: bold; font-size: 0.95em; color: #2c3e50;
+  }
+  .hora-cell input:focus { outline: none; }
+  .del-fila { position: absolute; top: 0; right: 1px; font-size: 0.65em; color: #e74c3c; cursor: pointer; opacity: 0.3; }
+  .del-fila:hover { opacity: 1; }
+
+  .celda { cursor: pointer; min-height: 28px; transition: 0.15s; position: relative; }
+  .celda:hover { box-shadow: inset 0 0 0 2px #667eea; }
+
+  /* ========== COLORES MÁS VIBRANTES ========== */
+  .c-clase { background: #74b9ff; color: #1a3a5c; font-weight: 500; }
+  .c-ensenanza { background: #a29bfe; color: #2d1b69; font-weight: 500; }
+  .c-estudio { background: #dfe6e9; color: #2d3436; }
+  .c-comida { background: #ffeaa7; color: #6c5700; font-weight: 500; }
+  .c-desconexion { background: #ff7675; color: #5c1a1a; font-weight: 500; }
+  .c-flexible { background: #fab1a0; color: #5c2e1a; font-weight: 500; }
+  .c-rutina { background: #55efc4; color: #004d40; font-weight: 500; }
+  .c-libre { background: #f5f6fa; color: #636e72; }
+
+  /* ========== MODAL ========== */
+  .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background:#fff; border-radius:16px; padding:20px; width:360px;
+    max-width:90vw; box-shadow:0 8px 40px rgba(0,0,0,0.2);
+    max-height:90vh; overflow-y:auto;
+  }
+  .modal h3 { margin-bottom:8px; font-size:0.95em; color:#1a252f; }
+  .modal label { display:block; font-size:0.78em; margin-bottom:3px; color:#666; }
+  .modal textarea, .modal select, .modal input[type=text], .modal input[type=password] {
+    width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:8px;
+    font-size:0.82em; margin-bottom:8px; transition:0.2s;
+  }
+  .modal textarea:focus, .modal select:focus, .modal input:focus { border-color: #667eea; outline: none; box-shadow: 0 0 0 2px #667eea33; }
+  .modal textarea { min-height:45px; resize:vertical; }
+  .modal .btns { display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
+  .modal .btns button { padding:6px 16px; border:none; border-radius:6px; cursor:pointer; font-size:0.78em; font-weight:500; }
+  .modal .btns .btn-ok { background: linear-gradient(135deg, #667eea, #764ba2); color:#fff; }
+  .modal .btns .btn-ok:hover { background: linear-gradient(135deg, #5a6fd6, #6a4192); }
+  .modal .btns .btn-cancel { background:#f1f2f6; color:#333; }
+  .modal .btns .btn-cancel:hover { background:#dfe6e9; }
+  .modal .precio-box {
+    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+    padding:14px; border-radius:10px; margin:10px 0; text-align:center;
+  }
+  .modal .precio-box p { font-size:0.82em; color:#4a148c; margin:3px 0; }
+
+  .leyenda { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; font-size: 0.70em; }
+  .leyenda span { display: flex; align-items: center; gap: 4px; background: #f8f9fa; padding: 3px 8px; border-radius: 12px; }
+  .leyenda .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+  .marca-agua { display: none; text-align: center; font-size: 0.55em; color: #aaa; padding: 2px; margin-top: 4px; }
+  .licenciado .marca-agua { display: block; color: #27ae60; font-weight: 500; }
+
+  .footer { text-align: center; margin-top: 12px; font-size: 0.65em; color: #999; }
+  .footer .demo-texto { display: inline; }
+  .footer .lic-texto { display: none; }
+
+  .cta-box {
+    text-align: center; margin: 12px 0; padding: 14px;
+    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+    border-radius: 10px; border: 1px solid #ce93d8;
+    cursor: pointer; transition: 0.2s;
+  }
+  .cta-box:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(106,27,154,0.2); }
+  .cta-box p { font-size: 0.8em; color: #4a148c; }
+
+  .codigo-licencia {
+    font-family: 'Courier New', monospace; font-size: 0.75em;
+    background: #f8f9fa; padding: 8px; border-radius: 6px;
+    word-break: break-all; user-select: all; border: 1px solid #ddd;
+    margin: 5px 0; color: #2c3e50;
+  }
+
+  .btn-wsp {
+    padding: 8px 24px; border: none; border-radius: 6px;
+    cursor: pointer; font-size: 0.85em; font-weight: 500;
+    background: linear-gradient(135deg, #25d366, #128C7E);
+    color: #fff; transition: 0.2s;
+  }
+  .btn-wsp:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,211,102,0.3); }
+
+/* ========== PLANIFIER TYPE SELECTOR ========== */
+.planner-type-selector {
+  display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;
+  margin-bottom: 10px;
+}
+.planner-type-selector button {
+  padding: 5px 12px; border: 2px solid #e0e0e0; border-radius: 20px;
+  background: #fff; cursor: pointer; font-size: 0.7em; font-weight: 500;
+  transition: all 0.2s; color: #555;
+}
+.planner-type-selector button:hover {
+  border-color: #667eea; color: #667eea; transform: translateY(-1px);
+}
+.planner-type-selector button.active {
+  border-color: #667eea; background: linear-gradient(135deg, #667eea22, #764ba222);
+  color: #5a6fd6; font-weight: 600; box-shadow: 0 2px 8px rgba(102,126,234,0.15);
+}
+
+/* ========== CUSTOM HEADER ========== */
+.custom-header { text-align: center; margin-bottom: 8px; }
+.custom-header input {
+  padding: 8px 16px; border: 2px dashed #ccc; border-radius: 10px;
+  font-size: 1em; text-align: center; width: 80%; max-width: 400px;
+  background: rgba(255,255,255,0.8); transition: all 0.3s;
+  font-weight: 500; color: #2c3e50;
+}
+.custom-header input:focus {
+  border-color: #667eea; border-style: solid; outline: none;
+  box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+}
+.custom-header input.filled {
+  border-style: solid; border-color: #667eea;
+  background: linear-gradient(135deg, #667eea08, #764ba208);
+  font-size: 1.1em;
+}
+.custom-header .header-preview {
+  display: none; font-size: 1.3em; font-weight: bold;
+  padding: 6px 20px; margin: 4px 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.custom-header .header-preview.show { display: block; }
+
+/* ========== VIEW TOGGLE ========== */
+.view-toggle {
+  display: flex; gap: 2px; justify-content: center; margin-bottom: 10px;
+  background: #f0f0f5; border-radius: 10px; padding: 3px; width: fit-content;
+  margin-left: auto; margin-right: auto;
+}
+.view-toggle button {
+  padding: 6px 18px; border: none; border-radius: 8px; cursor: pointer;
+  font-size: 0.72em; font-weight: 500; transition: all 0.2s;
+  background: transparent; color: #666;
+}
+.view-toggle button:hover { color: #333; }
+.view-toggle button.active {
+  background: #fff; color: #667eea; font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.view-content { display: none; }
+.view-content.active { display: block; }
+
+/* ========== DASHBOARD ENHANCED ========== */
+.dashboard { padding: 10px 0; }
+.dashboard h2 {
+  font-size: 1.3em; text-align: center; margin-bottom: 14px;
+  background: linear-gradient(135deg, #667eea, #764ba2, #e17055);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; letter-spacing: 0.5px;
+}
+
+/* Main charts row */
+.dash-row { display: flex; gap: 12px; margin-bottom: 12px; }
+@media (max-width: 700px) { .dash-row { flex-direction: column; } }
+.dash-chart-card {
+  flex: 1; background: #fff; border-radius: 14px; padding: 16px;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.05); border: 1px solid #eee;
+  position: relative; min-width: 0;
+}
+.chart-header {
+  font-size: 0.78em; font-weight: 700; color: #555; margin-bottom: 12px;
+  text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;
+}
+.chart-icon { font-size: 1.3em; }
+.chart-body { display: flex; gap: 14px; align-items: center; }
+.chart-body-bar { align-items: flex-start; }
+
+/* Pie chart area */
+.pie-chart {
+  width: 130px; height: 130px; border-radius: 50%;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: transform 0.3s;
+}
+.pie-chart:hover { transform: scale(1.03); }
+.pie-chart .center-text {
+  font-weight: 800; font-size: 1.3em; color: #2c3e50;
+  background: rgba(255,255,255,0.9); width: 60px; height: 60px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.chart-side { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.chart-stat {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 8px; background: #f8f9fa; border-radius: 6px; font-size: 0.72em;
+}
+.chart-stat .stat-label { color: #888; font-weight: 500; }
+.chart-stat .stat-val { font-weight: 700; color: #2c3e50; }
+
+/* Bar chart */
+.bar-chart-list { width: 100%; }
+.bar-chart-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; font-size: 0.7em; }
+.bar-chart-row .bar-label { width: 65px; text-align: right; color: #555; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.95em; }
+.bar-chart-row .bar-track { flex: 1; height: 18px; background: #f0f0f5; border-radius: 5px; overflow: hidden; }
+.bar-chart-row .bar-fill { height: 100%; border-radius: 5px; transition: width 0.6s; }
+.bar-chart-row .bar-pct { width: 38px; text-align: right; font-weight: 700; color: #555; font-size: 0.95em; }
+
+/* Chart interpretation */
+.chart-interp {
+  margin-top: 10px; padding: 8px 12px; background: #f0f4ff; border-radius: 8px;
+  font-size: 0.74em; line-height: 1.5; color: #1a3a5c; border-left: 3px solid #667eea;
+}
+.chart-footer {
+  margin-top: 6px; font-size: 0.68em; color: #999; text-align: center; padding: 4px;
+  border-top: 1px solid #f0f0f5;
+}
+
+/* Mini stats row */
+.dash-row-mini { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.dash-mini-card {
+  flex: 1; min-width: 100px; background: #fff; border-radius: 10px; padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #eee;
+  border-left: 3px solid #667eea; display: flex; align-items: center; gap: 8px;
+}
+.dash-mini-card .mini-icon { font-size: 1.3em; }
+.dash-mini-card .mini-label { font-size: 0.65em; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.dash-mini-card .mini-val { font-size: 1.1em; font-weight: 700; color: #2c3e50; }
+
+/* Existing cards (for recommendations, rewards, etc.) */
+.dash-card {
+  background: #fff; border-radius: 14px; padding: 14px 16px;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.05); border: 1px solid #eee;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative; overflow: hidden;
+}
+.dash-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+.dash-card h3 {
+  font-size: 0.75em; color: #555; margin-bottom: 10px; text-transform: uppercase;
+  letter-spacing: 0.8px; font-weight: 700; padding-left: 10px; position: relative;
+}
+.dash-card h3::before { content: ''; position: absolute; left: 0; top: 2px; bottom: 2px; width: 3px; background: linear-gradient(180deg, #667eea, #764ba2); border-radius: 2px; }
+
+.dash-day-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 0.7em; }
+.dash-day-row .day-label { width: 36px; font-weight: 700; color: #555; text-align: right; font-size: 0.85em; }
+.dash-day-row .day-bar { flex: 1; height: 20px; background: #f0f0f5; border-radius: 5px; overflow: hidden; }
+.dash-day-row .day-bar .fill { height: 100%; border-radius: 5px; transition: width 0.6s; }
+.dash-day-row .day-pct { width: 38px; text-align: right; font-weight: 700; color: #555; font-size: 0.9em; }
+
+.reward-item, .penalty-item { padding: 8px 12px; margin: 4px 0; border-radius: 10px; font-size: 0.74em; display: flex; align-items: center; gap: 8px; }
+.reward-item { background: linear-gradient(135deg, #e8f8f5, #d4edda); border: 1px solid #55efc4; }
+.reward-item.earned { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #27ae60; box-shadow: 0 2px 8px rgba(39,174,96,0.15); }
+.penalty-item { background: linear-gradient(135deg, #fdf2f2, #f8d7da); border: 1px solid #ff7675; }
+.penalty-item.triggered { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #e74c3c; box-shadow: 0 2px 8px rgba(231,76,60,0.15); }
+.reward-item .icon, .penalty-item .icon { font-size: 1.3em; }
+
+.reward-config { margin-top: 10px; padding: 12px; background: #f8f9fa; border-radius: 10px; border: 1px solid #eee; }
+.reward-config h4 { font-size: 0.75em; color: #555; margin-bottom: 8px; font-weight: 600; }
+.reward-config-row { display: flex; gap: 4px; align-items: center; margin: 4px 0; font-size: 0.7em; }
+.reward-config-row input, .reward-config-row select { padding: 4px 6px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9em; background: #fff; }
+.reward-config-row .rc-name { flex: 2; }
+.reward-config-row .rc-type { flex: 1; }
+.reward-config-row .rc-pct { width: 60px; }
+.reward-config-row .rc-del { cursor: pointer; color: #e74c3c; padding: 4px; font-size: 1.1em; }
+.reward-config .add-reward-btn { padding: 5px 14px; border: 1px dashed #667eea; border-radius: 6px; background: transparent; color: #667eea; cursor: pointer; font-size: 0.7em; margin-top: 5px; transition: 0.2s; }
+.reward-config .add-reward-btn:hover { background: #667eea11; }
+.streak-fire { color: #e17055; font-size: 1.6em; letter-spacing: 2px; }
+
+/* Interpretation cards */
+.dashboard-interp { margin-top: 0; }
+.interp-card {
+  padding: 10px 14px; border-radius: 10px; margin: 6px 0;
+  font-size: 0.75em; line-height: 1.5;
+  border-left: 3px solid transparent;
+}
+.interp-card.insight { background: linear-gradient(135deg, #e8f4fd, #d6eaf8); border-left-color: #74b9ff; color: #1a3a5c; }
+.interp-card.warning { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left-color: #ffc107; color: #7a6200; }
+.interp-card.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-left-color: #55efc4; color: #155724; }
+.interp-card.idea { background: linear-gradient(135deg, #f3e5f5, #e1bee7); border-left-color: #a29bfe; color: #4a148c; }
+.interp-card .interp-icon { font-size: 1.1em; margin-right: 6px; }
+.rec-title { font-weight: 700; margin-bottom: 2px; display: inline-block; }
+
+/* Table action buttons */
+.table-actions { display: flex; gap: 6px; justify-content: flex-end; margin-bottom: 8px; }
+.btn-mark { padding: 6px 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.72em; font-weight: 600; transition: all 0.2s; }
+.btn-mark.done { background: linear-gradient(135deg, #55efc4, #00b894); color: #fff; box-shadow: 0 2px 8px rgba(0,184,148,0.2); }
+.btn-mark.undo { background: linear-gradient(135deg, #ff7675, #e74c3c); color: #fff; box-shadow: 0 2px 8px rgba(231,76,60,0.2); }
+.btn-mark:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.interp-card.insight { background: #e8f4fd; border: 1px solid #74b9ff; color: #1a3a5c; }
+.interp-card.warning { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
+.interp-card.success { background: #d4edda; border: 1px solid #55efc4; color: #155724; }
+.interp-card.idea { background: #f3e5f5; border: 1px solid #a29bfe; color: #4a148c; }
+.interp-card .interp-icon { font-size: 1.2em; margin-right: 6px; }
+.rec-title { font-weight: 600; margin-bottom: 2px; }
+
+.cloud-btn.open { left: 290px; border-radius: 14px 0 0 14px; }
+
+/* ========== COMPLETION ON CELLS ========== */
+.celda .done-check {
+  position: absolute; top: 1px; right: 1px; width: 12px; height: 12px;
+  border-radius: 50%; border: 2px solid #ccc; background: #fff;
+  cursor: pointer; transition: all 0.2s; font-size: 0.55em;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1; opacity: 0.4;
+}
+.celda:hover .done-check { opacity: 1; }
+.celda .done-check.checked { background: #27ae60; border-color: #27ae60; color: #fff; opacity: 0.8; }
+.celda.done { opacity: 0.85; }
+.celda.done::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(39,174,96,0.08); pointer-events: none; border-radius: 2px;
+}
+
+/* ========== SCREENSHOT OVERLAY ========== */
+.screenshot-warning {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center;
+  align-items: center; flex-direction: column; text-align: center;
+  animation: fadeIn 0.15s;
+}
+.screenshot-warning.active { display: flex; }
+.screenshot-warning h2 { color: #e74c3c; font-size: 2em; margin-bottom: 10px; }
+.screenshot-warning p { color: #fff; font-size: 1.1em; max-width: 400px; }
+.screenshot-warning .subtext { color: #aaa; font-size: 0.85em; margin-top: 8px; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ========== ANTI SELECT ========== */
+body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; }
+
+/* ========== SIDE PANEL ========== */
+.cloud-btn {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+  width: 32px; height: 72px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #9b59b6 100%);
+  border-radius: 0 16px 16px 0; cursor: pointer; z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.15em; color: #fff;
+  box-shadow: 4px 4px 20px rgba(102,126,234,0.3);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); border: none; padding: 0;
+  border-right: none;
+}
+.cloud-btn:hover {
+  width: 38px;
+  box-shadow: 6px 6px 28px rgba(102,126,234,0.45);
+}
+.cloud-btn.open {
+  left: 305px; border-radius: 14px 0 0 14px;
+  box-shadow: -4px 4px 20px rgba(0,0,0,0.25);
+}
+.cloud-btn.open:hover { left: 308px; }
+.cloud-btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.12) 100%);
+  border-radius: inherit; pointer-events: none;
+}
+
+.side-panel {
+  position: fixed; top: 0; left: -330px; width: 305px; height: 100vh;
+  background: linear-gradient(170deg, #1a252f 0%, #2c3e50 40%, #34495e 100%);
+  z-index: 1001;
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto; overflow-x: hidden;
+  padding: 22px 18px;
+  box-shadow: 6px 0 40px rgba(0,0,0,0.4), inset -1px 0 0 rgba(255,255,255,0.06);
+}
+.side-panel.open { left: 0; }
+.side-panel::-webkit-scrollbar { width: 3px; }
+.side-panel::-webkit-scrollbar-track { background: transparent; }
+.side-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+.side-panel h3 {
+  color: #fff; font-size: 0.85em; margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;
+  font-weight: 600; letter-spacing: 0.3px;
+}
+
+.side-overlay {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  z-index: 1000; opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.side-overlay.open { display: block; opacity: 1; }
+
+/* Dark theme for panel dropdowns */
+.side-panel .dropdown-content {
+  background: #2c3e50; border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4); min-width: 180px;
+}
+.side-panel .dropdown-content a { color: rgba(255,255,255,0.85); }
+.side-panel .dropdown-content a:hover {
+  background: rgba(102,126,234,0.2); color: #fff;
+}
+.side-panel .dropdown > button {
+  background: rgba(255,255,255,0.08) !important;
+  color: rgba(255,255,255,0.85) !important; box-shadow: none !important;
+}
+.side-panel .dropdown > button:hover { background: rgba(255,255,255,0.15) !important; }
+
+/* Dark theme for panel content */
+.side-panel .planner-type-selector { margin-bottom: 10px; }
+.side-panel .planner-type-selector button {
+  background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7); font-size: 0.75em; padding: 6px 10px;
+}
+.side-panel .planner-type-selector button.active {
+  background: rgba(102,126,234,0.35); border-color: #667eea; color: #fff;
+}
+.side-panel .planner-type-selector button:hover { border-color: #667eea; color: #fff; }
+.side-panel .custom-header input {
+  background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15);
+  color: #fff; width: 100%; max-width: 100%; font-size: 0.85em;
+}
+.side-panel .custom-header input::placeholder { color: rgba(255,255,255,0.35); }
+.side-panel .custom-header input:focus { border-color: #667eea; border-style: solid; }
+.side-panel .custom-header .header-preview { -webkit-text-fill-color: #a29bfe; color: #a29bfe; }
+.side-panel .info-row { flex-direction: column; gap: 3px; margin: 0 0 8px 0; }
+.side-panel .info-row .campo { width: 100%; }
+.side-panel .info-row select, .side-panel .info-row input {
+  width: 100%; background: rgba(255,255,255,0.08); color: #fff;
+  border-color: rgba(255,255,255,0.15); min-width: 0; font-size: 0.78em;
+}
+.side-panel .info-row select option { color: #333; background: #fff; }
+.side-panel .info-row select:focus, .side-panel .info-row input:focus { border-color: #667eea; }
+.side-panel .toolbar { flex-wrap: wrap; gap: 3px; }
+.side-panel .toolbar button {
+  font-size: 0.7em; padding: 5px 9px; background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.8); border: none;
+}
+.side-panel .toolbar button:hover { background: rgba(255,255,255,0.15); }
+.side-panel .toolbar .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+.side-panel .toolbar .btn-danger { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
+.side-panel .toolbar .btn-yape { background: linear-gradient(135deg, #6a1b9a, #4a148c); color: #fff; }
+.side-panel .view-toggle { background: rgba(255,255,255,0.08); margin: 8px 0; }
+.side-panel .view-toggle button { color: rgba(255,255,255,0.5); font-size: 0.75em; padding: 6px 14px; }
+.side-panel .view-toggle button.active { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* Move app content to the left when panel is closed */
+.app { position: relative; }
+
+@media (max-width: 600px) {
+  .planner-type-selector button { font-size: 0.6em; padding: 4px 8px; }
+  .view-toggle button { font-size: 0.65em; padding: 5px 12px; }
+}
+
+  /* ========== EMPTY STATE ========== */
+  .empty-state {
+    display:none; text-align:center; padding:30px 20px;
+    background: linear-gradient(135deg, #667eea08, #764ba208);
+    border: 2px dashed #667eea44; border-radius:12px;
+    margin:10px 0;
+  }
+  .empty-state.show { display:block; }
+  .empty-state .big-icon { font-size:3em; margin-bottom:8px; }
+  .empty-state h3 { font-size:1em; color:#1a252f; margin-bottom:4px; }
+  .empty-state p { font-size:0.78em; color:#888; line-height:1.5; margin-bottom:8px; }
+  .empty-state .btn-plantilla {
+    display:inline-block; padding:8px 20px;
+    background:linear-gradient(135deg,#667eea,#764ba2); color:#fff;
+    border:none; border-radius:8px; cursor:pointer;
+    font-size:0.8em; font-weight:500; margin:3px; transition:0.2s;
+  }
+  .empty-state .btn-plantilla:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(102,126,234,0.3); }
+  .empty-state .btn-vacio {
+    display:inline-block; padding:8px 20px;
+    background:#f1f2f6; color:#555;
+    border:none; border-radius:8px; cursor:pointer;
+    font-size:0.8em; font-weight:500; margin:3px; transition:0.2s;
+  }
+  .empty-state .btn-vacio:hover { background:#dfe6e9; }
+
+  /* ========== TOAST REMINDER ========== */
+.toast-reminder {
+  display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, #2c3e50, #34495e); color: #fff;
+  padding: 14px 24px; border-radius: 12px; z-index: 9999;
+  font-size: 0.85em; font-weight: 500; box-shadow: 0 6px 30px rgba(0,0,0,0.3);
+  max-width: 90vw; text-align: center; white-space: nowrap;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.toast-reminder.active { display: block; animation: toastIn 0.3s; }
+@keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+
+/* ========== CELL REMINDER ICON ========== */
+.celda .reminder-bell {
+  position: absolute; bottom: 1px; left: 1px; font-size: 0.55em;
+  opacity: 0.5; line-height: 1; pointer-events: none;
+}
+
+/* ========== MOBILE RESPONSIVE ========== */
+  @media (max-width: 700px) {
+    body { padding: 6px; }
+    .app { padding: 10px; border-radius: 10px; }
+    h1 { font-size: 1em; }
+    .sub { font-size: 0.6em; }
+    th, td { font-size: 0.55em; padding: 2px 1px; }
+    .hora-cell { width: 32px; font-size: 0.5em; }
+    .hora-cell input { font-size: 0.85em; }
+    table { min-width: 400px; }
+    .table-wrap { min-width: 0; padding: 4px; }
+    .toolbar button { font-size: 0.6em; padding: 4px 7px; }
+    .info-row select, .info-row input { font-size: 0.6em; min-width: 90px; padding: 3px 5px; }
+    .cloud-btn { width: 26px; height: 56px; font-size: 0.9em; }
+    .cloud-btn:hover { width: 30px; }
+    .cloud-btn.open { left: 275px; border-radius: 12px 0 0 12px; }
+    .cloud-btn.open:hover { left: 278px; }
+    .side-panel { width: 270px; left: -290px; padding: 14px 12px; }
+    .side-panel.open { left: 0; }
+    .side-panel h3 { font-size: 0.75em; }
+    .side-panel .planner-type-selector button { font-size: 0.65em; padding: 4px 7px; }
+    .side-panel .toolbar button { font-size: 0.6em; padding: 4px 7px; }
+    .side-panel .view-toggle button { font-size: 0.65em; padding: 4px 10px; }
+    .planner-type-selector button { font-size: 0.65em; padding: 4px 8px; }
+    .view-toggle button { font-size: 0.6em; padding: 4px 10px; }
+    .modal { width: 300px; padding: 14px; }
+    .modal h3 { font-size: 0.85em; }
+    .dash-row { flex-direction: column; }
+    .dash-chart-card { padding: 10px; }
+    .pie-chart { width: 100px; height: 100px; }
+    .pie-chart .center-text { width: 46px; height: 46px; font-size: 1em; }
+    .chart-stat { font-size: 0.65em; }
+    .bar-chart-row { font-size: 0.6em; }
+    .bar-chart-row .bar-label { width: 50px; font-size: 0.85em; }
+    .bar-chart-row .bar-pct { width: 32px; font-size: 0.85em; }
+    .chart-interp { font-size: 0.65em; padding: 6px 10px; }
+    .dash-mini-card { min-width: 70px; padding: 6px 8px; }
+    .dash-mini-card .mini-val { font-size: 0.9em; }
+    .dash-mini-card .mini-label { font-size: 0.55em; }
+    .dash-card { padding: 10px; }
+    .dash-card h3 { font-size: 0.65em; }
+    .reward-item, .penalty-item { font-size: 0.65em; padding: 6px 8px; }
+    .reward-config-row { font-size: 0.6em; }
+    .btn-mark { font-size: 0.65em; padding: 4px 10px; }
+    .table-actions { gap: 4px; margin-bottom: 5px; }
+    .celda .done-check { width: 9px; height: 9px; font-size: 0.45em; }
+    .celda .reminder-bell { font-size: 0.45em; }
+    body { padding-bottom: 60px; }
+    .toast-reminder { font-size: 0.75em; padding: 10px 16px; bottom: 10px; }
+  }
+
+  @media (max-width: 400px) {
+    body { padding: 4px; }
+    .app { padding: 6px; border-radius: 8px; }
+    h1 { font-size: 0.85em; }
+    th, td { font-size: 0.5em; padding: 1px; }
+    table { min-width: 300px; }
+    .hora-cell { width: 28px; }
+    .side-panel { width: 220px; left: -240px; }
+    .cloud-btn.open { left: 230px; }
+    .modal { width: 260px; padding: 10px; }
+    .pie-chart { width: 80px; height: 80px; }
+    .pie-chart .center-text { width: 38px; height: 38px; font-size: 0.85em; }
+  }
+
+  /* ========== TUTORIAL ========== */
+  .tutorial-overlay {
+    display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;
+    backdrop-filter: blur(4px);
+  }
+  .tutorial-overlay.active { display: flex; }
+  .tutorial-box {
+    background:#fff; border-radius:20px; padding:28px 24px; width:440px;
+    max-width:92vw; box-shadow:0 16px 60px rgba(0,0,0,0.3);
+    position:relative; text-align:center;
+  }
+  .tutorial-box .t-step { display: none; }
+  .tutorial-box .t-step.active { display: block; }
+  .tutorial-box .t-icon { font-size:2.8em; margin-bottom:8px; }
+  .tutorial-box h2 { font-size:1.1em; color:#1a252f; margin-bottom:6px; }
+  .tutorial-box p { font-size:0.82em; color:#666; line-height:1.5; margin-bottom:10px; }
+  .tutorial-box .t-highlight {
+    background: linear-gradient(135deg, #667eea11, #764ba211);
+    border: 1px dashed #667eea; border-radius:10px; padding:10px;
+    font-size:0.78em; color:#5a6fd6; margin:8px 0;
+  }
+  .t-progress { display:flex; gap:6px; justify-content:center; margin:12px 0 8px; }
+  .t-progress .dot {
+    width:8px; height:8px; border-radius:50%; background:#ddd;
+    transition:0.2s; cursor:pointer;
+  }
+  .t-progress .dot.active { background:#667eea; width:20px; border-radius:4px; }
+  .t-progress .dot.done { background:#667eea88; }
+  .t-btns { display:flex; gap:8px; justify-content:center; margin-top:8px; }
+  .t-btns button {
+    padding:7px 18px; border:none; border-radius:8px; cursor:pointer;
+    font-size:0.78em; font-weight:500; transition:0.2s;
+  }
+  .t-btns .t-next { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .t-btns .t-next:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(102,126,234,0.3); }
+  .t-btns .t-prev { background:#f1f2f6; color:#555; }
+  .t-btns .t-prev:hover { background:#dfe6e9; }
+  .t-btns .t-skip { background:transparent; color:#999; }
+  .t-btns .t-skip:hover { color:#555; }
+
+  /* ========== INTERVAL SELECTOR ========== */
+  .interval-row {
+    display:flex; gap:4px; align-items:center; margin:6px 0; flex-wrap:wrap;
+    justify-content:center;
+  }
+  .interval-row label { font-size:0.7em; color:#888; font-weight:500; }
+  .interval-row select, .interval-row input {
+    padding:4px 6px; border:1px solid #ddd; border-radius:6px;
+    font-size:0.72em; background:#f8f9fa;
+  }
+  .side-panel .interval-row select,
+  .side-panel .interval-row input {
+    background:rgba(255,255,255,0.08); color:#fff;
+    border-color:rgba(255,255,255,0.15);
+  }
+  .side-panel .interval-row select option { color:#333; background:#fff; }
+
+  /* ========== DARK MODE ========== */
+  body.dark {
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  }
+  body.dark .app {
+    background: rgba(22, 25, 45, 0.95);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  body.dark th {
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    color: #e0e0e0;
+  }
+  body.dark td, body.dark .hora-cell, body.dark .hora-cell input {
+    background: #1a1d35;
+    color: #c0c0d0;
+    border-color: #2a2d45;
+  }
+  body.dark .hora-cell { background: #12142a; }
+  body.dark .celda:hover { box-shadow: inset 0 0 0 2px #4a6cf7; }
+  body.dark .table-wrap { background: #12142a; }
+  body.dark .c-clase { background: #1e3a5f; color: #8ab4f8; }
+  body.dark .c-ensenanza { background: #2a1f5e; color: #b4a0ff; }
+  body.dark .c-estudio { background: #1e2a3a; color: #ccd; }
+  body.dark .c-comida { background: #3a2e1a; color: #f0d060; }
+  body.dark .c-desconexion { background: #3a1a1a; color: #ff8070; }
+  body.dark .c-flexible { background: #3a261a; color: #f0b080; }
+  body.dark .c-rutina { background: #1a3a2a; color: #60d0a0; }
+  body.dark .c-libre { background: #1a1d30; color: #8888a0; }
+  body.dark .sub { color: #8888a0; }
+  body.dark .leyenda span { background: #1a1d35; color: #aaa; }
+  body.dark .modal { background: #1a1d35; color: #e0e0e0; }
+  body.dark .modal h3 { color: #e0e0e0; }
+  body.dark .modal label { color: #aaa; }
+  body.dark .modal textarea, body.dark .modal select, body.dark .modal input {
+    background: #12142a; color: #e0e0e0; border-color: #2a2d45;
+  }
+  body.dark .modal .btns .btn-cancel { background: #2a2d45; color: #ccc; }
+  body.dark .cta-box { background: linear-gradient(135deg, #1a1a3e, #2a1a4e); border-color: #4a3a8e; }
+  body.dark .cta-box p { color: #b4a0ff; }
+  body.dark .footer { color: #666; }
+  body.dark .empty-state h3 { color: #c0c0d0; }
+  body.dark .empty-state p { color: #8888a0; }
+  body.dark .empty-state .btn-vacio { background: #2a2d45; color: #ccc; }
+  body.dark .dash-chart-card { background: #1a1d35; border-color: #2a2d45; }
+  body.dark .dash-chart-card .chart-header { color: #aaa; }
+  body.dark .dash-card { background: #1a1d35; border-color: #2a2d45; }
+  body.dark .dash-card h3 { color: #aaa; }
+  body.dark .chart-stat { background: #12142a; }
+  body.dark .chart-stat .stat-label { color: #888; }
+  body.dark .chart-stat .stat-val { color: #e0e0e0; }
+  body.dark .bar-chart-row .bar-label { color: #aaa; }
+  body.dark .bar-chart-row .bar-track { background: #12142a; }
+  body.dark .bar-chart-row .bar-pct { color: #aaa; }
+  body.dark .chart-interp { background: #12142a; color: #c0d0e0; border-left-color: #4a6cf7; }
+  body.dark .chart-footer { color: #666; border-top-color: #2a2d45; }
+  body.dark .dash-mini-card { background: #1a1d35; border-color: #2a2d45; }
+  body.dark .dash-mini-card .mini-label { color: #888; }
+  body.dark .dash-mini-card .mini-val { color: #e0e0e0; }
+  body.dark .reward-config { background: #12142a; border-color: #2a2d45; }
+  body.dark .reward-config h4 { color: #aaa; }
+  body.dark .reward-config-row input, body.dark .reward-config-row select { background: #1a1d35; color: #e0e0e0; border-color: #2a2d45; }
+  body.dark .interp-card { border-left-width: 3px; }
+  body.dark .interp-card.insight { background: #0d2137; color: #8ab4f8; }
+  body.dark .interp-card.warning { background: #2a2410; color: #f0d060; }
+  body.dark .interp-card.success { background: #0d2a1a; color: #60d0a0; }
+  body.dark .interp-card.idea { background: #1a0d2a; color: #b4a0ff; }
+  body.dark .dash-day-row .day-label { color: #aaa; }
+  body.dark .dash-day-row .day-bar { background: #12142a; }
+  body.dark .dash-day-row .day-pct { color: #aaa; }
+  body.dark .btn-merge { background: #1a1d35; color: #4a6cf7; border-color: #4a6cf7; }
+  body.dark .btn-merge.active { background: linear-gradient(135deg, #4a6cf7, #6a4cf7); color: #fff; }
+  body.dark .merge-info { color: #8888a0; }
+  body.dark .demo-banner { background: linear-gradient(135deg, #2a2410, #1a1a0a); color: #f0d060; border-color: #5a4a10; }
+  body.dark .demo-banner a { color: #b4a0ff !important; }
+  body.dark .reward-item { background: #0d2a1a; border-color: #2a5a3a; }
+  body.dark .penalty-item { background: #2a1010; border-color: #5a2a2a; }
+  body.dark .dashboard h2 { background: linear-gradient(135deg, #4a6cf7, #7a4cf7, #f06050); -webkit-background-clip: text; background-clip: text; }
+  body.dark .toolbar button:not(.btn-primary):not(.btn-danger):not(.btn-yape) { background: #1a1d35; color: #aaa; }
+  body.dark .dropdown-content { background: #1a1d35; }
+  body.dark .dropdown-content a { color: #c0c0d0; }
+  body.dark .dropdown-content a:hover { background: #2a2d45; }
+  body.dark .planner-type-selector button { background: #1a1d35; color: #888; border-color: #2a2d45; }
+  body.dark .planner-type-selector button.active { background: linear-gradient(135deg, #4a6cf722, #6a4cf722); border-color: #4a6cf7; color: #8ab4f8; }
+  body.dark .view-toggle { background: #12142a; }
+  body.dark .view-toggle button { color: #666; }
+  body.dark .view-toggle button.active { background: #2a2d45; color: #8ab4f8; }
+  body.dark .info-row select, body.dark .info-row input { background: #1a1d35; color: #e0e0e0; border-color: #2a2d45; }
+  body.dark .celda .done-check { background: #1a1d35; border-color: #444; }
+  body.dark .celda .done-check.checked { background: #2a8a5a; border-color: #2a8a5a; }
+  body.dark .tutorial-box { background: #1a1d35; }
+  body.dark .tutorial-box h2 { color: #e0e0e0; }
+  body.dark .tutorial-box p { color: #aaa; }
+  body.dark .tutorial-box .t-highlight { background: #12142a; color: #8ab4f8; border-color: #4a6cf7; }
+  body.dark .t-progress .dot { background: #2a2d45; }
+  body.dark .t-progress .dot.active { background: #4a6cf7; }
+  body.dark .t-btns .t-prev { background: #2a2d45; color: #ccc; }
+  body.dark .t-btns .t-prev:hover { background: #3a3d55; }
+
+  /* ========== DARK TOGGLE BUTTON ========== */
+  .btn-dark {
+    padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer;
+    font-size: 0.72em; background: #fff; transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-weight: 500;
+  }
+  .btn-dark:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  body.dark .btn-dark { background: #2a2d45; color: #e0e0e0; }
+  body.dark .btn-dark:hover { background: #3a3d55; }
+
+  /* ========== PROFESSIONAL CELL COLORS (LESS VIBRANT) ========== */
+  .c-clase { background: #d0e4f7; color: #1a3a5c; font-weight: 500; }
+  .c-ensenanza { background: #d5ccf7; color: #2d1b69; font-weight: 500; }
+  .c-estudio { background: #e8eaed; color: #2d3436; }
+  .c-comida { background: #f5edd6; color: #6c5700; font-weight: 500; }
+  .c-desconexion { background: #f5d6d6; color: #5c1a1a; font-weight: 500; }
+  .c-flexible { background: #f5e0d6; color: #5c2e1a; font-weight: 500; }
+  .c-rutina { background: #d6f0e6; color: #004d40; font-weight: 500; }
+  .c-libre { background: #f0f1f5; color: #636e72; }
+
+  /* ========== PROFESSIONAL ANIMATIONS ========== */
+  @keyframes cardFadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .dash-chart-card, .dash-card, .dash-mini-card { animation: cardFadeIn 0.4s ease forwards; }
+  .dash-chart-card:nth-child(2) { animation-delay:0.1s; }
+  .dash-mini-card:nth-child(1) { animation-delay:0.15s; }
+  .dash-mini-card:nth-child(2) { animation-delay:0.2s; }
+  .dash-mini-card:nth-child(3) { animation-delay:0.25s; }
+  .dash-mini-card:nth-child(4) { animation-delay:0.3s; }
+
+  /* ========== CARD HOVER DEPTH ========== */
+  .dash-chart-card { transition: transform 0.3s, box-shadow 0.3s; }
+  .dash-chart-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+  body.dark .dash-chart-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+
+  /* ========== TABELA IMPROVEMENTS ========== */
+  table { border-radius: 8px; overflow: hidden; }
+  .table-wrap { border: 1px solid #e8e8ee; }
+  body.dark .table-wrap { border-color: #2a2d45; }
+
+  /* ========== MERGE COUNTER BADGE ========== */
+  .merge-badge {
+    display: none; position: absolute; top: 8px; right: 8px;
+    padding: 2px 8px; border-radius: 10px; font-size: 0.6em; font-weight: 600;
+    background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;
+    cursor: pointer; z-index: 10;
+  }
+  .merge-badge.show { display: block; }
+  body.dark .merge-badge { background: linear-gradient(135deg, #4a6cf7, #6a4cf7); }
+
+  /* ========== MERGE MODE ========== */
+  .merge-toolbar {
+    display:flex; gap:4px; justify-content:center; flex-wrap:wrap; margin:4px 0;
+  }
+  .btn-merge {
+    padding:4px 10px; border:2px solid #667eea; border-radius:6px;
+    cursor:pointer; font-size:0.68em; font-weight:600; transition:0.2s;
+    background:#fff; color:#667eea;
+  }
+  .btn-merge:hover { background:#667eea11; }
+  .btn-merge.active { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .btn-merge-apply {
+    padding:4px 10px; border:none; border-radius:6px; cursor:pointer;
+    font-size:0.68em; font-weight:600; transition:0.2s;
+    background:linear-gradient(135deg,#55efc4,#00b894); color:#fff;
+  }
+  .btn-merge-apply:hover { transform:translateY(-1px); }
+  .btn-merge-split {
+    padding:4px 10px; border:none; border-radius:6px; cursor:pointer;
+    font-size:0.68em; font-weight:600; transition:0.2s;
+    background:linear-gradient(135deg,#ff7675,#e74c3c); color:#fff;
+  }
+  .btn-merge-split:hover { transform:translateY(-1px); }
+
+  .celda.merge-selected {
+    box-shadow: inset 0 0 0 3px #667eea !important;
+    background: rgba(102,126,234,0.12) !important;
+  }
+  .celda.merge-source {
+    box-shadow: inset 0 0 0 3px #55efc4 !important;
+  }
+  .celda.merged-cell {
+    cursor: pointer;
+  }
+  .celda.merged-cell .merge-indicator {
+    position:absolute; top:2px; right:2px; font-size:0.5em;
+    color:#667eea; opacity:0.5;
+  }
+  .table-wrap.merge-active td { cursor: pointer !important; }
+  .merge-info {
+    font-size:0.65em; color:#888; text-align:center; margin:2px 0;
+  }
+  .side-panel .merge-info { color:rgba(255,255,255,0.5); }
+  .side-panel .btn-merge { background:rgba(255,255,255,0.08); color:#a29bfe; border-color:#a29bfe; }
+  .side-panel .btn-merge.active { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+  .side-panel .btn-merge-apply { background:linear-gradient(135deg,#00b894,#55efc4); }
+  .side-panel .btn-merge-split { background:linear-gradient(135deg,#e74c3c,#ff7675); }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <h1 id="main-title" title="Haz clic 5 veces para modo admin">📅 Planificador de Horarios</h1>
+  <p class="sub">Haz clic en cualquier celda para editarla · Arrastra bordes para ajustar</p>
+
+  <!-- OVERLAY -->
+  <div class="side-overlay" id="side-overlay" onclick="togglePanel()"></div>
+
+  <!-- CLOUD BUTTON -->
+  <div class="cloud-btn" id="cloud-btn" onclick="togglePanel()">⚙️</div>
+
+  <!-- SIDE PANEL -->
+  <div class="side-panel" id="side-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <h3 style="color:#fff;margin:0;font-size:0.85em;border:none;padding:0;">⚙️ Panel de Control</h3>
+      <span onclick="togglePanel()" style="cursor:pointer;color:rgba(255,255,255,0.5);font-size:1.1em;">✕</span>
+    </div>
+
+    <div class="planner-type-selector">
+      <button class="active" data-type="semanal" onclick="cambiarTipoPlanificador('semanal')">📅 Semanal</button>
+      <button data-type="diario" onclick="cambiarTipoPlanificador('diario')">📅 Diario</button>
+      <button data-type="mensual" onclick="cambiarTipoPlanificador('mensual')">📅 Mensual</button>
+      <button data-type="anual" onclick="cambiarTipoPlanificador('anual')">📅 Anual</button>
+      <button data-type="personalizado" onclick="cambiarTipoPlanificador('personalizado')">✏️ Personalizado</button>
+    </div>
+
+    <div class="custom-header">
+      <input id="inp-titulo-header" placeholder="Nombre de área / empresa / hogar..." oninput="actualizarHeaderPreview()">
+      <div class="header-preview" id="header-preview"></div>
+    </div>
+
+    <div class="info-row">
+      <div class="campo">
+        <select id="sel-nombre" onchange="cambioSelect(this,'inp-nombre')">
+          <optgroup label="— Selecciona —">
+            <option value="Estudiante">Estudiante</option>
+            <option value="Trabajador">Trabajador</option>
+            <option value="Freelancer">Freelancer</option>
+            <option value="Emprendedor">Emprendedor</option>
+            <option value="DOCENTE">DOCENTE</option>
+            <option value="otros">✏️ Otros</option>
+          </optgroup>
+        </select>
+        <input id="inp-nombre" class="oculto" placeholder="Tu nombre" value="">
+      </div>
+      <div class="campo">
+        <select id="sel-carrera" onchange="cambioSelect(this,'inp-carrera')">
+          <optgroup label="— Selecciona —">
+            <option value="Ing. Seguridad Industrial y Minera">Ing. Seg. Industrial y Minera</option>
+            <option value="Ing. de Sistemas">Ing. de Sistemas</option>
+            <option value="Ing. Civil">Ing. Civil</option>
+            <option value="Administración">Administración</option>
+            <option value="Medicina">Medicina</option>
+            <option value="Derecho">Derecho</option>
+            <option value="otros">✏️ Otros</option>
+          </optgroup>
+        </select>
+        <input id="inp-carrera" class="oculto" placeholder="Carrera" value="">
+      </div>
+      <div class="campo">
+        <select id="sel-ciclo" onchange="cambioSelect(this,'inp-ciclo')">
+          <optgroup label="— Selecciona —">
+            <option value="7mo Ciclo">7mo Ciclo</option>
+            <option value="1er Ciclo">1er Ciclo</option>
+            <option value="2do Ciclo">2do Ciclo</option>
+            <option value="3er Ciclo">3er Ciclo</option>
+            <option value="4to Ciclo">4to Ciclo</option>
+            <option value="Egresado">Egresado</option>
+            <option value="Profesional">Profesional</option>
+            <option value="otros">✏️ Otros</option>
+          </optgroup>
+        </select>
+        <input id="inp-ciclo" class="oculto" placeholder="Ciclo" value="">
+      </div>
+      <div class="campo">
+        <select id="sel-objetivo" onchange="cambioSelect(this,'inp-objetivo')">
+          <optgroup label="— Selecciona —">
+            <option value="Dormir 11pm · Sin pantallas 1–2h antes">Dormir 11pm · Sin pantallas</option>
+            <option value="Dormir 10pm · Madrugar 5am">Dormir 10pm · Madrugar</option>
+            <option value="Estudiar 4h diarias">Estudiar 4h diarias</option>
+            <option value="Hacer ejercicio 3x semana">Ejercicio 3x semana</option>
+            <option value="Trabajar + Estudiar">Trabajar + Estudiar</option>
+            <option value="otros">✏️ Otros</option>
+          </optgroup>
+        </select>
+        <input id="inp-objetivo" class="oculto" placeholder="Objetivo" value="">
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn-primary" onclick="guardar()">💾 Guardar</button>
+      <button onclick="cargar()">📂 Cargar</button>
+      <button onclick="resetear()">🔄 Restaurar</button>
+      <button class="btn-dark" onclick="nuevoPlanificador()">📋 Nuevo</button>
+      <div class="dropdown">
+        <button class="btn-primary">📥 Exportar ▾</button>
+        <div class="dropdown-content">
+          <a onclick="exportarPDF()">📄 PDF</a>
+          <a onclick="exportarExcel()">📊 Excel</a>
+          <a onclick="exportarWord()">📝 Word</a>
+          <a onclick="imprimir()">🖨️ Imprimir</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button>📁 Modelos ▾</button>
+        <div class="dropdown-content" style="min-width:200px;">
+          <a onclick="cargarModelo('estudiante')">🎓 Estudiante Universitario</a>
+          <a onclick="cargarModelo('trabajador')">💼 Trabajador 9-5</a>
+          <a onclick="cargarModelo('freelancer')">🚀 Freelancer</a>
+          <a onclick="cargarModelo('vacio')" style="border-top:1px solid #eee;">📋 Empezar de cero</a>
+        </div>
+      </div>
+      <button onclick="agregarFila()">➕ Fila</button>
+      <button onclick="agregarDia()">📅 + Día</button>
+      <button class="btn-danger" onclick="eliminarUltimoDia()">📅 − Día</button>
+      <button class="btn-yape" onclick="mostrarCompra()">💎 Comprar licencia</button>
+      <button onclick="mostrarTutorial()">❓ Ayuda</button>
+      <button class="btn-dark" id="btn-dark-mode" onclick="toggleDarkMode()">🌙 Oscuro</button>
+    </div>
+
+    <p style="text-align:center;font-size:0.6em;color:rgba(255,255,255,0.4);margin:6px 0;">
+      ✕ en la hora elimina la fila · Arrastra bordes de columnas
+    </p>
+
+    <div class="interval-row">
+      <label>⏱️ Intervalo:</label>
+      <select id="sel-intervalo" onchange="cambiarIntervalo(parseInt(this.value))">
+        <option value="5">5 min</option>
+        <option value="10">10 min</option>
+        <option value="15" selected>15 min</option>
+        <option value="20">20 min</option>
+        <option value="25">25 min</option>
+        <option value="30">30 min</option>
+        <option value="45">45 min</option>
+        <option value="60">1 hora</option>
+      </select>
+      <label>Desde:</label>
+      <input id="inp-hora-inicio" type="time" value="06:00" style="width:70px;">
+      <label>Hasta:</label>
+      <input id="inp-hora-fin" type="time" value="23:30" style="width:70px;">
+      <button onclick="aplicarIntervalo()" style="padding:4px 10px;border:none;border-radius:5px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;cursor:pointer;font-size:0.68em;">🔄 Aplicar</button>
+    </div>
+
+    <div class="merge-toolbar">
+      <button class="btn-merge" id="btn-merge-mode" onclick="toggleMergeMode()">🔗 Unir celdas</button>
+      <button class="btn-merge-apply" id="btn-merge-apply" onclick="aplicarMerge()" style="display:none;">✅ Unir</button>
+      <button class="btn-merge-split" id="btn-merge-split" onclick="dividirCelda()" style="display:none;">✂️ Dividir</button>
+    </div>
+    <div class="merge-info" id="merge-info"></div>
+
+    <div class="view-toggle">
+      <button class="active" onclick="cambiarVista('table')" id="btn-view-table">📋 Planificador</button>
+      <button onclick="cambiarVista('dashboard')" id="btn-view-dashboard">📊 Dashboard</button>
+    </div>
+  </div>
+
+  <div class="demo-banner">
+    🔒 <strong>VERSIÓN DEMO</strong> · Los archivos exportados incluirán marca de agua ·
+    <a style="color:#6a1b9a;cursor:pointer;font-weight:bold;" onclick="mostrarCompra()">🔥 Compra la licencia aquí</a>
+  </div>
+
+  <!-- VIEW: TABLE -->
+  <div id="view-table" class="view-content active">
+    <div class="empty-state" id="empty-state">
+      <div class="big-icon">📅</div>
+      <h3>¡Bienvenido a tu Planificador!</h3>
+      <p>Tu horario está vacío. Elige cómo empezar:</p>
+      <button class="btn-plantilla" onclick="cargarModelo('estudiante')">🎓 Cargar modelo Estudiante</button>
+      <button class="btn-plantilla" onclick="cargarModelo('trabajador')">💼 Cargar modelo Trabajador</button>
+      <button class="btn-plantilla" onclick="cargarModelo('freelancer')">🚀 Cargar modelo Freelancer</button>
+      <br>
+      <button class="btn-vacio" onclick="cerrarEmptyState()">✏️ Empezar desde cero</button>
+    </div>
+    <div class="table-actions">
+      <button onclick="marcarTodo(true)" class="btn-mark done">✅ Marcar todo</button>
+      <button onclick="marcarTodo(false)" class="btn-mark undo">⏳ Desmarcar todo</button>
+      <button class="btn-dark" onclick="nuevoPlanificador()" style="margin-left:auto;">📋 Nuevo</button>
+    </div>
+    <div class="table-wrap" id="table-wrap">
+      <span class="merge-badge" id="merge-badge" onclick="togglePanel();setTimeout(()=>document.getElementById('btn-merge-mode')?.click(),500)">🔗</span>
+      <table id="tabla">
+        <thead id="thead"><tr id="header-row"><th style="width:55px;position:relative;">HORA<div class="resizer" data-col="-1"></div></th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="marca-agua" id="marca-agua"></div>
+    </div>
+
+    <div class="leyenda" id="leyenda"></div>
+
+    <div class="cta-box" onclick="mostrarCompra()">
+      <p>🔥 <strong>¿Quieres la versión completa sin marca de agua?</strong></p>
+      <p style="font-size:0.7em;color:#888;">Licencia personal S/15 · Exporta sin restricciones · Soporte WhatsApp</p>
+    </div>
+
+    <div class="footer">
+      <span class="demo-texto">Versión Demo · <a style="cursor:pointer;color:#764ba2;font-weight:bold;" onclick="mostrarCompra()">Compra tu licencia</a></span>
+      <span class="lic-texto">✅ Licencia activada · Gracias por tu compra ❤️</span>
+      <span style="margin-left:12px;">· <a style="cursor:pointer;color:#667eea;font-weight:500;" onclick="mostrarTutorial()">📖 Tutorial</a></span>
+    </div>
+  </div>
+
+  <!-- VIEW: DASHBOARD -->
+  <div id="view-dashboard" class="view-content">
+  </div>
+
+</div>
+
+<!-- TUTORIAL -->
+  <div class="tutorial-overlay" id="tutorial" onclick="if(event.target===this)cerrarTutorial()">
+  <div class="tutorial-box">
+    <div class="t-step active" data-step="0">
+      <div class="t-icon">👋</div>
+      <h2>¡Bienvenido a tu Planificador!</h2>
+      <p>Organiza tus horas de estudio, trabajo y vida personal en un solo lugar. <br>Te guiaremos en 30 segundos.</p>
+      <div class="t-highlight">📌 Tip: Puedes volver a ver este tutorial desde el Panel de Control (⚙️)</div>
+    </div>
+    <div class="t-step" data-step="1">
+      <div class="t-icon">📋</div>
+      <h2>La Tabla de Horarios</h2>
+      <p>Cada <strong>fila</strong> es un bloque de tiempo y cada <strong>columna</strong> es un día. <br>Haz <strong>clic</strong> en cualquier celda vacía para editarla.</p>
+      <div class="t-highlight">💡 Las celdas verdes con ✓ son actividades completadas</div>
+    </div>
+    <div class="t-step" data-step="2">
+      <div class="t-icon">🎨</div>
+      <h2>Categorías con Color</h2>
+      <p>Asigna un color a cada actividad: <br>🟦 Clase · 🟪 Enseñanza · ⬜ Estudio · 🟨 Comida <br>🟥 Desconexión · 🟧 Flexible · 🟩 Rutina</p>
+      <div class="t-highlight">👆 Los colores te ayudan a ver tu semana de un vistazo</div>
+    </div>
+    <div class="t-step" data-step="3">
+      <div class="t-icon">⚙️</div>
+      <h2>Panel de Control</h2>
+      <p>Desliza el botón <strong>⚙️</strong> de la izquierda para abrir el panel. <br>Ahí puedes: cambiar tu nombre, carrera, tipo de planificador y más.</p>
+      <div class="t-highlight">📅 Prueba los tipos: Diario · Semanal · Mensual · Anual</div>
+    </div>
+    <div class="t-step" data-step="4">
+      <div class="t-icon">⏱️</div>
+      <h2>Intervalos de Tiempo</h2>
+      <p>¿Necesitas bloques de 15 min? ¿30 min? En el panel puedes elegir: <br><strong>5 · 10 · 15 · 20 · 25 · 30 · 45 min · 1 hora</strong></p>
+      <div class="t-highlight">🔄 Al cambiar el intervalo, las filas se reordenan solas</div>
+    </div>
+    <div class="t-step" data-step="5">
+      <div class="t-icon">🔗</div>
+      <h2>Unir Celdas (Merge)</h2>
+      <p>¿Un curso dura 3 bloques? Activa <strong>🔗 Unir</strong>, selecciona las celdas de una columna y combínalas en una sola.</p>
+      <div class="t-highlight">🎯 Ideal para cursos largos o bloques de trabajo intensivo</div>
+    </div>
+    <div class="t-step" data-step="6">
+      <div class="t-icon">📊</div>
+      <h2>Dashboard y Exportar</h2>
+      <p>Marca actividades como ✓ y ve tu <strong>progreso</strong> en el Dashboard. <br>Exporta a <strong>PDF · Excel · Word</strong> para imprimir o compartir.</p>
+      <div class="t-highlight">🔥 La versión completa no tiene marca de agua</div>
+    </div>
+    <div class="t-progress" id="t-progress"></div>
+    <div class="t-btns">
+      <button class="t-skip" onclick="cerrarTutorial()">Saltar</button>
+      <button class="t-prev" onclick="pasoTutorial(-1)" style="display:none;" id="t-prev">← Anterior</button>
+      <button class="t-next" onclick="pasoTutorial(1)" id="t-next">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREENSHOT WARNING -->
+<div class="screenshot-warning" id="screenshot-warning">
+  <h2>📸 Captura detectada</h2>
+  <p>Esta herramienta está protegida</p>
+  <p class="subtext">🔒 Todos los derechos reservados</p>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-titulo">Editar Celda</h3>
+    <label>Contenido:</label>
+    <textarea id="modal-texto" rows="3"></textarea>
+    <label>Categoría:</label>
+    <select id="modal-categoria">
+      <option value="clase">🟦 Clase universidad</option>
+      <option value="ensenanza">🟪 Enseñanza</option>
+      <option value="estudio">⬜ Estudio / Proyectos</option>
+      <option value="comida">🟨 Comida</option>
+      <option value="desconexion">🟥 Desconexión digital</option>
+      <option value="flexible">🟧 Bloque flexible</option>
+      <option value="rutina">🟩 Rutina / Dormir</option>
+      <option value="libre">⬜ Libre</option>
+    </select>
+    <label style="margin-top:4px;display:flex;align-items:center;gap:6px;font-size:0.78em;color:#555;">
+      <input type="checkbox" id="modal-reminder"> 🔔 Recordatorio (aviso antes de la hora)
+    </label>
+    <div class="btns"><button class="btn-cancel" onclick="cerrarModal()">Cancelar</button><button class="btn-ok" onclick="okModal()">OK</button></div>
+  </div>
+</div>
+
+<!-- MODAL COMPRA -->
+<div class="modal-overlay" id="modal-compra">
+  <div class="modal" style="text-align:center;">
+    <h3 style="color:#6a1b9a;">💎 Adquiere tu licencia</h3>
+    <p style="font-size:0.8em;color:#555;margin-bottom:5px;">Versión completa <strong>sin marca de agua</strong></p>
+    <div class="precio-box">
+      <p style="font-size:1.2em;">💰 <strong>S/ 15 — Un solo pago</strong></p>
+      <p style="font-size:0.75em;">Recibes el código de licencia al instante por WhatsApp</p>
+    </div>
+    <p style="font-size:0.8em;font-weight:bold;color:#333;">📲 Yapea escaneando el QR o al número:</p>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=936718790&margin=12" alt="QR Yape" style="width:150px;height:150px;border-radius:12px;margin:8px auto;display:block;border:2px solid #6a1b9a;">
+    <p style="font-size:1.8em;font-weight:bold;color:#6a1b9a;margin:3px 0;">936 718 790</p>
+    <p style="font-size:0.8em;font-weight:bold;color:#333;margin-top:8px;">📱 Luego envía el comprobante a:</p>
+    <p style="font-size:1.3em;font-weight:bold;color:#1565c0;margin:3px 0;">+51 936 718 790</p>
+    <p style="font-size:0.7em;color:#888;">Y recibe tu código de licencia al WhatsApp</p>
+    <div style="background:#e3f2fd;padding:10px;border-radius:10px;margin:10px 0;font-size:0.75em;text-align:left;">
+      <p>✅ Archivo completo sin marca de agua</p>
+      <p>✅ Exportación a PDF, Excel, Word sin restricciones</p>
+      <p>✅ Licencia personal intransferible</p>
+    </div>
+    <button class="btn-wsp" onclick="abrirWhatsApp()">📱 Contactar por WhatsApp</button>
+    <br>
+    <button style="margin-top:8px;padding:8px 20px;background:linear-gradient(135deg, #667eea, #764ba2);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.78em;" onclick="mostrarActivar()">🔑 Ya tengo un código</button>
+    <br><button class="btn-cancel" style="margin-top:8px;padding:5px 20px;background:#f1f2f6;border:none;border-radius:6px;cursor:pointer;font-size:0.75em;" onclick="cerrarModalCompra()">Cerrar</button>
+  </div>
+</div>
+
+<!-- MODAL ACTIVAR LICENCIA -->
+<div class="modal-overlay" id="modal-activar">
+  <div class="modal" style="text-align:center;">
+    <h3 style="color:#6a1b9a;">🔑 Activar licencia</h3>
+    <p style="font-size:0.8em;color:#555;margin-bottom:8px;">Ingresa el código que recibiste por WhatsApp</p>
+    <input id="inp-codigo" type="text" style="width:100%;padding:10px;border:2px solid #667eea;border-radius:8px;font-size:0.9em;text-align:center;font-family:monospace;" placeholder="Pega aquí tu código">
+    <p id="msg-activar" style="font-size:0.75em;margin:5px 0;min-height:20px;"></p>
+    <div class="btns" style="justify-content:center;">
+      <button class="btn-cancel" onclick="cerrarActivar()">Cancelar</button>
+      <button class="btn-ok" onclick="activarLicencia()" style="background:linear-gradient(135deg, #667eea, #764ba2);">✅ Activar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADMIN (solo vendedor) -->
+<div class="modal-overlay" id="modal-admin">
+  <div class="modal" style="text-align:center;">
+    <h3 style="color:#34495e;">🔐 Panel de Administración</h3>
+    <p style="font-size:0.78em;color:#555;margin-bottom:8px;">Genera códigos de licencia para tus clientes</p>
+    <label>Nombre del cliente:</label>
+    <input id="inp-cliente" type="text" placeholder="Ej: Juan Pérez">
+    <button class="btn-primary" onclick="generarLicenciaAdmin()" style="width:100%;margin-bottom:5px;">🔑 Generar código de licencia</button>
+    <div id="resultado-licencia" style="display:none;">
+      <p style="font-size:0.72em;color:#555;">Código de licencia (copia y envía al cliente):</p>
+      <div class="codigo-licencia" id="codigo-generado"></div>
+      <button style="font-size:0.72em;padding:4px 12px;background:#f1f2f6;border:1px solid #ddd;border-radius:4px;cursor:pointer;margin:3px;" onclick="copiarCodigo()">📋 Copiar código</button>
+    </div>
+    <hr style="margin:10px 0;">
+    <div style="font-size:0.78em;text-align:left;margin:6px 0;">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+        <input type="checkbox" id="chk-proteccion" onchange="toggleProteccion(this.checked)" checked>
+        🔒 Protección anti-captura activada
+      </label>
+      <p style="font-size:0.75em;color:#888;margin-top:4px;">Desactívala si la app te bloquea al cambiar de app en el celular</p>
+    </div>
+    <hr style="margin:10px 0;">
+    <p style="font-size:0.7em;color:#aaa;">Contraseña actual: <strong>admin123</strong> — <span style="color:#888;">cámbiala en el código si quieres</span></p>
+    <button class="btn-cancel" onclick="cerrarAdmin()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+  // ======================================================================
+  // ✅ TUS DATOS — YA ESTÁN CONFIGURADOS
+  // ======================================================================
+  const VENDEDOR = {
+    yape: '936 718 790',
+    whatsapp: '+51 936 718 790',
+    precio: 'S/ 15'
+  };
+
+  // Contraseña para entrar al panel de administración (haz clic 5 veces en el título)
+  const ADMIN_PASSWORD = 'admin123';
+
+  // ======================================================================
+  // SISTEMA DE LICENCIAS
+  // ======================================================================
+  function generarLicencia(comprador) {
+    const data = {
+      c: comprador.trim(),
+      t: Date.now(),
+      h: simpleHash(comprador.trim().toLowerCase() + '|' + Date.now() + '|S3CR3T0')
+    };
+    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  }
+
+  function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16);
+  }
+
+  function verificarLicencia(codigo) {
+    try {
+      const json = decodeURIComponent(escape(atob(codigo)));
+      const data = JSON.parse(json);
+      if (!data.c || !data.t || !data.h) return null;
+      const expectedHash = simpleHash(data.c.toLowerCase() + '|' + data.t + '|S3CR3T0');
+      if (data.h !== expectedHash) return null;
+      return { comprador: data.c, fecha: new Date(data.t).toLocaleDateString(), valido: true };
+    } catch(e) { return null; }
+  }
+
+  // ========== SERVICE WORKER ==========
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+
+  function activarLicencia() {
+    const codigo = document.getElementById('inp-codigo').value.trim();
+    const msg = document.getElementById('msg-activar');
+    if (!codigo) { msg.textContent = '❌ Ingresa un código'; msg.style.color = '#e74c3c'; return; }
+    const result = verificarLicencia(codigo);
+    if (!result) { msg.textContent = '❌ Código inválido'; msg.style.color = '#e74c3c'; return; }
+    localStorage.setItem('horario_licencia', JSON.stringify({ comprador: result.comprador, fecha: result.fecha, codigo }));
+    aplicarLicencia();
+    msg.textContent = '✅ ¡Licencia activada! Bienvenido, ' + result.comprador;
+    msg.style.color = '#27ae60';
+    setTimeout(() => { cerrarActivar(); }, 1500);
+  }
+
+  function aplicarLicencia() {
+    try {
+      const lic = JSON.parse(localStorage.getItem('horario_licencia'));
+      if (lic && lic.comprador) {
+        document.getElementById('app').classList.remove('demo-mode');
+        document.getElementById('app').classList.add('licenciado');
+        document.getElementById('marca-agua').textContent = '🔐 Licencia personal para ' + lic.comprador + ' — Gracias por tu compra ❤️';
+        return true;
+      }
+    } catch(e) {}
+    return false;
+  }
+
+  function verificarEstadoLicencia() {
+    if (!aplicarLicencia()) { document.getElementById('app').classList.add('demo-mode'); return false; }
+    return true;
+  }
+
+  // ========== ADMIN ==========
+  let clickCount = 0, clickTimer = null;
+  document.getElementById('main-title').addEventListener('click', function() {
+    clickCount++;
+    if (clickCount === 1) clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
+    if (clickCount >= 5) {
+      clickCount = 0; clearTimeout(clickTimer);
+      const pass = prompt('🔐 Ingresa la contraseña de administrador:');
+      if (pass === ADMIN_PASSWORD) {
+        document.getElementById('modal-admin').classList.add('active');
+        document.getElementById('resultado-licencia').style.display = 'none';
+        document.getElementById('inp-cliente').value = '';
+        document.getElementById('chk-proteccion').checked = proteccionActiva;
+      } else if (pass !== null) alert('❌ Contraseña incorrecta.');
+    }
+  });
+
+  function generarLicenciaAdmin() {
+    const nombre = document.getElementById('inp-cliente').value.trim();
+    if (!nombre) { alert('Ingresa el nombre del cliente.'); return; }
+    const codigo = generarLicencia(nombre);
+    document.getElementById('codigo-generado').textContent = codigo;
+    document.getElementById('resultado-licencia').style.display = 'block';
+  }
+
+  function copiarCodigo() {
+    const texto = document.getElementById('codigo-generado').textContent;
+    navigator.clipboard.writeText(texto).then(() => alert('✅ Código copiado')).catch(() => {
+      const range = document.createRange();
+      range.selectNode(document.getElementById('codigo-generado'));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.execCommand('copy');
+      alert('✅ Código copiado');
+    });
+  }
+
+  function cerrarAdmin() { document.getElementById('modal-admin').classList.remove('active'); }
+  document.getElementById('modal-admin').addEventListener('click', function(e) { if (e.target === this) cerrarAdmin(); });
+
+  // ========== CATEGORÍAS ==========
+  const CATS = [
+    { id:'clase', label:'Clase universidad', color:'#74b9ff' },
+    { id:'ensenanza', label:'Enseñanza', color:'#a29bfe' },
+    { id:'estudio', label:'Estudio / Proyectos', color:'#dfe6e9' },
+    { id:'comida', label:'Comida', color:'#ffeaa7' },
+    { id:'desconexion', label:'Desconexión digital', color:'#ff7675' },
+    { id:'flexible', label:'Bloque flexible', color:'#fab1a0' },
+    { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+    { id:'libre', label:'Libre', color:'#f5f6fa' }
+  ];
+
+  let dias = ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'];
+  let filas = [];
+  let modalFila = -1, modalCol = -1;
+  let plannerType = 'semanal';
+  const PLANNER_TYPES = {
+    diario: { label: 'Diario', dias: ['HOY'] },
+    semanal: { label: 'Semanal', dias: ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'] },
+    mensual: { label: 'Mensual', dias: Array.from({length:31},(_,i)=>`${i+1}`) },
+    anual: { label: 'Anual', dias: ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SETIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'] },
+    personalizado: { label: 'Personalizado', dias: [] }
+  };
+
+  function generarBloquesDefault() {
+    const interval = parseInt(localStorage.getItem('horario_intervalo') || '60');
+    const inicio = localStorage.getItem('horario_inicio') || '07:00';
+    const fin = localStorage.getItem('horario_fin') || '23:00';
+    return generarBloques(interval, inicio, fin);
+  }
+
+  const DEFAULT = generarBloquesDefault();
+
+  function getDefaultDiario() {
+    const hues = ['🌅 6:00 – 7:00','🌅 7:00 – 8:00','📚 8:00 – 10:00','📚 10:00 – 12:00','🍽️ 12:00 – 13:00','🚶 13:00 – 14:00','💪 14:00 – 15:00','💻 15:00 – 17:00','📞 17:00 – 18:00','🌆 18:00 – 19:00','🎯 19:00 – 21:00','🌙 21:00 – 22:00','💤 22:00'];
+    const acts = [
+      {t:'🛏️ Despertar, estiramientos, meditación',c:'rutina'},
+      {t:'🚿 Ducha, desayuno saludable, planificar el día',c:'rutina'},
+      {t:'💻 Bloque de trabajo / estudio profundo (Pomodoro)',c:'estudio'},
+      {t:'📚 Continuar trabajo / estudio / proyecto',c:'clase'},
+      {t:'🥗 Almuerzo, descanso, desconectar',c:'comida'},
+      {t:'🚶 Paseo / Siesta / Tiempo libre',c:'flexible'},
+      {t:'🏋️ Ejercicio / deporte / baile',c:'flexible'},
+      {t:'📚 Bloque de trabajo / estudio',c:'estudio'},
+      {t:'📱 Llamadas, pendientes, organización',c:'flexible'},
+      {t:'🍽️ Cena, tiempo en familia',c:'comida'},
+      {t:'📖 Tiempo personal / Curso online / Lectura',c:'desconexion'},
+      {t:'📱 Desconexión digital, prepararse para dormir',c:'rutina'},
+      {t:'😴 DORMIR (7–8h de sueño reparador)',c:'rutina'}
+    ];
+    return { dias: ['HOY'], filas: hues.map((h,i) => ({ hora: h, celdas: [{...acts[i], done: false}] })) };
+  }
+
+  function getDefaultMensual() {
+    const dias = Array.from({length:31}, (_, i) => `${i+1}`);
+    return {
+      dias,
+      filas: [
+        { hora: '💼 Trabajo / Laboral', celdas: dias.map(d => ({t:'',c:'clase',done:false})) },
+        { hora: '📚 Estudio / Formación', celdas: dias.map(d => ({t:'',c:'estudio',done:false})) },
+        { hora: '💪 Salud / Ejercicio', celdas: dias.map(d => ({t:'',c:'rutina',done:false})) },
+        { hora: '💰 Finanzas / Ahorro', celdas: dias.map(d => ({t:'',c:'flexible',done:false})) },
+        { hora: '🎯 Meta del mes', celdas: dias.map(d => ({t:'',c:'ensenanza',done:false})) },
+        { hora: '🌟 Vida social / Familia', celdas: dias.map(d => ({t:'',c:'comida',done:false})) }
+      ]
+    };
+  }
+
+  function getDefaultAnual() {
+    const meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SETIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+    const metas = [
+      {n:'🎓 Formación / Cursos', c:'clase'},
+      {n:'🏆 Salud / Deporte', c:'rutina'},
+      {n:'💰 Ahorro / Inversiones', c:'estudio'},
+      {n:'🌟 Proyecto personal', c:'ensenanza'},
+      {n:'🧘 Bienestar / Viajes', c:'flexible'}
+    ];
+    return {
+      dias: meses,
+      filas: metas.map(m => ({ hora: m.n, celdas: meses.map(() => ({t:'',c:m.c,done:false})) }))
+    };
+  }
+
+  function cambioSelect(sel, inpId) {
+    const inp = document.getElementById(inpId);
+    if (sel.value === 'otros') { inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = ''; inp.focus(); }
+    else { inp.classList.remove('visible'); inp.classList.add('oculto'); inp.value = sel.value; }
+  }
+
+  function valInfo(idSel, idInp) {
+    const sel = document.getElementById(idSel);
+    const inp = document.getElementById(idInp);
+    return inp.value || sel.options[sel.selectedIndex]?.value || '';
+  }
+
+  function estaVacio() {
+    return filas.every(f => f.celdas.every(c => !c.t || c.t === '' || c.t === '—'));
+  }
+
+  function cerrarEmptyState() {
+    document.getElementById('empty-state').classList.remove('show');
+    localStorage.setItem('horario_empty_cerrado', '1');
+  }
+
+  function renderizar() {
+    const tb = document.getElementById('tbody');
+    const hr = document.getElementById('header-row');
+    let hHtml = '<th style="width:55px;position:relative;">HORA<div class="resizer" data-col="-1"></div></th>';
+    dias.forEach((d,i) => {
+      hHtml += `<th style="position:relative;">${d.substring(0,3)}<div class="resizer" data-col="${i}"></div> <span style="cursor:pointer;color:#ff7675;font-size:0.8em;opacity:0.6" onclick="eliminarDia(${i})">✕</span></th>`;
+    });
+    hr.innerHTML = hHtml;
+    let html = '';
+    const mergeMode = document.getElementById('btn-merge-mode')?.classList.contains('active');
+    filas.forEach((fila, fi) => {
+      html += '<tr>';
+      html += `<td class="hora-cell"><span class="del-fila" onclick="eliminarFila(${fi})">✕</span><input type="text" value="${fila.hora}" onchange="cambiarHora(${fi},this.value)"></td>`;
+      for (let ci = 0; ci < dias.length; ci++) {
+        const cel = fila.celdas[ci] || {t:'',c:'libre',done:false,rowspan:1};
+        if (cel.rowspan === undefined) cel.rowspan = 1;
+        if (cel.rowspan === 0) continue;
+        if (cel.done === undefined) cel.done = false;
+        if (cel.reminder === undefined) cel.reminder = false;
+        const dc = cel.done ? ' done' : '';
+        const dk = cel.done ? ' checked' : '';
+        const bell = cel.reminder ? '<span class="reminder-bell">🔔</span>' : '';
+        const rs = cel.rowspan > 1 ? ` rowspan="${cel.rowspan}"` : '';
+        const mergeCls = cel.rowspan > 1 ? ' merged-cell' : '';
+        const mergeInd = cel.rowspan > 1 ? '<span class="merge-indicator">🔗</span>' : '';
+        const extraCls = mergeMode ? (cel.rowspan > 1 ? '' : '') : '';
+        const onClickMerge = mergeMode ? `onclick="toggleSeleccionMerge(${fi},${ci})"` : `onclick="abrirModal(${fi},${ci})"`;
+        html += `<td class="celda c-${cel.c}${dc}${mergeCls}${extraCls}"${rs} ${onClickMerge}><span class="done-check${dk}" onclick="event.stopPropagation();toggleDone(${fi},${ci})">${cel.done?'✓':''}</span>${mergeInd}${bell}${cel.t || '—'}</td>`;
+      }
+      html += '</tr>';
+    });
+    tb.innerHTML = html;
+    const emptyEl = document.getElementById('empty-state');
+    if (emptyEl && !localStorage.getItem('horario_empty_cerrado') && estaVacio()) {
+      emptyEl.classList.add('show');
+    } else if (emptyEl) {
+      emptyEl.classList.remove('show');
+    }
+    configurarResizers();
+    let leyHtml = '';
+    CATS.forEach(c => { leyHtml += `<span><span class="dot" style="background:${c.color}"></span> ${c.label}</span>`; });
+    document.getElementById('leyenda').innerHTML = leyHtml;
+    actualizarInfoMerge();
+    actualizarMergeBadge();
+  }
+
+  function actualizarMergeBadge() {
+    const badge = document.getElementById('merge-badge');
+    if (!badge) return;
+    const mergedCount = filas.reduce((sum, f) => sum + f.celdas.filter(c => c && c.rowspan > 1).length, 0);
+    badge.classList.toggle('show', mergedCount > 0);
+    badge.textContent = '🔗 ' + mergedCount;
+  }
+
+  function configurarResizers() {
+    document.querySelectorAll('.resizer').forEach(r => {
+      r.onmousedown = function(e) {
+        e.preventDefault();
+        const th = this.parentElement;
+        const startX = e.clientX;
+        const startW = th.offsetWidth;
+        function onMove(e2) {
+          const w = Math.max(30, startW + (e2.clientX - startX));
+          th.style.width = w + 'px';
+          const col = parseInt(th.dataset.col);
+          if (col >= 0) {
+            document.querySelectorAll(`#tabla td:nth-child(${col+2})`).forEach(td => td.style.width = w + 'px');
+            document.querySelectorAll(`#tabla th:nth-child(${col+2})`).forEach(th2 => th2.style.width = w + 'px');
+          }
+        }
+        function onUp() { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      };
+    });
+  }
+
+  function abrirModal(fi, ci) {
+    modalFila = fi; modalCol = ci;
+    const cel = filas[fi].celdas[ci] || {t:'',c:'libre'};
+    document.getElementById('modal-titulo').textContent = `Editando: ${dias[ci]} — ${filas[fi].hora}`;
+    document.getElementById('modal-texto').value = cel.t || '';
+    document.getElementById('modal-categoria').value = cel.c || 'libre';
+    document.getElementById('modal-reminder').checked = cel.reminder ? true : false;
+    document.getElementById('modal').classList.add('active');
+    document.getElementById('modal-texto').focus();
+  }
+
+  function okModal() {
+    const t = document.getElementById('modal-texto').value;
+    const c = document.getElementById('modal-categoria').value;
+    const r = document.getElementById('modal-reminder').checked;
+    if (modalFila >= 0 && modalCol >= 0) {
+      if (!filas[modalFila].celdas[modalCol]) filas[modalFila].celdas[modalCol] = {t:'',c:'libre',done:false};
+      filas[modalFila].celdas[modalCol].t = t;
+      filas[modalFila].celdas[modalCol].c = c;
+      filas[modalFila].celdas[modalCol].reminder = r;
+    }
+    localStorage.removeItem('horario_empty_cerrado');
+    cerrarModal(); renderizar(); autoGuardar();
+  }
+
+  function cerrarModal() { document.getElementById('modal').classList.remove('active'); modalFila = -1; modalCol = -1; }
+  document.getElementById('modal-texto').addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); okModal(); } });
+  document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
+
+  function cambiarHora(fi, val) { filas[fi].hora = val; autoGuardar(); }
+  function agregarFila() {
+    filas.push({ hora: `Nuevo #${filas.length+1}`, celdas: dias.map(() => ({t:'',c:'libre',done:false,reminder:false})) });
+    renderizar(); autoGuardar();
+  }
+  function eliminarFila(fi) {
+    if (filas.length <= 1) { alert('Debe haber al menos 1 fila.'); return; }
+    if (confirm(`¿Eliminar?`)) { filas.splice(fi, 1); renderizar(); autoGuardar(); }
+  }
+  function agregarDia() {
+    const nom = prompt('Nuevo día:', 'DÍA');
+    if (!nom || nom.trim() === '') return;
+    dias.push(nom.toUpperCase().trim());
+    filas.forEach(f => { f.celdas.push({t:'',c:'libre',done:false,reminder:false}); });
+    renderizar(); autoGuardar();
+  }
+  function eliminarDia(idx) {
+    if (dias.length <= 2) { alert('Mínimo 2 días.'); return; }
+    if (confirm(`¿Eliminar ${dias[idx]}?`)) { dias.splice(idx, 1); filas.forEach(f => f.celdas.splice(idx, 1)); renderizar(); autoGuardar(); }
+  }
+  function eliminarUltimoDia() { eliminarDia(dias.length - 1); }
+  function autoGuardar() { try { localStorage.setItem('horario_data_' + plannerType, JSON.stringify({dias,filas})); } catch(e) {} }
+
+  function getDatosCompletos() {
+    const header = document.getElementById('inp-titulo-header')?.value?.trim() || '';
+    const tipoLabel = PLANNER_TYPES[plannerType]?.label || plannerType;
+    return { nombre: valInfo('sel-nombre','inp-nombre'), carrera: valInfo('sel-carrera','inp-carrera'), ciclo: valInfo('sel-ciclo','inp-ciclo'), objetivo: valInfo('sel-objetivo','inp-objetivo'), header, tipo: tipoLabel, dias, filas };
+  }
+
+  function guardar() { try { localStorage.setItem('horario_completo', JSON.stringify(getDatosCompletos())); autoGuardar(); alert('✅ Guardado.'); } catch(e) { alert('Error: ' + e); } }
+  function cargar() { try { const r = localStorage.getItem('horario_completo'); if (!r) { alert('Sin datos.'); return; } aplicarDatos(JSON.parse(r)); alert('✅ Cargado.'); } catch(e) { alert('Error: ' + e); } }
+
+  function aplicarDatos(d) {
+    const ms = (selId, inpId, val) => {
+      const sel = document.getElementById(selId), inp = document.getElementById(inpId);
+      const opt = Array.from(sel.options).find(o => o.value === val);
+      if (opt) { sel.value = val; inp.classList.remove('visible'); inp.classList.add('oculto'); inp.value = ''; }
+      else { sel.value = 'otros'; inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = val||''; }
+    };
+    if (d.nombre) ms('sel-nombre','inp-nombre',d.nombre);
+    if (d.carrera) ms('sel-carrera','inp-carrera',d.carrera);
+    if (d.ciclo) ms('sel-ciclo','inp-ciclo',d.ciclo);
+    if (d.objetivo) ms('sel-objetivo','inp-objetivo',d.objetivo);
+    if (d.header !== undefined) {
+      document.getElementById('inp-titulo-header').value = d.header;
+      actualizarHeaderPreview();
+    }
+    if (d.dias) dias = d.dias; if (d.filas) filas = d.filas;
+    renderizar();
+  }
+
+  function resetear() {
+    if (!confirm('¿Restaurar ejemplo?')) return;
+    if (plannerType !== 'semanal') cambiarTipoPlanificador('semanal');
+    dias = ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'];
+    filas = JSON.parse(JSON.stringify(DEFAULT));
+    ['sel-nombre','sel-carrera','sel-ciclo','sel-objetivo'].forEach(id => document.getElementById(id).selectedIndex = 0);
+    ['inp-nombre','inp-carrera','inp-ciclo','inp-objetivo'].forEach(id => { document.getElementById(id).value = ''; document.getElementById(id).className = 'oculto'; });
+    document.getElementById('inp-titulo-header').value = '';
+    actualizarHeaderPreview();
+    renderizar(); autoGuardar(); alert('✅ Restablecido.');
+  }
+
+  // ========== EXPORTAR ==========
+  function getColorMap() { return { clase:'#74b9ff', ensenanza:'#a29bfe', estudio:'#dfe6e9', comida:'#ffeaa7', desconexion:'#ff7675', flexible:'#fab1a0', rutina:'#55efc4', libre:'#f5f6fa' }; }
+
+  function getMarcaAgua() {
+    try { if (JSON.parse(localStorage.getItem('horario_licencia')).comprador) return ''; } catch(e) {}
+    return '<p style="margin-top:10px;font-size:9px;color:#bbb;text-align:center;">VERSIÓN DEMO · Compra la licencia en [tu web]</p>';
+  }
+
+  function generarTablaExport() { const cm = getColorMap(); let rows = ''; filas.forEach(f => { rows+='<tr>'; rows+=`<td style="font-weight:bold;background:#f8f9fa;padding:5px 8px;border:1px solid #999;">${f.hora}</td>`; for(let ci=0;ci<dias.length;ci++){const c=f.celdas[ci]||{t:'',c:'libre'};rows+=`<td style="background:${cm[c.c]||'#fff'};padding:5px 8px;border:1px solid #999;">${c.t}</td>`} rows+='</tr>' }); return rows; }
+
+  function getHeaderExport(d) {
+    return d.header ? `<h2 style="text-align:center;color:#667eea;">${d.header}</h2>` : '';
+  }
+
+  function exportarPDF() {
+    const d = getDatosCompletos(); const rows = generarTablaExport();
+    const dt = dias.map(d=>`<th style="background:#2c3e50;color:#fff;padding:6px;border:1px solid #999;font-size:11px;">${d}</th>`).join('');
+    const h = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Planificador ${d.tipo}</title><style>body{font-family:Arial;padding:20px;}table{width:100%;border-collapse:collapse;font-size:12px;}</style></head><body>${getHeaderExport(d)}<h2>📅 Planificador ${d.tipo} — ${d.nombre}</h2><p style="font-size:11px;color:#555;">${d.carrera} · ${d.ciclo} · ${d.objetivo}</p><table><tr><th style="background:#2c3e50;color:#fff;padding:6px;border:1px solid #999;">HORA</th>${dt}</tr>${rows}</table>${getMarcaAgua()}</body></html>`;
+    const w = window.open('','_blank'); if(w){w.document.write(h);w.document.close();setTimeout(()=>w.print(),500);} else alert('Permite ventanas emergentes.');
+  }
+
+  function exportarExcel() {
+    const d = getDatosCompletos(); const rows = generarTablaExport();
+    const dt = dias.map(d=>`<th style="background:#2c3e50;color:#fff;padding:6px;border:1px solid #999;">${d}</th>`).join('');
+    const h = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Planificador ${d.tipo}</title><style>table{width:100%;border-collapse:collapse;font-size:11px;}th,td{border:1px solid #999;padding:4px;}</style></head><body>${getHeaderExport(d)}<h3>📅 Planificador ${d.tipo} — ${d.nombre}</h3><p>${d.carrera} · ${d.ciclo} · ${d.objetivo}</p><table><tr><th style="background:#2c3e50;color:#fff;">HORA</th>${dt}</tr>${rows}</table>${getMarcaAgua()}</body></html>`;
+    descargarComo(h,`Planificador_${d.tipo}_${d.nombre.replace(/ /g,'_')}.xls`,'application/vnd.ms-excel');
+  }
+
+  function exportarWord() {
+    const d = getDatosCompletos(); const rows = generarTablaExport();
+    const dt = dias.map(d=>`<th style="background:#2c3e50;color:#fff;padding:6px;border:1px solid #999;">${d}</th>`).join('');
+    const h = `<!DOCTYPE html><html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="UTF-8"><title>Planificador ${d.tipo}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]--><style>table{width:100%;border-collapse:collapse;font-size:11px;}th,td{border:1px solid #999;padding:4px;}body{font-family:Calibri;padding:20px;}</style></head><body>${getHeaderExport(d)}<h3>📅 Planificador ${d.tipo} — ${d.nombre}</h3><p>${d.carrera} · ${d.ciclo} · ${d.objetivo}</p><table><tr><th style="background:#2c3e50;color:#fff;">HORA</th>${dt}</tr>${rows}</table>${getMarcaAgua()}</body></html>`;
+    descargarComo(h,`Planificador_${d.tipo}_${d.nombre.replace(/ /g,'_')}.doc`,'application/msword');
+  }
+
+  function imprimir() { exportarPDF(); }
+  function descargarComo(h,n,m) { const b=new Blob([h],{type:m+';charset=utf-8'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(u),1000); }
+
+  // ========== COMPRA ==========
+  function mostrarCompra() { document.getElementById('modal-compra').classList.add('active'); }
+  function cerrarModalCompra() { document.getElementById('modal-compra').classList.remove('active'); }
+  document.getElementById('modal-compra').addEventListener('click', function(e) { if (e.target === this) cerrarModalCompra(); });
+  function mostrarActivar() { cerrarModalCompra(); setTimeout(()=>{document.getElementById('inp-codigo').value='';document.getElementById('msg-activar').textContent='';document.getElementById('modal-activar').classList.add('active');},300); }
+  function cerrarActivar() { document.getElementById('modal-activar').classList.remove('active'); }
+  document.getElementById('modal-activar').addEventListener('click', function(e) { if (e.target === this) cerrarActivar(); });
+  function abrirWhatsApp() { window.open(`https://wa.me/51936718790?text=${encodeURIComponent('🔥 ¡YA DECIDÍ! Quiero mi LICENCIA COMPLETA del Planificador de Horarios.\n\n✅ Sin marca de agua\n✅ Exportaciones sin restricciones\n✅ Soporte incluido\n\n💵 Son S/15 — ¿Cómo coordino el pago por Yape?')}`,'_blank'); }
+
+  // ========== INICIO ==========
+  function iniciar() {
+    verificarEstadoLicencia();
+    initScreenshotProtection();
+    initDarkMode();
+    const savedType = localStorage.getItem('horario_planner_type') || 'semanal';
+    plannerType = savedType;
+    document.querySelectorAll('.planner-type-selector button').forEach(b => {
+      b.classList.toggle('active', b.dataset.type === savedType);
+    });
+    try {
+      const hdr = localStorage.getItem('horario_custom_header');
+      if (hdr) { document.getElementById('inp-titulo-header').value = hdr; actualizarHeaderPreview(); }
+    } catch(e) {}
+    const savedInterval = localStorage.getItem('horario_intervalo');
+    if (savedInterval) {
+      document.getElementById('sel-intervalo').value = savedInterval;
+    }
+    const savedInicio = localStorage.getItem('horario_inicio');
+    if (savedInicio) {
+      document.getElementById('inp-hora-inicio').value = savedInicio;
+    }
+    const savedFin = localStorage.getItem('horario_fin');
+    if (savedFin) {
+      document.getElementById('inp-hora-fin').value = savedFin;
+    }
+    const saved = localStorage.getItem('horario_data_' + savedType);
+    if (saved) {
+      try {
+        const d = JSON.parse(saved);
+        dias = d.dias; filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
+        renderizar(); return;
+      } catch(e) {}
+    }
+    try { const r = localStorage.getItem('horario_completo'); if(r){const d=JSON.parse(r);aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem('horario_datos'); if(r){const d=JSON.parse(r);if(d.dias)dias=d.dias;if(d.filas)filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    if (!savedInterval) {
+      localStorage.setItem('horario_intervalo', '60');
+      localStorage.setItem('horario_inicio', '07:00');
+      localStorage.setItem('horario_fin', '23:00');
+    }
+    filas = JSON.parse(JSON.stringify(generarBloquesDefault())); renderizar();
+  }
+  iniciar();
+
+  // Mostrar tutorial en primera visita
+  if (!localStorage.getItem('horario_tutorial_visto')) {
+    setTimeout(mostrarTutorial, 800);
+  }
+
+  // ======================================================================
+  // 🆕 NUEVAS FUNCIONALIDADES
+  // ======================================================================
+
+  // ========== PLANNER TYPES ==========
+  // (PLANNER_TYPES y plannerType declarados arriba)
+
+  function cambiarTipoPlanificador(tipo) {
+    if (tipo === plannerType) return;
+    guardarDatosTipo(plannerType);
+    plannerType = tipo;
+    localStorage.setItem('horario_planner_type', tipo);
+    document.querySelectorAll('.planner-type-selector button').forEach(b => {
+      b.classList.toggle('active', b.dataset.type === tipo);
+    });
+    const saved = localStorage.getItem('horario_data_' + tipo);
+    if (saved) {
+      try {
+        const d = JSON.parse(saved);
+        dias = d.dias;
+        filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
+        renderizar(); autoGuardar(); return;
+      } catch(e) {}
+    }
+    if (tipo === 'personalizado') {
+      const cols = prompt('Nombres de columnas separados por coma:', 'COLUMNA 1, COLUMNA 2, COLUMNA 3');
+      if (!cols) { cambiarTipoPlanificador('semanal'); return; }
+      dias = cols.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+      if (dias.length === 0) { cambiarTipoPlanificador('semanal'); return; }
+      const horasBase = ['7:00','8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
+      filas = horasBase.map(h => ({ hora: h, celdas: dias.map(() => ({t:'',c:'libre',done:false,reminder:false,rowspan:1})) }));
+    } else {
+      dias = [...PLANNER_TYPES[tipo].dias];
+      const templateMap = { diario: getDefaultDiario, semanal: null, mensual: getDefaultMensual, anual: getDefaultAnual };
+      const tplFn = templateMap[tipo];
+      if (tplFn) {
+        const tpl = tplFn();
+        filas = tpl.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
+      } else {
+        const horasBase = ['7:00','8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
+        filas = horasBase.map(h => ({ hora: h, celdas: dias.map(() => ({t:'',c:'libre',done:false,reminder:false,rowspan:1})) }));
+      }
+    }
+    renderizar(); autoGuardar();
+  }
+
+  function guardarDatosTipo(tipo) {
+    localStorage.setItem('horario_data_' + tipo, JSON.stringify({ dias, filas }));
+  }
+
+  // ========== CUSTOM HEADER ==========
+  function actualizarHeaderPreview() {
+    const inp = document.getElementById('inp-titulo-header');
+    const preview = document.getElementById('header-preview');
+    const val = inp.value.trim();
+    if (val) {
+      preview.textContent = val;
+      preview.classList.add('show');
+      inp.classList.add('filled');
+    } else {
+      preview.classList.remove('show');
+      inp.classList.remove('filled');
+    }
+    localStorage.setItem('horario_custom_header', val);
+  }
+
+  // ========== SIDE PANEL TOGGLE ==========
+  function togglePanel() {
+    const panel = document.getElementById('side-panel');
+    const overlay = document.getElementById('side-overlay');
+    const btn = document.getElementById('cloud-btn');
+    const isOpen = panel.classList.toggle('open');
+    overlay.classList.toggle('open', isOpen);
+    btn.classList.toggle('open', isOpen);
+  }
+
+  // ========== VIEW TOGGLE ==========
+  function cambiarVista(vista) {
+    document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+    const el = document.getElementById('view-' + vista);
+    if (el) el.classList.add('active');
+    document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('btn-view-' + vista);
+    if (btn) btn.classList.add('active');
+    if (vista === 'dashboard') renderDashboard();
+    // Close panel on mobile after switching view
+    if (window.innerWidth <= 600) togglePanel();
+  }
+
+  // ========== COMPLIANCE TRACKING ==========
+  function toggleDone(fi, ci) {
+    const cel = filas[fi]?.celdas?.[ci];
+    if (!cel) return;
+    cel.done = !cel.done;
+    renderizar();
+    autoGuardar();
+  }
+
+  // ========== DASHBOARD ==========
+  const DEFAULT_REWARDS = [
+    { id: 'r1', name: '🍦 Helado o postre', type: 'reward', threshold: 80, active: true },
+    { id: 'r2', name: '🎬 Ver una película', type: 'reward', threshold: 90, active: true },
+    { id: 'r3', name: '💰 S/10 al cochinito', type: 'penalty', threshold: 40, active: true },
+    { id: 'r4', name: '🚫 Sin redes sociales 1 día', type: 'penalty', threshold: 30, active: true }
+  ];
+
+  function getRewards() {
+    try { return JSON.parse(localStorage.getItem('horario_rewards')) || DEFAULT_REWARDS; } catch(e) { return DEFAULT_REWARDS; }
+  }
+
+  function saveRewards(rewards) {
+    localStorage.setItem('horario_rewards', JSON.stringify(rewards));
+  }
+
+  // ========== SVG PIE CHART ==========
+  function generarPieSvg(pct, streak) {
+    const size = 130, cx = 65, cy = 65, r = 54;
+    const completed = Math.min(pct, 100);
+    const angle = (completed / 100) * 360;
+    const rad = (angle - 90) * Math.PI / 180;
+    const x2 = cx + r * Math.cos(rad);
+    const y2 = cy + r * Math.sin(rad);
+    const largeArc = angle > 180 ? 1 : 0;
+    const pathDone = completed > 0
+      ? `<path d="M${cx},${cy} L${cx},${cy-r} A${r},${r} 0 ${largeArc},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" fill="#55efc4" stroke="#3dae8a" stroke-width="0.5"/>`
+      : '';
+    const pathRemain = completed < 100
+      ? `<path d="M${cx},${cy} L${x2.toFixed(1)},${y2.toFixed(1)} A${r},${r} 0 ${100-completed>50?1:0},1 ${cx},${cy-r} Z" fill="#2a2d45" stroke="#3a3d55" stroke-width="0.5"/>`
+      : '';
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="flex-shrink:0;border-radius:50%;box-shadow:0 4px 16px rgba(0,0,0,0.12);">
+      ${pathDone}${pathRemain}
+      <circle cx="${cx}" cy="${cy}" r="36" fill="rgba(255,255,255,0.92)" stroke="#e0e0e0" stroke-width="0.5"/>
+      <text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle" font-size="22" font-weight="800" fill="#2c3e50">${completed}%</text>
+      <text x="${cx}" y="${cy+16}" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#999">${streak>0?'🔥'+streak:''}</text>
+    </svg>`;
+  }
+
+  function renderDashboard() {
+    const container = document.getElementById('view-dashboard');
+    if (!container) return;
+    const totalCells = filas.reduce((sum, f) => sum + f.celdas.length, 0);
+    const doneCells = filas.reduce((sum, f) => sum + f.celdas.filter(c => c.done).length, 0);
+    const totalPct = totalCells > 0 ? Math.round(doneCells / totalCells * 100) : 0;
+    const dayStats = dias.map((d, ci) => {
+      let done = 0, total = 0;
+      filas.forEach(f => { if (f.celdas[ci]) { total++; if (f.celdas[ci].done) done++; } });
+      return { name: d, pct: total > 0 ? Math.round(done/total*100) : 0, done, total };
+    });
+    const todayIdx = new Date().getDay();
+    const todayName = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'][todayIdx];
+    const todayStats = dayStats.find(d => d.name.startsWith(todayName.substring(0,3)) || d.name === todayName) || { pct: 0, done: 0, total: 0 };
+    let streak = 0;
+    for (let i = dayStats.length - 1; i >= 0; i--) {
+      if (dayStats[i].pct >= 50) streak++;
+      else break;
+    }
+    const rewards = getRewards();
+    const weeklyPct = dayStats.length > 0 ? Math.round(dayStats.reduce((s,d)=>s+d.pct,0)/dayStats.length) : 0;
+    const customHeader = document.getElementById('inp-titulo-header')?.value?.trim() || '';
+    const recs = generarRecomendaciones(totalPct, weeklyPct, streak, dayStats, todayStats, todayName);
+
+    // SVG Pie chart
+    const pieSvg = generarPieSvg(totalPct, streak);
+    // Day bars data sorted
+    const sortedDays = [...dayStats].sort((a,b) => b.pct - a.pct);
+
+    // Interpretation texts for charts
+    const pieInterpText = totalPct >= 80
+      ? `¡Excelente! Completaste <strong>${doneCells} de ${totalCells}</strong> actividades (${totalPct}%). Tu disciplina es admirable.`
+      : totalPct >= 60
+      ? `Buen avance: <strong>${doneCells} de ${totalCells}</strong> completadas (${totalPct}%). Identifica qué días bajas el ritmo y ajusta.`
+      : totalPct >= 40
+      ? `Vas en proceso: <strong>${doneCells} de ${totalCells}</strong> (${totalPct}%). Enfócate en completar las actividades más importantes cada día.`
+      : `Empieza poco a poco: solo <strong>${doneCells} de ${totalCells}</strong> (${totalPct}%). Programa 2–3 actividades clave al día y cúmplelas.`;
+
+    const bestDay = sortedDays.length > 0 ? sortedDays[sortedDays.length-1] : null;
+    const worstDay = sortedDays.length > 0 ? sortedDays[0] : null;
+    const barInterpText = (bestDay && worstDay && bestDay.name !== worstDay.name)
+      ? `Tu mejor período fue <strong>${bestDay.name}</strong> (${bestDay.pct}%) y el más bajo <strong>${worstDay.name}</strong> (${worstDay.pct}%). Analiza qué hizo diferente al mejor día y replícalo.`
+      : `Todos los períodos tienen cumplimiento similar. Para mejorar, prueba con horarios más específicos o reduce actividades.`;
+
+    let html = `<div class="dashboard"><h2>📊 Dashboard de Cumplimiento</h2>`;
+    if (customHeader) html += `<p style="text-align:center;font-size:0.85em;color:#667eea;font-weight:bold;margin-bottom:8px;">${customHeader}</p>`;
+
+    // === MAIN CHARTS ROW ===
+    html += `<div class="dash-row">
+      <div class="dash-chart-card">
+        <div class="chart-header"><span class="chart-icon">📊</span> Cumplimiento Total</div>
+        <div class="chart-body">
+          ${pieSvg}
+          <div class="chart-side">
+            <div class="chart-stat"><span class="stat-label">Completado</span><span class="stat-val" style="color:#00b894;">${totalPct}%</span></div>
+            <div class="chart-stat"><span class="stat-label">Pendiente</span><span class="stat-val" style="color:#aaa;">${100-totalPct}%</span></div>
+            <div class="chart-stat"><span class="stat-label">Actividades</span><span class="stat-val">${doneCells} / ${totalCells}</span></div>
+            <div class="chart-stat"><span class="stat-label">Racha</span><span class="stat-val">${streak > 0 ? '🔥'.repeat(Math.min(streak,3)) : '💤'} ${streak}</span></div>
+          </div>
+        </div>
+        <div class="chart-interp">📌 ${pieInterpText}</div>
+      </div>
+      <div class="dash-chart-card">
+        <div class="chart-header"><span class="chart-icon">📈</span> Rendimiento por Período</div>
+        <div class="chart-body chart-body-bar">
+          <div class="bar-chart-list">`;
+
+    sortedDays.forEach(d => {
+      const barColor = d.pct >= 70 ? '#55efc4' : d.pct >= 40 ? '#fdcb6e' : '#ff7675';
+      html += `<div class="bar-chart-row"><span class="bar-label">${d.name.substring(0,5)}</span><div class="bar-track"><div class="bar-fill" style="width:${d.pct}%;background:${barColor};"></div></div><span class="bar-pct">${d.pct}%</span></div>`;
+    });
+
+    const avgLabel = plannerType==='diario'?'Hoy':plannerType==='mensual'?'Mensual':'Semanal';
+    html += `</div></div>
+        <div class="chart-interp">📌 ${barInterpText}</div>
+        <div class="chart-footer">⬆ Promedio ${avgLabel}: <strong>${weeklyPct}%</strong> · Mejor: <strong>${bestDay?bestDay.name+' ('+bestDay.pct+'%)':'-'}</strong> · Peor: <strong>${worstDay?worstDay.name+' ('+worstDay.pct+'%)':'-'}</strong></div>
+      </div>
+    </div>`;
+
+    // === STREAK & QUICK STATS ===
+    html += `<div class="dash-row dash-row-mini">
+      <div class="dash-mini-card" style="border-left-color:#55efc4;"><span class="mini-icon">🔥</span><div><div class="mini-label">Racha</div><div class="mini-val">${streak} períodos</div></div></div>
+      <div class="dash-mini-card" style="border-left-color:#74b9ff;"><span class="mini-icon">📊</span><div><div class="mini-label">Completado</div><div class="mini-val">${totalPct}%</div></div></div>
+      <div class="dash-mini-card" style="border-left-color:#fdcb6e;"><span class="mini-icon">📈</span><div><div class="mini-label">Promedio</div><div class="mini-val">${weeklyPct}%</div></div></div>
+      <div class="dash-mini-card" style="border-left-color:#ff7675;"><span class="mini-icon">🎯</span><div><div class="mini-label">Hoy</div><div class="mini-val">${todayStats.pct}%</div></div></div>
+    </div>`;
+
+    // === STREAK INTERPRETATION ===
+    html += `<div class="dash-card dashboard-interp" style="margin-bottom:10px;"><h3>🔍 Interpretación y Recomendaciones</h3>`;
+    recs.forEach(r => {
+      html += `<div class="interp-card ${r.type}"><span class="interp-icon">${r.icon}</span><span class="rec-title">${r.title}</span><br><span>${r.text}</span></div>`;
+    });
+    html += `</div>`;
+
+    // === PER-DAY BREAKDOWN ===
+    html += `<div class="dash-card" style="margin-bottom:10px;"><h3>📋 Desglose por período</h3><div style="margin-top:6px;">`;
+    dayStats.forEach(d => {
+      const color = d.pct >= 70 ? '#55efc4' : d.pct >= 40 ? '#fdcb6e' : '#ff7675';
+      html += `<div class="dash-day-row"><span class="day-label">${d.name.substring(0,4)}</span><div class="day-bar"><div class="fill" style="width:${d.pct}%;background:${color};"></div></div><span class="day-pct">${d.pct}%</span></div>`;
+    });
+    html += `</div></div>`;
+
+    // === REWARDS ===
+    html += `<div class="dash-card" style="margin-bottom:10px;"><h3>🏆 Recompensas y Castigos</h3>`;
+    rewards.forEach(r => {
+      const earned = r.type === 'reward' ? weeklyPct >= r.threshold : weeklyPct <= r.threshold;
+      if (r.type === 'reward') {
+        html += `<div class="reward-item ${earned?'earned':''}"><span class="icon">${earned?'✅':'⏳'}</span><span><strong>${r.threshold}%</strong> → ${r.name} ${earned?'🎉 ¡Lo lograste!':'Aún no...'}</span></div>`;
+      } else {
+        html += `<div class="penalty-item ${earned?'triggered':''}"><span class="icon">${earned?'⚠️':'✅'}</span><span><strong>${r.threshold}%</strong> → ${r.name} ${earned?'😬 Se aplicó':'¡Bien, lo evitaste!'}</span></div>`;
+      }
+    });
+    html += `<div class="reward-config"><h4>⚙️ Configurar</h4>`;
+    rewards.forEach((r, i) => {
+      html += `<div class="reward-config-row">
+        <input class="rc-name" value="${r.name.replace(/"/g,'&quot;')}" placeholder="Nombre" onchange="editarReward(${i},'name',this.value)">
+        <select class="rc-type" onchange="editarReward(${i},'type',this.value)"><option value="reward" ${r.type==='reward'?'selected':''}>🎁 Recompensa</option><option value="penalty" ${r.type==='penalty'?'selected':''}>⚠️ Castigo</option></select>
+        <input class="rc-pct" type="number" value="${r.threshold}" min="0" max="100" onchange="editarReward(${i},'threshold',parseInt(this.value))">
+        <span style="font-size:0.8em;color:#888;">%</span>
+        <input type="checkbox" ${r.active?'checked':''} onchange="editarReward(${i},'active',this.checked)" style="width:auto;">
+        <span class="rc-del" onclick="eliminarReward(${i})">✕</span></div>`;
+    });
+    html += `<button class="add-reward-btn" onclick="agregarReward()">+ Agregar</button></div></div>`;
+    html += `<div style="text-align:center;margin-top:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="marcarTodo(true);renderDashboard();" style="padding:6px 16px;border:none;border-radius:6px;background:linear-gradient(135deg,#55efc4,#00b894);color:#fff;cursor:pointer;font-size:0.72em;">✅ Marcar todo listo</button>
+      <button onclick="resetearCumplimiento()" style="padding:6px 16px;border:1px solid #e74c3c;border-radius:6px;background:#fff;color:#e74c3c;cursor:pointer;font-size:0.72em;">🔄 Reiniciar cumplimiento</button>
+    </div>`;
+    html += `</div>`;
+    container.innerHTML = html;
+  }
+
+  function generarRecomendaciones(totalPct, weeklyPct, streak, dayStats, todayStats, todayName) {
+    const recs = [];
+    const nivel = totalPct >= 80 ? 'alto' : totalPct >= 60 ? 'bueno' : totalPct >= 40 ? 'medio' : 'bajo';
+    const tipoLabel = PLANNER_TYPES[plannerType]?.label || 'período';
+
+    // Interpretación principal
+    if (nivel === 'alto') {
+      recs.push({ type:'success', icon:'🌟', title:'¡Excelente rendimiento!', text:'Estás cumpliendo consistentemente tus actividades. Tu disciplina es admirable. Para seguir creciendo, considera aumentar gradualmente el nivel de exigencia o agregar nuevos retos profesionales y personales.' });
+    } else if (nivel === 'bueno') {
+      recs.push({ type:'insight', icon:'👍', title:'Buen progreso', text:`Vas por muy buen camino. Identifica qué ${tipoLabel}s tienen menor cumplimiento y analiza si las actividades programadas son realistas o necesitas ajustar tu estrategia.` });
+    } else if (nivel === 'medio') {
+      recs.push({ type:'warning', icon:'💪', title:'Estás en proceso', text:'Tienes margen para mejorar. Intenta reducir la cantidad de actividades diarias y enfócate en las 3–5 más importantes. La calidad del cumplimiento importa más que la cantidad.' });
+    } else {
+      recs.push({ type:'warning', icon:'🎯', title:'Comienza con pasos pequeños', text:'No te desanimes. Empieza por planificar solo 2–3 actividades clave al día y complétalas. Cuando domines eso, ve agregando más. ¡El hábito se construye de a pocos!' });
+    }
+
+    // Racha
+    if (streak >= 5) {
+      recs.push({ type:'success', icon:'🔥', title:`¡${streak} ${tipoLabel}s de racha!`, text:'Estás en una racha impresionante. Mantén el enfoque y premia tu consistencia. Las rachas largas son el mejor indicador de un hábito sólido.' });
+    } else if (streak >= 3) {
+      recs.push({ type:'success', icon:'✅', title:`${streak} ${tipoLabel}s consecutivos`, text:'Estás formando un hábito. Los estudios muestran que 3 semanas de consistencia crean una rutina automática. ¡Sigue así!' });
+    } else if (streak === 0 && totalPct > 0) {
+      recs.push({ type:'idea', icon:'💡', title:'Racha rota', text:`Tu último ${tipoLabel} no alcanzó el 50%. Revisa qué pasó: ¿imprevisto? ¿fatiga? ¿meta muy alta? Ajusta y vuelve a intentarlo.` });
+    }
+
+    // Mejor y peor día
+    if (dayStats.length > 0) {
+      const sorted = [...dayStats].sort((a,b) => b.pct - a.pct);
+      const best = sorted[0];
+      const worst = sorted[sorted.length-1];
+      if (best && best.pct >= 80) {
+        recs.push({ type:'success', icon:'🏆', title:`Mejor ${tipoLabel}: ${best.name}`, text:`${best.pct}% de cumplimiento. ¿Qué hiciste diferente? Identifica ese factor y replícalo en los demás ${tipoLabel}s.` });
+      }
+      if (worst && worst.pct < 50 && worst !== best) {
+        recs.push({ type:'idea', icon:'📅', title:`${tipoLabel} más bajo: ${worst.name}`, text:`Solo ${worst.pct}% — Revisa si programaste demasiadas actividades o si fue un día atípico. Reduce la carga o cambia el enfoque.` });
+      }
+    }
+
+    // Análisis de brecha
+    if (totalPct > 0 && totalPct < 100) {
+      const pendientes = 100 - totalPct;
+      if (pendientes >= 40) {
+        recs.push({ type:'idea', icon:'⏰', title:'Técnica Pomodoro', text:'Prueba trabajar en bloques de 25 min con 5 min de descanso. Te ayuda a mantener el enfoque y completar más actividades sin agotarte.' });
+      }
+      if (pendientes >= 20 && pendientes < 40) {
+        recs.push({ type:'insight', icon:'📋', title:'Regla 3-3-3', text:'Cada día elige 3 actividades principales, 3 tareas secundarias y 3 hábitos. Completa las principales primero y verás cómo sube tu cumplimiento.' });
+      }
+    }
+
+    // Meta de mejora
+    const proximaMeta = totalPct < 100 ? Math.min(totalPct + 15, 100) : 100;
+    if (totalPct < 100) {
+      recs.push({ type:'insight', icon:'🎯', title:`Próxima meta: ${proximaMeta}%`, text:`Tu objetivo para los próximos ${tipoLabel}s es alcanzar ${proximaMeta}% de cumplimiento. Revisa estas recomendaciones y elige una para implementar hoy.` });
+    } else {
+      recs.push({ type:'success', icon:'🏅', title:'¡100% de cumplimiento!', text:'Has completado absolutamente todo. Este es el momento ideal para celebrar y plantearte metas más ambiciosas. ¡Eres un ejemplo de disciplina!' });
+    }
+
+    return recs;
+  }
+
+  function editarReward(idx, field, value) {
+    const rewards = getRewards();
+    rewards[idx][field] = value;
+    saveRewards(rewards);
+  }
+
+  function eliminarReward(idx) {
+    const rewards = getRewards();
+    rewards.splice(idx, 1);
+    saveRewards(rewards);
+    renderDashboard();
+  }
+
+  function agregarReward() {
+    const rewards = getRewards();
+    rewards.push({ id: 'r' + Date.now(), name: 'Nueva meta', type: 'reward', threshold: 80, active: true });
+    saveRewards(rewards);
+    renderDashboard();
+  }
+
+  function marcarTodo(estado) {
+    filas.forEach(f => f.celdas.forEach(c => c.done = estado));
+    autoGuardar();
+    renderizar();
+    renderDashboard();
+  }
+
+  // ========== DARK MODE ==========
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+    const btn = document.getElementById('btn-dark-mode');
+    const isDark = document.body.classList.contains('dark');
+    btn.textContent = isDark ? '☀️ Claro' : '🌙 Oscuro';
+    localStorage.setItem('horario_dark_mode', isDark ? '1' : '');
+    if (document.getElementById('view-dashboard').classList.contains('active') || document.querySelector('#view-dashboard.active')) {
+      renderDashboard();
+    }
+  }
+
+  function initDarkMode() {
+    if (localStorage.getItem('horario_dark_mode') === '1') {
+      document.body.classList.add('dark');
+      const btn = document.getElementById('btn-dark-mode');
+      if (btn) btn.textContent = '☀️ Claro';
+    }
+  }
+
+  // ========== NUEVO PLANIFICADOR VACÍO ==========
+  function nuevoPlanificador() {
+    if (!confirm('¿Crear un planificador vacío? Se perderán los datos actuales.')) return;
+    const interval = parseInt(localStorage.getItem('horario_intervalo') || '60');
+    const inicio = localStorage.getItem('horario_inicio') || '07:00';
+    const fin = localStorage.getItem('horario_fin') || '23:00';
+    plannerType = 'semanal';
+    localStorage.setItem('horario_planner_type', 'semanal');
+    document.querySelectorAll('.planner-type-selector button').forEach(b => {
+      b.classList.toggle('active', b.dataset.type === 'semanal');
+    });
+    dias = ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'];
+    filas = generarBloques(interval, inicio, fin);
+    localStorage.removeItem('horario_data_semanal');
+    localStorage.removeItem('horario_empty_cerrado');
+    renderizar();
+    autoGuardar();
+    document.getElementById('empty-state').classList.add('show');
+  }
+
+  function resetearCumplimiento() {
+    if (!confirm('¿Reiniciar todo el cumplimiento? Se marcarán todas las actividades como "no completadas".')) return;
+    marcarTodo(false);
+  }
+
+  // ========== REMINDERS / NOTIFICATIONS ==========
+  function parseHora(horaStr) {
+    const m = horaStr.match(/(\d{1,2}):(\d{2})/);
+    return m ? { h: parseInt(m[1],10), m: parseInt(m[2],10) } : null;
+  }
+
+  function mostrarToast(msg) {
+    let t = document.getElementById('toast-reminder');
+    if (!t) { t = document.createElement('div'); t.id = 'toast-reminder'; t.className = 'toast-reminder'; document.body.appendChild(t); }
+    t.textContent = msg; t.classList.add('active');
+    clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('active'), 6000);
+  }
+
+  function checkReminders() {
+    const now = new Date();
+    const todayKey = now.toDateString();
+    const currentMin = now.getHours() * 60 + now.getMinutes();
+
+    let notified = {};
+    try { notified = JSON.parse(localStorage.getItem('horario_notified') || '{}'); } catch(e) {}
+    if (!notified[todayKey]) notified[todayKey] = [];
+
+    filas.forEach((fila, fi) => {
+      const parsed = parseHora(fila.hora);
+      if (!parsed) return;
+      const startMin = parsed.h * 60 + parsed.m;
+
+      (fila.celdas || []).forEach((cel, ci) => {
+        if (!cel || !cel.reminder) return;
+        if (cel.done) return; // skip completed
+        const alertMin = startMin - 1; // 1 minute before start
+        if (alertMin < 0) return;
+        const key = `${fi}_${ci}`;
+        if (notified[todayKey].includes(key)) return;
+        if (currentMin !== alertMin) return;
+
+        const msg = `🔔 ${dias[ci]} ${fila.hora}: ${cel.t}`;
+        if ('Notification' in window && Notification.permission === 'granted') {
+          try { new Notification('Recordatorio', { body: msg, requireInteraction: false }); } catch(e) {}
+        }
+        mostrarToast(msg);
+        notified[todayKey].push(key);
+      });
+    });
+
+    localStorage.setItem('horario_notified', JSON.stringify(notified));
+  }
+
+  function solicitarPermisoNotificacion() {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') Notification.requestPermission();
+  }
+
+  // Start reminder checker every 30 seconds
+  setInterval(checkReminders, 30000);
+  setTimeout(checkReminders, 5000);
+  // Request permission on first user interaction
+  document.addEventListener('click', solicitarPermisoNotificacion, { once: true });
+
+  // ========== SCREENSHOT PREVENTION ==========
+  let screenshotTimer = null;
+
+  function mostrarAvisoCaptura() {
+    const overlay = document.getElementById('screenshot-warning');
+    if (!overlay) return;
+    overlay.classList.add('active');
+    let nombre = '';
+    try {
+      const lic = JSON.parse(localStorage.getItem('horario_licencia'));
+      if (lic && lic.comprador) nombre = lic.comprador;
+    } catch(e) {}
+    const header = document.getElementById('inp-titulo-header')?.value?.trim();
+    const ident = nombre || header || 'USUARIO';
+    overlay.querySelector('h2').textContent = nombre ? '📸 Captura detectada' : '📸 Captura detectada · Versión Demo';
+    overlay.querySelector('p').innerHTML = nombre
+      ? `Esta herramienta está licenciada para <strong>${nombre}</strong>`
+      : '<strong>Versión Demo</strong> · Compra tu licencia para activar';
+    overlay.querySelector('.subtext').textContent = `🔒 ${ident} · ${new Date().toLocaleString()}`;
+    clearTimeout(screenshotTimer);
+    screenshotTimer = setTimeout(() => overlay.classList.remove('active'), 2500);
+  }
+
+  let proteccionActiva = true;
+
+  function toggleProteccion(estado) {
+    proteccionActiva = estado;
+    localStorage.setItem('horario_proteccion', estado ? '1' : '0');
+  }
+
+  // Dropdown click toggle for mobile
+  document.addEventListener('click', function(e) {
+    const dd = e.target.closest('.dropdown');
+    document.querySelectorAll('.dropdown-content').forEach(c => {
+      if (!dd || !c.closest('.dropdown').contains(dd)) c.classList.remove('open');
+    });
+    if (dd) {
+      const content = dd.querySelector('.dropdown-content');
+      if (content) content.classList.toggle('open');
+    }
+  });
+
+  function initScreenshotProtection() {
+    const saved = localStorage.getItem('horario_proteccion');
+    if (saved === '0') proteccionActiva = false;
+
+    document.addEventListener('keydown', function(e) {
+      if (!proteccionActiva) return;
+      if (e.key === 'PrintScreen' || e.keyCode === 44) {
+        mostrarAvisoCaptura();
+        return false;
+      }
+      if ((e.key === 's' || e.key === 'S') && e.shiftKey && e.metaKey) mostrarAvisoCaptura();
+      if ((e.key === 's' || e.key === 'S') && e.shiftKey && e.ctrlKey) mostrarAvisoCaptura();
+    });
+    document.addEventListener('contextmenu', function(e) {
+      if (!proteccionActiva) return;
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') e.preventDefault();
+    });
+  }
+
+  // ======================================================================
+  // 🆕 MODELOS DE EJEMPLO
+  // ======================================================================
+  var MODELOS = null;
+
+  function initModelos() {
+    if (MODELOS) return;
+    function _c(t, c) { return Array.from({length:7}, () => ({t, c, done:false, reminder:false, rowspan:1})); }
+    MODELOS = {
+      'estudiante': {
+        label: '🎓 Estudiante Universitario',
+        desc: 'Horario completo con clases, estudio y rutinas',
+        tipo: 'semanal', intervalo: null,
+        data: [
+          { hora:'7:00 – 8:30', celdas:[
+            {t:'🛏️ Despertar, ducha, desayuno',c:'rutina'},{t:'🛏️ Despertar, ducha, desayuno',c:'rutina'},
+            {t:'🛏️ Despertar, ducha, desayuno',c:'rutina'},{t:'🛏️ Despertar, ducha, desayuno',c:'rutina'},
+            {t:'🛏️ Despertar, rutina matutina',c:'rutina'},{t:'🛏️ Despertar sin apuro',c:'rutina'},{t:'🛏️ Despertar sin apuro',c:'rutina'}
+          ]},
+          { hora:'8:30 – 10:00', celdas:[
+            {t:'🏫 Prevención de Riesgos',c:'clase'},{t:'☕ Libre / Estudio',c:'libre'},
+            {t:'☕ Libre / Proyectos',c:'libre'},{t:'🏫 Prevención de Riesgos',c:'clase'},
+            {t:'📚 Proyectos / Estudio',c:'estudio'},{t:'☕ T. libre',c:'rutina'},{t:'☕ T. libre',c:'rutina'}
+          ]},
+          { hora:'10:00 – 12:00', celdas:[
+            {t:'📚 Estudio / Proyectos',c:'estudio'},{t:'👨‍🏫 Enseñanza (10–11:30)',c:'ensenanza'},
+            {t:'🏫 Integrador I (11:45–14:45)',c:'clase'},{t:'📚 Estudio / Proyectos',c:'estudio'},
+            {t:'📚 Proyectos / Estudio',c:'estudio'},{t:'🏫 Gestión Mantenimiento (10:30–13:15)',c:'clase'},{t:'📚 Proyectos personales',c:'estudio'}
+          ]},
+          { hora:'12:00 – 14:00', celdas:[
+            {t:'🍽️ Almuerzo y descanso',c:'comida'},{t:'🍽️ Almuerzo / Proyectos',c:'comida'},
+            {t:'🏫 Integrador I (continúa)',c:'clase'},{t:'📚 Estudio / Proyectos',c:'estudio'},
+            {t:'🍽️ Almuerzo',c:'comida'},{t:'🍽️ Almuerzo',c:'comida'},{t:'🍽️ Almuerzo',c:'comida'}
+          ]},
+          { hora:'14:00 – 16:00', celdas:[
+            {t:'👨‍🏫 Enseñanza / Proyectos',c:'ensenanza'},{t:'📚 Estudio personal',c:'estudio'},
+            {t:'🍽️ Almuerzo (desde 14:45)',c:'comida'},{t:'👨‍🏫 Enseñanza / Proyectos',c:'ensenanza'},
+            {t:'👨‍🏫 Enseñanza / Proyectos',c:'ensenanza'},{t:'🌟 T. libre / Deporte',c:'flexible'},{t:'🌟 T. libre / Deporte',c:'flexible'}
+          ]},
+          { hora:'16:00 – 18:00', celdas:[
+            {t:'🕐 T. libre / Enseñanza virtual',c:'flexible'},{t:'👨‍🏫 Enseñanza fija (4–6pm)',c:'ensenanza'},
+            {t:'👨‍🏫 Enseñanza / Proyectos',c:'ensenanza'},{t:'🕐 Tiempo libre',c:'flexible'},
+            {t:'🕐 Tiempo libre',c:'flexible'},{t:'🌟 Deporte / Amigos',c:'flexible'},{t:'🌟 Deporte / Amigos',c:'flexible'}
+          ]},
+          { hora:'18:00 – 20:00', celdas:[
+            {t:'🍽️ Cena / Estudio',c:'comida'},{t:'🍽️ Cena / Preparación',c:'comida'},
+            {t:'🏫 Fisiología Laboral (18:15–21:30)',c:'clase'},{t:'🏫 Saneamiento Industrial (18:15–21:30)',c:'clase'},
+            {t:'🍽️ Cena / T. libre',c:'comida'},{t:'🕐 T. libre / Cena',c:'flexible'},{t:'📚 Prep. semana',c:'estudio'}
+          ]},
+          { hora:'20:00 – 22:30', celdas:[
+            {t:'🏫 Procesos Mineros (20:15–22:30)',c:'clase'},
+            {t:'🏫 Prog. e Inspecciones Seg. (20:15–22:30)',c:'clase'},
+            {t:'🏫 Fisiología Laboral (hasta 21:30)',c:'clase'},{t:'🏫 Saneamiento Indust. (hasta 21:30)',c:'clase'},
+            {t:'🏫 Resp. Social (20:15–22:30)',c:'clase'},
+            {t:'🔌 Desconexión digital',c:'desconexion'},{t:'🔌 DESCONEXIÓN TOTAL',c:'desconexion'}
+          ]},
+          { hora:'22:30 – 23:00', celdas:[
+            {t:'🔌 Desconexión rápida',c:'desconexion'},{t:'🔌 Desconexión rápida',c:'desconexion'},
+            {t:'🔌 Desconexión',c:'desconexion'},{t:'🔌 Desconexión',c:'desconexion'},
+            {t:'🔌 Desconexión rápida',c:'desconexion'},{t:'🌙 Rutina de sueño',c:'rutina'},{t:'🌙 Rutina de sueño',c:'rutina'}
+          ]},
+          { hora:'🌙 23:00 💤', celdas:[
+            {t:'😴 DORMIR',c:'rutina'},{t:'😴 DORMIR',c:'rutina'},{t:'😴 DORMIR',c:'rutina'},
+            {t:'😴 DORMIR',c:'rutina'},{t:'😴 DORMIR',c:'rutina'},{t:'😴 DORMIR',c:'rutina'},{t:'😴 DORMIR',c:'rutina'}
+          ]}
+        ]
+      },
+      'trabajador': {
+        label: '💼 Trabajador 9-5', desc: 'Jornada laboral con bloques de trabajo y vida personal',
+        tipo: 'semanal', intervalo: null,
+        data: [
+          { hora:'6:00 – 7:00', celdas: _c('🛏️ Despertar, ducha, desayuno', 'rutina') },
+          { hora:'7:00 – 8:00', celdas: _c('🚌 Transporte / Trayecto', 'flexible') },
+          { hora:'8:00 – 10:00', celdas: [
+            {t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},
+            {t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},
+            {t:'🛌 Dormir hasta tarde',c:'rutina'},{t:'🛌 Dormir hasta tarde',c:'rutina'}
+          ]},
+          { hora:'10:00 – 12:00', celdas: [
+            {t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},
+            {t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},
+            {t:'📚 Curso / Lectura',c:'estudio'},{t:'📚 Curso / Lectura',c:'estudio'}
+          ]},
+          { hora:'12:00 – 13:00', celdas: _c('🍽️ Almuerzo', 'comida') },
+          { hora:'13:00 – 15:00', celdas: [
+            {t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},
+            {t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},
+            {t:'🛌 Siesta / T. libre',c:'rutina'},{t:'🛌 Siesta / T. libre',c:'rutina'}
+          ]},
+          { hora:'15:00 – 17:00', celdas: [
+            {t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},
+            {t:'💻 Trabajo',c:'clase'},{t:'💻 Trabajo',c:'clase'},
+            {t:'🌟 Salir / Deporte',c:'flexible'},{t:'🌟 Salir / Deporte',c:'flexible'}
+          ]},
+          { hora:'17:00 – 18:00', celdas: _c('🚌 Regreso a casa', 'flexible') },
+          { hora:'18:00 – 20:00', celdas: [
+            {t:'🏋️ Ejercicio / Deporte',c:'flexible'},{t:'🏋️ Ejercicio / Deporte',c:'flexible'},
+            {t:'🏋️ Ejercicio / Deporte',c:'flexible'},{t:'🏋️ Ejercicio / Deporte',c:'flexible'},
+            {t:'🏋️ Ejercicio / Deporte',c:'flexible'},
+            {t:'🍿 Cena y peli',c:'comida'},{t:'🍿 Cena y peli',c:'comida'}
+          ]},
+          { hora:'20:00 – 22:00', celdas: [
+            {t:'📖 T. personal / Curso',c:'estudio'},{t:'📖 T. personal / Curso',c:'estudio'},
+            {t:'📖 T. personal / Curso',c:'estudio'},{t:'📖 T. personal / Curso',c:'estudio'},
+            {t:'📖 T. personal / Curso',c:'estudio'},
+            {t:'🌙 Desconexión',c:'desconexion'},{t:'🌙 Desconexión',c:'desconexion'}
+          ]},
+          { hora:'22:00 – 23:00', celdas: _c('🔌 Desconexión digital', 'desconexion') },
+          { hora:'23:00 💤', celdas: _c('😴 DORMIR', 'rutina') }
+        ]
+      },
+      'freelancer': {
+        label: '🚀 Freelancer / Emprendedor', desc: 'Bloques flexibles para proyectos y clientes',
+        tipo: 'semanal', intervalo: null,
+        data: [
+          { hora:'7:00 – 8:00', celdas: _c('🛏️ Rutina matutina', 'rutina') },
+          { hora:'8:00 – 10:00', celdas: _c('💻 Bloque profundo (clientes)', 'estudio') },
+          { hora:'10:00 – 12:00', celdas: _c('📚 Proyectos personales', 'ensenanza') },
+          { hora:'12:00 – 13:00', celdas: _c('🍽️ Almuerzo', 'comida') },
+          { hora:'13:00 – 15:00', celdas: _c('📞 Llamadas / Admin', 'flexible') },
+          { hora:'15:00 – 17:00', celdas: _c('💻 Bloque creativo', 'libre') },
+          { hora:'17:00 – 18:00', celdas: _c('🚶 Paseo / Deporte', 'flexible') },
+          { hora:'18:00 – 20:00', celdas: _c('🍽️ Cena / Familia', 'comida') },
+          { hora:'20:00 – 22:00', celdas: _c('📖 Lectura / Curso', 'estudio') },
+          { hora:'22:00 – 23:00', celdas: _c('🔌 Desconexión', 'desconexion') },
+          { hora:'23:00 💤', celdas: _c('😴 DORMIR', 'rutina') }
+        ]
+      },
+      'vacio': {
+        label: '📋 Empezar de cero', desc: 'Tabla vacía para que crees tu propio horario',
+        tipo: 'semanal', intervalo: 60, data: null
+      }
+    };
+  }
+
+  function clonarData(data) {
+    if (!data) return [];
+    return data.map(f => ({
+      hora: f.hora,
+      celdas: f.celdas.map(c => ({
+        t: c.t || '',
+        c: c.c || 'libre',
+        done: c.done || false,
+        reminder: c.reminder || false,
+        rowspan: c.rowspan || 1
+      }))
+    }));
+  }
+
+  function cargarModelo(id) {
+    try {
+      initModelos();
+      const modelo = MODELOS[id];
+      if (!modelo) return;
+      localStorage.removeItem('horario_empty_cerrado');
+      if (modelo.tipo) {
+        plannerType = modelo.tipo;
+        localStorage.setItem('horario_planner_type', modelo.tipo);
+        document.querySelectorAll('.planner-type-selector button').forEach(b => {
+          b.classList.toggle('active', b.dataset.type === modelo.tipo);
+        });
+      }
+      dias = ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'];
+      if (modelo.data) {
+        filas = clonarData(modelo.data);
+      } else if (modelo.intervalo) {
+        const hInicio = localStorage.getItem('horario_inicio') || '07:00';
+        const hFin = localStorage.getItem('horario_fin') || '23:00';
+        filas = generarBloques(modelo.intervalo, hInicio, hFin);
+      } else {
+        filas = clonarData(generarBloquesDefault());
+      }
+      renderizar();
+      autoGuardar();
+    } catch(e) {
+      alert('Error al cargar modelo: ' + e.message);
+      return;
+    }
+  }
+
+  // ======================================================================
+  // 🆕 GENERAR BLOQUES DE TIEMPO
+  // ======================================================================
+  function generarBloques(intervalMinutos, horaInicio, horaFin) {
+    const bloques = [];
+    let [h, m] = horaInicio.split(':').map(Number);
+    const [hEnd, mEnd] = horaFin.split(':').map(Number);
+    let start = h * 60 + m;
+    const end = hEnd * 60 + mEnd;
+    while (start < end) {
+      const next = Math.min(start + intervalMinutos, end);
+      const h1 = String(Math.floor(start/60)).padStart(2,'0');
+      const m1 = String(start%60).padStart(2,'0');
+      const h2 = String(Math.floor(next/60)).padStart(2,'0');
+      const m2 = String(next%60).padStart(2,'0');
+      bloques.push({ hora: `${h1}:${m1} – ${h2}:${m2}`, celdas: dias.map(() => ({t:'',c:'libre',done:false,reminder:false,rowspan:1})) });
+      start = next;
+    }
+    return bloques;
+  }
+
+  function cambiarIntervalo(minutos) {
+    document.getElementById('sel-intervalo').value = minutos;
+  }
+
+  function aplicarIntervalo() {
+    const interval = parseInt(document.getElementById('sel-intervalo').value);
+    const inicio = document.getElementById('inp-hora-inicio').value || '07:00';
+    const fin = document.getElementById('inp-hora-fin').value || '23:00';
+    if (confirm(`¿Reordenar horario con bloques de ${interval} min?\nLos datos actuales se perderán.`)) {
+      localStorage.setItem('horario_intervalo', interval);
+      localStorage.setItem('horario_inicio', inicio);
+      localStorage.setItem('horario_fin', fin);
+      filas = generarBloques(interval, inicio, fin);
+      renderizar();
+      autoGuardar();
+    }
+  }
+
+  // ======================================================================
+  // 🆕 MERGE / UNIR CELDAS
+  // ======================================================================
+  let mergeActivo = false;
+  let mergeSeleccion = [];
+
+  function toggleMergeMode() {
+    mergeActivo = !mergeActivo;
+    mergeSeleccion = [];
+    document.getElementById('btn-merge-mode').classList.toggle('active', mergeActivo);
+    document.getElementById('btn-merge-apply').style.display = 'none';
+    document.getElementById('btn-merge-split').style.display = 'none';
+    document.getElementById('table-wrap').classList.toggle('merge-active', mergeActivo);
+    document.getElementById('merge-info').textContent = mergeActivo ? 'Haz clic en las celdas de una misma columna para unirlas' : '';
+    renderizar();
+  }
+
+  function toggleSeleccionMerge(fi, ci) {
+    const cel = filas[fi]?.celdas?.[ci];
+    const isMerged = cel && cel.rowspan > 1;
+    const splitBtn = document.getElementById('btn-merge-split');
+    const applyBtn = document.getElementById('btn-merge-apply');
+    if (isMerged) {
+      mergeSeleccion = [{ fi, ci }];
+      splitBtn.style.display = 'inline-block';
+      applyBtn.style.display = 'none';
+    } else {
+      const idx = mergeSeleccion.findIndex(s => s.fi === fi && s.ci === ci);
+      if (idx >= 0) {
+        mergeSeleccion.splice(idx, 1);
+      } else {
+        mergeSeleccion.push({ fi, ci });
+      }
+      splitBtn.style.display = 'none';
+      applyBtn.style.display = mergeSeleccion.length >= 2 ? 'inline-block' : 'none';
+    }
+    actualizarInfoMerge();
+    resaltarSeleccionMerge();
+  }
+
+  function resaltarSeleccionMerge() {
+    document.querySelectorAll('.celda.merge-selected').forEach(el => el.classList.remove('merge-selected'));
+    mergeSeleccion.forEach(s => {
+      const celda = document.querySelector(`#tabla tbody tr:nth-child(${s.fi+1}) td:nth-child(${s.ci+2})`);
+      if (celda) celda.classList.add('merge-selected');
+    });
+  }
+
+  function actualizarInfoMerge() {
+    const info = document.getElementById('merge-info');
+    if (!mergeActivo) {
+      const mergedCount = filas.reduce((sum, f) => sum + f.celdas.filter(c => c && c.rowspan > 1).length, 0);
+      if (mergedCount > 0) {
+        info.textContent = `🔗 ${mergedCount} celda(s) unida(s) — Activa "Unir celdas" para editar`;
+      } else {
+        info.textContent = '';
+      }
+      return;
+    }
+    if (mergeSeleccion.length === 0) {
+      info.textContent = 'Haz clic en las celdas de una misma columna para unirlas';
+      return;
+    }
+    const cols = [...new Set(mergeSeleccion.map(s => s.ci))];
+    if (cols.length > 1) {
+      info.textContent = '⚠️ Solo puedes unir celdas de la MISMA columna (mismo día)';
+      return;
+    }
+    const rows = mergeSeleccion.map(s => s.fi).sort((a,b) => a-b);
+    const continuas = rows.every((r, i) => i === 0 || r === rows[i-1] + 1);
+    if (!continuas) {
+      info.textContent = '⚠️ Selecciona celdas consecutivas en la misma columna';
+      return;
+    }
+    info.innerHTML = `✅ ${rows.length} celdas seleccionadas en ${dias[cols[0]]} — <strong>Listo para unir</strong>`;
+    info.style.color = '#55efc4';
+  }
+
+  function aplicarMerge() {
+    if (!mergeActivo || mergeSeleccion.length < 2) return;
+    const cols = [...new Set(mergeSeleccion.map(s => s.ci))];
+    if (cols.length > 1) return;
+    const ci = cols[0];
+    const rows = mergeSeleccion.map(s => s.fi).sort((a,b) => a-b);
+    const continuas = rows.every((r, i) => i === 0 || r === rows[i-1] + 1);
+    if (!continuas) return;
+    const fiInicio = rows[0];
+    const fiFin = rows[rows.length-1];
+    const contenido = filas[fiInicio].celdas[ci]?.t || '';
+    const categoria = filas[fiInicio].celdas[ci]?.c || 'libre';
+    const nombre = prompt('Nombre del curso o actividad:', contenido);
+    if (nombre === null) return;
+    const cat = prompt('Categoría (clase/ensenanza/estudio/comida/desconexion/flexible/rutina/libre):', categoria);
+    if (cat === null) return;
+    const valCat = CATS.find(c => c.id === cat) ? cat : 'clase';
+    filas[fiInicio].celdas[ci] = { t: nombre || '—', c: valCat, done: false, reminder: false, rowspan: rows.length };
+    for (let i = fiInicio + 1; i <= fiFin; i++) {
+      filas[i].celdas[ci] = { t: null, c: 'libre', done: false, reminder: false, rowspan: 0 };
+    }
+    mergeSeleccion = [];
+    renderizar();
+    autoGuardar();
+    toggleMergeMode();
+  }
+
+  function dividirCelda() {
+    const cel = mergeSeleccion[0];
+    if (!cel) return;
+    const fi = cel.fi, ci = cel.ci;
+    const data = filas[fi].celdas[ci];
+    if (!data || data.rowspan <= 1) return;
+    const totalRows = data.rowspan;
+    data.rowspan = 1;
+    for (let i = fi + 1; i < fi + totalRows; i++) {
+      if (filas[i] && filas[i].celdas[ci]) {
+        filas[i].celdas[ci] = { t: '', c: 'libre', done: false, reminder: false, rowspan: 1 };
+      }
+    }
+    mergeSeleccion = [];
+    renderizar();
+    autoGuardar();
+    toggleMergeMode();
+  }
+
+  // ======================================================================
+  // 🆕 TUTORIAL
+  // ======================================================================
+  let pasoActual = 0;
+  const TOTAL_PASOS = 7;
+
+  function mostrarTutorial() {
+    pasoActual = 0;
+    document.getElementById('tutorial').classList.add('active');
+    const prev = document.getElementById('t-prev');
+    const next = document.getElementById('t-next');
+    prev.style.display = 'none';
+    next.textContent = 'Siguiente →';
+    document.querySelectorAll('.t-step').forEach(s => s.classList.remove('active'));
+    document.querySelector('.t-step[data-step="0"]').classList.add('active');
+    renderTutorialProgress();
+  }
+
+  function cerrarTutorial() {
+    document.getElementById('tutorial').classList.remove('active');
+    localStorage.setItem('horario_tutorial_visto', '1');
+  }
+
+  function pasoTutorial(dir) {
+    const steps = document.querySelectorAll('.t-step');
+    steps.forEach(s => s.classList.remove('active'));
+    pasoActual = Math.max(0, Math.min(TOTAL_PASOS - 1, pasoActual + dir));
+    steps.forEach(s => {
+      if (parseInt(s.dataset.step) === pasoActual) s.classList.add('active');
+    });
+    const prev = document.getElementById('t-prev');
+    const next = document.getElementById('t-next');
+    prev.style.display = pasoActual > 0 ? 'inline-block' : 'none';
+    if (pasoActual === TOTAL_PASOS - 1) {
+      next.textContent = '🎉 ¡Empezar!';
+    } else {
+      next.textContent = 'Siguiente →';
+    }
+    renderTutorialProgress();
+  }
+
+  function renderTutorialProgress() {
+    const container = document.getElementById('t-progress');
+    let html = '';
+    for (let i = 0; i < TOTAL_PASOS; i++) {
+      const cls = i === pasoActual ? 'active' : i < pasoActual ? 'done' : '';
+      html += `<span class="dot ${cls}" onclick="pasoTutorial(${i - pasoActual})"></span>`;
+    }
+    container.innerHTML = html;
+  }
+</script>
+</body>
+</html>

@@ -860,6 +860,21 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   .c-rutina { background: #d6f0e6; color: #004d40; font-weight: 500; }
   .c-libre { background: #f0f1f5; color: #636e72; }
 
+  /* ========== PRODUCTIVITY BAR CHART ========== */
+  .prod-row { display:flex; align-items:center; gap:8px; margin:3px 0; }
+  .prod-label { width:90px; font-size:0.7em; color:#555; text-align:right; flex-shrink:0; }
+  body.dark .prod-label { color:#aaa; }
+  .prod-track { flex:1; height:16px; background:rgba(0,0,0,0.06); border-radius:8px; overflow:hidden; }
+  body.dark .prod-track { background:rgba(255,255,255,0.06); }
+  .prod-fill { height:100%; border-radius:8px; transition:width 0.6s ease; min-width:2px; }
+  .prod-pct { width:36px; font-size:0.68em; color:#888; text-align:right; flex-shrink:0; }
+  body.dark .prod-pct { color:#aaa; }
+  .prod-index { text-align:center; padding:10px; margin-bottom:8px; border-radius:12px; background:linear-gradient(135deg,#667eea1a,#764ba21a); }
+  body.dark .prod-index { background:linear-gradient(135deg,#667eea22,#764ba222); }
+  .prod-index-val { font-size:1.4em; font-weight:700; }
+  .prod-index-label { font-size:0.7em; color:#888; margin-top:2px; }
+  body.dark .prod-index-label { color:#aaa; }
+
   /* ========== PROFESSIONAL ANIMATIONS ========== */
   @keyframes cardFadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
   .dash-chart-card, .dash-card, .dash-mini-card { animation: cardFadeIn 0.4s ease forwards; }
@@ -2052,6 +2067,68 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     actualizarMergeBadge();
   }
 
+  function calcularEstadisticasSemanales() {
+    const intervalMin = parseInt(document.getElementById('sel-intervalo').value) || 60;
+    const totalSlots = filas.length;
+    const catMap = {};
+    let occupiedSlots = 0, doneSlots = 0;
+    filas.forEach(f => {
+      f.celdas.forEach(c => {
+        if (!c || !c.t || c.t.trim() === '') return;
+        occupiedSlots++;
+        if (c.done) doneSlots++;
+        const catId = c.c || 'libre';
+        if (!catMap[catId]) catMap[catId] = { id:catId, label:catId, color:'#f0f1f5', hours:0, done:0, total:0 };
+        catMap[catId].total++;
+        if (c.done) catMap[catId].done++;
+      });
+    });
+    const categories = CATS.map(c => {
+      const m = catMap[c.id];
+      if (!m) return null;
+      m.label = c.label || c.id;
+      m.color = c.color || '#f0f1f5';
+      m.hours = m.total * intervalMin / 60;
+      m.pct = totalSlots > 0 ? Math.round(m.total / totalSlots * 100) : 0;
+      m.donePct = m.total > 0 ? Math.round(m.done / m.total * 100) : 0;
+      return m;
+    }).filter(Boolean);
+    const totalHours = occupiedSlots * intervalMin / 60;
+    const completionPct = occupiedSlots > 0 ? Math.round(doneSlots / occupiedSlots * 100) : 0;
+    const busyPct = totalSlots > 0 ? Math.round(occupiedSlots / totalSlots * 100) : 0;
+    let indexMsg = 'Sin datos aún';
+    if (occupiedSlots > 0) {
+      if (completionPct >= 90) indexMsg = `🔥 ¡Rendimiento impecable! Llevas el ${completionPct}% de tus bloques completados esta semana.`;
+      else if (completionPct >= 70) indexMsg = `💪 ¡Buen ritmo! Completaste el ${completionPct}% de tus bloques. Sigue así.`;
+      else if (completionPct >= 50) indexMsg = `📈 Vas por la mitad: ${completionPct}% completado. ¡A darle!`;
+      else indexMsg = `🚀 Llevas ${completionPct}% completado. ¡Empieza marcando tus bloques!`;
+    }
+    return { categories, totalHours, completionPct, busyPct, occupiedSlots, totalSlots, indexMsg };
+  }
+
+  function renderProductividad() {
+    const stats = calcularEstadisticasSemanales();
+    if (!stats || stats.occupiedSlots === 0) {
+      return `<div class="dash-card" id="productivity-reports-container"><h3>📊 Reporte Semanal</h3><p style="font-size:0.78em;color:#888;text-align:center;padding:12px 0;">Aún no hay bloques ocupados. ¡Agrega actividades al horario para ver tu reporte!</p></div>`;
+    }
+    const pct = stats.completionPct;
+    let emoji = '🟢', moodClass = '';
+    if (pct >= 80) { emoji = '🟢'; moodClass = 'mood-excellent'; }
+    else if (pct >= 60) { emoji = '🟡'; moodClass = 'mood-good'; }
+    else if (pct >= 40) { emoji = '🟠'; moodClass = 'mood-fair'; }
+    else { emoji = '🔴'; moodClass = 'mood-low'; }
+    let html = `<div class="dash-card" id="productivity-reports-container"><h3>📊 Reporte Semanal de Productividad</h3>`;
+    html += `<div class="prod-index ${moodClass}"><div class="prod-index-val">${emoji} ${stats.completionPct}%</div><div class="prod-index-label">Índice de Productividad · ${stats.occupiedSlots}/${stats.totalSlots} bloques ocupados</div></div>`;
+    html += `<p style="font-size:0.78em;color:#888;margin-bottom:8px;">${stats.indexMsg}</p>`;
+    html += `<div style="margin-top:10px;">`;
+    stats.categories.forEach(c => {
+      const w = Math.max(c.pct, 2);
+      html += `<div class="prod-row"><span class="prod-label">${c.label}</span><div class="prod-track"><div class="prod-fill" style="width:${w}%;background:${c.color};"></div></div><span class="prod-pct">${c.pct}%</span><span style="font-size:0.65em;color:#999;">${c.hours.toFixed(1)}h · ${c.donePct}% hecho</span></div>`;
+    });
+    html += `</div></div>`;
+    return html;
+  }
+
   function actualizarMergeBadge() {
     const badge = document.getElementById('merge-badge');
     if (!badge) return;
@@ -2572,6 +2649,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
       <button onclick="marcarTodo(true);renderDashboard();" style="padding:6px 16px;border:none;border-radius:6px;background:linear-gradient(135deg,#55efc4,#00b894);color:#fff;cursor:pointer;font-size:0.72em;">✅ Marcar todo listo</button>
       <button onclick="resetearCumplimiento()" style="padding:6px 16px;border:1px solid #e74c3c;border-radius:6px;background:#fff;color:#e74c3c;cursor:pointer;font-size:0.72em;">🔄 Reiniciar cumplimiento</button>
     </div>`;
+    html += renderProductividad();
     html += actualizarMetasDashboard();
     html += `</div>`;
     container.innerHTML = html;

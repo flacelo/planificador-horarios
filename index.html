@@ -997,7 +997,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
         </div>
         <div class="info-row">
           <div class="campo">
-            <select id="sel-nombre" onchange="cambioSelect(this,'inp-nombre')">
+            <select id="sel-nombre" onchange="onNombreChange(this)">
               <optgroup label="— Selecciona —">
                 <option value="Estudiante">Estudiante</option>
                 <option value="Trabajador">Trabajador</option>
@@ -1032,7 +1032,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
               <option value="Otra Ingeniería">🔧 Otra Ingeniería</option>
             </select>
           </div>
-          <div class="campo">
+          <div class="campo" id="ciclo-container">
             <select id="sel-ciclo" onchange="cambioSelect(this,'inp-ciclo')">
               <optgroup label="— Selecciona —">
                 <option value="7mo Ciclo">7mo Ciclo</option>
@@ -1827,22 +1827,35 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     renderizar();
   }
 
+  function onNombreChange(sel) {
+    const cicloContainer = document.getElementById('ciclo-container');
+    const inp = document.getElementById('inp-nombre');
+    if (sel.value === 'otros') { inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = ''; inp.focus(); }
+    else { inp.classList.remove('visible'); inp.classList.add('oculto'); inp.value = sel.value; }
+    if (cicloContainer) {
+      if (sel.value === 'DOCENTE' || sel.value === 'Freelancer') {
+        cicloContainer.classList.add('oculto');
+      } else {
+        cicloContainer.classList.remove('oculto');
+      }
+    }
+  }
+
   function onCarreraChange() {
     const sel = document.getElementById('sel-carrera');
     const sub = document.getElementById('engineering-sub-container');
+    const subSel = document.getElementById('sel-ingenieria');
     if (!sel) return;
     const val = sel.value;
     if (val === 'Ingeniería') {
       sub.classList.remove('oculto');
       sub.classList.add('visible');
       document.getElementById('inp-carrera').value = '';
-    } else if (val === '') {
-      sub.classList.add('oculto');
-      sub.classList.remove('visible');
     } else {
-      sub.classList.add('oculto');
-      sub.classList.remove('visible');
-      if (profiles[val]) cargarPerfil(val);
+      if (sub) { sub.classList.add('oculto'); sub.classList.remove('visible'); }
+      if (subSel) subSel.value = '';
+      if (val && profiles[val]) cargarPerfil(val);
+      else if (!val) document.getElementById('inp-carrera').value = '';
     }
   }
 
@@ -2021,7 +2034,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
       if (opt) { sel.value = val; inp.classList.remove('visible'); inp.classList.add('oculto'); inp.value = ''; }
       else { sel.value = 'otros'; inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = val||''; }
     };
-    if (d.nombre) ms('sel-nombre','inp-nombre',d.nombre);
+    if (d.nombre) { ms('sel-nombre','inp-nombre',d.nombre); onNombreChange(document.getElementById('sel-nombre')); }
     if (d.carrera) ms('sel-carrera','inp-carrera',d.carrera);
     if (d.ciclo) ms('sel-ciclo','inp-ciclo',d.ciclo);
     if (d.objetivo) ms('sel-objetivo','inp-objetivo',d.objetivo);
@@ -2042,6 +2055,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     ['inp-nombre','inp-carrera','inp-ciclo','inp-objetivo'].forEach(id => { document.getElementById(id).value = ''; document.getElementById(id).className = 'oculto'; });
     document.getElementById('inp-titulo-header').value = '';
     actualizarHeaderPreview();
+    onNombreChange(document.getElementById('sel-nombre'));
     renderizar(); autoGuardar(); alert('✅ Restablecido.');
   }
 
@@ -2155,6 +2169,8 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
       localStorage.setItem('horario_fin', '23:00');
     }
     filas = JSON.parse(JSON.stringify(generarBloquesDefault())); renderizar();
+    const nombreSel = document.getElementById('sel-nombre');
+    if (nombreSel) onNombreChange(nombreSel);
   }
   iniciar();
 

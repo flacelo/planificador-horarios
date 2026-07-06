@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Planificador">
@@ -26,6 +26,12 @@
     padding: 20px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
     backdrop-filter: blur(10px);
+  }
+
+  /* ========== ZOOM TÁCTIL ========== */
+  .table-wrap {
+    touch-action: pan-x pan-y pinch-zoom;
+    -webkit-overflow-scrolling: touch;
   }
 
   h1 {
@@ -925,6 +931,42 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   .side-panel .btn-merge.active { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
   .side-panel .btn-merge-apply { background:linear-gradient(135deg,#00b894,#55efc4); }
   .side-panel .btn-merge-split { background:linear-gradient(135deg,#e74c3c,#ff7675); }
+
+  /* ========== SIDE PANEL ACCORDION ========== */
+  .sp-section {
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .sp-section[open] { padding-bottom: 6px; }
+  .sp-section summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.78em;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    user-select: none;
+    list-style: none;
+  }
+  .sp-section summary::-webkit-details-marker { display: none; }
+  .sp-section summary::after {
+    content: '\25B8';
+    margin-left: auto;
+    transition: transform 0.25s;
+    font-size: 0.85em;
+    color: rgba(255,255,255,0.3);
+  }
+  .sp-section[open] summary::after { transform: rotate(90deg); }
+  .sp-section summary:hover { background: rgba(255,255,255,0.06); }
+  .sp-section summary span { font-size: 1.1em; }
+  .sp-body { padding: 2px 10px 8px; }
+  .sp-body .toolbar { margin-bottom: 0; }
 </style>
 </head>
 <body>
@@ -946,142 +988,169 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
       <span onclick="togglePanel()" style="cursor:pointer;color:rgba(255,255,255,0.5);font-size:1.1em;">✕</span>
     </div>
 
-    <div class="planner-type-selector">
-      <button class="active" data-type="semanal" onclick="cambiarTipoPlanificador('semanal')">📅 Semanal</button>
-      <button data-type="diario" onclick="cambiarTipoPlanificador('diario')">📅 Diario</button>
-      <button data-type="mensual" onclick="cambiarTipoPlanificador('mensual')">📅 Mensual</button>
-      <button data-type="anual" onclick="cambiarTipoPlanificador('anual')">📅 Anual</button>
-      <button data-type="personalizado" onclick="cambiarTipoPlanificador('personalizado')">✏️ Personalizado</button>
-    </div>
-
-    <div class="custom-header">
-      <input id="inp-titulo-header" placeholder="Nombre de área / empresa / hogar..." oninput="actualizarHeaderPreview()">
-      <div class="header-preview" id="header-preview"></div>
-    </div>
-
-    <div class="info-row">
-      <div class="campo">
-        <select id="sel-nombre" onchange="cambioSelect(this,'inp-nombre')">
-          <optgroup label="— Selecciona —">
-            <option value="Estudiante">Estudiante</option>
-            <option value="Trabajador">Trabajador</option>
-            <option value="Freelancer">Freelancer</option>
-            <option value="Emprendedor">Emprendedor</option>
-            <option value="DOCENTE">DOCENTE</option>
-            <option value="otros">✏️ Otros</option>
-          </optgroup>
-        </select>
-        <input id="inp-nombre" class="oculto" placeholder="Tu nombre" value="">
-      </div>
-      <div class="campo">
-        <select id="sel-carrera" onchange="cambioSelect(this,'inp-carrera')">
-          <optgroup label="— Selecciona —">
-            <option value="Ing. Seguridad Industrial y Minera">Ing. Seg. Industrial y Minera</option>
-            <option value="Ing. de Sistemas">Ing. de Sistemas</option>
-            <option value="Ing. Civil">Ing. Civil</option>
-            <option value="Administración">Administración</option>
-            <option value="Medicina">Medicina</option>
-            <option value="Derecho">Derecho</option>
-            <option value="otros">✏️ Otros</option>
-          </optgroup>
-        </select>
-        <input id="inp-carrera" class="oculto" placeholder="Carrera" value="">
-      </div>
-      <div class="campo">
-        <select id="sel-ciclo" onchange="cambioSelect(this,'inp-ciclo')">
-          <optgroup label="— Selecciona —">
-            <option value="7mo Ciclo">7mo Ciclo</option>
-            <option value="1er Ciclo">1er Ciclo</option>
-            <option value="2do Ciclo">2do Ciclo</option>
-            <option value="3er Ciclo">3er Ciclo</option>
-            <option value="4to Ciclo">4to Ciclo</option>
-            <option value="Egresado">Egresado</option>
-            <option value="Profesional">Profesional</option>
-            <option value="otros">✏️ Otros</option>
-          </optgroup>
-        </select>
-        <input id="inp-ciclo" class="oculto" placeholder="Ciclo" value="">
-      </div>
-      <div class="campo">
-        <select id="sel-objetivo" onchange="cambioSelect(this,'inp-objetivo')">
-          <optgroup label="— Selecciona —">
-            <option value="Dormir 11pm · Sin pantallas 1–2h antes">Dormir 11pm · Sin pantallas</option>
-            <option value="Dormir 10pm · Madrugar 5am">Dormir 10pm · Madrugar</option>
-            <option value="Estudiar 4h diarias">Estudiar 4h diarias</option>
-            <option value="Hacer ejercicio 3x semana">Ejercicio 3x semana</option>
-            <option value="Trabajar + Estudiar">Trabajar + Estudiar</option>
-            <option value="otros">✏️ Otros</option>
-          </optgroup>
-        </select>
-        <input id="inp-objetivo" class="oculto" placeholder="Objetivo" value="">
-      </div>
-    </div>
-
-    <div class="toolbar">
-      <button class="btn-primary" onclick="guardar()">💾 Guardar</button>
-      <button onclick="cargar()">📂 Cargar</button>
-      <button onclick="resetear()">🔄 Restaurar</button>
-      <button class="btn-dark" onclick="nuevoPlanificador()">📋 Nuevo</button>
-      <div class="dropdown">
-        <button class="btn-primary">📥 Exportar ▾</button>
-        <div class="dropdown-content">
-          <a onclick="exportarPDF()">📄 PDF</a>
-          <a onclick="exportarExcel()">📊 Excel</a>
-          <a onclick="exportarWord()">📝 Word</a>
-          <a onclick="imprimir()">🖨️ Imprimir</a>
+    <details class="sp-section" open>
+      <summary><span>👤</span> General</summary>
+      <div class="sp-body">
+        <div class="custom-header">
+          <input id="inp-titulo-header" placeholder="Nombre de área / empresa / hogar..." oninput="actualizarHeaderPreview()">
+          <div class="header-preview" id="header-preview"></div>
+        </div>
+        <div class="info-row">
+          <div class="campo">
+            <select id="sel-nombre" onchange="cambioSelect(this,'inp-nombre')">
+              <optgroup label="— Selecciona —">
+                <option value="Estudiante">Estudiante</option>
+                <option value="Trabajador">Trabajador</option>
+                <option value="Freelancer">Freelancer</option>
+                <option value="Emprendedor">Emprendedor</option>
+                <option value="DOCENTE">DOCENTE</option>
+                <option value="otros">✏️ Otros</option>
+              </optgroup>
+            </select>
+            <input id="inp-nombre" class="oculto" placeholder="Tu nombre" value="">
+          </div>
+          <div class="campo">
+            <select id="sel-carrera" onchange="cambioSelect(this,'inp-carrera')">
+              <optgroup label="— Selecciona —">
+                <option value="Ing. Seguridad Industrial y Minera">Ing. Seg. Industrial y Minera</option>
+                <option value="Ing. de Sistemas">Ing. de Sistemas</option>
+                <option value="Ing. Civil">Ing. Civil</option>
+                <option value="Administración">Administración</option>
+                <option value="Medicina">Medicina</option>
+                <option value="Derecho">Derecho</option>
+                <option value="otros">✏️ Otros</option>
+              </optgroup>
+            </select>
+            <input id="inp-carrera" class="oculto" placeholder="Carrera" value="">
+          </div>
+          <div class="campo">
+            <select id="sel-ciclo" onchange="cambioSelect(this,'inp-ciclo')">
+              <optgroup label="— Selecciona —">
+                <option value="7mo Ciclo">7mo Ciclo</option>
+                <option value="1er Ciclo">1er Ciclo</option>
+                <option value="2do Ciclo">2do Ciclo</option>
+                <option value="3er Ciclo">3er Ciclo</option>
+                <option value="4to Ciclo">4to Ciclo</option>
+                <option value="Egresado">Egresado</option>
+                <option value="Profesional">Profesional</option>
+                <option value="otros">✏️ Otros</option>
+              </optgroup>
+            </select>
+            <input id="inp-ciclo" class="oculto" placeholder="Ciclo" value="">
+          </div>
+          <div class="campo">
+            <select id="sel-objetivo" onchange="cambioSelect(this,'inp-objetivo')">
+              <optgroup label="— Selecciona —">
+                <option value="Dormir 11pm · Sin pantallas 1–2h antes">Dormir 11pm · Sin pantallas</option>
+                <option value="Dormir 10pm · Madrugar 5am">Dormir 10pm · Madrugar</option>
+                <option value="Estudiar 4h diarias">Estudiar 4h diarias</option>
+                <option value="Hacer ejercicio 3x semana">Ejercicio 3x semana</option>
+                <option value="Trabajar + Estudiar">Trabajar + Estudiar</option>
+                <option value="otros">✏️ Otros</option>
+              </optgroup>
+            </select>
+            <input id="inp-objetivo" class="oculto" placeholder="Objetivo" value="">
+          </div>
         </div>
       </div>
-      <div class="dropdown">
-        <button>📁 Modelos ▾</button>
-        <div class="dropdown-content" style="min-width:200px;">
-          <a onclick="cargarModelo('estudiante')">🎓 Estudiante Universitario</a>
-          <a onclick="cargarModelo('trabajador')">💼 Trabajador 9-5</a>
-          <a onclick="cargarModelo('freelancer')">🚀 Freelancer</a>
-          <a onclick="cargarModelo('vacio')" style="border-top:1px solid #eee;">📋 Empezar de cero</a>
+    </details>
+
+    <details class="sp-section" open>
+      <summary><span>🎨</span> Vista</summary>
+      <div class="sp-body">
+        <div class="planner-type-selector">
+          <button class="active" data-type="semanal" onclick="cambiarTipoPlanificador('semanal')">📅 Semanal</button>
+          <button data-type="diario" onclick="cambiarTipoPlanificador('diario')">📅 Diario</button>
+          <button data-type="mensual" onclick="cambiarTipoPlanificador('mensual')">📅 Mensual</button>
+          <button data-type="anual" onclick="cambiarTipoPlanificador('anual')">📅 Anual</button>
+          <button data-type="personalizado" onclick="cambiarTipoPlanificador('personalizado')">✏️ Personalizado</button>
+        </div>
+        <div class="view-toggle">
+          <button class="active" onclick="cambiarVista('table')" id="btn-view-table">📋 Planificador</button>
+          <button onclick="cambiarVista('dashboard')" id="btn-view-dashboard">📊 Dashboard</button>
         </div>
       </div>
-      <button onclick="agregarFila()">➕ Fila</button>
-      <button onclick="agregarDia()">📅 + Día</button>
-      <button class="btn-danger" onclick="eliminarUltimoDia()">📅 − Día</button>
-      <button class="btn-yape" onclick="mostrarCompra()">💎 Comprar licencia</button>
-      <button onclick="mostrarTutorial()">❓ Ayuda</button>
-      <button class="btn-dark" id="btn-dark-mode" onclick="toggleDarkMode()">🌙 Oscuro</button>
-    </div>
+    </details>
 
-    <p style="text-align:center;font-size:0.6em;color:rgba(255,255,255,0.4);margin:6px 0;">
-      ✕ en la hora elimina la fila · Arrastra bordes de columnas
-    </p>
+    <details class="sp-section">
+      <summary><span>📁</span> Plantillas</summary>
+      <div class="sp-body">
+        <div class="toolbar" style="justify-content:center;">
+          <button onclick="cargarModelo('estudiante')" style="font-size:0.7em;padding:5px 8px;">🎓 Estudiante</button>
+          <button onclick="cargarModelo('trabajador')" style="font-size:0.7em;padding:5px 8px;">💼 Trabajador</button>
+          <button onclick="cargarModelo('freelancer')" style="font-size:0.7em;padding:5px 8px;">🚀 Freelancer</button>
+          <button onclick="cargarModelo('vacio')" style="font-size:0.7em;padding:5px 8px;">📋 Vacío</button>
+        </div>
+      </div>
+    </details>
 
-    <div class="interval-row">
-      <label>⏱️ Intervalo:</label>
-      <select id="sel-intervalo" onchange="cambiarIntervalo(parseInt(this.value))">
-        <option value="5">5 min</option>
-        <option value="10">10 min</option>
-        <option value="15" selected>15 min</option>
-        <option value="20">20 min</option>
-        <option value="25">25 min</option>
-        <option value="30">30 min</option>
-        <option value="45">45 min</option>
-        <option value="60">1 hora</option>
-      </select>
-      <label>Desde:</label>
-      <input id="inp-hora-inicio" type="time" value="06:00" style="width:70px;">
-      <label>Hasta:</label>
-      <input id="inp-hora-fin" type="time" value="23:30" style="width:70px;">
-      <button onclick="aplicarIntervalo()" style="padding:4px 10px;border:none;border-radius:5px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;cursor:pointer;font-size:0.68em;">🔄 Aplicar</button>
-    </div>
+    <details class="sp-section">
+      <summary><span>⏱️</span> Horario</summary>
+      <div class="sp-body">
+        <div class="interval-row">
+          <label>Intervalo:</label>
+          <select id="sel-intervalo" onchange="cambiarIntervalo(parseInt(this.value))">
+            <option value="5">5 min</option>
+            <option value="10">10 min</option>
+            <option value="15" selected>15 min</option>
+            <option value="20">20 min</option>
+            <option value="25">25 min</option>
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="60">1 hora</option>
+          </select>
+          <label>Desde:</label>
+          <input id="inp-hora-inicio" type="time" value="06:00" style="width:70px;">
+          <label>Hasta:</label>
+          <input id="inp-hora-fin" type="time" value="23:30" style="width:70px;">
+          <button onclick="aplicarIntervalo()" style="padding:4px 10px;border:none;border-radius:5px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;cursor:pointer;font-size:0.68em;">🔄 Aplicar</button>
+        </div>
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:8px 0;">
+        <button onclick="agregarFila()" style="font-size:0.68em;padding:4px 10px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);border:none;border-radius:6px;cursor:pointer;">➕ Fila</button>
+        <button onclick="agregarDia()" style="font-size:0.68em;padding:4px 10px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);border:none;border-radius:6px;cursor:pointer;">📅 + Día</button>
+        <button onclick="eliminarUltimoDia()" style="font-size:0.68em;padding:4px 10px;background:rgba(255,255,255,0.08);color:#ff7675;border:none;border-radius:6px;cursor:pointer;">📅 − Día</button>
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:8px 0;">
+        <div class="merge-toolbar">
+          <button class="btn-merge" id="btn-merge-mode" onclick="toggleMergeMode()">🔗 Unir celdas</button>
+          <button class="btn-merge-apply" id="btn-merge-apply" onclick="aplicarMerge()" style="display:none;">✅ Unir</button>
+          <button class="btn-merge-split" id="btn-merge-split" onclick="dividirCelda()" style="display:none;">✂️ Dividir</button>
+        </div>
+        <div class="merge-info" id="merge-info"></div>
+        <p style="text-align:center;font-size:0.55em;color:rgba(255,255,255,0.3);margin:4px 0;">✕ en la hora elimina la fila · Arrastra bordes de columnas</p>
+      </div>
+    </details>
 
-    <div class="merge-toolbar">
-      <button class="btn-merge" id="btn-merge-mode" onclick="toggleMergeMode()">🔗 Unir celdas</button>
-      <button class="btn-merge-apply" id="btn-merge-apply" onclick="aplicarMerge()" style="display:none;">✅ Unir</button>
-      <button class="btn-merge-split" id="btn-merge-split" onclick="dividirCelda()" style="display:none;">✂️ Dividir</button>
-    </div>
-    <div class="merge-info" id="merge-info"></div>
+    <details class="sp-section">
+      <summary><span>💾</span> Archivos</summary>
+      <div class="sp-body">
+        <div class="toolbar" style="justify-content:center;">
+          <button class="btn-primary" onclick="guardar()">💾 Guardar</button>
+          <button onclick="cargar()">📂 Cargar</button>
+          <button onclick="resetear()">🔄 Restaurar</button>
+          <button class="btn-dark" onclick="nuevoPlanificador()">📋 Nuevo</button>
+          <div class="dropdown">
+            <button class="btn-primary">📥 Exportar ▾</button>
+            <div class="dropdown-content">
+              <a onclick="exportarPDF()">📄 PDF</a>
+              <a onclick="exportarExcel()">📊 Excel</a>
+              <a onclick="exportarWord()">📝 Word</a>
+              <a onclick="imprimir()">🖨️ Imprimir</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
 
-    <div class="view-toggle">
-      <button class="active" onclick="cambiarVista('table')" id="btn-view-table">📋 Planificador</button>
-      <button onclick="cambiarVista('dashboard')" id="btn-view-dashboard">📊 Dashboard</button>
-    </div>
+    <details class="sp-section">
+      <summary><span>⚙️</span> Configuración</summary>
+      <div class="sp-body">
+        <div class="toolbar" style="justify-content:center;">
+          <button class="btn-dark" id="btn-dark-mode" onclick="toggleDarkMode()">🌙 Oscuro</button>
+          <button onclick="mostrarTutorial()">❓ Ayuda</button>
+          <button class="btn-yape" onclick="mostrarCompra()">💎 Licencia</button>
+        </div>
+      </div>
+    </details>
   </div>
 
   <div class="demo-banner">
@@ -1516,6 +1585,18 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     localStorage.setItem('horario_empty_cerrado', '1');
   }
 
+  function actualizarEmptyState() {
+    const emptyEl = document.getElementById('empty-state');
+    if (!emptyEl) return;
+    const oculto = localStorage.getItem('horario_empty_cerrado');
+    const tieneDatos = filas.length > 0 && filas.some(f => f.celdas.some(c => c.t && c.t !== '' && c.t !== '—'));
+    if (tieneDatos || oculto) {
+      emptyEl.classList.remove('show');
+    } else if (estaVacio()) {
+      emptyEl.classList.add('show');
+    }
+  }
+
   function renderizar() {
     const tb = document.getElementById('tbody');
     const hr = document.getElementById('header-row');
@@ -1548,12 +1629,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
       html += '</tr>';
     });
     tb.innerHTML = html;
-    const emptyEl = document.getElementById('empty-state');
-    if (emptyEl && !localStorage.getItem('horario_empty_cerrado') && estaVacio()) {
-      emptyEl.classList.add('show');
-    } else if (emptyEl) {
-      emptyEl.classList.remove('show');
-    }
+    actualizarEmptyState();
     configurarResizers();
     let leyHtml = '';
     CATS.forEach(c => { leyHtml += `<span><span class="dot" style="background:${c.color}"></span> ${c.label}</span>`; });
@@ -2173,8 +2249,8 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     localStorage.removeItem('horario_data_semanal');
     localStorage.removeItem('horario_empty_cerrado');
     renderizar();
+    actualizarEmptyState();
     autoGuardar();
-    document.getElementById('empty-state').classList.add('show');
   }
 
   function resetearCumplimiento() {
@@ -2475,6 +2551,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
         filas = clonarData(generarBloquesDefault());
       }
       renderizar();
+      actualizarEmptyState();
       autoGuardar();
     } catch(e) {
       alert('Error al cargar modelo: ' + e.message);

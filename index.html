@@ -1008,7 +1008,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
             </select>
             <input id="inp-nombre" class="oculto" placeholder="Tu nombre" value="">
           </div>
-          <div class="campo">
+          <div class="campo" id="carrera-container">
             <select id="sel-carrera" onchange="onCarreraChange()">
               <option value="">— Carrera / Área —</option>
               <option value="Ingeniería">🔧 Ingeniería</option>
@@ -1826,17 +1826,33 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   }
 
   function onRolChange(sel) {
-    const cicloContainer = document.getElementById('ciclo-container');
     const inp = document.getElementById('inp-nombre');
     if (sel.value === 'otros') { inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = ''; inp.focus(); }
     else { inp.classList.remove('visible'); inp.classList.add('oculto'); inp.value = sel.value; }
-    if (cicloContainer) {
-      if (sel.value === 'Estudiante') {
-        cicloContainer.style.display = '';
-      } else {
-        cicloContainer.style.display = 'none';
-        document.getElementById('sel-ciclo').selectedIndex = 0;
-        document.getElementById('inp-ciclo').value = '';
+
+    const carreraC = document.getElementById('carrera-container');
+    const espC = document.getElementById('especialidad-container');
+    const cicloC = document.getElementById('ciclo-container');
+    const carreraSel = document.getElementById('sel-carrera');
+    const espSel = document.getElementById('sel-especialidad');
+    const cicloSel = document.getElementById('sel-ciclo');
+
+    if (sel.value === 'Freelancer') {
+      if (carreraC) { carreraC.style.display = 'none'; carreraSel.selectedIndex = 0; }
+      if (espC) { espC.style.display = 'none'; if (espSel) espSel.selectedIndex = 0; }
+      if (cicloC) { cicloC.style.display = 'none'; if (cicloSel) cicloSel.selectedIndex = 0; }
+      document.getElementById('inp-carrera').value = '';
+      document.getElementById('inp-ciclo').value = '';
+      if (profiles.Freelancer) cargarPerfil('Freelancer');
+    } else {
+      if (carreraC) carreraC.style.display = '';
+      if (cicloC) {
+        if (sel.value === 'Estudiante') {
+          cicloC.style.display = '';
+        } else {
+          cicloC.style.display = 'none';
+          if (cicloSel) { cicloSel.selectedIndex = 0; document.getElementById('inp-ciclo').value = ''; }
+        }
       }
     }
   }

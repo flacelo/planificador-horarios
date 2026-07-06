@@ -1010,18 +1010,27 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
             <input id="inp-nombre" class="oculto" placeholder="Tu nombre" value="">
           </div>
           <div class="campo">
-            <select id="sel-carrera" onchange="cambioSelect(this,'inp-carrera')">
-              <optgroup label="— Selecciona —">
-                <option value="Ing. Seguridad Industrial y Minera">Ing. Seg. Industrial y Minera</option>
-                <option value="Ing. de Sistemas">Ing. de Sistemas</option>
-                <option value="Ing. Civil">Ing. Civil</option>
-                <option value="Administración">Administración</option>
-                <option value="Medicina">Medicina</option>
-                <option value="Derecho">Derecho</option>
-                <option value="otros">✏️ Otros</option>
-              </optgroup>
+            <select id="sel-carrera" onchange="onCarreraChange()">
+              <option value="">— Selecciona tu carrera —</option>
+              <option value="Ingeniería">🔧 Ingeniería</option>
+              <option value="Medicina">⚕️ Medicina</option>
+              <option value="Derecho">⚖️ Derecho</option>
+              <option value="Arquitectura">🏛️ Arquitectura</option>
+              <option value="Enfermería">🩺 Enfermería</option>
+              <option value="Psicología">🧠 Psicología</option>
+              <option value="Freelancer">🚀 Freelancer</option>
+              <option value="Otra Carrera">📚 Otra Carrera</option>
             </select>
             <input id="inp-carrera" class="oculto" placeholder="Carrera" value="">
+          </div>
+          <div id="engineering-sub-container" class="oculto" style="margin-top:4px;">
+            <select id="sel-ingenieria" onchange="onIngenieriaChange()">
+              <option value="">— Rama de Ingeniería —</option>
+              <option value="Ingeniería de Seguridad Industrial y Minera">⛏️ Ing. Seg. Industrial y Minera</option>
+              <option value="Ingeniería de Sistemas">💻 Ing. de Sistemas</option>
+              <option value="Ingeniería Civil">🏗️ Ing. Civil</option>
+              <option value="Otra Ingeniería">🔧 Otra Ingeniería</option>
+            </select>
           </div>
           <div class="campo">
             <select id="sel-ciclo" onchange="cambioSelect(this,'inp-ciclo')">
@@ -1272,16 +1281,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     <label>Contenido:</label>
     <textarea id="modal-texto" rows="3"></textarea>
     <label>Categoría:</label>
-    <select id="modal-categoria">
-      <option value="clase">🟦 Clase universidad</option>
-      <option value="ensenanza">🟪 Enseñanza</option>
-      <option value="estudio">⬜ Estudio / Proyectos</option>
-      <option value="comida">🟨 Comida</option>
-      <option value="desconexion">🟥 Desconexión digital</option>
-      <option value="flexible">🟧 Bloque flexible</option>
-      <option value="rutina">🟩 Rutina / Dormir</option>
-      <option value="libre">⬜ Libre</option>
-    </select>
+    <select id="modal-categoria"></select>
     <label style="margin-top:4px;display:flex;align-items:center;gap:6px;font-size:0.78em;color:#555;">
       <input type="checkbox" id="modal-reminder"> 🔔 Recordatorio (aviso antes de la hora)
     </label>
@@ -1482,7 +1482,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   document.getElementById('modal-admin').addEventListener('click', function(e) { if (e.target === this) cerrarAdmin(); });
 
   // ========== CATEGORÍAS ==========
-  const CATS = [
+  let CATS = [
     { id:'clase', label:'Clase universidad', color:'#74b9ff' },
     { id:'ensenanza', label:'Enseñanza', color:'#a29bfe' },
     { id:'estudio', label:'Estudio / Proyectos', color:'#dfe6e9' },
@@ -1492,6 +1492,221 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
     { id:'libre', label:'Libre', color:'#f5f6fa' }
   ];
+
+  // ========== PERFILES POR CARRERA ==========
+  const profiles = {
+    'Ingeniería de Seguridad Industrial y Minera': {
+      label: 'Ing. Seguridad Industrial y Minera',
+      icon: '⛏️',
+      cats: [
+        { id:'clase', label:'Clase universidad', color:'#74b9ff' },
+        { id:'laboratorio', label:'Laboratorio', color:'#a29bfe' },
+        { id:'estudio', label:'Estudio', color:'#dfe6e9' },
+        { id:'inspeccion-epp', label:'Inspección EPP', color:'#fdcb6e' },
+        { id:'matriz-iperc', label:'Matriz IPERC', color:'#e17055' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Aprobar todas las materias con ≥14',
+        'Completar 3 matrices IPERC por ciclo',
+        'Mantener récord de seguridad en prácticas'
+      ]
+    },
+    'Ingeniería de Sistemas': {
+      label: 'Ing. de Sistemas',
+      icon: '💻',
+      cats: [
+        { id:'clase', label:'Clase universidad', color:'#74b9ff' },
+        { id:'programacion', label:'Programación', color:'#a29bfe' },
+        { id:'base-datos', label:'Base de Datos', color:'#fdcb6e' },
+        { id:'proyectos', label:'Proyectos', color:'#e17055' },
+        { id:'estudio', label:'Estudio', color:'#dfe6e9' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Entregar todos los proyectos a tiempo',
+        'Aprender un nuevo framework este ciclo',
+        'Mantener promedio ≥15 en cursos de programación'
+      ]
+    },
+    'Ingeniería Civil': {
+      label: 'Ing. Civil',
+      icon: '🏗️',
+      cats: [
+        { id:'clase', label:'Clase universidad', color:'#74b9ff' },
+        { id:'topografia', label:'Topografía', color:'#a29bfe' },
+        { id:'planos', label:'Planos / AutoCAD', color:'#fdcb6e' },
+        { id:'estructuras', label:'Estructuras', color:'#e17055' },
+        { id:'estudio', label:'Estudio', color:'#dfe6e9' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Terminar planos estructurales del proyecto final',
+        'Aprobar cursos de concreto armado y suelos',
+        'Visitar obra al menos 1 vez por semana'
+      ]
+    },
+    'Otra Ingeniería': {
+      label: 'Otra Ingeniería',
+      icon: '🔧',
+      cats: [
+        { id:'clase', label:'Clase universidad', color:'#74b9ff' },
+        { id:'laboratorio', label:'Laboratorio', color:'#a29bfe' },
+        { id:'estudio', label:'Estudio', color:'#dfe6e9' },
+        { id:'proyectos', label:'Proyectos', color:'#fdcb6e' },
+        { id:'reportes', label:'Reportes', color:'#e17055' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Mantener promedio ponderado ≥14',
+        'Entregar reportes de laboratorio completos',
+        'Participar en al menos 1 proyecto integrador'
+      ]
+    },
+    'Medicina': {
+      label: 'Medicina',
+      icon: '⚕️',
+      cats: [
+        { id:'hospital', label:'Hospital / Clínica', color:'#e17055' },
+        { id:'guardia', label:'Guardia', color:'#d63031' },
+        { id:'anatomia', label:'Anatomía', color:'#fdcb6e' },
+        { id:'casos-clinicos', label:'Casos Clínicos', color:'#74b9ff' },
+        { id:'estudio', label:'Estudio', color:'#dfe6e9' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Asistir al 100% de prácticas hospitalarias',
+        'Repasar anatomía 30 min diarios',
+        'Presentar 2 casos clínicos por rotación'
+      ]
+    },
+    'Derecho': {
+      label: 'Derecho',
+      icon: '⚖️',
+      cats: [
+        { id:'clase', label:'Clase universidad', color:'#74b9ff' },
+        { id:'lectura-codigos', label:'Lectura de Códigos', color:'#a29bfe' },
+        { id:'analisis-casos', label:'Análisis de Casos', color:'#fdcb6e' },
+        { id:'litigacion', label:'Litigación', color:'#e17055' },
+        { id:'debate', label:'Debate / Oral', color:'#55efc4' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Leer y analizar 2 códigos por ciclo',
+        'Ganar al menos 1 simulación de juicio',
+        'Redactar 1 demanda o contrato modelo'
+      ]
+    },
+    'Arquitectura': {
+      label: 'Arquitectura',
+      icon: '🏛️',
+      cats: [
+        { id:'clase', label:'Clase universidad', color:'#74b9ff' },
+        { id:'diseno', label:'Diseño Arquitectónico', color:'#a29bfe' },
+        { id:'planos', label:'Planos / Revit', color:'#fdcb6e' },
+        { id:'maquetas', label:'Maquetas', color:'#e17055' },
+        { id:'estudio', label:'Estudio', color:'#dfe6e9' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Terminar láminas del proyecto del ciclo',
+        'Construir maqueta a escala 1:50',
+        'Visitar 2 obras arquitectónicas referentes'
+      ]
+    },
+    'Enfermería': {
+      label: 'Enfermería',
+      icon: '🩺',
+      cats: [
+        { id:'clase', label:'Clase universidad', color:'#74b9ff' },
+        { id:'practicas-clinicas', label:'Prácticas Clínicas', color:'#a29bfe' },
+        { id:'anatomia', label:'Anatomía', color:'#fdcb6e' },
+        { id:'guardias', label:'Guardias', color:'#e17055' },
+        { id:'estudio', label:'Estudio', color:'#dfe6e9' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Cumplir todas las guardias programadas',
+        'Aprobar examen de anatomía con ≥15',
+        'Realizar 5 procedimientos clínicos supervisados'
+      ]
+    },
+    'Psicología': {
+      label: 'Psicología',
+      icon: '🧠',
+      cats: [
+        { id:'clase', label:'Clase universidad', color:'#74b9ff' },
+        { id:'psicoterapia', label:'Psicoterapia', color:'#a29bfe' },
+        { id:'lectura', label:'Lectura', color:'#fdcb6e' },
+        { id:'casos-clinicos', label:'Casos Clínicos', color:'#fab1a0' },
+        { id:'talleres', label:'Talleres', color:'#e17055' },
+        { id:'estudio', label:'Estudio', color:'#dfe6e9' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Leer 1 libro de psicología por mes',
+        'Realizar 3 entrevistas clínicas supervisadas',
+        'Asistir a 2 talleres o congresos por ciclo'
+      ]
+    },
+    'Freelancer': {
+      label: 'Freelancer',
+      icon: '🚀',
+      cats: [
+        { id:'proyectos', label:'Proyectos', color:'#74b9ff' },
+        { id:'reunion-cliente', label:'Reunión Cliente', color:'#a29bfe' },
+        { id:'trabajo-enfoque', label:'Trabajo Enfoque', color:'#55efc4' },
+        { id:'finanzas', label:'Finanzas', color:'#fdcb6e' },
+        { id:'aprendizaje', label:'Aprendizaje', color:'#e17055' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Entregar proyectos antes del deadline',
+        'Dedicar 2h diarias a trabajo enfocado',
+        'Aumentar ingresos mensuales en 20%'
+      ]
+    },
+    'Otra Carrera': {
+      label: 'Otra Carrera',
+      icon: '📚',
+      cats: [
+        { id:'clase', label:'Clase universidad', color:'#74b9ff' },
+        { id:'repaso', label:'Repaso', color:'#a29bfe' },
+        { id:'tareas', label:'Tareas', color:'#fdcb6e' },
+        { id:'proyectos', label:'Proyectos', color:'#e17055' },
+        { id:'lectura', label:'Lectura', color:'#fab1a0' },
+        { id:'examenes', label:'Exámenes', color:'#ff7675' },
+        { id:'comida', label:'Comida', color:'#ffeaa7' },
+        { id:'rutina', label:'Rutina / Dormir', color:'#55efc4' },
+        { id:'libre', label:'Libre', color:'#f5f6fa' }
+      ],
+      goals: [
+        'Estudiar 2h fuera de clase cada día',
+        'Entregar todos los trabajos a tiempo',
+        'Preparar exámenes con 1 semana de anticipación'
+      ]
+    }
+  };
 
   let dias = ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'];
   let filas = [];
@@ -1568,6 +1783,73 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     const inp = document.getElementById(inpId);
     if (sel.value === 'otros') { inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = ''; inp.focus(); }
     else { inp.classList.remove('visible'); inp.classList.add('oculto'); inp.value = sel.value; }
+  }
+
+  function actualizarModalCategorias() {
+    const sel = document.getElementById('modal-categoria');
+    if (!sel) return;
+    sel.innerHTML = CATS.map(c => `<option value="${c.id}">${c.label}</option>`).join('');
+  }
+
+  function inyectarCSScategorias() {
+    let styleId = 'dynamic-cat-css';
+    let old = document.getElementById(styleId);
+    if (old) old.remove();
+    let css = '';
+    CATS.forEach(c => {
+      const hsl = (col) => { const r=parseInt(col.slice(1,3),16),g=parseInt(col.slice(3,5),16),b=parseInt(col.slice(5,7),16); return [r,g,b]; };
+      const [r,g,b] = hsl(c.color);
+      css += `.c-${c.id} { background:${c.color} !important; }\n`;
+      css += `body.dark .c-${c.id} { background:rgb(${Math.round(r*0.35)},${Math.round(g*0.35)},${Math.round(b*0.35)}) !important; color:${c.color} !important; }\n`;
+    });
+    const st = document.createElement('style');
+    st.id = styleId;
+    st.textContent = css;
+    document.head.appendChild(st);
+  }
+
+  function cargarPerfil(perfilId) {
+    const perfil = profiles[perfilId];
+    if (!perfil) return;
+    CATS = perfil.cats;
+    inyectarCSScategorias();
+    actualizarModalCategorias();
+    const selObj = document.getElementById('sel-objetivo');
+    if (selObj && perfil.goals) {
+      selObj.innerHTML = '<optgroup label="— Selecciona —">' +
+        perfil.goals.map(g => `<option value="${g}">${g}</option>`).join('') +
+        '<option value="otros">✏️ Otros</option></optgroup>';
+      selObj.value = perfil.goals[0];
+    }
+    localStorage.setItem('horario_perfil', perfilId);
+    const inpCarrera = document.getElementById('inp-carrera');
+    if (inpCarrera) inpCarrera.value = perfil.label || perfilId;
+    renderizar();
+  }
+
+  function onCarreraChange() {
+    const sel = document.getElementById('sel-carrera');
+    const sub = document.getElementById('engineering-sub-container');
+    if (!sel) return;
+    const val = sel.value;
+    if (val === 'Ingeniería') {
+      sub.classList.remove('oculto');
+      sub.classList.add('visible');
+      document.getElementById('inp-carrera').value = '';
+    } else if (val === '') {
+      sub.classList.add('oculto');
+      sub.classList.remove('visible');
+    } else {
+      sub.classList.add('oculto');
+      sub.classList.remove('visible');
+      if (profiles[val]) cargarPerfil(val);
+    }
+  }
+
+  function onIngenieriaChange() {
+    const sel = document.getElementById('sel-ingenieria');
+    if (!sel || !sel.value) return;
+    if (profiles[sel.value]) cargarPerfil(sel.value);
   }
 
   function valInfo(idSel, idInp) {
@@ -1671,10 +1953,12 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
 
   function abrirModal(fi, ci) {
     modalFila = fi; modalCol = ci;
-    const cel = filas[fi].celdas[ci] || {t:'',c:'libre'};
+    const cel = filas[fi].celdas[ci] || {t:'',c:''};
     document.getElementById('modal-titulo').textContent = `Editando: ${dias[ci]} — ${filas[fi].hora}`;
     document.getElementById('modal-texto').value = cel.t || '';
-    document.getElementById('modal-categoria').value = cel.c || 'libre';
+    const catSel = document.getElementById('modal-categoria');
+    const catVal = cel.c && CATS.some(c => c.id === cel.c) ? cel.c : (CATS[0]?.id || 'libre');
+    catSel.value = catVal;
     document.getElementById('modal-reminder').checked = cel.reminder ? true : false;
     document.getElementById('modal').classList.add('active');
     document.getElementById('modal-texto').focus();
@@ -1762,7 +2046,11 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   }
 
   // ========== EXPORTAR ==========
-  function getColorMap() { return { clase:'#74b9ff', ensenanza:'#a29bfe', estudio:'#dfe6e9', comida:'#ffeaa7', desconexion:'#ff7675', flexible:'#fab1a0', rutina:'#55efc4', libre:'#f5f6fa' }; }
+  function getColorMap() {
+    const m = {};
+    CATS.forEach(c => { m[c.id] = c.color; });
+    return m;
+  }
 
   function getMarcaAgua() {
     try { if (JSON.parse(localStorage.getItem('horario_licencia')).comprador) return ''; } catch(e) {}
@@ -1813,6 +2101,23 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     verificarEstadoLicencia();
     initScreenshotProtection();
     initDarkMode();
+    actualizarModalCategorias();
+    const savedPerfil = localStorage.getItem('horario_perfil');
+    if (savedPerfil && profiles[savedPerfil]) {
+      const p = profiles[savedPerfil];
+      CATS = p.cats;
+      inyectarCSScategorias();
+      actualizarModalCategorias();
+      const selObj = document.getElementById('sel-objetivo');
+      if (selObj && p.goals) {
+        selObj.innerHTML = '<optgroup label="— Selecciona —">' +
+          p.goals.map(g => `<option value="${g}">${g}</option>`).join('') +
+          '<option value="otros">✏️ Otros</option></optgroup>';
+        selObj.value = p.goals[0];
+      }
+      const inpCarrera = document.getElementById('inp-carrera');
+      if (inpCarrera) inpCarrera.value = p.label || savedPerfil;
+    }
     const savedType = localStorage.getItem('horario_planner_type') || 'semanal';
     plannerType = savedType;
     document.querySelectorAll('.planner-type-selector button').forEach(b => {

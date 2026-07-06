@@ -997,7 +997,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
         </div>
         <div class="info-row">
           <div class="campo">
-            <select id="sel-nombre" onchange="onNombreChange(this)">
+            <select id="sel-nombre" onchange="onRolChange(this)">
               <option value="">Soy...</option>
               <option value="Estudiante">🎓 Estudiante</option>
               <option value="Docente">👨‍🏫 Docente</option>
@@ -1825,7 +1825,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     renderizar();
   }
 
-  function onNombreChange(sel) {
+  function onRolChange(sel) {
     const cicloContainer = document.getElementById('ciclo-container');
     const inp = document.getElementById('inp-nombre');
     if (sel.value === 'otros') { inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = ''; inp.focus(); }
@@ -2085,7 +2085,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
       if (opt) { sel.value = val; inp.classList.remove('visible'); inp.classList.add('oculto'); inp.value = ''; }
       else { sel.value = 'otros'; inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = val||''; }
     };
-    if (d.nombre) { ms('sel-nombre','inp-nombre',d.nombre); onNombreChange(document.getElementById('sel-nombre')); }
+    if (d.nombre) { ms('sel-nombre','inp-nombre',d.nombre); onRolChange(document.getElementById('sel-nombre')); }
     if (d.carrera) ms('sel-carrera','inp-carrera',d.carrera);
     if (d.ciclo) ms('sel-ciclo','inp-ciclo',d.ciclo);
     if (d.objetivo) ms('sel-objetivo','inp-objetivo',d.objetivo);
@@ -2108,7 +2108,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (espContainer) espContainer.style.display = 'none';
     document.getElementById('inp-titulo-header').value = '';
     actualizarHeaderPreview();
-    onNombreChange(document.getElementById('sel-nombre'));
+    onRolChange(document.getElementById('sel-nombre'));
     renderizar(); autoGuardar(); alert('✅ Restablecido.');
   }
 
@@ -2169,6 +2169,12 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     initScreenshotProtection();
     initDarkMode();
     actualizarModalCategorias();
+    ['sel-nombre','sel-carrera','sel-ciclo'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.value && !Array.from(el.options).some(o => o.value === el.value)) {
+        el.selectedIndex = 0;
+      }
+    });
     const savedPerfil = localStorage.getItem('horario_perfil');
     if (savedPerfil && profiles[savedPerfil]) {
       const p = profiles[savedPerfil];
@@ -2223,7 +2229,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     }
     filas = JSON.parse(JSON.stringify(generarBloquesDefault())); renderizar();
     const nombreSel = document.getElementById('sel-nombre');
-    if (nombreSel) onNombreChange(nombreSel);
+    if (nombreSel) onRolChange(nombreSel);
   }
   iniciar();
 

@@ -998,20 +998,19 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
         <div class="info-row">
           <div class="campo">
             <select id="sel-nombre" onchange="onNombreChange(this)">
-              <optgroup label="— Selecciona —">
-                <option value="Estudiante">Estudiante</option>
-                <option value="Trabajador">Trabajador</option>
-                <option value="Freelancer">Freelancer</option>
-                <option value="Emprendedor">Emprendedor</option>
-                <option value="DOCENTE">DOCENTE</option>
-                <option value="otros">✏️ Otros</option>
-              </optgroup>
+              <option value="">Soy...</option>
+              <option value="Estudiante">🎓 Estudiante</option>
+              <option value="Docente">👨‍🏫 Docente</option>
+              <option value="Egresado">🎓 Egresado</option>
+              <option value="Profesional">💼 Profesional</option>
+              <option value="Freelancer">🚀 Freelancer</option>
+              <option value="otros">✏️ Otros</option>
             </select>
             <input id="inp-nombre" class="oculto" placeholder="Tu nombre" value="">
           </div>
           <div class="campo">
             <select id="sel-carrera" onchange="onCarreraChange()">
-              <option value="">— Selecciona tu carrera —</option>
+              <option value="">— Carrera / Área —</option>
               <option value="Ingeniería">🔧 Ingeniería</option>
               <option value="Medicina">⚕️ Medicina</option>
               <option value="Derecho">⚖️ Derecho</option>
@@ -1023,27 +1022,26 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
             </select>
             <input id="inp-carrera" class="oculto" placeholder="Carrera" value="">
           </div>
-          <div id="engineering-sub-container" class="oculto" style="margin-top:4px;">
-            <select id="sel-ingenieria" onchange="onIngenieriaChange()">
-              <option value="">— Rama de Ingeniería —</option>
-              <option value="Ingeniería de Seguridad Industrial y Minera">⛏️ Ing. Seg. Industrial y Minera</option>
-              <option value="Ingeniería de Sistemas">💻 Ing. de Sistemas</option>
-              <option value="Ingeniería Civil">🏗️ Ing. Civil</option>
-              <option value="Otra Ingeniería">🔧 Otra Ingeniería</option>
+          <div id="especialidad-container" style="display:none;margin-top:4px;">
+            <select id="sel-especialidad" onchange="onEspecialidadChange()">
+              <option value="">— Selecciona —</option>
             </select>
+            <input id="inp-especialidad" class="oculto" placeholder="Escribe tu especialidad..." style="margin-top:4px;width:100%;">
           </div>
           <div class="campo" id="ciclo-container">
             <select id="sel-ciclo" onchange="cambioSelect(this,'inp-ciclo')">
-              <optgroup label="— Selecciona —">
-                <option value="7mo Ciclo">7mo Ciclo</option>
-                <option value="1er Ciclo">1er Ciclo</option>
-                <option value="2do Ciclo">2do Ciclo</option>
-                <option value="3er Ciclo">3er Ciclo</option>
-                <option value="4to Ciclo">4to Ciclo</option>
-                <option value="Egresado">Egresado</option>
-                <option value="Profesional">Profesional</option>
-                <option value="otros">✏️ Otros</option>
-              </optgroup>
+              <option value="">Nivel / Ciclo</option>
+              <option value="1er Ciclo">1er Ciclo</option>
+              <option value="2do Ciclo">2do Ciclo</option>
+              <option value="3er Ciclo">3er Ciclo</option>
+              <option value="4to Ciclo">4to Ciclo</option>
+              <option value="5to Ciclo">5to Ciclo</option>
+              <option value="6to Ciclo">6to Ciclo</option>
+              <option value="7mo Ciclo">7mo Ciclo</option>
+              <option value="8vo Ciclo">8vo Ciclo</option>
+              <option value="9no Ciclo">9no Ciclo</option>
+              <option value="10mo Ciclo">10mo Ciclo</option>
+              <option value="otros">✏️ Otros</option>
             </select>
             <input id="inp-ciclo" class="oculto" placeholder="Ciclo" value="">
           </div>
@@ -1833,35 +1831,88 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (sel.value === 'otros') { inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = ''; inp.focus(); }
     else { inp.classList.remove('visible'); inp.classList.add('oculto'); inp.value = sel.value; }
     if (cicloContainer) {
-      if (sel.value === 'DOCENTE' || sel.value === 'Freelancer') {
-        cicloContainer.classList.add('oculto');
+      if (sel.value === 'Estudiante') {
+        cicloContainer.style.display = '';
       } else {
-        cicloContainer.classList.remove('oculto');
+        cicloContainer.style.display = 'none';
+        document.getElementById('sel-ciclo').selectedIndex = 0;
+        document.getElementById('inp-ciclo').value = '';
       }
     }
   }
 
-  function onCarreraChange() {
-    const sel = document.getElementById('sel-carrera');
-    const sub = document.getElementById('engineering-sub-container');
-    const subSel = document.getElementById('sel-ingenieria');
-    if (!sel) return;
-    const val = sel.value;
-    if (val === 'Ingeniería') {
-      sub.classList.remove('oculto');
-      sub.classList.add('visible');
-      document.getElementById('inp-carrera').value = '';
-    } else {
-      if (sub) { sub.classList.add('oculto'); sub.classList.remove('visible'); }
-      if (subSel) subSel.value = '';
-      if (val && profiles[val]) cargarPerfil(val);
-      else if (!val) document.getElementById('inp-carrera').value = '';
-    }
+  function poblarEspecialidad(carrera) {
+    const container = document.getElementById('especialidad-container');
+    const sel = document.getElementById('sel-especialidad');
+    const inp = document.getElementById('inp-especialidad');
+    if (!container || !sel) return;
+    const map = {
+      Ingeniería: { label: '— Rama de Ingeniería —', opts: [
+        ['Ingeniería de Seguridad Industrial y Minera', '⛏️ Ing. Seg. Industrial y Minera'],
+        ['Ingeniería de Sistemas', '💻 Ing. de Sistemas'],
+        ['Ingeniería Civil', '🏗️ Ing. Civil'],
+        ['Otra Ingeniería', '🔧 Otra Ingeniería']
+      ]},
+      Medicina: { label: '— Especialidad —', opts: [
+        ['Cardiología', '❤️ Cardiología'],
+        ['Pediatría', '👶 Pediatría'],
+        ['Neurología', '🧠 Neurología'],
+        ['Cirugía General', '🔪 Cirugía General'],
+        ['Agregar especialidad...', '✏️ Agregar especialidad...']
+      ]},
+      Enfermería: { label: '— Especialidad —', opts: [
+        ['Enfermería General', '🩺 Enfermería General'],
+        ['Enfermería Intensiva', '💉 Enf. Intensiva'],
+        ['Enfermería Pediátrica', '👶 Enf. Pediátrica'],
+        ['Agregar especialidad...', '✏️ Agregar especialidad...']
+      ]},
+      default: { label: '— Especialidad —', opts: [
+        ['Agregar especialidad...', '✏️ Agregar especialidad...']
+      ]}
+    };
+    const config = map[carrera] || map.default;
+    sel.innerHTML = '<option value="">' + config.label + '</option>' +
+      config.opts.map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join('');
+    container.style.display = 'block';
+    inp.classList.add('oculto');
+    inp.value = '';
   }
 
-  function onIngenieriaChange() {
-    const sel = document.getElementById('sel-ingenieria');
+  function onCarreraChange() {
+    const sel = document.getElementById('sel-carrera');
+    const container = document.getElementById('especialidad-container');
+    const espSel = document.getElementById('sel-especialidad');
+    const espInp = document.getElementById('inp-especialidad');
+    if (!sel) return;
+    const val = sel.value;
+    document.getElementById('inp-carrera').value = '';
+    if (val === 'Freelancer') {
+      container.style.display = 'none';
+      if (profiles.Freelancer) cargarPerfil('Freelancer');
+    } else if (val && profiles[val]) {
+      container.style.display = 'none';
+      cargarPerfil(val);
+    } else if (val) {
+      poblarEspecialidad(val);
+    } else {
+      container.style.display = 'none';
+    }
+    if (espSel) espSel.value = '';
+    if (espInp) { espInp.value = ''; espInp.classList.add('oculto'); }
+  }
+
+  function onEspecialidadChange() {
+    const sel = document.getElementById('sel-especialidad');
+    const inp = document.getElementById('inp-especialidad');
     if (!sel || !sel.value) return;
+    if (sel.value === 'Agregar especialidad...') {
+      inp.classList.remove('oculto');
+      inp.value = '';
+      inp.focus();
+      return;
+    }
+    inp.classList.add('oculto');
+    inp.value = sel.value;
     if (profiles[sel.value]) cargarPerfil(sel.value);
   }
 
@@ -2052,7 +2103,9 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     dias = ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'];
     filas = JSON.parse(JSON.stringify(DEFAULT));
     ['sel-nombre','sel-carrera','sel-ciclo','sel-objetivo'].forEach(id => document.getElementById(id).selectedIndex = 0);
-    ['inp-nombre','inp-carrera','inp-ciclo','inp-objetivo'].forEach(id => { document.getElementById(id).value = ''; document.getElementById(id).className = 'oculto'; });
+    ['inp-nombre','inp-carrera','inp-ciclo','inp-objetivo','inp-especialidad'].forEach(id => { const el=document.getElementById(id); if(el){el.value='';el.className='oculto';} });
+    const espContainer = document.getElementById('especialidad-container');
+    if (espContainer) espContainer.style.display = 'none';
     document.getElementById('inp-titulo-header').value = '';
     actualizarHeaderPreview();
     onNombreChange(document.getElementById('sel-nombre'));

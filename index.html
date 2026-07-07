@@ -2591,38 +2591,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     return d.header ? `<h2 style="text-align:center;color:#667eea;">${d.header}</h2>` : '';
   }
 
-  function exportarPDF() {
-    const d = getDatosCompletos(); const rows = generarTablaExport();
-    const dt = dias.map(d=>`<th style="background:#2c3e50;color:#fff;padding:6px;border:1px solid #999;font-size:11px;">${d}</th>`).join('');
-    const h = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Planificador ${d.tipo}</title><style>body{font-family:Arial;padding:20px;}table{width:100%;border-collapse:collapse;font-size:12px;}</style></head><body>${getHeaderExport(d)}<h2>📅 Planificador ${d.tipo} — ${d.nombre}</h2><p style="font-size:11px;color:#555;">${d.carrera} · ${d.ciclo} · ${d.objetivo}</p><table><tr><th style="background:#2c3e50;color:#fff;padding:6px;border:1px solid #999;">HORA</th>${dt}</tr>${rows}</table>${getMarcaAgua()}</body></html>`;
-    const w = window.open('','_blank'); if(w){w.document.write(h);w.document.close();setTimeout(()=>w.print(),500);} else alert('Permite ventanas emergentes.');
-  }
 
-  function exportarExcel() {
-    const d = getDatosCompletos(); const rows = generarTablaExport();
-    const dt = dias.map(d=>`<th style="background:#2c3e50;color:#fff;padding:6px;border:1px solid #999;">${d}</th>`).join('');
-    const h = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Planificador ${d.tipo}</title><style>table{width:100%;border-collapse:collapse;font-size:11px;}th,td{border:1px solid #999;padding:4px;}</style></head><body>${getHeaderExport(d)}<h3>📅 Planificador ${d.tipo} — ${d.nombre}</h3><p>${d.carrera} · ${d.ciclo} · ${d.objetivo}</p><table><tr><th style="background:#2c3e50;color:#fff;">HORA</th>${dt}</tr>${rows}</table>${getMarcaAgua()}</body></html>`;
-    descargarComo(h,`Planificador_${d.tipo}_${d.nombre.replace(/ /g,'_')}.xls`,'application/vnd.ms-excel');
-  }
-
-  function exportarWord() {
-    const d = getDatosCompletos(); const rows = generarTablaExport();
-    const dt = dias.map(d=>`<th style="background:#2c3e50;color:#fff;padding:6px;border:1px solid #999;">${d}</th>`).join('');
-    const h = `<!DOCTYPE html><html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="UTF-8"><title>Planificador ${d.tipo}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]--><style>table{width:100%;border-collapse:collapse;font-size:11px;}th,td{border:1px solid #999;padding:4px;}body{font-family:Calibri;padding:20px;}</style></head><body>${getHeaderExport(d)}<h3>📅 Planificador ${d.tipo} — ${d.nombre}</h3><p>${d.carrera} · ${d.ciclo} · ${d.objetivo}</p><table><tr><th style="background:#2c3e50;color:#fff;">HORA</th>${dt}</tr>${rows}</table>${getMarcaAgua()}</body></html>`;
-    descargarComo(h,`Planificador_${d.tipo}_${d.nombre.replace(/ /g,'_')}.doc`,'application/msword');
-  }
-
-  function imprimir() { exportarPDF(); }
-  function descargarComo(h,n,m) { const b=new Blob([h],{type:m+';charset=utf-8'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(u),1000); }
-
-  // ========== COMPRA ==========
-  function mostrarCompra() { document.getElementById('modal-compra').classList.add('active'); }
-  function cerrarModalCompra() { document.getElementById('modal-compra').classList.remove('active'); }
-  document.getElementById('modal-compra').addEventListener('click', function(e) { if (e.target === this) cerrarModalCompra(); });
-  function mostrarActivar() { cerrarModalCompra(); setTimeout(()=>{document.getElementById('inp-codigo').value='';document.getElementById('msg-activar').textContent='';document.getElementById('modal-activar').classList.add('active');},300); }
-  function cerrarActivar() { document.getElementById('modal-activar').classList.remove('active'); }
-  document.getElementById('modal-activar').addEventListener('click', function(e) { if (e.target === this) cerrarActivar(); });
-  function abrirWhatsApp() { window.open(`https://wa.me/51936718790?text=${encodeURIComponent('🔥 ¡YA DECIDÍ! Quiero mi LICENCIA COMPLETA del Planificador de Horarios.\n\n✅ Sin marca de agua\n✅ Exportaciones sin restricciones\n✅ Soporte incluido\n\n💵 Son S/15 — ¿Cómo coordino el pago por Yape?')}`,'_blank'); }
 
   // ========== INICIO ==========
   function iniciar() {

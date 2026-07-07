@@ -1,4 +1,4 @@
-const CACHE = 'planificador-v1';
+const CACHE = 'planificador-v2';
 const ASSETS = [
   './',
   './index.html',

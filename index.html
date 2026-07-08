@@ -1464,6 +1464,130 @@
     localStorage.setItem('horario_rewards', JSON.stringify(rewards));
   }
 
+  // ======================================================================
+  // 🆕 MERGE / UNIR CELDAS
+  // ======================================================================
+  let mergeActivo = false;
+  let mergeSeleccion = [];
+
+  function toggleMergeMode() {
+    mergeActivo = !mergeActivo;
+    mergeSeleccion = [];
+    document.getElementById('btn-merge-mode').classList.toggle('active', mergeActivo);
+    document.getElementById('btn-merge-apply').style.display = 'none';
+    document.getElementById('btn-merge-split').style.display = 'none';
+    document.getElementById('table-wrap').classList.toggle('merge-active', mergeActivo);
+    document.getElementById('merge-info').textContent = mergeActivo ? 'Haz clic en las celdas de una misma columna para unirlas' : '';
+    renderizar();
+  }
+
+  function toggleSeleccionMerge(fi, ci) {
+    const cel = filas[fi]?.celdas?.[ci];
+    const isMerged = cel && cel.rowspan > 1;
+    const splitBtn = document.getElementById('btn-merge-split');
+    const applyBtn = document.getElementById('btn-merge-apply');
+    if (isMerged) {
+      mergeSeleccion = [{ fi, ci }];
+      splitBtn.style.display = 'inline-block';
+      applyBtn.style.display = 'none';
+    } else {
+      const idx = mergeSeleccion.findIndex(s => s.fi === fi && s.ci === ci);
+      if (idx >= 0) {
+        mergeSeleccion.splice(idx, 1);
+      } else {
+        mergeSeleccion.push({ fi, ci });
+      }
+      splitBtn.style.display = 'none';
+      applyBtn.style.display = mergeSeleccion.length >= 2 ? 'inline-block' : 'none';
+    }
+    actualizarInfoMerge();
+    resaltarSeleccionMerge();
+  }
+
+  function resaltarSeleccionMerge() {
+    document.querySelectorAll('.celda.merge-selected').forEach(el => el.classList.remove('merge-selected'));
+    mergeSeleccion.forEach(s => {
+      const celda = document.querySelector(`#tabla tbody tr:nth-child(${s.fi+1}) td:nth-child(${s.ci+2})`);
+      if (celda) celda.classList.add('merge-selected');
+    });
+  }
+
+  function actualizarInfoMerge() {
+    const info = document.getElementById('merge-info');
+    if (!mergeActivo) {
+      const mergedCount = filas.reduce((sum, f) => sum + f.celdas.filter(c => c && c.rowspan > 1).length, 0);
+      if (mergedCount > 0) {
+        info.textContent = `🔗 ${mergedCount} celda(s) unida(s) — Activa "Unir celdas" para editar`;
+      } else {
+        info.textContent = '';
+      }
+      return;
+    }
+    if (mergeSeleccion.length === 0) {
+      info.textContent = 'Haz clic en las celdas de una misma columna para unirlas';
+      return;
+    }
+    const cols = [...new Set(mergeSeleccion.map(s => s.ci))];
+    if (cols.length > 1) {
+      info.textContent = '⚠️ Solo puedes unir celdas de la MISMA columna (mismo día)';
+      return;
+    }
+    const rows = mergeSeleccion.map(s => s.fi).sort((a,b) => a-b);
+    const continuas = rows.every((r, i) => i === 0 || r === rows[i-1] + 1);
+    if (!continuas) {
+      info.textContent = '⚠️ Selecciona celdas consecutivas en la misma columna';
+      return;
+    }
+    info.innerHTML = `✅ ${rows.length} celdas seleccionadas en ${dias[cols[0]]} — <strong>Listo para unir</strong>`;
+    info.style.color = '#55efc4';
+  }
+
+  function aplicarMerge() {
+    if (!mergeActivo || mergeSeleccion.length < 2) return;
+    const cols = [...new Set(mergeSeleccion.map(s => s.ci))];
+    if (cols.length > 1) return;
+    const ci = cols[0];
+    const rows = mergeSeleccion.map(s => s.fi).sort((a,b) => a-b);
+    const continuas = rows.every((r, i) => i === 0 || r === rows[i-1] + 1);
+    if (!continuas) return;
+    const fiInicio = rows[0];
+    const fiFin = rows[rows.length-1];
+    const contenido = filas[fiInicio].celdas[ci]?.t || '';
+    const categoria = filas[fiInicio].celdas[ci]?.c || 'libre';
+    const nombre = prompt('Nombre del curso o actividad:', contenido);
+    if (nombre === null) return;
+    const cat = prompt('Categoría (clase/ensenanza/estudio/comida/desconexion/flexible/rutina/libre):', categoria);
+    if (cat === null) return;
+    const valCat = CATS.find(c => c.id === cat) ? cat : 'clase';
+    filas[fiInicio].celdas[ci] = { t: nombre || '—', c: valCat, done: false, reminder: false, rowspan: rows.length };
+    for (let i = fiInicio + 1; i <= fiFin; i++) {
+      filas[i].celdas[ci] = { t: null, c: 'libre', done: false, reminder: false, rowspan: 0 };
+    }
+    mergeSeleccion = [];
+    renderizar();
+    autoGuardar();
+    toggleMergeMode();
+  }
+
+  function dividirCelda() {
+    const cel = mergeSeleccion[0];
+    if (!cel) return;
+    const fi = cel.fi, ci = cel.ci;
+    const data = filas[fi].celdas[ci];
+    if (!data || data.rowspan <= 1) return;
+    const totalRows = data.rowspan;
+    data.rowspan = 1;
+    for (let i = fi + 1; i < fi + totalRows; i++) {
+      if (filas[i] && filas[i].celdas[ci]) {
+        filas[i].celdas[ci] = { t: '', c: 'libre', done: false, reminder: false, rowspan: 1 };
+      }
+    }
+    mergeSeleccion = [];
+    renderizar();
+    autoGuardar();
+    toggleMergeMode();
+  }
+
   iniciar();
 
   function configurarDelegacionCeldas() {
@@ -2229,129 +2353,7 @@
     }
   }
 
-  // ======================================================================
-  // 🆕 MERGE / UNIR CELDAS
-  // ======================================================================
-  let mergeActivo = false;
-  let mergeSeleccion = [];
-
-  function toggleMergeMode() {
-    mergeActivo = !mergeActivo;
-    mergeSeleccion = [];
-    document.getElementById('btn-merge-mode').classList.toggle('active', mergeActivo);
-    document.getElementById('btn-merge-apply').style.display = 'none';
-    document.getElementById('btn-merge-split').style.display = 'none';
-    document.getElementById('table-wrap').classList.toggle('merge-active', mergeActivo);
-    document.getElementById('merge-info').textContent = mergeActivo ? 'Haz clic en las celdas de una misma columna para unirlas' : '';
-    renderizar();
-  }
-
-  function toggleSeleccionMerge(fi, ci) {
-    const cel = filas[fi]?.celdas?.[ci];
-    const isMerged = cel && cel.rowspan > 1;
-    const splitBtn = document.getElementById('btn-merge-split');
-    const applyBtn = document.getElementById('btn-merge-apply');
-    if (isMerged) {
-      mergeSeleccion = [{ fi, ci }];
-      splitBtn.style.display = 'inline-block';
-      applyBtn.style.display = 'none';
-    } else {
-      const idx = mergeSeleccion.findIndex(s => s.fi === fi && s.ci === ci);
-      if (idx >= 0) {
-        mergeSeleccion.splice(idx, 1);
-      } else {
-        mergeSeleccion.push({ fi, ci });
-      }
-      splitBtn.style.display = 'none';
-      applyBtn.style.display = mergeSeleccion.length >= 2 ? 'inline-block' : 'none';
-    }
-    actualizarInfoMerge();
-    resaltarSeleccionMerge();
-  }
-
-  function resaltarSeleccionMerge() {
-    document.querySelectorAll('.celda.merge-selected').forEach(el => el.classList.remove('merge-selected'));
-    mergeSeleccion.forEach(s => {
-      const celda = document.querySelector(`#tabla tbody tr:nth-child(${s.fi+1}) td:nth-child(${s.ci+2})`);
-      if (celda) celda.classList.add('merge-selected');
-    });
-  }
-
-  function actualizarInfoMerge() {
-    const info = document.getElementById('merge-info');
-    if (!mergeActivo) {
-      const mergedCount = filas.reduce((sum, f) => sum + f.celdas.filter(c => c && c.rowspan > 1).length, 0);
-      if (mergedCount > 0) {
-        info.textContent = `🔗 ${mergedCount} celda(s) unida(s) — Activa "Unir celdas" para editar`;
-      } else {
-        info.textContent = '';
-      }
-      return;
-    }
-    if (mergeSeleccion.length === 0) {
-      info.textContent = 'Haz clic en las celdas de una misma columna para unirlas';
-      return;
-    }
-    const cols = [...new Set(mergeSeleccion.map(s => s.ci))];
-    if (cols.length > 1) {
-      info.textContent = '⚠️ Solo puedes unir celdas de la MISMA columna (mismo día)';
-      return;
-    }
-    const rows = mergeSeleccion.map(s => s.fi).sort((a,b) => a-b);
-    const continuas = rows.every((r, i) => i === 0 || r === rows[i-1] + 1);
-    if (!continuas) {
-      info.textContent = '⚠️ Selecciona celdas consecutivas en la misma columna';
-      return;
-    }
-    info.innerHTML = `✅ ${rows.length} celdas seleccionadas en ${dias[cols[0]]} — <strong>Listo para unir</strong>`;
-    info.style.color = '#55efc4';
-  }
-
-  function aplicarMerge() {
-    if (!mergeActivo || mergeSeleccion.length < 2) return;
-    const cols = [...new Set(mergeSeleccion.map(s => s.ci))];
-    if (cols.length > 1) return;
-    const ci = cols[0];
-    const rows = mergeSeleccion.map(s => s.fi).sort((a,b) => a-b);
-    const continuas = rows.every((r, i) => i === 0 || r === rows[i-1] + 1);
-    if (!continuas) return;
-    const fiInicio = rows[0];
-    const fiFin = rows[rows.length-1];
-    const contenido = filas[fiInicio].celdas[ci]?.t || '';
-    const categoria = filas[fiInicio].celdas[ci]?.c || 'libre';
-    const nombre = prompt('Nombre del curso o actividad:', contenido);
-    if (nombre === null) return;
-    const cat = prompt('Categoría (clase/ensenanza/estudio/comida/desconexion/flexible/rutina/libre):', categoria);
-    if (cat === null) return;
-    const valCat = CATS.find(c => c.id === cat) ? cat : 'clase';
-    filas[fiInicio].celdas[ci] = { t: nombre || '—', c: valCat, done: false, reminder: false, rowspan: rows.length };
-    for (let i = fiInicio + 1; i <= fiFin; i++) {
-      filas[i].celdas[ci] = { t: null, c: 'libre', done: false, reminder: false, rowspan: 0 };
-    }
-    mergeSeleccion = [];
-    renderizar();
-    autoGuardar();
-    toggleMergeMode();
-  }
-
-  function dividirCelda() {
-    const cel = mergeSeleccion[0];
-    if (!cel) return;
-    const fi = cel.fi, ci = cel.ci;
-    const data = filas[fi].celdas[ci];
-    if (!data || data.rowspan <= 1) return;
-    const totalRows = data.rowspan;
-    data.rowspan = 1;
-    for (let i = fi + 1; i < fi + totalRows; i++) {
-      if (filas[i] && filas[i].celdas[ci]) {
-        filas[i].celdas[ci] = { t: '', c: 'libre', done: false, reminder: false, rowspan: 1 };
-      }
-    }
-    mergeSeleccion = [];
-    renderizar();
-    autoGuardar();
-    toggleMergeMode();
-  }
+  // MERGE BLOCK (moved to top)
 
   // ======================================================================
   // 🆕 TUTORIAL

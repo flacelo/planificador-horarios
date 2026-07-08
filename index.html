@@ -2584,7 +2584,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
       if (opt) { sel.value = val; inp.classList.remove('visible'); inp.classList.add('oculto'); inp.value = ''; }
       else { sel.value = 'otros'; inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = val||''; }
     };
-    if (d.nombre) { ms('sel-nombre','inp-nombre',d.nombre); onRolChange(document.getElementById('sel-nombre')); }
+    if (d.nombre) { ms('sel-nombre','inp-nombre',d.nombre); onRolChange(document.getElementById('sel-nombre')); document.getElementById('inp-nombre').value = d.nombre; }
     if (d.carrera) ms('sel-carrera','inp-carrera',d.carrera);
     if (d.ciclo) ms('sel-ciclo','inp-ciclo',d.ciclo);
     if (d.objetivo) ms('sel-objetivo','inp-objetivo',d.objetivo);
@@ -2685,14 +2685,15 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (saved) {
       try {
         const d = JSON.parse(saved);
-        if (!Array.isArray(d.dias) || !Array.isArray(d.filas)) throw new Error('invalid');
+        if (!Array.isArray(d.dias)) d.dias = [];
+        if (!Array.isArray(d.filas)) d.filas = [];
         dias = d.dias;
         filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
         renderizar(); return;
       } catch(e) {}
     }
-    try { const r = localStorage.getItem('horario_completo'); if(r){const d=JSON.parse(r);if(!Array.isArray(d.dias)||!Array.isArray(d.filas))throw new Error('invalid');aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
-    try { const r = localStorage.getItem('horario_datos'); if(r){const d=JSON.parse(r);if(!Array.isArray(d.dias)||!Array.isArray(d.filas))throw new Error('invalid');dias=d.dias;filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem('horario_completo'); if(r){const d=JSON.parse(r);if(!Array.isArray(d.dias))d.dias=[];if(!Array.isArray(d.filas))d.filas=[];aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem('horario_datos'); if(r){const d=JSON.parse(r);if(!Array.isArray(d.dias))d.dias=[];if(!Array.isArray(d.filas))d.filas=[];dias=d.dias;filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
     if (!savedInterval) {
       localStorage.setItem('horario_intervalo', '60');
       localStorage.setItem('horario_inicio', '07:00');
@@ -2769,7 +2770,8 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (saved) {
       try {
         const d = JSON.parse(saved);
-        if (!Array.isArray(d.dias) || !Array.isArray(d.filas)) throw new Error('invalid');
+        if (!Array.isArray(d.dias)) d.dias = [];
+        if (!Array.isArray(d.filas)) d.filas = [];
         dias = d.dias;
         filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
         renderizar(); autoGuardar(); return;

@@ -264,7 +264,7 @@
   .chip:active { transform:scale(0.95); }
   body.dark .chip { box-shadow:0 1px 4px rgba(0,0,0,0.3); }
   .modal .btns { display: flex; gap: var(--space-sm); justify-content: flex-end; margin-top: 6px; }
-  .modal .btns button { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: var(--font-size-base); font-weight: 500; }
+  .modal .btns button { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: var(--font-size-base); font-weight: 500; transition: all 0.2s ease-in-out; }
   .modal .btns .btn-ok { background: var(--primary-gradient); color: #fff; }
   .modal .btns .btn-ok:hover { opacity: 0.9; }
   .modal .btns .btn-cancel { background: #f1f2f6; color: var(--text-muted); }
@@ -1174,7 +1174,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     text-decoration: none; white-space: nowrap;
   }
   .btn:hover { transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
+  .btn:active { transform: scale(0.97); }
   .btn:focus-visible { outline: 2px solid var(--primary-1); outline-offset: 2px; }
 
   .btn-primary {
@@ -1203,6 +1203,10 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   .btn-sm { padding: 4px 10px; font-size: var(--font-size-xs); }
   .btn-lg { padding: 10px 24px; font-size: var(--font-size-base); }
   .btn-block { width: 100%; }
+
+  /* Global button interactions */
+  button:active { transform: scale(0.97); }
+  button:focus-visible { outline: 2px solid var(--primary-1); outline-offset: 2px; }
 
   /* Inputs */
   .input {

@@ -2405,14 +2405,14 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
         const mergeCls = cel.rowspan > 1 ? ' merged-cell' : '';
         const mergeInd = cel.rowspan > 1 ? '<span class="merge-indicator">🔗</span>' : '';
         const extraCls = mergeMode ? (cel.rowspan > 1 ? '' : '') : '';
-        const onClickMerge = mergeMode ? `onclick="toggleSeleccionMerge(${fi},${ci})"` : `onclick="abrirModal(${fi},${ci})"`;
-        html += `<td class="celda c-${cel.c}${dc}${mergeCls}${extraCls}"${rs} ${onClickMerge}><span class="done-check${dk}" onclick="event.stopPropagation();toggleDone(${fi},${ci})">${cel.done?'✓':''}</span>${mergeInd}${bell}${cel.t || '—'}</td>`;
+        html += `<td class="celda c-${cel.c}${dc}${mergeCls}${extraCls}"${rs} data-fi="${fi}" data-ci="${ci}"><span class="done-check${dk}">${cel.done?'✓':''}</span>${mergeInd}${bell}${cel.t || '—'}</td>`;
       }
       html += '</tr>';
     });
     tb.innerHTML = html;
     actualizarEmptyState();
     configurarResizers();
+    configurarDelegacionCeldas();
     let leyHtml = '';
     CATS.forEach(c => { leyHtml += `<span><span class="dot" style="background:${c.color}"></span> ${c.label}</span>`; });
     document.getElementById('leyenda').innerHTML = leyHtml;
@@ -2701,6 +2701,29 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (nombreSel) onRolChange(nombreSel);
   }
   iniciar();
+
+  function configurarDelegacionCeldas() {
+    const tb = document.getElementById('tbody');
+    if (!tb || tb.dataset.delegacionLista) return;
+    tb.dataset.delegacionLista = '1';
+    tb.addEventListener('click', function(e) {
+      const doneCheck = e.target.closest('.done-check');
+      if (doneCheck) {
+        const celda = doneCheck.closest('.celda');
+        if (celda) toggleDone(parseInt(celda.dataset.fi), parseInt(celda.dataset.ci));
+        return;
+      }
+      const celda = e.target.closest('.celda');
+      if (!celda) return;
+      const fi = parseInt(celda.dataset.fi);
+      const ci = parseInt(celda.dataset.ci);
+      if (document.getElementById('btn-merge-mode')?.classList.contains('active')) {
+        toggleSeleccionMerge(fi, ci);
+      } else {
+        abrirModal(fi, ci);
+      }
+    });
+  }
 
   // Mostrar tutorial en primera visita
   if (!localStorage.getItem('horario_tutorial_visto')) {

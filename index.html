@@ -1133,14 +1133,25 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   .sp-section summary::after {
     content: '\25B8';
     margin-left: auto;
-    transition: transform 0.15s ease;
+    transition: transform 0.25s ease-out;
     font-size: 0.85em;
     color: rgba(255,255,255,0.3);
   }
   .sp-section[open] summary::after { transform: rotate(90deg); }
   .sp-section summary:hover { background: rgba(255,255,255,0.06); }
   .sp-section summary span { font-size: 1.1em; }
-  .sp-body { padding: 8px 14px 12px; }
+  .sp-body {
+    padding: 8px 14px 12px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+    pointer-events: none;
+  }
+  .sp-section[open] .sp-body {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
   .sp-body .toolbar { margin-bottom: 0; }
   .sp-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: var(--space-sm) 0; opacity: 0.8; }
   .sp-hint { text-align: center; font-size: 0.55em; color: rgba(255,255,255,0.35); margin: 6px 0; letter-spacing: 0.2px; }

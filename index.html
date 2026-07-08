@@ -1346,9 +1346,8 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
               <option value="Freelancer">🚀 Freelancer</option>
               <option value="Otra Carrera">📚 Otra Carrera</option>
             </select>
-            <input id="inp-carrera" class="oculto" placeholder="Carrera" value="">
           </div>
-          <div id="especialidad-container" style="display:none;margin-top:4px;">
+          <div class="campo" id="especialidad-container" style="display:none;">
             <select id="sel-especialidad" onchange="onEspecialidadChange()">
               <option value="">— Selecciona —</option>
             </select>
@@ -2171,8 +2170,6 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     }
     renderizarChipsSugeridos();
     localStorage.setItem('horario_perfil', perfilId);
-    const inpCarrera = document.getElementById('inp-carrera');
-    if (inpCarrera) inpCarrera.value = perfil.label || perfilId;
     renderizar();
   }
 
@@ -2216,7 +2213,6 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
       if (carreraC) { carreraC.style.display = 'none'; carreraSel.selectedIndex = 0; }
       if (espC) { espC.style.display = 'none'; if (espSel) espSel.selectedIndex = 0; }
       if (cicloC) { cicloC.style.display = 'none'; if (cicloSel) cicloSel.selectedIndex = 0; }
-      document.getElementById('inp-carrera').value = '';
       document.getElementById('inp-ciclo').value = '';
       if (profiles.Freelancer) cargarPerfil('Freelancer');
     } else {
@@ -2276,7 +2272,6 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     const espInp = document.getElementById('inp-especialidad');
     if (!sel) return;
     const val = sel.value;
-    document.getElementById('inp-carrera').value = '';
     if (val === 'Freelancer') {
       container.style.display = 'none';
       if (profiles.Freelancer) cargarPerfil('Freelancer');
@@ -2310,7 +2305,8 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   function valInfo(idSel, idInp) {
     const sel = document.getElementById(idSel);
     const inp = document.getElementById(idInp);
-    return inp.value || sel.options[sel.selectedIndex]?.value || '';
+    if (inp && inp.classList.contains('visible')) return inp.value;
+    return sel.options[sel.selectedIndex]?.value || '';
   }
 
   function estaVacio() {
@@ -2566,7 +2562,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (confirm(`¿Eliminar ${dias[idx]}?`)) { dias.splice(idx, 1); filas.forEach(f => f.celdas.splice(idx, 1)); renderizar(); autoGuardar(); }
   }
   function eliminarUltimoDia() { eliminarDia(dias.length - 1); }
-  function autoGuardar() { try { if (!Array.isArray(dias) || !Array.isArray(filas) || !plannerType) return; localStorage.setItem('horario_data_' + plannerType, JSON.stringify({dias,filas})); } catch(e) {} }
+  function autoGuardar() { try { localStorage.setItem('horario_data_' + plannerType, JSON.stringify({dias,filas})); } catch(e) {} }
 
   function getDatosCompletos() {
     const header = document.getElementById('inp-titulo-header')?.value?.trim() || '';
@@ -2581,18 +2577,18 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     const ms = (selId, inpId, val) => {
       const sel = document.getElementById(selId), inp = document.getElementById(inpId);
       const opt = Array.from(sel.options).find(o => o.value === val);
-      if (opt) { sel.value = val; inp.classList.remove('visible'); inp.classList.add('oculto'); inp.value = ''; }
-      else { sel.value = 'otros'; inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = val||''; }
+      if (opt) { sel.value = val; if(inp){inp.classList.remove('visible');inp.classList.add('oculto');inp.value='';} }
+      else if (inp) { sel.value = 'otros'; inp.classList.remove('oculto'); inp.classList.add('visible'); inp.value = val||''; }
     };
-    if (d.nombre) { ms('sel-nombre','inp-nombre',d.nombre); onRolChange(document.getElementById('sel-nombre')); document.getElementById('inp-nombre').value = d.nombre; }
-    if (d.carrera) ms('sel-carrera','inp-carrera',d.carrera);
+    if (d.nombre) { ms('sel-nombre','inp-nombre',d.nombre); onRolChange(document.getElementById('sel-nombre')); }
+    if (d.carrera) { const _cs=document.getElementById('sel-carrera'); if (_cs && Array.from(_cs.options).some(o=>o.value===d.carrera)) _cs.value=d.carrera; if (_cs && _cs.value && _cs.value!=='Freelancer' && !profiles[_cs.value]) poblarEspecialidad(_cs.value); }
     if (d.ciclo) ms('sel-ciclo','inp-ciclo',d.ciclo);
     if (d.objetivo) ms('sel-objetivo','inp-objetivo',d.objetivo);
     if (d.header !== undefined) {
       document.getElementById('inp-titulo-header').value = d.header;
       actualizarHeaderPreview();
     }
-    if (Array.isArray(d.dias)) dias = d.dias; if (Array.isArray(d.filas)) filas = d.filas;
+    if (d.dias) dias = d.dias; if (d.filas) filas = d.filas;
     renderizar();
   }
 
@@ -2602,7 +2598,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     dias = ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'];
     filas = JSON.parse(JSON.stringify(DEFAULT));
     ['sel-nombre','sel-carrera','sel-ciclo','sel-objetivo'].forEach(id => document.getElementById(id).selectedIndex = 0);
-    ['inp-nombre','inp-carrera','inp-ciclo','inp-objetivo','inp-especialidad'].forEach(id => { const el=document.getElementById(id); if(el){el.value='';el.className='oculto';} });
+    ['inp-nombre','inp-ciclo','inp-objetivo','inp-especialidad'].forEach(id => { const el=document.getElementById(id); if(el){el.value='';el.className='oculto';} });
     const espContainer = document.getElementById('especialidad-container');
     if (espContainer) espContainer.style.display = 'none';
     document.getElementById('inp-titulo-header').value = '';
@@ -2657,8 +2653,12 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
         selObj.value = p.goals[0];
       }
       renderizarChipsSugeridos();
-      const inpCarrera = document.getElementById('inp-carrera');
-      if (inpCarrera) inpCarrera.value = p.label || savedPerfil;
+      const _cs=document.getElementById('sel-carrera');
+      if (_cs) {
+        const _eng=['Ingeniería de Seguridad Industrial y Minera','Ingeniería de Sistemas','Ingeniería Civil','Otra Ingeniería'];
+        if (_eng.includes(savedPerfil)) { _cs.value='Ingeniería';poblarEspecialidad('Ingeniería'); }
+        else if (Array.from(_cs.options).some(o=>o.value===savedPerfil)) { _cs.value=savedPerfil; if (!profiles[savedPerfil]) poblarEspecialidad(savedPerfil); }
+      }
     }
     const savedType = localStorage.getItem('horario_planner_type') || 'semanal';
     plannerType = savedType;
@@ -2685,15 +2685,12 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (saved) {
       try {
         const d = JSON.parse(saved);
-        if (!Array.isArray(d.dias)) d.dias = [];
-        if (!Array.isArray(d.filas)) d.filas = [];
-        dias = d.dias;
-        filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
+        dias = d.dias; filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
         renderizar(); return;
       } catch(e) {}
     }
-    try { const r = localStorage.getItem('horario_completo'); if(r){const d=JSON.parse(r);if(!Array.isArray(d.dias))d.dias=[];if(!Array.isArray(d.filas))d.filas=[];aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
-    try { const r = localStorage.getItem('horario_datos'); if(r){const d=JSON.parse(r);if(!Array.isArray(d.dias))d.dias=[];if(!Array.isArray(d.filas))d.filas=[];dias=d.dias;filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem('horario_completo'); if(r){const d=JSON.parse(r);aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem('horario_datos'); if(r){const d=JSON.parse(r);if(d.dias)dias=d.dias;if(d.filas)filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
     if (!savedInterval) {
       localStorage.setItem('horario_intervalo', '60');
       localStorage.setItem('horario_inicio', '07:00');
@@ -2713,12 +2710,11 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   ];
 
   function getRewards() {
-    try { const r = JSON.parse(localStorage.getItem('horario_rewards')); return Array.isArray(r) ? r : DEFAULT_REWARDS; } catch(e) { return DEFAULT_REWARDS; }
+    try { return JSON.parse(localStorage.getItem('horario_rewards')) || DEFAULT_REWARDS; } catch(e) { return DEFAULT_REWARDS; }
   }
 
   function saveRewards(rewards) {
-    if (!Array.isArray(rewards)) return;
-    try { localStorage.setItem('horario_rewards', JSON.stringify(rewards)); } catch(e) {}
+    localStorage.setItem('horario_rewards', JSON.stringify(rewards));
   }
 
   iniciar();
@@ -2770,8 +2766,6 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (saved) {
       try {
         const d = JSON.parse(saved);
-        if (!Array.isArray(d.dias)) d.dias = [];
-        if (!Array.isArray(d.filas)) d.filas = [];
         dias = d.dias;
         filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
         renderizar(); autoGuardar(); return;
@@ -2800,8 +2794,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   }
 
   function guardarDatosTipo(tipo) {
-    if (!tipo || !Array.isArray(dias) || !Array.isArray(filas)) return;
-    try { localStorage.setItem('horario_data_' + tipo, JSON.stringify({ dias, filas })); } catch(e) {}
+    localStorage.setItem('horario_data_' + tipo, JSON.stringify({ dias, filas }));
   }
 
   // ========== CUSTOM HEADER ==========

@@ -11,6 +11,51 @@
   const ADMIN_PASSWORD = 'admin123';
 
   // ======================================================================
+  // 🆕 CONFIGURACIÓN GLOBAL CENTRALIZADA
+  // ======================================================================
+  const CONFIG = Object.freeze({
+    STORAGE: {
+      LICENCIA: 'horario_licencia',
+      PERFIL: 'horario_perfil',
+      PLANNER_TYPE: 'horario_planner_type',
+      DATA_PREFIX: 'horario_data_',
+      COMPLETO: 'horario_completo',
+      DATOS_LEGACY: 'horario_datos',
+      CUSTOM_HEADER: 'horario_custom_header',
+      INTERVALO: 'horario_intervalo',
+      INICIO: 'horario_inicio',
+      FIN: 'horario_fin',
+      DARK_MODE: 'horario_dark_mode',
+      EMPTY_CERRADO: 'horario_empty_cerrado',
+      METAS_CHECK: 'horario_metas_check',
+      NOTIFIED: 'horario_notified',
+      PROTECCION: 'horario_proteccion',
+      REWARDS: 'horario_rewards',
+      TUTORIAL_VISTO: 'horario_tutorial_visto',
+    },
+    LIMITES: {
+      LICENCIA_DIAS: 365,
+      MIN_FILAS: 1,
+      MIN_DIAS: 2,
+      RESPONSIVE_BREAK: 600,
+      INTERVALO_DEFAULT: 60,
+      HORA_DEFAULT_INICIO: '07:00',
+      HORA_DEFAULT_FIN: '23:00',
+    },
+    TIME: {
+      AUTOGUARDAR_DEBOUNCE: 200,
+      TUTORIAL_INICIO: 800,
+      CLICK_RESET: 2000,
+      SCREENSHOT_MS: 2500,
+      REMINDER_CHECK: 5000,
+      CIERRE_ACTIVAR: 1500,
+    },
+    TUTORIAL: {
+      TOTAL_PASOS: 7,
+    },
+  });
+
+  // ======================================================================
   // SISTEMA DE LICENCIAS
   // ======================================================================
   function generarLicencia(comprador) {
@@ -56,16 +101,16 @@
     if (!codigo) { msg.textContent = '❌ Ingresa un código'; msg.style.color = '#e74c3c'; return; }
     const result = verificarLicencia(codigo);
     if (!result) { msg.textContent = '❌ Código inválido'; msg.style.color = '#e74c3c'; return; }
-    localStorage.setItem('horario_licencia', JSON.stringify({ comprador: result.comprador, fecha: result.fecha, codigo }));
+    localStorage.setItem(CONFIG.STORAGE.LICENCIA, JSON.stringify({ comprador: result.comprador, fecha: result.fecha, codigo }));
     aplicarLicencia();
     msg.textContent = '✅ ¡Licencia activada! Bienvenido, ' + result.comprador;
     msg.style.color = '#27ae60';
-    setTimeout(() => { cerrarActivar(); }, 1500);
+    setTimeout(() => { cerrarActivar(); }, CONFIG.TIME.CIERRE_ACTIVAR);
   }
 
   function aplicarLicencia() {
     try {
-      const lic = JSON.parse(localStorage.getItem('horario_licencia'));
+      const lic = JSON.parse(localStorage.getItem(CONFIG.STORAGE.LICENCIA));
       if (lic && lic.comprador) {
         document.getElementById('app').classList.remove('demo-mode');
         document.getElementById('app').classList.add('licenciado');
@@ -110,7 +155,7 @@
   let clickCount = 0, clickTimer = null;
   document.getElementById('main-title').addEventListener('click', function() {
     clickCount++;
-    if (clickCount === 1) clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
+    if (clickCount === 1) clickTimer = setTimeout(() => { clickCount = 0; }, CONFIG.TIME.CLICK_RESET);
     if (clickCount >= 5) {
       clickCount = 0; clearTimeout(clickTimer);
       const pass = prompt('🔐 Ingresa la contraseña de administrador:');
@@ -386,9 +431,9 @@
   };
 
   function generarBloquesDefault() {
-    const interval = parseInt(localStorage.getItem('horario_intervalo') || '60');
-    const inicio = localStorage.getItem('horario_inicio') || '07:00';
-    const fin = localStorage.getItem('horario_fin') || '23:00';
+    const interval = parseInt(localStorage.getItem(CONFIG.STORAGE.INTERVALO) || String(CONFIG.LIMITES.INTERVALO_DEFAULT));
+    const inicio = localStorage.getItem(CONFIG.STORAGE.INICIO) || CONFIG.LIMITES.HORA_DEFAULT_INICIO;
+    const fin = localStorage.getItem(CONFIG.STORAGE.FIN) || CONFIG.LIMITES.HORA_DEFAULT_FIN;
     return generarBloques(interval, inicio, fin);
   }
 
@@ -508,15 +553,15 @@
       selObj.value = perfil.goals[0];
     }
     renderizarChipsSugeridos();
-    localStorage.setItem('horario_perfil', perfilId);
+    localStorage.setItem(CONFIG.STORAGE.PERFIL, perfilId);
     renderizar();
   }
 
   function actualizarMetasDashboard() {
-    const perfilId = localStorage.getItem('horario_perfil');
+    const perfilId = localStorage.getItem(CONFIG.STORAGE.PERFIL);
     const perfil = perfilId && profiles[perfilId] ? profiles[perfilId] : null;
     if (!perfil || !perfil.goals || perfil.goals.length === 0) return '';
-    const saved = (() => { try { return JSON.parse(localStorage.getItem('horario_metas_check') || '{}'); } catch(e) { return {}; } })();
+    const saved = (() => { try { return JSON.parse(localStorage.getItem(CONFIG.STORAGE.METAS_CHECK) || '{}'); } catch(e) { return {}; } })();
     return `<div class="dash-card" style="margin-bottom:10px;"><h3>🎯 Metas del Perfil: ${perfil.icon || ''} ${perfil.label}</h3><div style="margin-top:6px;">` +
       perfil.goals.map((g, i) => {
         const key = perfilId + '|' + i;
@@ -531,9 +576,9 @@
 
   function toggleMetaCheck(perfilId, idx, checked) {
     let saved = {};
-    try { saved = JSON.parse(localStorage.getItem('horario_metas_check') || '{}'); } catch(e) {}
+    try { saved = JSON.parse(localStorage.getItem(CONFIG.STORAGE.METAS_CHECK) || '{}'); } catch(e) {}
     saved[perfilId + '|' + idx] = checked;
-    localStorage.setItem('horario_metas_check', JSON.stringify(saved));
+    localStorage.setItem(CONFIG.STORAGE.METAS_CHECK, JSON.stringify(saved));
   }
 
   function onRolChange(sel) {
@@ -654,7 +699,7 @@
 
   function cerrarEmptyState() {
     document.getElementById('empty-state').classList.remove('show');
-    localStorage.setItem('horario_empty_cerrado', '1');
+    localStorage.setItem(CONFIG.STORAGE.EMPTY_CERRADO, '1');
   }
 
   function renderDaySummary() {
@@ -699,11 +744,11 @@
     const emptyEl = document.getElementById('empty-state');
     const dayEl = document.getElementById('day-summary');
     if (!emptyEl) return;
-    const oculto = localStorage.getItem('horario_empty_cerrado');
+    const oculto = localStorage.getItem(CONFIG.STORAGE.EMPTY_CERRADO);
     const tieneDatos = filas.length > 0 && filas.some(f => f.celdas.some(c => c.t && c.t !== '' && c.t !== '—'));
     if (tieneDatos) {
       emptyEl.classList.remove('show');
-      if (oculto) localStorage.removeItem('horario_empty_cerrado');
+      if (oculto) localStorage.removeItem(CONFIG.STORAGE.EMPTY_CERRADO);
       renderDaySummary();
     } else if (oculto) {
       emptyEl.classList.remove('show');
@@ -872,7 +917,7 @@
       filas[modalFila].celdas[modalCol].c = c;
       filas[modalFila].celdas[modalCol].reminder = r;
     }
-    localStorage.removeItem('horario_empty_cerrado');
+    localStorage.removeItem(CONFIG.STORAGE.EMPTY_CERRADO);
     cerrarModal(); renderizar(); autoGuardar();
   }
 
@@ -906,8 +951,8 @@
     clearTimeout(_guardarTimer);
     _guardarTimer = setTimeout(() => {
       _guardarTimer = null;
-      try { localStorage.setItem('horario_data_' + plannerType, JSON.stringify({dias,filas})); } catch(e) {}
-    }, 200);
+      try { localStorage.setItem(CONFIG.STORAGE.DATA_PREFIX + plannerType, JSON.stringify({dias,filas})); } catch(e) {}
+    }, CONFIG.TIME.AUTOGUARDAR_DEBOUNCE);
   }
 
   function getDatosCompletos() {
@@ -916,8 +961,8 @@
     return { nombre: valInfo('sel-nombre','inp-nombre'), carrera: valInfo('sel-carrera','inp-carrera'), ciclo: valInfo('sel-ciclo','inp-ciclo'), objetivo: valInfo('sel-objetivo','inp-objetivo'), header, tipo: tipoLabel, dias, filas };
   }
 
-  function guardar() { try { localStorage.setItem('horario_completo', JSON.stringify(getDatosCompletos())); autoGuardar(); alert('✅ Guardado.'); } catch(e) { alert('Error: ' + e); } }
-  function cargar() { try { const r = localStorage.getItem('horario_completo'); if (!r) { alert('Sin datos.'); return; } aplicarDatos(JSON.parse(r)); alert('✅ Cargado.'); } catch(e) { alert('Error: ' + e); } }
+  function guardar() { try { localStorage.setItem(CONFIG.STORAGE.COMPLETO, JSON.stringify(getDatosCompletos())); autoGuardar(); alert('✅ Guardado.'); } catch(e) { alert('Error: ' + e); } }
+  function cargar() { try { const r = localStorage.getItem(CONFIG.STORAGE.COMPLETO); if (!r) { alert('Sin datos.'); return; } aplicarDatos(JSON.parse(r)); alert('✅ Cargado.'); } catch(e) { alert('Error: ' + e); } }
 
   function aplicarDatos(d) {
     const ms = (selId, inpId, val) => {
@@ -963,7 +1008,7 @@
   }
 
   function getMarcaAgua() {
-    try { if (JSON.parse(localStorage.getItem('horario_licencia')).comprador) return ''; } catch(e) {}
+    try { if (JSON.parse(localStorage.getItem(CONFIG.STORAGE.LICENCIA)).comprador) return ''; } catch(e) {}
     return '<p style="margin-top:10px;font-size:9px;color:#bbb;text-align:center;">VERSIÓN DEMO · Compra la licencia en [tu web]</p>';
   }
 
@@ -987,7 +1032,7 @@
         el.selectedIndex = 0;
       }
     });
-    const savedPerfil = localStorage.getItem('horario_perfil');
+    const savedPerfil = localStorage.getItem(CONFIG.STORAGE.PERFIL);
     if (savedPerfil && profiles[savedPerfil]) {
       const p = profiles[savedPerfil];
       CATS = p.cats;
@@ -1008,28 +1053,28 @@
         else if (Array.from(_cs.options).some(o=>o.value===savedPerfil)) { _cs.value=savedPerfil; if (!profiles[savedPerfil]) poblarEspecialidad(savedPerfil); }
       }
     }
-    const savedType = localStorage.getItem('horario_planner_type') || 'semanal';
+    const savedType = localStorage.getItem(CONFIG.STORAGE.PLANNER_TYPE) || 'semanal';
     plannerType = savedType;
     document.querySelectorAll('.planner-type-selector button').forEach(b => {
       b.classList.toggle('active', b.dataset.type === savedType);
     });
     try {
-      const hdr = localStorage.getItem('horario_custom_header');
+      const hdr = localStorage.getItem(CONFIG.STORAGE.CUSTOM_HEADER);
       if (hdr) { document.getElementById('inp-titulo-header').value = hdr; actualizarHeaderPreview(); }
     } catch(e) {}
-    const savedInterval = localStorage.getItem('horario_intervalo');
+    const savedInterval = localStorage.getItem(CONFIG.STORAGE.INTERVALO);
     if (savedInterval) {
       document.getElementById('sel-intervalo').value = savedInterval;
     }
-    const savedInicio = localStorage.getItem('horario_inicio');
+    const savedInicio = localStorage.getItem(CONFIG.STORAGE.INICIO);
     if (savedInicio) {
       document.getElementById('inp-hora-inicio').value = savedInicio;
     }
-    const savedFin = localStorage.getItem('horario_fin');
+    const savedFin = localStorage.getItem(CONFIG.STORAGE.FIN);
     if (savedFin) {
       document.getElementById('inp-hora-fin').value = savedFin;
     }
-    const saved = localStorage.getItem('horario_data_' + savedType);
+    const saved = localStorage.getItem(CONFIG.STORAGE.DATA_PREFIX + savedType);
     if (saved) {
       try {
         const d = JSON.parse(saved);
@@ -1037,12 +1082,12 @@
         renderizar(); return;
       } catch(e) {}
     }
-    try { const r = localStorage.getItem('horario_completo'); if(r){const d=JSON.parse(r);aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
-    try { const r = localStorage.getItem('horario_datos'); if(r){const d=JSON.parse(r);if(d.dias)dias=d.dias;if(d.filas)filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem(CONFIG.STORAGE.COMPLETO); if(r){const d=JSON.parse(r);aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem(CONFIG.STORAGE.DATOS_LEGACY); if(r){const d=JSON.parse(r);if(d.dias)dias=d.dias;if(d.filas)filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
     if (!savedInterval) {
-      localStorage.setItem('horario_intervalo', '60');
-      localStorage.setItem('horario_inicio', '07:00');
-      localStorage.setItem('horario_fin', '23:00');
+      localStorage.setItem(CONFIG.STORAGE.INTERVALO, String(CONFIG.LIMITES.INTERVALO_DEFAULT));
+      localStorage.setItem(CONFIG.STORAGE.INICIO, CONFIG.LIMITES.HORA_DEFAULT_INICIO);
+      localStorage.setItem(CONFIG.STORAGE.FIN, CONFIG.LIMITES.HORA_DEFAULT_FIN);
     }
     filas = JSON.parse(JSON.stringify(generarBloquesDefault())); renderizar();
     const nombreSel = document.getElementById('sel-nombre');
@@ -1058,11 +1103,11 @@
   ];
 
   function getRewards() {
-    try { return JSON.parse(localStorage.getItem('horario_rewards')) || DEFAULT_REWARDS; } catch(e) { return DEFAULT_REWARDS; }
+    try { return JSON.parse(localStorage.getItem(CONFIG.STORAGE.REWARDS)) || DEFAULT_REWARDS; } catch(e) { return DEFAULT_REWARDS; }
   }
 
   function saveRewards(rewards) {
-    localStorage.setItem('horario_rewards', JSON.stringify(rewards));
+    localStorage.setItem(CONFIG.STORAGE.REWARDS, JSON.stringify(rewards));
   }
 
   // ======================================================================
@@ -1215,8 +1260,8 @@
   }
 
   // Mostrar tutorial en primera visita
-  if (!localStorage.getItem('horario_tutorial_visto')) {
-    setTimeout(mostrarTutorial, 800);
+  if (!localStorage.getItem(CONFIG.STORAGE.TUTORIAL_VISTO)) {
+    setTimeout(mostrarTutorial, CONFIG.TIME.TUTORIAL_INICIO);
   }
 
   // ======================================================================
@@ -1230,11 +1275,11 @@
     if (tipo === plannerType) return;
     guardarDatosTipo(plannerType);
     plannerType = tipo;
-    localStorage.setItem('horario_planner_type', tipo);
+    localStorage.setItem(CONFIG.STORAGE.PLANNER_TYPE, tipo);
     document.querySelectorAll('.planner-type-selector button').forEach(b => {
       b.classList.toggle('active', b.dataset.type === tipo);
     });
-    const saved = localStorage.getItem('horario_data_' + tipo);
+    const saved = localStorage.getItem(CONFIG.STORAGE.DATA_PREFIX + tipo);
     if (saved) {
       try {
         const d = JSON.parse(saved);
@@ -1266,7 +1311,7 @@
   }
 
   function guardarDatosTipo(tipo) {
-    try { localStorage.setItem('horario_data_' + tipo, JSON.stringify({ dias, filas })); } catch(e) {}
+    try { localStorage.setItem(CONFIG.STORAGE.DATA_PREFIX + tipo, JSON.stringify({ dias, filas })); } catch(e) {}
   }
 
   // ========== CUSTOM HEADER ==========
@@ -1282,7 +1327,7 @@
       preview.classList.remove('show');
       inp.classList.remove('filled');
     }
-    localStorage.setItem('horario_custom_header', val);
+    localStorage.setItem(CONFIG.STORAGE.CUSTOM_HEADER, val);
   }
 
   // ========== SIDE PANEL TOGGLE ==========
@@ -1305,7 +1350,7 @@
     if (btn) btn.classList.add('active');
     if (vista === 'dashboard') renderDashboard();
     // Close panel on mobile after switching view
-    if (window.innerWidth <= 600) togglePanel();
+    if (window.innerWidth <= CONFIG.LIMITES.RESPONSIVE_BREAK) togglePanel();
   }
 
   // ========== COMPLIANCE TRACKING ==========
@@ -1568,14 +1613,14 @@
     const btn = document.getElementById('btn-dark-mode');
     const isDark = document.body.classList.contains('dark');
     btn.textContent = isDark ? '☀️ Claro' : '🌙 Oscuro';
-    localStorage.setItem('horario_dark_mode', isDark ? '1' : '');
+    localStorage.setItem(CONFIG.STORAGE.DARK_MODE, isDark ? '1' : '');
     if (document.getElementById('view-dashboard').classList.contains('active') || document.querySelector('#view-dashboard.active')) {
       renderDashboard();
     }
   }
 
   function initDarkMode() {
-    if (localStorage.getItem('horario_dark_mode') === '1') {
+    if (localStorage.getItem(CONFIG.STORAGE.DARK_MODE) === '1') {
       document.body.classList.add('dark');
       const btn = document.getElementById('btn-dark-mode');
       if (btn) btn.textContent = '☀️ Claro';
@@ -1585,11 +1630,11 @@
   // ========== NUEVO PLANIFICADOR VACÍO ==========
   function nuevoPlanificador() {
     if (!confirm('¿Crear un planificador vacío? Se perderán los datos actuales.')) return;
-    const interval = parseInt(localStorage.getItem('horario_intervalo') || '60');
-    const inicio = localStorage.getItem('horario_inicio') || '07:00';
-    const fin = localStorage.getItem('horario_fin') || '23:00';
+    const interval = parseInt(localStorage.getItem(CONFIG.STORAGE.INTERVALO) || String(CONFIG.LIMITES.INTERVALO_DEFAULT));
+    const inicio = localStorage.getItem(CONFIG.STORAGE.INICIO) || CONFIG.LIMITES.HORA_DEFAULT_INICIO;
+    const fin = localStorage.getItem(CONFIG.STORAGE.FIN) || CONFIG.LIMITES.HORA_DEFAULT_FIN;
     plannerType = 'semanal';
-    localStorage.setItem('horario_planner_type', 'semanal');
+    localStorage.setItem(CONFIG.STORAGE.PLANNER_TYPE, 'semanal');
     document.querySelectorAll('.planner-type-selector button').forEach(b => {
       b.classList.toggle('active', b.dataset.type === 'semanal');
     });
@@ -1602,8 +1647,8 @@
     if (_eSel) _eSel.innerHTML = '<option value="">— Selecciona —</option>';
     const _nomSel=document.getElementById('sel-nombre');
     if (_nomSel) onRolChange(_nomSel);
-    localStorage.removeItem('horario_data_semanal');
-    localStorage.removeItem('horario_empty_cerrado');
+    localStorage.removeItem(CONFIG.STORAGE.DATA_PREFIX + 'semanal');
+    localStorage.removeItem(CONFIG.STORAGE.EMPTY_CERRADO);
     renderizar();
     actualizarEmptyState();
     autoGuardar();
@@ -1633,7 +1678,7 @@
     const currentMin = now.getHours() * 60 + now.getMinutes();
 
     let notified = {};
-    try { notified = JSON.parse(localStorage.getItem('horario_notified') || '{}'); } catch(e) {}
+    try { notified = JSON.parse(localStorage.getItem(CONFIG.STORAGE.NOTIFIED) || '{}'); } catch(e) {}
     if (!notified[todayKey]) notified[todayKey] = [];
 
     filas.forEach((fila, fi) => {
@@ -1659,7 +1704,7 @@
       });
     });
 
-    localStorage.setItem('horario_notified', JSON.stringify(notified));
+    localStorage.setItem(CONFIG.STORAGE.NOTIFIED, JSON.stringify(notified));
   }
 
   function solicitarPermisoNotificacion() {
@@ -1669,7 +1714,7 @@
 
   // Start reminder checker every 30 seconds
   setInterval(checkReminders, 30000);
-  setTimeout(checkReminders, 5000);
+  setTimeout(checkReminders, CONFIG.TIME.REMINDER_CHECK);
   // Request permission on first user interaction
   document.addEventListener('click', solicitarPermisoNotificacion, { once: true });
 
@@ -1682,7 +1727,7 @@
     overlay.classList.add('active');
     let nombre = '';
     try {
-      const lic = JSON.parse(localStorage.getItem('horario_licencia'));
+      const lic = JSON.parse(localStorage.getItem(CONFIG.STORAGE.LICENCIA));
       if (lic && lic.comprador) nombre = lic.comprador;
     } catch(e) {}
     const header = document.getElementById('inp-titulo-header')?.value?.trim();
@@ -1693,14 +1738,14 @@
       : '<strong>Versión Demo</strong> · Compra tu licencia para activar';
     overlay.querySelector('.subtext').textContent = `🔒 ${ident} · ${new Date().toLocaleString()}`;
     clearTimeout(screenshotTimer);
-    screenshotTimer = setTimeout(() => overlay.classList.remove('active'), 2500);
+    screenshotTimer = setTimeout(() => overlay.classList.remove(CONFIG.SELECTORES.TUTORIAL.substring(1)), CONFIG.TIME.SCREENSHOT_MS);
   }
 
   let proteccionActiva = true;
 
   function toggleProteccion(estado) {
     proteccionActiva = estado;
-    localStorage.setItem('horario_proteccion', estado ? '1' : '0');
+    localStorage.setItem(CONFIG.STORAGE.PROTECCION, estado ? '1' : '0');
   }
 
   // Dropdown click toggle for mobile
@@ -1716,7 +1761,7 @@
   });
 
   function initScreenshotProtection() {
-    const saved = localStorage.getItem('horario_proteccion');
+    const saved = localStorage.getItem(CONFIG.STORAGE.PROTECCION);
     if (saved === '0') proteccionActiva = false;
 
     document.addEventListener('keydown', function(e) {
@@ -1888,10 +1933,10 @@
       initModelos();
       const modelo = MODELOS[id];
       if (!modelo) return;
-      localStorage.removeItem('horario_empty_cerrado');
+      localStorage.removeItem(CONFIG.STORAGE.EMPTY_CERRADO);
       if (modelo.tipo) {
         plannerType = modelo.tipo;
-        localStorage.setItem('horario_planner_type', modelo.tipo);
+        localStorage.setItem(CONFIG.STORAGE.PLANNER_TYPE, modelo.tipo);
         document.querySelectorAll('.planner-type-selector button').forEach(b => {
           b.classList.toggle('active', b.dataset.type === modelo.tipo);
         });
@@ -1900,8 +1945,8 @@
       if (modelo.data) {
         filas = clonarData(modelo.data);
       } else if (modelo.intervalo) {
-        const hInicio = localStorage.getItem('horario_inicio') || '07:00';
-        const hFin = localStorage.getItem('horario_fin') || '23:00';
+        const hInicio = localStorage.getItem(CONFIG.STORAGE.INICIO) || CONFIG.LIMITES.HORA_DEFAULT_INICIO;
+        const hFin = localStorage.getItem(CONFIG.STORAGE.FIN) || CONFIG.LIMITES.HORA_DEFAULT_FIN;
         filas = generarBloques(modelo.intervalo, hInicio, hFin);
       } else {
         filas = clonarData(generarBloquesDefault());
@@ -1945,9 +1990,9 @@
     const inicio = document.getElementById('inp-hora-inicio').value || '07:00';
     const fin = document.getElementById('inp-hora-fin').value || '23:00';
     if (confirm(`¿Reordenar horario con bloques de ${interval} min?\nLos datos actuales se perderán.`)) {
-      localStorage.setItem('horario_intervalo', interval);
-      localStorage.setItem('horario_inicio', inicio);
-      localStorage.setItem('horario_fin', fin);
+      localStorage.setItem(CONFIG.STORAGE.INTERVALO, interval);
+      localStorage.setItem(CONFIG.STORAGE.INICIO, inicio);
+      localStorage.setItem(CONFIG.STORAGE.FIN, fin);
       filas = generarBloques(interval, inicio, fin);
       renderizar();
       autoGuardar();
@@ -1960,7 +2005,7 @@
   // 🆕 TUTORIAL
   // ======================================================================
   let pasoActual = 0;
-  const TOTAL_PASOS = 7;
+  // TOTAL_PASOS centralizado en CONFIG.TUTORIAL.TOTAL_PASOS
 
   function mostrarTutorial() {
     pasoActual = 0;
@@ -1976,21 +2021,21 @@
 
   function cerrarTutorial() {
     document.getElementById('tutorial').classList.remove('active');
-    localStorage.setItem('horario_tutorial_visto', '1');
+    localStorage.setItem(CONFIG.STORAGE.TUTORIAL_VISTO, '1');
   }
 
   function pasoTutorial(dir) {
-    if (dir > 0 && pasoActual >= TOTAL_PASOS - 1) { cerrarTutorial(); return; }
+    if (dir > 0 && pasoActual >= CONFIG.TUTORIAL.TOTAL_PASOS - 1) { cerrarTutorial(); return; }
     const steps = document.querySelectorAll('.t-step');
     steps.forEach(s => s.classList.remove('active'));
-    pasoActual = Math.max(0, Math.min(TOTAL_PASOS - 1, pasoActual + dir));
+    pasoActual = Math.max(0, Math.min(CONFIG.TUTORIAL.TOTAL_PASOS - 1, pasoActual + dir));
     steps.forEach(s => {
       if (parseInt(s.dataset.step) === pasoActual) s.classList.add('active');
     });
     const prev = document.getElementById('t-prev');
     const next = document.getElementById('t-next');
     prev.style.display = pasoActual > 0 ? 'inline-block' : 'none';
-    if (pasoActual === TOTAL_PASOS - 1) {
+    if (pasoActual === CONFIG.TUTORIAL.TOTAL_PASOS - 1) {
       next.textContent = '🎉 ¡Empezar!';
     } else {
       next.textContent = 'Siguiente →';
@@ -2001,9 +2046,14 @@
   function renderTutorialProgress() {
     const container = document.getElementById('t-progress');
     let html = '';
-    for (let i = 0; i < TOTAL_PASOS; i++) {
+    for (let i = 0; i < CONFIG.TUTORIAL.TOTAL_PASOS; i++) {
       const cls = i === pasoActual ? 'active' : i < pasoActual ? 'done' : '';
       html += `<span class="dot ${cls}" onclick="pasoTutorial(${i - pasoActual})"></span>`;
     }
     container.innerHTML = html;
   }
+
+
+
+
+

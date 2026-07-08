@@ -2566,7 +2566,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (confirm(`¿Eliminar ${dias[idx]}?`)) { dias.splice(idx, 1); filas.forEach(f => f.celdas.splice(idx, 1)); renderizar(); autoGuardar(); }
   }
   function eliminarUltimoDia() { eliminarDia(dias.length - 1); }
-  function autoGuardar() { try { localStorage.setItem('horario_data_' + plannerType, JSON.stringify({dias,filas})); } catch(e) {} }
+  function autoGuardar() { try { if (!Array.isArray(dias) || !Array.isArray(filas) || !plannerType) return; localStorage.setItem('horario_data_' + plannerType, JSON.stringify({dias,filas})); } catch(e) {} }
 
   function getDatosCompletos() {
     const header = document.getElementById('inp-titulo-header')?.value?.trim() || '';
@@ -2592,7 +2592,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
       document.getElementById('inp-titulo-header').value = d.header;
       actualizarHeaderPreview();
     }
-    if (d.dias) dias = d.dias; if (d.filas) filas = d.filas;
+    if (Array.isArray(d.dias)) dias = d.dias; if (Array.isArray(d.filas)) filas = d.filas;
     renderizar();
   }
 
@@ -2685,12 +2685,14 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (saved) {
       try {
         const d = JSON.parse(saved);
-        dias = d.dias; filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
+        if (!Array.isArray(d.dias) || !Array.isArray(d.filas)) throw new Error('invalid');
+        dias = d.dias;
+        filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
         renderizar(); return;
       } catch(e) {}
     }
-    try { const r = localStorage.getItem('horario_completo'); if(r){const d=JSON.parse(r);aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
-    try { const r = localStorage.getItem('horario_datos'); if(r){const d=JSON.parse(r);if(d.dias)dias=d.dias;if(d.filas)filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem('horario_completo'); if(r){const d=JSON.parse(r);if(!Array.isArray(d.dias)||!Array.isArray(d.filas))throw new Error('invalid');aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem('horario_datos'); if(r){const d=JSON.parse(r);if(!Array.isArray(d.dias)||!Array.isArray(d.filas))throw new Error('invalid');dias=d.dias;filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
     if (!savedInterval) {
       localStorage.setItem('horario_intervalo', '60');
       localStorage.setItem('horario_inicio', '07:00');
@@ -2710,11 +2712,12 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   ];
 
   function getRewards() {
-    try { return JSON.parse(localStorage.getItem('horario_rewards')) || DEFAULT_REWARDS; } catch(e) { return DEFAULT_REWARDS; }
+    try { const r = JSON.parse(localStorage.getItem('horario_rewards')); return Array.isArray(r) ? r : DEFAULT_REWARDS; } catch(e) { return DEFAULT_REWARDS; }
   }
 
   function saveRewards(rewards) {
-    localStorage.setItem('horario_rewards', JSON.stringify(rewards));
+    if (!Array.isArray(rewards)) return;
+    try { localStorage.setItem('horario_rewards', JSON.stringify(rewards)); } catch(e) {}
   }
 
   iniciar();
@@ -2766,6 +2769,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     if (saved) {
       try {
         const d = JSON.parse(saved);
+        if (!Array.isArray(d.dias) || !Array.isArray(d.filas)) throw new Error('invalid');
         dias = d.dias;
         filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
         renderizar(); autoGuardar(); return;
@@ -2794,7 +2798,8 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   }
 
   function guardarDatosTipo(tipo) {
-    localStorage.setItem('horario_data_' + tipo, JSON.stringify({ dias, filas }));
+    if (!tipo || !Array.isArray(dias) || !Array.isArray(filas)) return;
+    try { localStorage.setItem('horario_data_' + tipo, JSON.stringify({ dias, filas })); } catch(e) {}
   }
 
   // ========== CUSTOM HEADER ==========

@@ -766,7 +766,12 @@
     dias.forEach((d,i) => {
       hHtml += `<th style="position:relative;">${d.substring(0,3)}<div class="resizer" data-col="${i}"></div> <span style="cursor:pointer;color:#ff7675;font-size:0.8em;opacity:0.6" onclick="eliminarDia(${i})">✕</span></th>`;
     });
-    hr.innerHTML = hHtml;
+    const hTemp = document.createElement('tr');
+    hTemp.innerHTML = hHtml;
+    const hFrag = document.createDocumentFragment();
+    while (hTemp.firstChild) hFrag.appendChild(hTemp.firstChild);
+    hr.textContent = '';
+    hr.appendChild(hFrag);
     let html = '';
     const mergeMode = document.getElementById('btn-merge-mode')?.classList.contains('active');
     filas.forEach((fila, fi) => {
@@ -789,13 +794,24 @@
       }
       html += '</tr>';
     });
-    tb.innerHTML = html;
+    const temp = document.createElement('tbody');
+    temp.innerHTML = html;
+    const frag = document.createDocumentFragment();
+    while (temp.firstChild) frag.appendChild(temp.firstChild);
+    tb.textContent = '';
+    tb.appendChild(frag);
     actualizarEmptyState();
     configurarResizers();
     configurarDelegacionCeldas();
     let leyHtml = '';
     CATS.forEach(c => { leyHtml += `<span><span class="dot" style="background:${c.color}"></span> ${c.label}</span>`; });
-    document.getElementById('leyenda').innerHTML = leyHtml;
+    const lTemp = document.createElement('div');
+    lTemp.innerHTML = leyHtml;
+    const lFrag = document.createDocumentFragment();
+    while (lTemp.firstChild) lFrag.appendChild(lTemp.firstChild);
+    const leyenda = document.getElementById('leyenda');
+    leyenda.textContent = '';
+    leyenda.appendChild(lFrag);
     actualizarInfoMerge();
     actualizarMergeBadge();
   }

@@ -146,10 +146,9 @@
 
   function cerrarActivar() {
     document.getElementById('modal-activar').classList.remove('active');
+    document.getElementById('inp-codigo').value = '';
+    document.getElementById('msg-activar').textContent = '';
   }
-
-  document.getElementById('modal-compra').addEventListener('click', function(e) { if (e.target === this) cerrarModalCompra(); });
-  document.getElementById('modal-activar').addEventListener('click', function(e) { if (e.target === this) cerrarActivar(); });
 
   // ========== ADMIN ==========
   let clickCount = 0, clickTimer = null;
@@ -188,8 +187,10 @@
     });
   }
 
-  function cerrarAdmin() { document.getElementById('modal-admin').classList.remove('active'); }
-  document.getElementById('modal-admin').addEventListener('click', function(e) { if (e.target === this) cerrarAdmin(); });
+  function cerrarAdmin() {
+    document.getElementById('modal-admin').classList.remove('active');
+    document.getElementById('resultado-licencia').style.display = 'none';
+  }
 
   // ========== CATEGORÍAS ==========
   let CATS = [
@@ -942,7 +943,6 @@
 
   function cerrarModal() { document.getElementById('modal').classList.remove('active'); modalFila = -1; modalCol = -1; }
   document.getElementById('modal-texto').addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); okModal(); } });
-  document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
 
   function cambiarHora(fi, val) { filas[fi].hora = val; autoGuardar(); }
   function agregarFila() {
@@ -1254,6 +1254,25 @@
   }
 
   iniciar();
+
+  // ========== GESTIÓN UNIFICADA DE MODALES ==========
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Escape') return;
+    if (document.getElementById('modal').classList.contains('active')) { cerrarModal(); return; }
+    if (document.getElementById('tutorial').classList.contains('active')) { cerrarTutorial(); return; }
+    if (document.getElementById('modal-compra').classList.contains('active')) { cerrarModalCompra(); return; }
+    if (document.getElementById('modal-activar').classList.contains('active')) { cerrarActivar(); return; }
+    if (document.getElementById('modal-admin').classList.contains('active')) { cerrarAdmin(); return; }
+  });
+  document.addEventListener('click', function(e) {
+    const overlay = e.target.closest('.modal-overlay, .tutorial-overlay');
+    if (!overlay || e.target !== overlay) return;
+    if (overlay.id === 'modal') cerrarModal();
+    else if (overlay.id === 'modal-compra') cerrarModalCompra();
+    else if (overlay.id === 'modal-activar') cerrarActivar();
+    else if (overlay.id === 'modal-admin') cerrarAdmin();
+    else if (overlay.id === 'tutorial') cerrarTutorial();
+  });
 
   function configurarDelegacionCeldas() {
     const tb = document.getElementById('tbody');

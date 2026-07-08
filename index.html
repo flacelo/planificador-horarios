@@ -2600,7 +2600,9 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     ['sel-nombre','sel-carrera','sel-ciclo','sel-objetivo'].forEach(id => document.getElementById(id).selectedIndex = 0);
     ['inp-nombre','inp-ciclo','inp-objetivo','inp-especialidad'].forEach(id => { const el=document.getElementById(id); if(el){el.value='';el.className='oculto';} });
     const espContainer = document.getElementById('especialidad-container');
+    const espSel = document.getElementById('sel-especialidad');
     if (espContainer) espContainer.style.display = 'none';
+    if (espSel) espSel.innerHTML = '<option value="">— Selecciona —</option>';
     document.getElementById('inp-titulo-header').value = '';
     actualizarHeaderPreview();
     onRolChange(document.getElementById('sel-nombre'));
@@ -3123,6 +3125,13 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     });
     dias = ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'];
     filas = generarBloques(interval, inicio, fin);
+    ['sel-nombre','sel-carrera','sel-ciclo','sel-objetivo'].forEach(id => { const el=document.getElementById(id); if(el)el.selectedIndex=0; });
+    ['inp-nombre','inp-ciclo','inp-objetivo','inp-especialidad'].forEach(id => { const el=document.getElementById(id); if(el){el.value='';el.className='oculto';} });
+    const _esp=document.getElementById('especialidad-container'); const _eSel=document.getElementById('sel-especialidad');
+    if (_esp) _esp.style.display = 'none';
+    if (_eSel) _eSel.innerHTML = '<option value="">— Selecciona —</option>';
+    const _nomSel=document.getElementById('sel-nombre');
+    if (_nomSel) onRolChange(_nomSel);
     localStorage.removeItem('horario_data_semanal');
     localStorage.removeItem('horario_empty_cerrado');
     renderizar();

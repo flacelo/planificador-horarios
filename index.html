@@ -197,28 +197,28 @@
 
   /* ========== TABLA ========== */
   .table-wrap {
-    overflow: auto; background: var(--surface); border-radius: var(--radius);
-    box-shadow: var(--shadow-xs); padding: var(--space-sm);
+    overflow: auto; background: var(--surface); border-radius: 12px;
+    box-shadow: var(--shadow-xs); padding: 6px;
     resize: both; min-height: 200px; min-width: 400px; max-width: 100%;
     border: 2px solid transparent; transition: border-color var(--transition-base);
   }
   .table-wrap:hover { border-color: var(--primary-light); }
   table { width: 100%; border-collapse: collapse; min-width: 600px; table-layout: fixed; }
   th, td {
-    border: 1px solid #e0e0e0; padding: 5px 3px;
+    border: 1px solid #e8e8e8; padding: 6px 4px;
     text-align: center; vertical-align: middle;
     font-size: 0.72em; line-height: 1.25; overflow: hidden; word-wrap: break-word;
   }
   th {
     background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: #fff; padding: 6px 3px; font-size: 0.74em; position: relative;
-    letter-spacing: 0.3px; font-weight: 600;
+    color: #fff; padding: 7px 4px; font-size: 0.74em; position: relative;
+    letter-spacing: 0.5px; font-weight: 700;
   }
   .resizer { position: absolute; right: 0; top: 0; bottom: 0; width: 4px; cursor: col-resize; }
   .resizer:hover { background: #667eea; }
   .hora-cell {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    font-weight: bold; color: #2c3e50; width: 55px; font-size: 0.65em;
+    background: linear-gradient(135deg, #f8f9fa, #eceff1);
+    font-weight: 700; color: #2c3e50; width: 55px; font-size: 0.65em;
     cursor: pointer; position: relative;
   }
   .hora-cell input {
@@ -520,18 +520,18 @@
 
 /* ========== COMPLETION ON CELLS ========== */
 .celda .done-check {
-  position: absolute; top: 1px; right: 1px; width: 12px; height: 12px;
-  border-radius: 50%; border: 2px solid #ccc; background: #fff;
-  cursor: pointer; transition: all 0.2s; font-size: 0.55em;
+  position: absolute; top: 2px; right: 2px; width: 14px; height: 14px;
+  border-radius: 50%; border: 2px solid #d0d0d0; background: #fff;
+  cursor: pointer; transition: all 0.2s; font-size: 0.5em;
   display: flex; align-items: center; justify-content: center;
-  line-height: 1; opacity: 0.4;
+  line-height: 1; opacity: 0.35;
 }
 .celda:hover .done-check { opacity: 1; }
 .celda .done-check.checked { background: #27ae60; border-color: #27ae60; color: #fff; opacity: 0.8; }
 .celda.done { opacity: 0.85; }
 .celda.done::after {
   content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(39,174,96,0.08); pointer-events: none; border-radius: 2px;
+  background: rgba(39,174,96,0.08); pointer-events: none; border-radius: 4px;
 }
 
 /* ========== SCREENSHOT OVERLAY ========== */
@@ -765,7 +765,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     .app { padding: 16px 14px; border-radius: var(--radius); }
     h1 { font-size: 1em; }
     .sub { font-size: 0.6em; }
-    th, td { font-size: 0.55em; padding: 2px 1px; }
+    th, td { font-size: 0.55em; padding: 3px 2px; }
     .hora-cell { width: 32px; font-size: 0.5em; }
     .hora-cell input { font-size: 0.85em; }
     table { min-width: 400px; }
@@ -808,7 +808,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     .reward-config-row { font-size: 0.6em; }
     .btn-mark { font-size: 0.65em; padding: 4px 10px; }
     .table-actions { gap: 4px; margin-bottom: 5px; }
-    .celda .done-check { width: 9px; height: 9px; font-size: 0.45em; }
+    .celda .done-check { width: 10px; height: 10px; font-size: 0.4em; }
     .celda .reminder-bell { font-size: 0.45em; }
     body { padding-bottom: 60px; }
     .day-summary { flex-wrap: wrap; gap: var(--space-xs); padding: var(--space-xs) var(--space-sm); }
@@ -937,7 +937,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   body.dark .btn-ghost:hover { background: rgba(255,255,255,0.06); color: #ccc; }
   body.dark .input:hover, body.dark .select:hover { border-color: #4a4d65; }
   body.dark th {
-    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    background: linear-gradient(135deg, #1a1a2e, #162447);
     color: #e0e0e0;
   }
   body.dark td, body.dark .hora-cell, body.dark .hora-cell input {

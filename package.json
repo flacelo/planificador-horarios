@@ -1,0 +1,10 @@
+{
+  "name": "planificador-horarios",
+  "version": "1.0.0",
+  "description": "Planificador de Horarios — App web progresiva para gestionar horarios académicos y laborales",
+  "private": true,
+  "scripts": {
+    "check": "node --check js/app.js",
+    "build": "npm run check && node -e \"var f=['index.html','css/main.css','css/panel.css','css/dashboard.css','css/grid.css','js/app.js'];f.forEach(function(p){if(!require('fs').existsSync(p)){console.error('FALTA: '+p);process.exit(1)}});console.log('Build OK: todos los archivos presentes')"
+  }
+}

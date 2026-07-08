@@ -507,14 +507,6 @@
     container.innerHTML = '<div class="chips-wrap">' + CATS.map(c =>
       `<button type="button" class="chip" style="background:${c.color};color:${textColor(c.color)};" data-cat="${c.id}" data-label="${c.label}">${c.label}</button>`
     ).join('') + '</div>';
-    container.querySelectorAll('.chip').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const texto = document.getElementById('modal-texto');
-        const catSel = document.getElementById('modal-categoria');
-        if (texto) texto.value = this.dataset.label;
-        if (catSel) catSel.value = this.dataset.cat;
-      });
-    });
   }
 
   function textColor(hex) {
@@ -886,26 +878,37 @@
     badge.textContent = '🔗 ' + mergedCount;
   }
 
+  let _resizersReady = false;
+  document.getElementById('suggested-chips-container').addEventListener('click', function(e) {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    const texto = document.getElementById('modal-texto');
+    const catSel = document.getElementById('modal-categoria');
+    if (texto) texto.value = chip.dataset.label;
+    if (catSel) catSel.value = chip.dataset.cat;
+  });
   function configurarResizers() {
-    document.querySelectorAll('.resizer').forEach(r => {
-      r.onmousedown = function(e) {
-        e.preventDefault();
-        const th = this.parentElement;
-        const startX = e.clientX;
-        const startW = th.offsetWidth;
-        function onMove(e2) {
-          const w = Math.max(30, startW + (e2.clientX - startX));
-          th.style.width = w + 'px';
-          const col = parseInt(th.dataset.col);
-          if (col >= 0) {
-            document.querySelectorAll(`#tabla td:nth-child(${col+2})`).forEach(td => td.style.width = w + 'px');
-            document.querySelectorAll(`#tabla th:nth-child(${col+2})`).forEach(th2 => th2.style.width = w + 'px');
-          }
+    if (_resizersReady) return;
+    _resizersReady = true;
+    document.getElementById('tabla').addEventListener('mousedown', function(e) {
+      const r = e.target.closest('.resizer');
+      if (!r) return;
+      e.preventDefault();
+      const th = r.parentElement;
+      const startX = e.clientX;
+      const startW = th.offsetWidth;
+      function onMove(e2) {
+        const w = Math.max(30, startW + (e2.clientX - startX));
+        th.style.width = w + 'px';
+        const col = parseInt(th.dataset.col);
+        if (col >= 0) {
+          document.querySelectorAll(`#tabla td:nth-child(${col+2})`).forEach(td => td.style.width = w + 'px');
+          document.querySelectorAll(`#tabla th:nth-child(${col+2})`).forEach(th2 => th2.style.width = w + 'px');
         }
-        function onUp() { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
-      };
+      }
+      function onUp() { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
     });
   }
 

@@ -901,7 +901,14 @@
     if (confirm(`¿Eliminar ${dias[idx]}?`)) { dias.splice(idx, 1); filas.forEach(f => f.celdas.splice(idx, 1)); renderizar(); autoGuardar(); }
   }
   function eliminarUltimoDia() { eliminarDia(dias.length - 1); }
-  function autoGuardar() { try { localStorage.setItem('horario_data_' + plannerType, JSON.stringify({dias,filas})); } catch(e) {} }
+  let _guardarTimer = null;
+  function autoGuardar() {
+    clearTimeout(_guardarTimer);
+    _guardarTimer = setTimeout(() => {
+      _guardarTimer = null;
+      try { localStorage.setItem('horario_data_' + plannerType, JSON.stringify({dias,filas})); } catch(e) {}
+    }, 200);
+  }
 
   function getDatosCompletos() {
     const header = document.getElementById('inp-titulo-header')?.value?.trim() || '';
@@ -1259,7 +1266,7 @@
   }
 
   function guardarDatosTipo(tipo) {
-    localStorage.setItem('horario_data_' + tipo, JSON.stringify({ dias, filas }));
+    try { localStorage.setItem('horario_data_' + tipo, JSON.stringify({ dias, filas })); } catch(e) {}
   }
 
   // ========== CUSTOM HEADER ==========

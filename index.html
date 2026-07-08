@@ -387,8 +387,8 @@
 .dash-row { display: flex; gap: 12px; margin-bottom: 12px; }
 @media (max-width: 700px) { .dash-row { flex-direction: column; } }
 .dash-chart-card {
-  flex: 1; background: var(--surface-card); border-radius: var(--radius); padding: var(--space-md);
-  box-shadow: var(--shadow-xs); border: 1px solid var(--border-light);
+  flex: 1; background: var(--surface-card); border-radius: 12px; padding: 18px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid var(--border-light);
   position: relative; min-width: 0;
 }
 .chart-header {
@@ -415,7 +415,7 @@
 .chart-side { display: flex; flex-direction: column; gap: var(--space-sm); flex: 1; }
 .chart-stat {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 6px 10px; background: var(--surface-hover); border-radius: var(--radius-sm); font-size: 0.72em;
+  padding: 6px 10px; background: var(--surface-hover); border-radius: 8px; font-size: 0.72em;
 }
 .chart-stat .stat-label { color: var(--text-light); font-weight: 500; }
 .chart-stat .stat-val { font-weight: 700; color: var(--text-secondary); }
@@ -430,7 +430,7 @@
 
 /* Chart interpretation */
 .chart-interp {
-  margin-top: var(--space-sm); padding: var(--space-sm) var(--space-md); background: #f0f4ff; border-radius: var(--radius-sm);
+  margin-top: var(--space-sm); padding: var(--space-sm) var(--space-md); background: #f0f4ff; border-radius: 8px;
   font-size: 0.74em; line-height: 1.5; color: #1a3a5c; border-left: 3px solid var(--primary-1);
 }
 .chart-footer {
@@ -441,18 +441,20 @@
 /* Mini stats row */
 .dash-row-mini { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
 .dash-mini-card {
-  flex: 1; min-width: 100px; background: var(--surface-card); border-radius: var(--radius); padding: 12px var(--space-md);
-  box-shadow: var(--shadow-xs); border: 1px solid var(--border-light);
+  flex: 1; min-width: 100px; background: var(--surface-card); border-radius: 12px; padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid var(--border-light);
   border-left: 3px solid var(--primary-1); display: flex; align-items: center; gap: var(--space-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+.dash-mini-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
 .dash-mini-card .mini-icon { font-size: 1.3em; }
 .dash-mini-card .mini-label { font-size: var(--font-size-xs); color: var(--text-lighter); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
 .dash-mini-card .mini-val { font-size: 1.1em; font-weight: 700; color: var(--text-secondary); }
 
 /* Existing cards (for recommendations, rewards, etc.) */
 .dash-card {
-  background: var(--surface-card); border-radius: var(--radius); padding: var(--space-md) var(--space-md);
-  box-shadow: var(--shadow-xs); border: 1px solid var(--border-light);
+  background: var(--surface-card); border-radius: 12px; padding: 18px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid var(--border-light);
   transition: transform var(--transition-base), box-shadow var(--transition-base);
   position: relative; overflow: hidden;
 }
@@ -469,14 +471,15 @@
 .dash-day-row .day-bar .fill { height: 100%; border-radius: var(--radius-sm); transition: width 0.6s; }
 .dash-day-row .day-pct { width: 38px; text-align: right; font-weight: 700; color: var(--text-muted); font-size: 0.9em; }
 
-.reward-item, .penalty-item { padding: var(--space-sm) var(--space-md); margin: 4px 0; border-radius: var(--radius); font-size: 0.74em; display: flex; align-items: center; gap: var(--space-sm); }
+.reward-item, .penalty-item { padding: 8px 16px; margin: 4px 0; border-radius: 12px; font-size: 0.74em; display: flex; align-items: center; gap: var(--space-sm); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.reward-item:hover, .penalty-item:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 .reward-item { background: linear-gradient(135deg, #e8f8f5, #d4edda); border: 1px solid var(--color-success); }
 .reward-item.earned { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: var(--color-success-dark); box-shadow: 0 2px 8px rgba(39,174,96,0.15); }
 .penalty-item { background: linear-gradient(135deg, #fdf2f2, #f8d7da); border: 1px solid var(--color-danger); }
 .penalty-item.triggered { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: var(--color-danger-dark); box-shadow: 0 2px 8px rgba(231,76,60,0.15); }
 .reward-item .icon, .penalty-item .icon { font-size: 1.3em; }
 
-.reward-config { margin-top: var(--space-sm); padding: var(--space-md); background: var(--surface-hover); border-radius: var(--radius); border: 1px solid var(--border-light); }
+.reward-config { margin-top: var(--space-sm); padding: 16px 18px; background: var(--surface-hover); border-radius: 12px; border: 1px solid var(--border-light); }
 .reward-config h4 { font-size: 0.75em; color: var(--text-muted); margin-bottom: var(--space-sm); font-weight: 600; }
 .reward-config-row { display: flex; gap: var(--space-xs); align-items: center; margin: 4px 0; font-size: 0.7em; }
 .reward-config-row input, .reward-config-row select { padding: 4px 6px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.9em; background: var(--surface); }
@@ -484,14 +487,14 @@
 .reward-config-row .rc-type { flex: 1; }
 .reward-config-row .rc-pct { width: 60px; }
 .reward-config-row .rc-del { cursor: pointer; color: var(--color-danger-dark); padding: 4px; font-size: 1.1em; }
-.reward-config .add-reward-btn { padding: 5px 14px; border: 1px dashed var(--primary-1); border-radius: var(--radius); background: transparent; color: var(--primary-1); cursor: pointer; font-size: 0.7em; margin-top: 5px; transition: var(--transition-base); }
+.reward-config .add-reward-btn { padding: 5px 14px; border: 1px dashed var(--primary-1); border-radius: 12px; background: transparent; color: var(--primary-1); cursor: pointer; font-size: 0.7em; margin-top: 5px; transition: var(--transition-base); }
 .reward-config .add-reward-btn:hover { background: var(--primary-light); }
 .streak-fire { color: #e17055; font-size: 1.6em; letter-spacing: 2px; }
 
 /* Interpretation cards */
 .dashboard-interp { margin-top: 0; }
 .interp-card {
-  padding: 10px 14px; border-radius: var(--radius); margin: 6px 0;
+  padding: 10px 14px; border-radius: 12px; margin: 6px 0;
   font-size: 0.75em; line-height: 1.5;
   border-left: 3px solid transparent;
 }
@@ -788,7 +791,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     .modal { width: 300px; padding: var(--space-md); }
     .modal h3 { font-size: 0.85em; }
     .dash-row { flex-direction: column; }
-    .dash-chart-card { padding: 10px; }
+    .dash-chart-card { padding: 12px; }
     .pie-chart { width: 100px; height: 100px; }
     .pie-chart .center-text { width: 46px; height: 46px; font-size: 1em; }
     .chart-stat { font-size: 0.65em; }
@@ -796,12 +799,12 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     .bar-chart-row .bar-label { width: 50px; font-size: 0.85em; }
     .bar-chart-row .bar-pct { width: 32px; font-size: 0.85em; }
     .chart-interp { font-size: 0.65em; padding: 6px 10px; }
-    .dash-mini-card { min-width: 70px; padding: 6px 8px; }
+    .dash-mini-card { min-width: 70px; padding: 8px 10px; }
     .dash-mini-card .mini-val { font-size: 0.9em; }
     .dash-mini-card .mini-label { font-size: 0.55em; }
-    .dash-card { padding: 10px; }
+    .dash-card { padding: 12px; }
     .dash-card h3 { font-size: 0.65em; }
-    .reward-item, .penalty-item { font-size: 0.65em; padding: 6px 8px; }
+    .reward-item, .penalty-item { font-size: 0.65em; padding: 6px 10px; }
     .reward-config-row { font-size: 0.6em; }
     .btn-mark { font-size: 0.65em; padding: 4px 10px; }
     .table-actions { gap: 4px; margin-bottom: 5px; }

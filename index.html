@@ -1767,6 +1767,31 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     return true;
   }
 
+  function mostrarCompra() {
+    document.getElementById('modal-compra').classList.add('active');
+  }
+
+  function mostrarActivar() {
+    document.getElementById('modal-compra').classList.remove('active');
+    document.getElementById('modal-activar').classList.add('active');
+  }
+
+  function abrirWhatsApp() {
+    const msg = encodeURIComponent('¡Hola! Quiero comprar la licencia del Planificador de Horarios (S/ 15). ¿Cómo puedo realizar el pago?');
+    window.open('https://wa.me/51936718790?text=' + msg, '_blank', 'noopener,noreferrer');
+  }
+
+  function cerrarModalCompra() {
+    document.getElementById('modal-compra').classList.remove('active');
+  }
+
+  function cerrarActivar() {
+    document.getElementById('modal-activar').classList.remove('active');
+  }
+
+  document.getElementById('modal-compra').addEventListener('click', function(e) { if (e.target === this) cerrarModalCompra(); });
+  document.getElementById('modal-activar').addEventListener('click', function(e) { if (e.target === this) cerrarActivar(); });
+
   // ========== ADMIN ==========
   let clickCount = 0, clickTimer = null;
   document.getElementById('main-title').addEventListener('click', function() {

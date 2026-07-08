@@ -229,8 +229,8 @@
   .del-fila { position: absolute; top: 0; right: 1px; font-size: 0.65em; color: #e74c3c; cursor: pointer; opacity: 0.3; }
   .del-fila:hover { opacity: 1; }
 
-  .celda { cursor: pointer; min-height: 28px; transition: var(--transition-fast); position: relative; }
-  .celda:hover { box-shadow: inset 0 0 0 2px var(--primary-1); }
+  .celda { cursor: pointer; min-height: 28px; transition: box-shadow 0.15s ease; position: relative; }
+  .celda:hover { box-shadow: inset 0 0 0 100px rgba(102,126,234,0.06); }
 
   /* ========== COLORES MÁS VIBRANTES ========== */
   .c-clase { background: #74b9ff; color: #1a3a5c; font-weight: 500; }
@@ -946,7 +946,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     border-color: var(--border-color);
   }
   body.dark .hora-cell { background: var(--surface-hover); }
-  body.dark .celda:hover { box-shadow: inset 0 0 0 2px var(--primary-1); }
+  body.dark .celda:hover { box-shadow: inset 0 0 0 100px rgba(255,255,255,0.04); }
   body.dark .table-wrap { background: var(--surface-hover); }
   body.dark .c-clase { background: #1e3a5f; color: #8ab4f8; }
   body.dark .c-ensenanza { background: #2a1f5e; color: #b4a0ff; }

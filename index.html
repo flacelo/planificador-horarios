@@ -243,17 +243,17 @@
   .c-libre { background: #f5f6fa; color: #636e72; }
 
   /* ========== MODAL ========== */
-  .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
+  .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; backdrop-filter: blur(4px); }
   .modal-overlay.active { display: flex; }
   .modal {
-    background: var(--surface-modal); border-radius: var(--radius); padding: var(--space-lg); width: 360px;
-    max-width: 90vw; box-shadow: var(--shadow-xl);
+    background: var(--surface-modal); border-radius: 12px; padding: 24px 22px; width: 360px;
+    max-width: 90vw; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
     max-height: 90vh; overflow-y: auto;
   }
   .modal h3 { margin-bottom: var(--space-sm); font-size: 0.95em; color: var(--text-primary); }
   .modal label { display: block; font-size: var(--font-size-base); margin-bottom: 3px; color: var(--text-muted); }
   .modal textarea, .modal select, .modal input[type=text], .modal input[type=password] {
-    width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius);
+    width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 8px;
     font-size: 0.82em; margin-bottom: var(--space-sm); transition: var(--transition-base);
   }
   .modal textarea:focus, .modal select:focus, .modal input:focus { border-color: var(--primary-1); outline: none; box-shadow: 0 0 0 3px var(--primary-light); }
@@ -264,14 +264,14 @@
   .chip:active { transform:scale(0.95); }
   body.dark .chip { box-shadow:0 1px 4px rgba(0,0,0,0.3); }
   .modal .btns { display: flex; gap: var(--space-sm); justify-content: flex-end; margin-top: 6px; }
-  .modal .btns button { padding: 8px 20px; border: none; border-radius: var(--radius); cursor: pointer; font-size: var(--font-size-base); font-weight: 500; }
+  .modal .btns button { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: var(--font-size-base); font-weight: 500; }
   .modal .btns .btn-ok { background: var(--primary-gradient); color: #fff; }
   .modal .btns .btn-ok:hover { opacity: 0.9; }
   .modal .btns .btn-cancel { background: #f1f2f6; color: var(--text-muted); }
   .modal .btns .btn-cancel:hover { background: #dfe6e9; }
   .modal .precio-box {
     background: linear-gradient(135deg, #f3e5f5, #e1bee7);
-    padding: var(--space-md); border-radius: var(--radius); margin: var(--space-sm) 0; text-align: center;
+    padding: 16px 18px; border-radius: 12px; margin: var(--space-sm) 0; text-align: center;
   }
   .modal .precio-box p { font-size: 0.82em; color: var(--accent-purple); margin: 3px 0; }
 
@@ -304,7 +304,7 @@
   }
 
   .btn-wsp {
-    padding: 10px 24px; border: none; border-radius: var(--radius);
+    padding: 10px 24px; border: none; border-radius: 8px;
     cursor: pointer; font-size: 0.85em; font-weight: 500;
     background: linear-gradient(135deg, #25d366, #128C7E);
     color: #fff; transition: var(--transition-base);
@@ -788,7 +788,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     .sp-btn-sm { font-size: 0.6em; padding: 3px 6px; }
     .planner-type-selector button { font-size: 0.65em; padding: 4px 8px; }
     .view-toggle button { font-size: 0.6em; padding: 4px 10px; }
-    .modal { width: 300px; padding: var(--space-md); }
+    .modal { width: 300px; padding: 16px; }
     .modal h3 { font-size: 0.85em; }
     .dash-row { flex-direction: column; }
     .dash-chart-card { padding: 12px; }
@@ -832,7 +832,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     .hora-cell { width: 28px; }
     .side-panel { width: 220px; left: -240px; }
     .cloud-btn.open { left: 230px; }
-    .modal { width: 260px; padding: 10px; }
+    .modal { width: 260px; padding: 12px; }
     .pie-chart { width: 80px; height: 80px; }
     .pie-chart .center-text { width: 38px; height: 38px; font-size: 0.85em; }
   }
@@ -845,8 +845,8 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   }
   .tutorial-overlay.active { display: flex; }
   .tutorial-box {
-    background: var(--surface); border-radius: var(--radius-xl); padding: var(--space-3xl) var(--space-lg); width: 440px;
-    max-width: 92vw; box-shadow: var(--shadow-xl);
+    background: var(--surface); border-radius: 12px; padding: var(--space-3xl) var(--space-lg); width: 440px;
+    max-width: 92vw; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
     position: relative; text-align: center;
   }
   .tutorial-box .t-step { display: none; }

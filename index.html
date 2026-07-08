@@ -2700,6 +2700,23 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     const nombreSel = document.getElementById('sel-nombre');
     if (nombreSel) onRolChange(nombreSel);
   }
+
+  // ========== DASHBOARD ==========
+  const DEFAULT_REWARDS = [
+    { id: 'r1', name: '🍦 Helado o postre', type: 'reward', threshold: 80, active: true },
+    { id: 'r2', name: '🎬 Ver una película', type: 'reward', threshold: 90, active: true },
+    { id: 'r3', name: '💰 S/10 al cochinito', type: 'penalty', threshold: 40, active: true },
+    { id: 'r4', name: '🚫 Sin redes sociales 1 día', type: 'penalty', threshold: 30, active: true }
+  ];
+
+  function getRewards() {
+    try { return JSON.parse(localStorage.getItem('horario_rewards')) || DEFAULT_REWARDS; } catch(e) { return DEFAULT_REWARDS; }
+  }
+
+  function saveRewards(rewards) {
+    localStorage.setItem('horario_rewards', JSON.stringify(rewards));
+  }
+
   iniciar();
 
   function configurarDelegacionCeldas() {
@@ -2828,22 +2845,6 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     autoGuardar();
   }
 
-  // ========== DASHBOARD ==========
-  const DEFAULT_REWARDS = [
-    { id: 'r1', name: '🍦 Helado o postre', type: 'reward', threshold: 80, active: true },
-    { id: 'r2', name: '🎬 Ver una película', type: 'reward', threshold: 90, active: true },
-    { id: 'r3', name: '💰 S/10 al cochinito', type: 'penalty', threshold: 40, active: true },
-    { id: 'r4', name: '🚫 Sin redes sociales 1 día', type: 'penalty', threshold: 30, active: true }
-  ];
-
-  function getRewards() {
-    try { return JSON.parse(localStorage.getItem('horario_rewards')) || DEFAULT_REWARDS; } catch(e) { return DEFAULT_REWARDS; }
-  }
-
-  function saveRewards(rewards) {
-    localStorage.setItem('horario_rewards', JSON.stringify(rewards));
-  }
-
   // ========== SVG PIE CHART ==========
   function generarPieSvg(pct, streak) {
     const size = 130, cx = 65, cy = 65, r = 54;
@@ -2870,12 +2871,13 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   function renderDashboard() {
     const container = document.getElementById('view-dashboard');
     if (!container) return;
-    const totalCells = filas.reduce((sum, f) => sum + f.celdas.length, 0);
-    const doneCells = filas.reduce((sum, f) => sum + f.celdas.filter(c => c.done).length, 0);
+    try {
+    const totalCells = filas.reduce((sum, f) => sum + (f.celdas?.length ?? 0), 0);
+    const doneCells = filas.reduce((sum, f) => sum + (f.celdas?.filter(c => c?.done)?.length ?? 0), 0);
     const totalPct = totalCells > 0 ? Math.round(doneCells / totalCells * 100) : 0;
     const dayStats = dias.map((d, ci) => {
       let done = 0, total = 0;
-      filas.forEach(f => { if (f.celdas[ci]) { total++; if (f.celdas[ci].done) done++; } });
+      filas.forEach(f => { const cel = f.celdas?.[ci]; if (cel) { total++; if (cel.done) done++; } });
       return { name: d, pct: total > 0 ? Math.round(done/total*100) : 0, done, total };
     });
     const todayIdx = new Date().getDay();
@@ -2998,6 +3000,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
     html += actualizarMetasDashboard();
     html += `</div>`;
     container.innerHTML = html;
+    } catch(e) { console.error('renderDashboard error:',e); container.innerHTML = `<div class="dashboard" style="padding:20px;text-align:center;"><h2>📊 Dashboard de Cumplimiento</h2><p style="color:#e74c3c;margin-top:12px;">⚠️ Error: ${e.message}</p></div>`; }
   }
 
   function generarRecomendaciones(totalPct, weeklyPct, streak, dayStats, todayStats, todayName) {

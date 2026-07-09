@@ -536,6 +536,7 @@
     const perfil = profiles[perfilId];
     if (!perfil) return;
     CATS = perfil.cats;
+    renderizarLeyenda();
     inyectarCSScategorias();
     actualizarModalCategorias();
     const selObj = document.getElementById('sel-objetivo');
@@ -796,17 +797,25 @@
     actualizarEmptyState();
     configurarResizers();
     configurarDelegacionCeldas();
-    let leyHtml = '';
-    CATS.forEach(c => { leyHtml += `<span><span class="dot" style="background:${c.color}"></span> ${c.label}</span>`; });
-    const lTemp = document.createElement('div');
-    lTemp.innerHTML = leyHtml;
-    const lFrag = document.createDocumentFragment();
-    while (lTemp.firstChild) lFrag.appendChild(lTemp.firstChild);
-    const leyenda = document.getElementById('leyenda');
-    leyenda.textContent = '';
-    leyenda.appendChild(lFrag);
+    renderizarLeyenda();
     actualizarInfoMerge();
     actualizarMergeBadge();
+  }
+
+  function renderizarLeyenda() {
+    const leyenda = document.getElementById('leyenda');
+    leyenda.textContent = '';
+    const frag = document.createDocumentFragment();
+    CATS.forEach(c => {
+      const span = document.createElement('span');
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      dot.style.background = c.color;
+      span.appendChild(dot);
+      span.appendChild(document.createTextNode(' ' + c.label));
+      frag.appendChild(span);
+    });
+    leyenda.appendChild(frag);
   }
 
   function calcularEstadisticasSemanales() {
@@ -1055,6 +1064,7 @@
     if (savedPerfil && profiles[savedPerfil]) {
       const p = profiles[savedPerfil];
       CATS = p.cats;
+      renderizarLeyenda();
       inyectarCSScategorias();
       actualizarModalCategorias();
       const selObj = document.getElementById('sel-objetivo');

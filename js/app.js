@@ -767,13 +767,14 @@
     hr.textContent = '';
     hr.appendChild(hFrag);
     let html = '';
+    var ocupadas = {};
     filas.forEach((fila, fi) => {
       html += '<tr>';
       html += `<td class="hora-cell"><span class="del-fila" onclick="eliminarFila(${fi})">✕</span><input type="text" value="${fila.hora}" onchange="cambiarHora(${fi},this.value)"></td>`;
       for (let ci = 0; ci < dias.length; ci++) {
+        if (ocupadas[fi + ',' + ci]) continue;
         const cel = fila.celdas[ci] || {t:'',c:'libre',done:false,rowspan:1};
         if (cel.rowspan === undefined) cel.rowspan = 1;
-        if (cel.rowspan === 0) continue;
         if (cel.done === undefined) cel.done = false;
         if (cel.reminder === undefined) cel.reminder = false;
         const dc = cel.done ? ' done' : '';
@@ -782,6 +783,9 @@
         const rs = cel.rowspan > 1 ? ` rowspan="${cel.rowspan}"` : '';
         const mergeCls = cel.rowspan > 1 ? ' merged-cell' : '';
         const mergeInd = cel.rowspan > 1 ? '<span class="merge-indicator">🔗</span>' : '';
+        if (cel.rowspan > 1) {
+          for (var r = fi + 1; r < fi + cel.rowspan; r++) ocupadas[r + ',' + ci] = true;
+        }
         html += `<td class="celda c-${cel.c}${dc}${mergeCls}"${rs} data-fi="${fi}" data-ci="${ci}"><span class="done-check${dk}">${cel.done?'✓':''}</span>${mergeInd}${bell}${cel.t || '—'}</td>`;
       }
       html += '</tr>';

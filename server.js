@@ -14,6 +14,9 @@ const MIME = {
 };
 
 http.createServer((req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '-1');
   let filePath = req.url === '/' ? '/index.html' : req.url;
   filePath = path.join(__dirname, filePath);
   const ext = path.extname(filePath);
@@ -23,12 +26,7 @@ http.createServer((req, res) => {
       res.end('404 Not Found');
       return;
     }
-    res.writeHead(200, {
-      'Content-Type': MIME[ext] || 'application/octet-stream',
-      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-    });
+    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
     res.end(data);
   });
 }).listen(PORT, () => {

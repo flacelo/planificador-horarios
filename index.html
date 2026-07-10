@@ -200,6 +200,12 @@
           <button class="sp-btn sp-btn-purple" onclick="mostrarCompra()">💎 Licencia</button>
           <button class="sp-btn" id="btn-login" onclick="mostrarLogin()">🔑 Iniciar sesión</button>
         </div>
+        <div class="dispositivos-section" id="dispositivos-section" style="display:none">
+          <hr style="border-color:var(--border);margin:12px 0">
+          <div style="font-size:0.85em;font-weight:600;margin-bottom:8px;color:var(--text-muted)">📱 Dispositivos conectados</div>
+          <ul id="lista-dispositivos" style="list-style:none;padding:0;margin:0 0 8px 0;font-size:0.82em"></ul>
+          <button class="sp-btn" id="btn-cerrar-otras" onclick="cerrarOtrasSesiones()" style="font-size:0.78em;width:100%">🔒 Cerrar sesión en otros dispositivos</button>
+        </div>
       </div>
     </details>
   </div>
@@ -449,5 +455,6 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_ES/sdk.js#xfbml=1&version=v18.0&appId=YOUR_FACEBOOK_APP_ID"></script>
 <script src="js/app.js"></script>
+<div id="notif-sync" style="display:none;position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:var(--bg-card,#2d3436);color:#55efc4;padding:10px 20px;border-radius:8px;font-size:.85em;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.3);border:1px solid var(--border,#444)"></div>
 </body>
 </html>

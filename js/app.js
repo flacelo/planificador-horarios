@@ -1128,6 +1128,7 @@
     filas = JSON.parse(JSON.stringify(generarBloquesDefault())); renderizar();
     const nombreSel = document.getElementById('sel-nombre');
     if (nombreSel) onRolChange(nombreSel);
+    iniciarPollingSesiones();
   }
 
   // ========== DASHBOARD ==========
@@ -2211,6 +2212,7 @@
   function actualizarUIlogin() {
     var btn = document.getElementById('btn-login');
     if (!btn) return;
+    var devSection = document.getElementById('dispositivos-section');
     if (loginUsuario) {
       btn.textContent = '👤 ' + (loginUsuario.nombre || 'Usuario');
       document.getElementById('login-pending').style.display = 'none';
@@ -2218,8 +2220,13 @@
       if (document.getElementById('login-avatar')) document.getElementById('login-avatar').src = loginUsuario.foto || '';
       if (document.getElementById('login-name')) document.getElementById('login-name').textContent = loginUsuario.nombre || '';
       if (document.getElementById('login-email')) document.getElementById('login-email').textContent = loginUsuario.correo || '';
+      if (devSection) devSection.style.display = 'block';
+      fetchSesiones();
     } else {
       btn.textContent = '🔑 Iniciar sesión';
+      if (devSection) devSection.style.display = 'none';
+      var lista = document.getElementById('lista-dispositivos');
+      if (lista) lista.innerHTML = '';
     }
   }
 
@@ -2261,4 +2268,81 @@
         msg.textContent = '✅ Enlace de recuperación enviado a tu correo';
       });
   }
+
+  // ========== SESIONES MULTIDISPOSITIVO ==========
+
+  var intervaloSesiones = null;
+  var ultimaVersionLocal = 0;
+
+  function etagLocal() {
+    var raw = localStorage.getItem(CONFIG.STORAGE.DATA_PREFIX + plannerType) || '';
+    var sum = 0;
+    for (var i = 0; i < raw.length; i++) {
+      sum = ((sum << 5) - sum) + raw.charCodeAt(i); sum |= 0;
+    }
+    return sum;
+  }
+
+  function fetchSesiones() {
+    if (!loginUsuario || !loginUsuario.correo) return;
+    fetch('/api/auth/sessions?email=' + encodeURIComponent(loginUsuario.correo))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.ok && data.sesiones) {
+          actualizarUIDispositivos(data.sesiones);
+          var nuevaVersion = etagLocal();
+          if (ultimaVersionLocal !== 0 && nuevaVersion !== ultimaVersionLocal) {
+            var notif = document.getElementById('notif-sync');
+            if (notif) {
+              notif.textContent = '🔄 Datos actualizados desde otro dispositivo';
+              notif.style.display = 'block';
+              setTimeout(function() { notif.style.display = 'none'; }, 4000);
+            }
+          }
+          ultimaVersionLocal = nuevaVersion;
+        }
+      })
+      .catch(function() {});
+  }
+
+  function actualizarUIDispositivos(sesiones) {
+    var lista = document.getElementById('lista-dispositivos');
+    if (!lista) return;
+    lista.innerHTML = '';
+    sesiones.forEach(function(s) {
+      var li = document.createElement('li');
+      li.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);opacity:' + (s.cerrada ? '0.4' : '1');
+      var icono = s.dispositivo.toLowerCase().indexOf('laptop') !== -1 ? '💻' : '📱';
+      li.innerHTML = '<span>' + icono + '</span> <span style="flex:1">' + s.dispositivo + '</span>' +
+        (s.actual ? '<span style="font-size:0.7em;color:#55efc4">●</span>' : '') +
+        (s.cerrada ? '<span style="font-size:0.7em;color:#ff7675">✕</span>' : '');
+      lista.appendChild(li);
+    });
+  }
+
+  function cerrarOtrasSesiones() {
+    if (!loginUsuario || !loginUsuario.correo) return;
+    fetch('/api/auth/sessions/close-others', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: loginUsuario.correo })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.ok) { fetchSesiones(); }
+    })
+    .catch(function() {});
+  }
+
+  function iniciarPollingSesiones() {
+    if (intervaloSesiones) clearInterval(intervaloSesiones);
+    intervaloSesiones = setInterval(function() {
+      if (loginUsuario) fetchSesiones();
+    }, 30000);
+  }
+
+  window.iniciarPollingSesiones = iniciarPollingSesiones;
+  window.fetchSesiones = fetchSesiones;
+  window.actualizarUIDispositivos = actualizarUIDispositivos;
+  window.cerrarOtrasSesiones = cerrarOtrasSesiones;
 

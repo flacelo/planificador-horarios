@@ -2142,7 +2142,84 @@
     container.innerHTML = html;
   }
 
+  // ========== LOGIN SOCIAL (Google & Facebook) ==========
+  var loginUsuario = null;
 
+  function mostrarLogin() {
+    document.getElementById('modal-login').classList.add('active');
+    if (loginUsuario) {
+      document.getElementById('login-pending').style.display = 'none';
+      document.getElementById('login-success').style.display = 'block';
+      document.getElementById('login-avatar').src = loginUsuario.foto || '';
+      document.getElementById('login-name').textContent = loginUsuario.nombre || '';
+      document.getElementById('login-email').textContent = loginUsuario.correo || '';
+    } else {
+      document.getElementById('login-pending').style.display = 'block';
+      document.getElementById('login-success').style.display = 'none';
+    }
+  }
 
+  function cerrarLogin() {
+    document.getElementById('modal-login').classList.remove('active');
+  }
 
+  function onGoogleSignIn(response) {
+    try {
+      var payload = JSON.parse(atob(response.credential.split('.')[1]));
+      loginUsuario = {
+        nombre: payload.name || 'Usuario Google',
+        correo: payload.email || '',
+        foto: payload.picture || '',
+        proveedor: 'google'
+      };
+      actualizarUIlogin();
+      cerrarLogin();
+    } catch(e) {
+      console.error('Error al decodificar Google token:', e);
+    }
+  }
+
+  function onFacebookLogin() {
+    if (typeof FB === 'undefined') { alert('Facebook SDK no está cargado aún. Intenta de nuevo.'); return; }
+    FB.login(function(response) {
+      if (response.authResponse) {
+        FB.api('/me', { fields: 'name,email,picture.width(96).height(96)' }, function(apiRes) {
+          if (!apiRes || apiRes.error) { alert('Error al obtener perfil de Facebook'); return; }
+          loginUsuario = {
+            nombre: apiRes.name || 'Usuario Facebook',
+            correo: apiRes.email || '',
+            foto: apiRes.picture?.data?.url || '',
+            proveedor: 'facebook'
+          };
+          actualizarUIlogin();
+          cerrarLogin();
+        });
+      } else {
+        alert('Inicio de sesión cancelado o fallido');
+      }
+    }, { scope: 'public_profile,email' });
+  }
+
+  function cerrarSesion() {
+    loginUsuario = null;
+    if (typeof FB !== 'undefined') { try { FB.logout(); } catch(e) {} }
+    document.getElementById('btn-login').textContent = '🔑 Iniciar sesión';
+    actualizarUIlogin();
+    cerrarLogin();
+  }
+
+  function actualizarUIlogin() {
+    var btn = document.getElementById('btn-login');
+    if (!btn) return;
+    if (loginUsuario) {
+      btn.textContent = '👤 ' + (loginUsuario.nombre || 'Usuario');
+      document.getElementById('login-pending').style.display = 'none';
+      document.getElementById('login-success').style.display = 'block';
+      if (document.getElementById('login-avatar')) document.getElementById('login-avatar').src = loginUsuario.foto || '';
+      if (document.getElementById('login-name')) document.getElementById('login-name').textContent = loginUsuario.nombre || '';
+      if (document.getElementById('login-email')) document.getElementById('login-email').textContent = loginUsuario.correo || '';
+    } else {
+      btn.textContent = '🔑 Iniciar sesión';
+    }
+  }
 

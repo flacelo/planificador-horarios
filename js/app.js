@@ -1109,12 +1109,12 @@
     if (saved) {
       try {
         const d = JSON.parse(saved);
-        dias = d.dias; filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
+        dias = d.dias; filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan === undefined ? 1 : c.rowspan}))}));
         renderizar(); return;
       } catch(e) {}
     }
-    try { const r = localStorage.getItem(CONFIG.STORAGE.COMPLETO); if(r){const d=JSON.parse(r);aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
-    try { const r = localStorage.getItem(CONFIG.STORAGE.DATOS_LEGACY); if(r){const d=JSON.parse(r);if(d.dias)dias=d.dias;if(d.filas)filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan||1}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem(CONFIG.STORAGE.COMPLETO); if(r){const d=JSON.parse(r);aplicarDatos(d);filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan === undefined ? 1 : c.rowspan}))}));renderizar();return;} } catch(e){}
+    try { const r = localStorage.getItem(CONFIG.STORAGE.DATOS_LEGACY); if(r){const d=JSON.parse(r);if(d.dias)dias=d.dias;if(d.filas)filas=d.filas.map(f=>({hora:f.hora,celdas:f.celdas.map(c=>({t:c.t,c:c.c,done:c.done||false,reminder:c.reminder||false,rowspan:c.rowspan === undefined ? 1 : c.rowspan}))}));renderizar();return;} } catch(e){}
     if (!savedInterval) {
       localStorage.setItem(CONFIG.STORAGE.INTERVALO, String(CONFIG.LIMITES.INTERVALO_DEFAULT));
       localStorage.setItem(CONFIG.STORAGE.INICIO, CONFIG.LIMITES.HORA_DEFAULT_INICIO);
@@ -1368,7 +1368,7 @@
       try {
         const d = JSON.parse(saved);
         dias = d.dias;
-        filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
+        filas = d.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan === undefined ? 1 : c.rowspan}))}));
         renderizar(); autoGuardar(); return;
       } catch(e) {}
     }
@@ -1385,7 +1385,7 @@
       const tplFn = templateMap[tipo];
       if (tplFn) {
         const tpl = tplFn();
-        filas = tpl.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan||1}))}));
+        filas = tpl.filas.map(f => ({hora:f.hora, celdas:f.celdas.map(c => ({t:c.t, c:c.c, done:c.done||false, reminder:c.reminder||false, rowspan:c.rowspan === undefined ? 1 : c.rowspan}))}));
       } else {
         const horasBase = ['7:00','8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
         filas = horasBase.map(h => ({ hora: h, celdas: dias.map(() => ({t:'',c:'libre',done:false,reminder:false,rowspan:1})) }));
@@ -2007,7 +2007,7 @@
         c: c.c || 'libre',
         done: c.done || false,
         reminder: c.reminder || false,
-        rowspan: c.rowspan || 1
+        rowspan: c.rowspan === undefined ? 1 : c.rowspan
       }))
     }));
   }

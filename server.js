@@ -16,6 +16,50 @@ const MIME = {
 
 http.createServer((req, res) => {
   // API routes
+
+  // Mock session store
+  var sesionesPorUsuario = {};
+
+  function getSesionesMock(email) {
+    if (!email) return [];
+    if (!sesionesPorUsuario[email]) {
+      sesionesPorUsuario[email] = [
+        { id: 's1', dispositivo: 'Laptop Windows', ubicacion: 'Chiclayo, PE', ultimaAct: new Date().toISOString(), actual: true },
+        { id: 's2', dispositivo: 'Smartphone Android', ubicacion: 'Lima, PE', ultimaAct: new Date(Date.now() - 60000).toISOString(), actual: false },
+      ];
+    }
+    return sesionesPorUsuario[email];
+  }
+
+  if (req.method === 'GET' && req.url.startsWith('/api/auth/sessions')) {
+    var params = new URL(req.url, 'http://localhost').searchParams;
+    var email = params.get('email') || '';
+    var list = getSesionesMock(email);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, sesiones: list }));
+    return;
+  }
+
+  if (req.method === 'POST' && req.url === '/api/auth/sessions/close-others') {
+    let body = '';
+    req.on('data', function(chunk) { body += chunk; });
+    req.on('end', function() {
+      try {
+        var data = JSON.parse(body);
+        var email = data.email || '';
+        var sesiones = getSesionesMock(email);
+        sesiones.forEach(function(s) { if (!s.actual) s.cerrada = true; });
+        console.log('[SESSIONS] Sesiones cerradas para', email);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, message: 'Sesiones cerradas en otros dispositivos' }));
+      } catch(e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));
+      }
+    });
+    return;
+  }
+
   if (req.method === 'POST' && req.url === '/api/auth/recover') {
     let body = '';
     req.on('data', function(chunk) { body += chunk; });

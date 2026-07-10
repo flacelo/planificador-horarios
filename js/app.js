@@ -797,6 +797,7 @@
     actualizarEmptyState();
     configurarResizers();
     configurarDelegacionCeldas();
+    configurarArrastreMerge();
     renderizarLeyenda();
     actualizarInfoMerge();
     actualizarMergeBadge();
@@ -1145,6 +1146,97 @@
   let mergeActivo = false;
   let mergeSeleccion = [];
 
+  // ---------------------------------------------------------------
+  // 🖱️ MOTOR DE SELECCIÓN MÚLTIPLE POR ARRASTRE
+  // ---------------------------------------------------------------
+  let arrastreActivo = false;
+  let arrastreEnCurso = false;
+  let arrastreCompletado = false;
+  let arrastreOrigen = null;
+  let ultimaFiArrastre = -1;
+  let cacheCeldas = [];
+  let _arrastreReady = false;
+
+  function coordenadasSeleccion(actualizar) {
+    if (actualizar || cacheCeldas.length === 0) {
+      cacheCeldas = Array.from(document.querySelectorAll('#tabla tbody tr')).map(function(tr, idx) {
+        var r = tr.getBoundingClientRect();
+        return { fi: idx, top: r.top, bottom: r.bottom };
+      });
+    }
+    return cacheCeldas;
+  }
+
+  function filaDesdeY(y) {
+    var filas = coordenadasSeleccion();
+    for (var i = 0; i < filas.length; i++) {
+      if (y >= filas[i].top && y < filas[i].bottom) return filas[i].fi;
+    }
+    if (filas.length && y >= filas[filas.length - 1].bottom) return filas[filas.length - 1].fi;
+    if (filas.length && y < filas[0].top) return filas[0].fi;
+    return -1;
+  }
+
+  function actualizarSeleccionArrastre(fiCursor) {
+    var fiMin = Math.min(arrastreOrigen.fi, fiCursor);
+    var fiMax = Math.max(arrastreOrigen.fi, fiCursor);
+    var ci = arrastreOrigen.ci;
+    var set = new Set();
+    for (var f = fiMin; f <= fiMax; f++) set.add(f + ',' + ci);
+    document.querySelectorAll('#tabla .celda').forEach(function(el) {
+      el.classList.toggle('merge-selected', set.has(el.dataset.fi + ',' + el.dataset.ci));
+    });
+  }
+
+  function configurarArrastreMerge() {
+    if (_arrastreReady) return;
+    _arrastreReady = true;
+    document.getElementById('tabla').addEventListener('mousedown', function(e) {
+      if (!mergeActivo) return;
+      var celda = e.target.closest('.celda');
+      if (!celda) return;
+      arrastreOrigen = { fi: parseInt(celda.dataset.fi), ci: parseInt(celda.dataset.ci) };
+      arrastreActivo = true;
+      arrastreEnCurso = false;
+      arrastreCompletado = false;
+      ultimaFiArrastre = arrastreOrigen.fi;
+      coordenadasSeleccion(true);
+      e.preventDefault();
+      var origenX = e.clientX, origenY = e.clientY;
+      function onMove(e2) {
+        if (!arrastreActivo) return;
+        var fiCursor = filaDesdeY(e2.clientY);
+        if (fiCursor < 0) return;
+        ultimaFiArrastre = fiCursor;
+        if (!arrastreEnCurso) {
+          var dx = e2.clientX - origenX, dy = e2.clientY - origenY;
+          if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+          arrastreEnCurso = true;
+        }
+        actualizarSeleccionArrastre(fiCursor);
+      }
+      function onUp() {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        if (arrastreEnCurso) {
+          arrastreCompletado = true;
+          var fiMin = Math.min(arrastreOrigen.fi, ultimaFiArrastre);
+          var fiMax = Math.max(arrastreOrigen.fi, ultimaFiArrastre);
+          var ci = arrastreOrigen.ci;
+          mergeSeleccion = [];
+          for (var f = fiMin; f <= fiMax; f++) mergeSeleccion.push({ fi: f, ci: ci });
+          actualizarInfoMerge();
+        }
+        arrastreActivo = false;
+        arrastreEnCurso = false;
+        arrastreOrigen = null;
+        cacheCeldas = [];
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  }
+
   function toggleMergeMode() {
     mergeActivo = !mergeActivo;
     mergeSeleccion = [];
@@ -1180,10 +1272,9 @@
   }
 
   function resaltarSeleccionMerge() {
-    document.querySelectorAll('.celda.merge-selected').forEach(el => el.classList.remove('merge-selected'));
-    mergeSeleccion.forEach(s => {
-      const celda = document.querySelector(`#tabla tbody tr:nth-child(${s.fi+1}) td:nth-child(${s.ci+2})`);
-      if (celda) celda.classList.add('merge-selected');
+    var set = new Set(mergeSeleccion.map(function(s) { return s.fi + ',' + s.ci; }));
+    document.querySelectorAll('#tabla .celda').forEach(function(el) {
+      el.classList.toggle('merge-selected', set.has(el.dataset.fi + ',' + el.dataset.ci));
     });
   }
 
@@ -1289,6 +1380,7 @@
     if (!tb || tb.dataset.delegacionLista) return;
     tb.dataset.delegacionLista = '1';
     tb.addEventListener('click', function(e) {
+      if (arrastreCompletado) { arrastreCompletado = false; return; }
       const doneCheck = e.target.closest('.done-check');
       if (doneCheck) {
         const celda = doneCheck.closest('.celda');

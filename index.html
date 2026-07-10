@@ -198,6 +198,7 @@
           <button class="sp-btn" id="btn-dark-mode" onclick="toggleDarkMode()">🌙 Oscuro</button>
           <button class="sp-btn" onclick="mostrarTutorial()">❓ Ayuda</button>
           <button class="sp-btn sp-btn-purple" onclick="mostrarCompra()">💎 Licencia</button>
+          <button class="sp-btn" id="btn-login" onclick="mostrarLogin()">🔑 Iniciar sesión</button>
         </div>
       </div>
     </details>
@@ -374,6 +375,35 @@
   </div>
 </div>
 
+<!-- MODAL LOGIN SOCIAL -->
+<div class="modal-overlay" id="modal-login">
+  <div class="modal" style="text-align:center;">
+    <h3 style="color:var(--text-primary);">🔑 Iniciar sesión</h3>
+    <p style="font-size:0.78em;color:#888;margin-bottom:10px;">Accede para guardar tus horarios en la nube</p>
+    <div id="login-pending">
+      <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com" data-callback="onGoogleSignIn" data-auto_prompt="false"></div>
+      <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-width="280"></div>
+      <div style="margin:6px 0;font-size:0.75em;color:#bbb;">o</div>
+      <button class="btn-facebook" onclick="onFacebookLogin()">
+        <svg viewBox="0 0 36 36"><path d="M15.2 34V19.8h-4.7v-5.5h4.7v-4c0-4.6 2.8-7.2 7-7.2 2 0 3.7.15 4.2.22v4.9H23c-2.3 0-2.8 1.1-2.8 2.7v3.5h5.6l-.7 5.5h-4.9V34"/></svg>
+        Continuar con Facebook
+      </button>
+    </div>
+    <div id="login-success" style="display:none;">
+      <img class="login-avatar" id="login-avatar" src="" alt="Avatar">
+      <div class="login-user-info">
+        <strong id="login-name"></strong>
+        <span id="login-email"></span>
+      </div>
+      <p style="font-size:0.78em;color:#55efc4;font-weight:600;">✅ Sesión iniciada</p>
+      <button class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+    <div class="btns" style="justify-content:center;margin-top:10px;">
+      <button class="btn-cancel" onclick="cerrarLogin()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL ADMIN (solo vendedor) -->
 <div class="modal-overlay" id="modal-admin">
   <div class="modal" style="text-align:center;">
@@ -401,6 +431,8 @@
   </div>
 </div>
 
-<script src="js/app.js?v=1.0.2"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_ES/sdk.js#xfbml=1&version=v18.0&appId=YOUR_FACEBOOK_APP_ID"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

@@ -243,6 +243,25 @@
     color: #fff; transition: var(--transition-base);
   }
   .btn-wsp:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,211,102,0.3); }
+
+/* ========== SOCIAL LOGIN ========== */
+.login-avatar { width:48px; height:48px; border-radius:50%; margin:0 auto 8px; display:block; object-fit:cover; border:2px solid var(--primary-1); }
+.login-user-info { text-align:center; margin:6px 0 12px; font-size:0.82em; color:var(--text-primary); }
+.login-user-info strong { display:block; font-size:1.05em; }
+.login-user-info span { color:var(--text-muted); font-size:0.9em; }
+.btn-google { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:10px 16px; border:1px solid #dadce0; border-radius:8px; background:#fff; color:#3c4043; font-size:0.85em; font-weight:500; cursor:pointer; transition:all 0.2s; margin:4px 0; }
+.btn-google:hover { background:#f8f9fa; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+.btn-google img { width:18px; height:18px; }
+.btn-facebook { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:10px 16px; border:none; border-radius:8px; background:#1877f2; color:#fff; font-size:0.85em; font-weight:600; cursor:pointer; transition:all 0.2s; margin:4px 0; }
+.btn-facebook:hover { background:#166fe5; box-shadow:0 2px 8px rgba(24,119,242,0.3); }
+.btn-facebook svg { width:18px; height:18px; fill:#fff; }
+.btn-logout { width:100%; margin-top:8px; padding:8px; border:1px solid #ddd; border-radius:6px; background:#f5f5f5; color:#666; font-size:0.78em; cursor:pointer; transition:all 0.2s; }
+.btn-logout:hover { background:#eee; color:#e74c3c; border-color:#e74c3c; }
+body.dark .btn-google { background:#2d2d3d; border-color:#3a3a55; color:#e0e0e0; }
+body.dark .btn-google:hover { background:#3a3a55; }
+body.dark .btn-logout { background:#2a2d45; border-color:#3a3d55; color:#aaa; }
+body.dark .btn-logout:hover { background:#3a3d55; color:#ff6b6b; border-color:#ff6b6b; }
+body.dark .login-user-info { color:var(--text-primary); }
 /* ========== PLANIFIER TYPE SELECTOR ========== */
 .planner-type-selector {
   display: flex; flex-wrap: wrap; gap: var(--space-xs); justify-content: center;

@@ -88,19 +88,6 @@
   .merge-toolbar {
     display:flex; gap:4px; justify-content:center; flex-wrap:wrap; margin:4px 0;
   }
-  .btn-merge {
-    padding: 5px 12px; border: 2px solid var(--primary-1); border-radius: var(--radius);
-    cursor: pointer; font-size: 0.68em; font-weight: 600; transition: var(--transition-base);
-    background: var(--surface); color: var(--primary-1);
-  }
-  .btn-merge:hover { background: var(--primary-light); }
-  .btn-merge.active { background: var(--primary-gradient); color: #fff; }
-  .btn-merge-apply {
-    padding: 5px 12px; border: none; border-radius: var(--radius); cursor: pointer;
-    font-size: 0.68em; font-weight: 600; transition: var(--transition-base);
-    background: linear-gradient(135deg, var(--color-success), var(--color-success-dark)); color: #fff;
-  }
-  .btn-merge-apply:hover { transform: translateY(-1px); }
   .btn-merge-split {
     padding: 5px 12px; border: none; border-radius: var(--radius); cursor: pointer;
     font-size: 0.68em; font-weight: 600; transition: var(--transition-base);
@@ -122,7 +109,6 @@
     position:absolute; top:2px; right:2px; font-size:0.5em;
     color:#667eea; opacity:0.5;
   }
-  .table-wrap.merge-active td { cursor: pointer !important; }
   .merge-info {
     font-size:0.65em; color:#888; text-align:center; margin:2px 0;
   }
@@ -267,8 +253,6 @@
   body.dark .day-summary .ds-actions button { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
   body.dark .day-summary .ds-actions button:hover { background: rgba(102,126,234,0.2); color: #fff; }
   body.dark .dropdown-content a:hover { background: #2a2d45; }
-  body.dark .btn-merge { background: var(--surface-card); color: var(--primary-1); border-color: var(--primary-1); }
-  body.dark .btn-merge.active { background: var(--primary-gradient); color: #fff; }
   body.dark .merge-info { color: var(--text-light); }
   body.dark .demo-banner { background: linear-gradient(135deg, #2a2418, #1e1a10); color: #fbbf24; border-color: #5a4a20; box-shadow: 0 1px 4px rgba(251,191,36,0.08); }
   body.dark .demo-banner a { color: #b4a0ff !important; }

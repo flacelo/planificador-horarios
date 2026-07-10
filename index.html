@@ -163,8 +163,6 @@
         <button class="sp-btn sp-btn-sm sp-btn-danger" onclick="eliminarUltimoDia()">📅 − Día</button>
         <hr class="sp-divider">
         <div class="merge-toolbar">
-          <button class="btn-merge" id="btn-merge-mode" onclick="toggleMergeMode()">🔗 Unir celdas</button>
-          <button class="btn-merge-apply" id="btn-merge-apply" onclick="aplicarMerge()" style="display:none;">✅ Unir</button>
           <button class="btn-merge-split" id="btn-merge-split" onclick="dividirCelda()" style="display:none;">✂️ Dividir</button>
         </div>
         <div class="merge-info" id="merge-info"></div>
@@ -230,7 +228,7 @@
       <button class="btn-dark" onclick="nuevoPlanificador()" style="margin-left:auto;">📋 Nuevo</button>
     </div>
     <div class="table-wrap" id="table-wrap">
-      <span class="merge-badge" id="merge-badge" onclick="togglePanel();setTimeout(()=>document.getElementById('btn-merge-mode')?.click(),500)">🔗</span>
+      <span class="merge-badge" id="merge-badge" onclick="togglePanel()">🔗</span>
       <table id="tabla">
         <thead id="thead"><tr id="header-row"><th style="width:55px;position:relative;">HORA<div class="resizer" data-col="-1"></div></th></tr></thead>
         <tbody id="tbody"></tbody>

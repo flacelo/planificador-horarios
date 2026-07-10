@@ -117,9 +117,7 @@
 .side-panel .view-toggle button { color: rgba(255,255,255,0.5); font-size: 0.75em; padding: 6px 14px; border-radius: 7px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
 .side-panel .view-toggle button.active { background: rgba(255,255,255,0.15); color: #fff; }
   .side-panel .merge-info { color:rgba(255,255,255,0.5); }
-  .side-panel .btn-merge { background:rgba(255,255,255,0.08); color:#a29bfe; border-color:#a29bfe; font-size:0.68em; padding:5px 9px; }
-  .side-panel .btn-merge.active { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
-  .side-panel .btn-merge-apply { background:linear-gradient(135deg,#00b894,#55efc4); color:#fff; font-size:0.68em; padding:5px 9px; border:none; border-radius:5px; cursor:pointer; }
+
   .side-panel .btn-merge-split { background:linear-gradient(135deg,#e74c3c,#ff7675); color:#fff; font-size:0.68em; padding:5px 9px; border:none; border-radius:5px; cursor:pointer; }
   /* ========== SIDE PANEL ACCORDION ========== */
   .sp-section {

@@ -388,6 +388,7 @@
         <svg viewBox="0 0 36 36"><path d="M15.2 34V19.8h-4.7v-5.5h4.7v-4c0-4.6 2.8-7.2 7-7.2 2 0 3.7.15 4.2.22v4.9H23c-2.3 0-2.8 1.1-2.8 2.7v3.5h5.6l-.7 5.5h-4.9V34"/></svg>
         Continuar con Facebook
       </button>
+      <p style="margin:8px 0 0;font-size:0.75em;"><a style="color:#667eea;cursor:pointer;text-decoration:underline;" onclick="mostrarRecuperarPassword()">¿Olvidaste tu contraseña?</a></p>
     </div>
     <div id="login-success" style="display:none;">
       <img class="login-avatar" id="login-avatar" src="" alt="Avatar">
@@ -400,6 +401,20 @@
     </div>
     <div class="btns" style="justify-content:center;margin-top:10px;">
       <button class="btn-cancel" onclick="cerrarLogin()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RECUPERAR CONTRASEÑA -->
+<div class="modal-overlay" id="modal-recover">
+  <div class="modal" style="text-align:center;">
+    <h3 style="color:var(--text-primary);">🔐 Recuperar contraseña</h3>
+    <p style="font-size:0.78em;color:#888;margin-bottom:10px;">Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña</p>
+    <input id="inp-recover-email" type="email" placeholder="tucorreo@ejemplo.com" style="width:100%;padding:10px;border:2px solid #667eea;border-radius:8px;font-size:0.85em;text-align:center;margin:6px 0;">
+    <p id="msg-recover" style="font-size:0.75em;min-height:20px;margin:4px 0;"></p>
+    <div class="btns" style="justify-content:center;">
+      <button class="btn-cancel" onclick="cerrarRecuperarPassword()">Cancelar</button>
+      <button class="btn-ok" onclick="solicitarRecuperacionPassword()">📩 Enviar enlace</button>
     </div>
   </div>
 </div>

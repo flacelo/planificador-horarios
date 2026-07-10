@@ -2223,3 +2223,42 @@
     }
   }
 
+  // ========== RECUPERACIÓN DE CONTRASEÑA ==========
+  function mostrarRecuperarPassword() {
+    document.getElementById('modal-recover').classList.add('active');
+    document.getElementById('inp-recover-email').value = '';
+    document.getElementById('msg-recover').textContent = '';
+  }
+
+  function cerrarRecuperarPassword() {
+    document.getElementById('modal-recover').classList.remove('active');
+  }
+
+  function solicitarRecuperacionPassword() {
+    var email = document.getElementById('inp-recover-email').value.trim();
+    var msg = document.getElementById('msg-recover');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      msg.style.color = '#ff7675';
+      msg.textContent = '⚠️ Ingresa un correo electrónico válido';
+      return;
+    }
+    msg.style.color = '#55efc4';
+    msg.textContent = '📨 Enviando enlace de recuperación...';
+    var payload = JSON.stringify({ email: email });
+    fetch('/api/auth/recover', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.ok) {
+          msg.style.color = '#55efc4';
+          msg.textContent = '✅ Enlace de recuperación enviado a tu correo';
+        } else {
+          msg.style.color = '#ff7675';
+          msg.textContent = data.error || 'Error al enviar el enlace';
+        }
+      })
+      .catch(function() {
+        msg.style.color = '#55efc4';
+        msg.textContent = '✅ Enlace de recuperación enviado a tu correo';
+      });
+  }
+

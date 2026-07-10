@@ -973,12 +973,15 @@
     if (confirm(`¿Eliminar ${dias[idx]}?`)) { dias.splice(idx, 1); filas.forEach(f => f.celdas.splice(idx, 1)); renderizar(); autoGuardar(); }
   }
   function eliminarUltimoDia() { eliminarDia(dias.length - 1); }
+  function guardarEstadoLocal() {
+    try { localStorage.setItem(CONFIG.STORAGE.DATA_PREFIX + plannerType, JSON.stringify({ dias: dias, filas: filas })); } catch(e) {}
+  }
   let _guardarTimer = null;
   function autoGuardar() {
     clearTimeout(_guardarTimer);
-    _guardarTimer = setTimeout(() => {
+    _guardarTimer = setTimeout(function() {
       _guardarTimer = null;
-      try { localStorage.setItem(CONFIG.STORAGE.DATA_PREFIX + plannerType, JSON.stringify({dias,filas})); } catch(e) {}
+      guardarEstadoLocal();
     }, CONFIG.TIME.AUTOGUARDAR_DEBOUNCE);
   }
 
@@ -1392,7 +1395,7 @@
   }
 
   function guardarDatosTipo(tipo) {
-    try { localStorage.setItem(CONFIG.STORAGE.DATA_PREFIX + tipo, JSON.stringify({ dias, filas })); } catch(e) {}
+    try { localStorage.setItem(CONFIG.STORAGE.DATA_PREFIX + tipo, JSON.stringify({ dias: dias, filas: filas })); } catch(e) {}
   }
 
   // ========== CUSTOM HEADER ==========

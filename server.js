@@ -267,6 +267,45 @@ http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'GET' && req.url.startsWith('/api/checkout/invoice/')) {
+    var sessionId = req.url.replace('/api/checkout/invoice/', '').split('?')[0];
+    var session = sesionesPago[sessionId];
+    if (!session) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Sesión no encontrada' }));
+      return;
+    }
+    var userData = null;
+    for (var ui = 0; ui < usuariosAdmin.length; ui++) {
+      if (usuariosAdmin[ui].correo === session.email) { userData = usuariosAdmin[ui]; break; }
+    }
+    var serial = serialesLicencia[session.email] || '';
+    var expInfo = calcularExpiracion(session.plan);
+    var factura = {
+      ok: true,
+      invoice: {
+        id: 'INV-' + sessionId.replace('cs_test_', '').slice(0, 12).toUpperCase(),
+        sessionId: sessionId,
+        transaccionId: 'TXN-' + crypto.randomBytes(6).toString('hex').toUpperCase(),
+        fecha: session.creado,
+        cliente: session.email,
+        nombreCliente: userData ? userData.nombre : session.email,
+        plan: session.plan,
+        planTipo: expInfo.tipo,
+        monto: 'S/ 15.00',
+        moneda: 'PEN',
+        serial: serial,
+        expiracion: expInfo.fecha,
+        emisor: 'Potencia Tech E.I.R.L.',
+        ruc: '20606789341',
+        sello: 'PTECH-OK-' + new Date().getFullYear()
+      }
+    };
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(factura));
+    return;
+  }
+
   if (req.method === 'POST' && req.url === '/api/licenses/verify') {
     let body = '';
     req.on('data', function(chunk) { body += chunk; });

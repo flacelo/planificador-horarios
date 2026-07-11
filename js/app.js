@@ -180,6 +180,51 @@
     });
   }
 
+  function generarComprobantePDF(sessionId) {
+    fetch('/api/checkout/invoice/' + encodeURIComponent(sessionId))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.ok || !data.invoice) { alert('Error al obtener datos de factura'); return; }
+        var inv = data.invoice;
+        var win = window.open('', '_blank');
+        if (!win) { alert('Permite ventanas emergentes para ver el comprobante'); return; }
+        win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comprobante de Pago - ' + inv.id + '</title>' +
+          '<style>' +
+          'body{font-family:"Segoe UI",Arial,sans-serif;margin:0;padding:20px;color:#333;}' +
+          '.invoice{max-width:680px;margin:0 auto;border:2px solid #6c5ce7;border-radius:12px;padding:30px;background:#fff;}' +
+          '.header{text-align:center;border-bottom:2px solid #6c5ce7;padding-bottom:16px;margin-bottom:20px;}' +
+          '.header h1{color:#6c5ce7;margin:0;font-size:1.5em;}' +
+          '.header p{color:#888;font-size:0.8em;margin:4px 0 0;}' +
+          '.sello{display:inline-block;background:#6c5ce7;color:#fff;padding:4px 16px;border-radius:4px;font-size:0.75em;margin-top:6px;}' +
+          '.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:0.85em;}' +
+          '.row .label{color:#888;font-weight:600;}' +
+          '.row .value{font-weight:600;color:#333;}' +
+          '.serial-box{margin:16px 0;padding:12px;background:#f3f0ff;border-radius:8px;text-align:center;}' +
+          '.serial-box .code{font-size:1.1em;font-weight:700;color:#6c5ce7;letter-spacing:1px;font-family:monospace;}' +
+          '.footer{text-align:center;margin-top:16px;font-size:0.72em;color:#aaa;}' +
+          '@media print{body{padding:0;}.invoice{border:none;box-shadow:none;}}' +
+          '</style></head><body>' +
+          '<div class="invoice">' +
+          '<div class="header"><h1>🧾 ' + inv.emisor + '</h1><p>RUC ' + inv.ruc + '</p><span class="sello">' + inv.sello + '</span></div>' +
+          '<div class="row"><span class="label">Comprobante</span><span class="value">' + inv.id + '</span></div>' +
+          '<div class="row"><span class="label">Transacción</span><span class="value">' + inv.transaccionId + '</span></div>' +
+          '<div class="row"><span class="label">Fecha</span><span class="value">' + new Date(inv.fecha).toLocaleString('es-PE') + '</span></div>' +
+          '<div class="row"><span class="label">Cliente</span><span class="value">' + inv.nombreCliente + '</span></div>' +
+          '<div class="row"><span class="label">Correo</span><span class="value">' + inv.cliente + '</span></div>' +
+          '<div class="row"><span class="label">Plan</span><span class="value">' + inv.plan + '</span></div>' +
+          '<div class="row"><span class="label">Monto</span><span class="value" style="color:#6c5ce7;font-size:1.1em;">' + inv.monto + ' ' + inv.moneda + '</span></div>' +
+          '<div class="serial-box">' +
+          '<p style="font-size:0.75em;color:#888;margin:0 0 4px;">🔑 Código de Activación</p>' +
+          '<div class="code">' + inv.serial + '</div></div>' +
+          '<div class="footer">' +
+          '<p>✅ Este comprobante certifica la compra de tu licencia ' + inv.planTipo + '</p>' +
+          '<p>Potencia Tech E.I.R.L. — Todos los derechos reservados © ' + new Date().getFullYear() + '</p></div>' +
+          '</div><script>window.print();<' + '/script></body></html>');
+        win.document.close();
+      })
+      .catch(function() { alert('Error al generar el comprobante'); });
+  }
+
   function copiarSerial(texto) {
     navigator.clipboard.writeText(texto).then(function() {
       var btn = document.getElementById('btn-copiar-serial');
@@ -227,6 +272,7 @@
             '<p style="color:#155724;font-weight:600;">✅ ¡Pago exitoso! Tu licencia ha sido activada</p>' +
             '<p style="color:#155724;font-size:0.85em;margin-top:4px;">Gracias por tu compra 🎉</p></div>' +
             serialHtml +
+            '<button class="btn-primary" onclick="generarComprobantePDF(\'' + sessionId + '\')" style="font-size:0.78em;width:100%;margin-top:6px;">📥 Descargar Comprobante (PDF)</button>' +
             '<button class="btn-cancel" onclick="cerrarModalCompra()" style="margin-top:6px;">Cerrar</button>';
           actualizarUIlogin();
         } else {
@@ -243,6 +289,7 @@
     });
   }
 
+  window.generarComprobantePDF = generarComprobantePDF;
   window.copiarSerial = copiarSerial;
 
   window.iniciarCheckout = iniciarCheckout;

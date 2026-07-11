@@ -180,6 +180,14 @@
     });
   }
 
+  function copiarSerial(texto) {
+    navigator.clipboard.writeText(texto).then(function() {
+      var btn = document.getElementById('btn-copiar-serial');
+      if (btn) btn.textContent = '✅ Copiado';
+      setTimeout(function() { if (btn) btn.textContent = '📋 Copiar código'; }, 2000);
+    }).catch(function() { alert('✅ Código: ' + texto); });
+  }
+
   function simularPagoExitoso(sessionId) {
     var result = document.getElementById('checkout-result');
     if (result) {
@@ -195,10 +203,27 @@
     .then(function(data) {
       if (result) {
         if (data.ok) {
+          if (data.serial) {
+            var comprador = loginUsuario ? loginUsuario.nombre : 'Usuario';
+            localStorage.setItem(CONFIG.STORAGE.LICENCIA, JSON.stringify({
+              comprador: comprador,
+              fecha: new Date().toISOString().slice(0, 10),
+              codigo: data.serial
+            }));
+          }
+          var serialHtml = '';
+          if (data.serial) {
+            serialHtml = '<div style="margin:8px 0;padding:10px;background:#fff;border:2px solid #6c5ce7;border-radius:8px;">' +
+              '<p style="font-size:0.75em;color:#888;margin-bottom:4px;">🔑 Tu código de activación único:</p>' +
+              '<p style="font-size:1.1em;font-weight:700;color:#6c5ce7;letter-spacing:1px;font-family:monospace;" id="serial-display">' + data.serial + '</p>' +
+              '<button class="btn-primary" id="btn-copiar-serial" onclick="copiarSerial(\'' + data.serial + '\')" style="font-size:0.75em;padding:3px 12px;margin-top:4px;">📋 Copiar código</button></div>';
+          }
           result.innerHTML = '<div style="margin:8px 0;padding:12px;background:#d4edda;border-radius:8px;font-size:0.82em;">' +
             '<p style="color:#155724;font-weight:600;">✅ ¡Pago exitoso! Tu licencia ha sido activada</p>' +
             '<p style="color:#155724;font-size:0.85em;margin-top:4px;">Gracias por tu compra 🎉</p></div>' +
+            serialHtml +
             '<button class="btn-cancel" onclick="cerrarModalCompra()" style="margin-top:6px;">Cerrar</button>';
+          actualizarUIlogin();
         } else {
           result.innerHTML = '<p style="font-size:0.78em;color:#ff7675;">❌ Error en la confirmación del pago</p>';
         }
@@ -212,6 +237,8 @@
       }
     });
   }
+
+  window.copiarSerial = copiarSerial;
 
   window.iniciarCheckout = iniciarCheckout;
   window.simularPagoExitoso = simularPagoExitoso;
@@ -2355,6 +2382,19 @@
       if (document.getElementById('login-email')) document.getElementById('login-email').textContent = loginUsuario.correo || '';
       if (devSection) devSection.style.display = 'block';
       fetchSesiones();
+      if (document.getElementById('login-licencia')) {
+        var lic = localStorage.getItem(CONFIG.STORAGE.LICENCIA);
+        var el = document.getElementById('login-licencia');
+        if (lic) {
+          try {
+            var l = JSON.parse(lic);
+            el.innerHTML = '<span style="color:#55efc4;font-weight:600;">● Licencia activa</span>' +
+              (l.codigo ? '<span style="font-size:0.7em;color:#888;display:block;font-family:monospace;">' + l.codigo + '</span>' : '');
+          } catch(e) { el.innerHTML = ''; }
+        } else {
+          el.innerHTML = '<span style="color:#ff7675;">◌ Demo</span>';
+        }
+      }
     } else {
       btn.textContent = '🔑 Iniciar sesión';
       if (devSection) devSection.style.display = 'none';

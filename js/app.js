@@ -205,11 +205,16 @@
         if (data.ok) {
           if (data.serial) {
             var comprador = loginUsuario ? loginUsuario.nombre : 'Usuario';
-            localStorage.setItem(CONFIG.STORAGE.LICENCIA, JSON.stringify({
+            var licData = {
               comprador: comprador,
               fecha: new Date().toISOString().slice(0, 10),
               codigo: data.serial
-            }));
+            };
+            if (data.expiracion) {
+              licData.planTipo = data.expiracion.tipo;
+              licData.fechaExpiracion = data.expiracion.fecha;
+            }
+            localStorage.setItem(CONFIG.STORAGE.LICENCIA, JSON.stringify(licData));
           }
           var serialHtml = '';
           if (data.serial) {
@@ -2388,8 +2393,19 @@
         if (lic) {
           try {
             var l = JSON.parse(lic);
-            el.innerHTML = '<span style="color:#55efc4;font-weight:600;">● Licencia activa</span>' +
-              (l.codigo ? '<span style="font-size:0.7em;color:#888;display:block;font-family:monospace;">' + l.codigo + '</span>' : '');
+            var html = '<span style="color:#55efc4;font-weight:600;">● Licencia activa</span>';
+            if (l.fechaExpiracion) {
+              var diff = Math.ceil((new Date(l.fechaExpiracion) - new Date()) / (1000*60*60*24));
+              if (diff > 0) {
+                html += '<span style="font-size:0.7em;color:#888;display:block;">⏳ ' + (l.planTipo === 'vitalicio' ? 'Licencia Vitalicia Activa' : 'Vence en ' + diff + ' día' + (diff !== 1 ? 's' : '')) + '</span>';
+              } else {
+                html += '<span style="font-size:0.7em;color:#ff7675;display:block;">⚠️ Licencia vencida</span>';
+              }
+            } else if (l.planTipo === 'vitalicio') {
+              html += '<span style="font-size:0.7em;color:#888;display:block;">♾️ Licencia Vitalicia Activa</span>';
+            }
+            html += l.codigo ? '<span style="font-size:0.65em;color:#888;display:block;font-family:monospace;">' + l.codigo + '</span>' : '';
+            el.innerHTML = html;
           } catch(e) { el.innerHTML = ''; }
         } else {
           el.innerHTML = '<span style="color:#ff7675;">◌ Demo</span>';

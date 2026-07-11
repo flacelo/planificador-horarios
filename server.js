@@ -14,11 +14,31 @@ const MIME = {
   '.ico': 'image/x-icon',
 };
 
+// Persistent mock stores
+var sesionesPorUsuario = {};
+var usuariosAdmin = [
+  { id: 1, nombre: 'Carlos López', correo: 'carlos@email.com', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
+  { id: 2, nombre: 'María García', correo: 'maria@email.com', licencia: 'Mensual', estado: 'Activo', ultimoAcceso: '2026-07-09' },
+  { id: 3, nombre: 'José Ramos', correo: 'jose@email.com', licencia: 'Demo', estado: 'Pendiente', ultimoAcceso: '2026-07-08' },
+  { id: 4, nombre: 'Ana Torres', correo: 'ana@email.com', licencia: 'Mensual', estado: 'Vencido', ultimoAcceso: '2026-06-15' },
+  { id: 5, nombre: 'Luis Fernández', correo: 'luis@email.com', licencia: 'Demo', estado: 'Activo', ultimoAcceso: '2026-07-10' },
+  { id: 6, nombre: 'Sofía Castillo', correo: 'sofia@email.com', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
+];
+var serialesLicencia = {};
+var sesionesPago = {};
+
+function generarSerial() {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var parte = function(len) {
+    var s = '';
+    for (var i = 0; i < len; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
+    return s;
+  };
+  return 'PTECH-' + parte(4) + '-' + parte(4) + '-' + parte(4);
+}
+
 http.createServer((req, res) => {
   // API routes
-
-  // Mock session store
-  var sesionesPorUsuario = {};
 
   function getSesionesMock(email) {
     if (!email) return [];
@@ -87,15 +107,6 @@ http.createServer((req, res) => {
 
   // Admin API (protegida simulada)
 
-  var usuariosAdmin = [
-    { id: 1, nombre: 'Carlos López', correo: 'carlos@email.com', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
-    { id: 2, nombre: 'María García', correo: 'maria@email.com', licencia: 'Mensual', estado: 'Activo', ultimoAcceso: '2026-07-09' },
-    { id: 3, nombre: 'José Ramos', correo: 'jose@email.com', licencia: 'Demo', estado: 'Pendiente', ultimoAcceso: '2026-07-08' },
-    { id: 4, nombre: 'Ana Torres', correo: 'ana@email.com', licencia: 'Mensual', estado: 'Vencido', ultimoAcceso: '2026-06-15' },
-    { id: 5, nombre: 'Luis Fernández', correo: 'luis@email.com', licencia: 'Demo', estado: 'Activo', ultimoAcceso: '2026-07-10' },
-    { id: 6, nombre: 'Sofía Castillo', correo: 'sofia@email.com', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
-  ];
-
   if (req.method === 'GET' && req.url.startsWith('/api/admin/users')) {
     var params = new URL(req.url, 'http://localhost').searchParams;
     var token = params.get('token') || '';
@@ -143,7 +154,6 @@ http.createServer((req, res) => {
   }
 
   // Checkout / Payment mock
-  var sesionesPago = {};
 
   if (req.method === 'POST' && req.url === '/api/checkout/create-session') {
     let body = '';
@@ -194,20 +204,42 @@ http.createServer((req, res) => {
         var data = JSON.parse(body);
         var sessionId = data.sessionId || data.session_id || '';
         var session = sesionesPago[sessionId];
+        var serial = '';
         if (session) {
           session.estado = 'completado';
           console.log('[WEBHOOK] Pago confirmado para sesión:', sessionId);
-          // Simular activación de licencia para el usuario
+          serial = generarSerial();
+          serialesLicencia[session.email] = serial;
           for (var ui = 0; ui < usuariosAdmin.length; ui++) {
             if (usuariosAdmin[ui].correo === session.email) {
               usuariosAdmin[ui].estado = 'Activo';
               usuariosAdmin[ui].ultimoAcceso = new Date().toISOString().slice(0, 10);
+              usuariosAdmin[ui].serial = serial;
               break;
             }
           }
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true, message: 'Webhook recibido' }));
+        res.end(JSON.stringify({ ok: true, message: 'Webhook recibido', serial: serial }));
+      } catch(e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));
+      }
+    });
+    return;
+  }
+
+  if (req.method === 'POST' && req.url === '/api/licenses/verify') {
+    let body = '';
+    req.on('data', function(chunk) { body += chunk; });
+    req.on('end', function() {
+      try {
+        var data = JSON.parse(body);
+        var email = data.email || '';
+        var codigo = (data.codigo || '').toUpperCase();
+        var valido = serialesLicencia[email] && serialesLicencia[email] === codigo;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, valido: valido, email: email }));
       } catch(e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));

@@ -85,6 +85,63 @@ http.createServer((req, res) => {
     return;
   }
 
+  // Admin API (protegida simulada)
+
+  var usuariosAdmin = [
+    { id: 1, nombre: 'Carlos López', correo: 'carlos@email.com', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
+    { id: 2, nombre: 'María García', correo: 'maria@email.com', licencia: 'Mensual', estado: 'Activo', ultimoAcceso: '2026-07-09' },
+    { id: 3, nombre: 'José Ramos', correo: 'jose@email.com', licencia: 'Demo', estado: 'Pendiente', ultimoAcceso: '2026-07-08' },
+    { id: 4, nombre: 'Ana Torres', correo: 'ana@email.com', licencia: 'Mensual', estado: 'Vencido', ultimoAcceso: '2026-06-15' },
+    { id: 5, nombre: 'Luis Fernández', correo: 'luis@email.com', licencia: 'Demo', estado: 'Activo', ultimoAcceso: '2026-07-10' },
+    { id: 6, nombre: 'Sofía Castillo', correo: 'sofia@email.com', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
+  ];
+
+  if (req.method === 'GET' && req.url.startsWith('/api/admin/users')) {
+    var params = new URL(req.url, 'http://localhost').searchParams;
+    var token = params.get('token') || '';
+    if (token !== 'admin123') {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'No autorizado' }));
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, usuarios: usuariosAdmin }));
+    return;
+  }
+
+  if (req.method === 'POST' && req.url === '/api/admin/users/activate') {
+    let body = '';
+    req.on('data', function(chunk) { body += chunk; });
+    req.on('end', function() {
+      try {
+        var data = JSON.parse(body);
+        if (data.token !== 'admin123') {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'No autorizado' }));
+          return;
+        }
+        var user = null;
+        for (var i = 0; i < usuariosAdmin.length; i++) {
+          if (usuariosAdmin[i].id === data.userId) { user = usuariosAdmin[i]; break; }
+        }
+        if (!user) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'Usuario no encontrado' }));
+          return;
+        }
+        user.estado = 'Activo';
+        user.ultimoAcceso = new Date().toISOString().slice(0, 10);
+        console.log('[ADMIN] Licencia activada para', user.nombre, '(' + user.correo + ')');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, message: 'Licencia activada para ' + user.nombre }));
+      } catch(e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));
+      }
+    });
+    return;
+  }
+
   // Static files
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.setHeader('Pragma', 'no-cache');

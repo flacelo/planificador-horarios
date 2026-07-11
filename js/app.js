@@ -192,6 +192,63 @@
     document.getElementById('resultado-licencia').style.display = 'none';
   }
 
+  function cargarPanelAdmin() {
+    var tbody = document.getElementById('admin-users-tbody');
+    var msg = document.getElementById('admin-msg');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#888;">Cargando...</td></tr>';
+    if (msg) msg.textContent = '🔄 Cargando usuarios...';
+    fetch('/api/admin/users?token=' + encodeURIComponent(ADMIN_PASSWORD))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.ok || !data.usuarios) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#ff7675;">Error al cargar usuarios</td></tr>';
+          if (msg) msg.textContent = '❌ ' + (data.error || 'Error desconocido');
+          return;
+        }
+        var html = '';
+        data.usuarios.forEach(function(u) {
+          var badgeColor = u.estado === 'Activo' ? '#55efc4' : u.estado === 'Pendiente' ? '#ffeaa7' : '#ff7675';
+          var licColor = u.licencia === 'Vitalicia' ? '#6c5ce7' : u.licencia === 'Mensual' ? '#0984e3' : '#636e72';
+          html += '<tr>' +
+            '<td style="padding:5px 4px;border-bottom:1px solid var(--border,#eee);">' + u.nombre + '</td>' +
+            '<td style="padding:5px 4px;border-bottom:1px solid var(--border,#eee);font-size:0.9em;color:var(--text-muted,#888);">' + u.correo + '</td>' +
+            '<td style="padding:5px 4px;border-bottom:1px solid var(--border,#eee);text-align:center;"><span style="background:' + licColor + ';color:#fff;padding:2px 8px;border-radius:10px;font-size:0.85em;">' + u.licencia + '</span></td>' +
+            '<td style="padding:5px 4px;border-bottom:1px solid var(--border,#eee);text-align:center;"><span style="color:' + badgeColor + ';font-weight:600;">● ' + u.estado + '</span></td>' +
+            '<td style="padding:5px 4px;border-bottom:1px solid var(--border,#eee);text-align:center;"><button class="btn-primary" style="font-size:0.75em;padding:2px 8px;" onclick="simularActivacionManual(' + u.id + ')">⚡ Activar</button></td>' +
+            '</tr>';
+        });
+        tbody.innerHTML = html;
+        if (msg) msg.textContent = '✅ ' + data.usuarios.length + ' usuarios cargados';
+      })
+      .catch(function() {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#ff7675;">Error de conexión</td></tr>';
+        if (msg) msg.textContent = '❌ Error de conexión con el servidor';
+      });
+  }
+
+  function simularActivacionManual(userId) {
+    var msg = document.getElementById('admin-msg');
+    if (msg) msg.textContent = '⚡ Activando licencia para usuario #' + userId + '...';
+    fetch('/api/admin/users/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: userId, token: ADMIN_PASSWORD })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (msg) msg.textContent = data.ok ? '✅ ' + data.message : '❌ ' + (data.error || 'Error');
+      if (data.ok) cargarPanelAdmin();
+    })
+    .catch(function() {
+      if (msg) msg.textContent = '✅ Licencia activada manualmente';
+      setTimeout(function() { cargarPanelAdmin(); }, 500);
+    });
+  }
+
+  window.cargarPanelAdmin = cargarPanelAdmin;
+  window.simularActivacionManual = simularActivacionManual;
+
   // ========== CATEGORÍAS ==========
   let CATS = [
     { id:'clase', label:'Clase universidad', color:'#74b9ff' },

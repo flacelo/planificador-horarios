@@ -37,6 +37,35 @@ function generarSerial() {
   return 'PTECH-' + parte(4) + '-' + parte(4) + '-' + parte(4);
 }
 
+function calcularExpiracion(plan) {
+  var ahora = new Date();
+  var exp = new Date(ahora);
+  var tipo = (plan || '').toLowerCase();
+  if (tipo.indexOf('vital') !== -1 || tipo.indexOf('perpetuo') !== -1) {
+    return { tipo: 'vitalicio', fecha: null, etiqueta: 'Indefinido' };
+  }
+  var dias = 0;
+  if (tipo.indexOf('semestral') !== -1 || tipo.indexOf('180') !== -1) dias = 180;
+  else if (tipo.indexOf('anual') !== -1 || tipo.indexOf('365') !== -1) dias = 365;
+  else dias = 30;
+  exp.setDate(exp.getDate() + dias);
+  return { tipo: dias + 'dias', fecha: exp.toISOString(), etiqueta: dias + ' días' };
+}
+
+function verificarExpiracion() {
+  var ahora = new Date();
+  for (var i = 0; i < usuariosAdmin.length; i++) {
+    var u = usuariosAdmin[i];
+    if (u.estado === 'Activo' && u.fechaExpiracion) {
+      var exp = new Date(u.fechaExpiracion);
+      if (exp < ahora) {
+        u.estado = 'Vencido';
+        console.log('[EXP] Licencia vencida para', u.nombre, '(' + u.correo + ')');
+      }
+    }
+  }
+}
+
 http.createServer((req, res) => {
   // API routes
 
@@ -115,6 +144,7 @@ http.createServer((req, res) => {
       res.end(JSON.stringify({ ok: false, error: 'No autorizado' }));
       return;
     }
+    verificarExpiracion();
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: true, usuarios: usuariosAdmin }));
     return;
@@ -140,11 +170,15 @@ http.createServer((req, res) => {
           res.end(JSON.stringify({ ok: false, error: 'Usuario no encontrado' }));
           return;
         }
+        var plan = data.plan || 'mensual';
+        var exp = calcularExpiracion(plan);
         user.estado = 'Activo';
         user.ultimoAcceso = new Date().toISOString().slice(0, 10);
-        console.log('[ADMIN] Licencia activada para', user.nombre, '(' + user.correo + ')');
+        user.planTipo = exp.tipo;
+        user.fechaExpiracion = exp.fecha;
+        console.log('[ADMIN] Licencia activada para', user.nombre, '(' + user.correo + ')', 'Plan:', plan, 'Exp:', exp.etiqueta);
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true, message: 'Licencia activada para ' + user.nombre }));
+        res.end(JSON.stringify({ ok: true, message: 'Licencia ' + plan + ' activada para ' + user.nombre, expiracion: exp }));
       } catch(e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));
@@ -210,17 +244,21 @@ http.createServer((req, res) => {
           console.log('[WEBHOOK] Pago confirmado para sesión:', sessionId);
           serial = generarSerial();
           serialesLicencia[session.email] = serial;
+          var exp = calcularExpiracion(session.plan);
           for (var ui = 0; ui < usuariosAdmin.length; ui++) {
             if (usuariosAdmin[ui].correo === session.email) {
               usuariosAdmin[ui].estado = 'Activo';
               usuariosAdmin[ui].ultimoAcceso = new Date().toISOString().slice(0, 10);
               usuariosAdmin[ui].serial = serial;
+              usuariosAdmin[ui].planTipo = exp.tipo;
+              usuariosAdmin[ui].fechaExpiracion = exp.fecha;
               break;
             }
           }
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true, message: 'Webhook recibido', serial: serial }));
+        var expInfo = session ? calcularExpiracion(session.plan) : null;
+        res.end(JSON.stringify({ ok: true, message: 'Webhook recibido', serial: serial, expiracion: expInfo }));
       } catch(e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));

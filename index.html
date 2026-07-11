@@ -361,9 +361,16 @@
       <p>✅ Licencia personal intransferible</p>
     </div>
     <button class="btn-wsp" onclick="abrirWhatsApp()">📱 Contactar por WhatsApp</button>
+    <div style="margin:8px 0;font-size:0.75em;color:#888;">— o paga automáticamente —</div>
+    <button id="btn-pagar-tarjeta" class="btn-primary" onclick="iniciarCheckout()" style="width:100%;font-size:0.85em;padding:10px;">💳 Pagar con tarjeta (S/ 15)</button>
+    <div id="checkout-spinner" style="display:none;margin:6px 0;">
+      <div class="spinner" style="width:28px;height:28px;border:3px solid #e0e0e0;border-top-color:#6c5ce7;border-radius:50%;animation:spin .8s linear infinite;margin:6px auto;"></div>
+      <p style="font-size:0.75em;color:#888;">Redirigiendo a la pasarela de pago...</p>
+    </div>
+    <div id="checkout-result" style="display:none;margin:6px 0;"></div>
     <br>
-    <button style="margin-top:8px;padding:8px 20px;background:linear-gradient(135deg, #667eea, #764ba2);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.78em;" onclick="mostrarActivar()">🔑 Ya tengo un código</button>
-    <br><button class="btn-cancel" style="margin-top:8px;padding:5px 20px;background:#f1f2f6;border:none;border-radius:6px;cursor:pointer;font-size:0.75em;" onclick="cerrarModalCompra()">Cerrar</button>
+    <button style="margin-top:6px;padding:8px 20px;background:linear-gradient(135deg, #667eea, #764ba2);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.78em;" onclick="mostrarActivar()">🔑 Ya tengo un código</button>
+    <br><button class="btn-cancel" style="margin-top:6px;padding:5px 20px;background:#f1f2f6;border:none;border-radius:6px;cursor:pointer;font-size:0.75em;" onclick="cerrarModalCompra()">Cerrar</button>
   </div>
 </div>
 

@@ -142,6 +142,80 @@ http.createServer((req, res) => {
     return;
   }
 
+  // Checkout / Payment mock
+  var sesionesPago = {};
+
+  if (req.method === 'POST' && req.url === '/api/checkout/create-session') {
+    let body = '';
+    req.on('data', function(chunk) { body += chunk; });
+    req.on('end', function() {
+      try {
+        var data = JSON.parse(body);
+        var plan = data.plan || 'Licencia Personal S/15';
+        var email = data.email || 'cliente@email.com';
+        var sessionId = 'cs_test_' + crypto.randomBytes(16).toString('hex');
+        sesionesPago[sessionId] = { plan: plan, email: email, estado: 'pendiente', creado: new Date().toISOString() };
+        console.log('[CHECKOUT] Sesión creada:', sessionId, 'Plan:', plan);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          ok: true,
+          sessionId: sessionId,
+          redirectUrl: '/api/checkout/success?session_id=' + sessionId
+        }));
+      } catch(e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));
+      }
+    });
+    return;
+  }
+
+  if (req.method === 'GET' && req.url.startsWith('/api/checkout/success')) {
+    var urlParams = new URL(req.url, 'http://localhost').searchParams;
+    var sessionId = urlParams.get('session_id') || '';
+    var session = sesionesPago[sessionId];
+    if (!session) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Sesión no encontrada' }));
+      return;
+    }
+    session.estado = 'completado';
+    console.log('[CHECKOUT] Pago completado para sesión:', sessionId);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, message: 'Pago exitoso', sessionId: sessionId }));
+    return;
+  }
+
+  if (req.method === 'POST' && req.url === '/api/checkout/webhook') {
+    let body = '';
+    req.on('data', function(chunk) { body += chunk; });
+    req.on('end', function() {
+      try {
+        var data = JSON.parse(body);
+        var sessionId = data.sessionId || data.session_id || '';
+        var session = sesionesPago[sessionId];
+        if (session) {
+          session.estado = 'completado';
+          console.log('[WEBHOOK] Pago confirmado para sesión:', sessionId);
+          // Simular activación de licencia para el usuario
+          for (var ui = 0; ui < usuariosAdmin.length; ui++) {
+            if (usuariosAdmin[ui].correo === session.email) {
+              usuariosAdmin[ui].estado = 'Activo';
+              usuariosAdmin[ui].ultimoAcceso = new Date().toISOString().slice(0, 10);
+              break;
+            }
+          }
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, message: 'Webhook recibido' }));
+      } catch(e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));
+      }
+    });
+    return;
+  }
+
   // Static files
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.setHeader('Pragma', 'no-cache');

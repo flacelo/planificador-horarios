@@ -605,3 +605,4 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   .u-select-none { user-select: none; -webkit-user-select: none; }
   .u-transition { transition: all var(--transition-base); }
   .u-transition-fast { transition: all var(--transition-fast); }
+  @keyframes spin { to { transform: rotate(360deg); } }

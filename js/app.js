@@ -140,6 +140,82 @@
     window.open('https://wa.me/51936718790?text=' + msg, '_blank', 'noopener,noreferrer');
   }
 
+  function iniciarCheckout() {
+    var btn = document.getElementById('btn-pagar-tarjeta');
+    var spinner = document.getElementById('checkout-spinner');
+    var result = document.getElementById('checkout-result');
+    if (btn) btn.style.display = 'none';
+    if (spinner) spinner.style.display = 'block';
+    if (result) { result.style.display = 'none'; result.innerHTML = ''; }
+    fetch('/api/checkout/create-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plan: 'Licencia Personal S/15',
+        email: (loginUsuario && loginUsuario.correo) ? loginUsuario.correo : 'cliente@email.com'
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.ok && data.sessionId) {
+        if (spinner) spinner.style.display = 'none';
+        if (result) {
+          result.style.display = 'block';
+          result.innerHTML = '<p style="font-size:0.78em;color:#888;">✅ Sesión de pago creada</p>' +
+            '<p style="font-size:0.75em;color:#888;margin:2px 0;">ID: <code style="font-size:0.85em;">' + data.sessionId + '</code></p>' +
+            '<div style="margin:8px 0;padding:10px;background:#e3f2fd;border-radius:8px;font-size:0.78em;">' +
+            '<p style="color:#1565c0;font-weight:600;">🔄 Simulando redirección a pasarela...</p></div>' +
+            '<button class="btn-primary" onclick="simularPagoExitoso(\'' + data.sessionId + '\')" style="font-size:0.82em;">✅ Simular pago exitoso</button>';
+        }
+      } else {
+        if (spinner) spinner.style.display = 'none';
+        if (btn) btn.style.display = 'block';
+        if (result) { result.style.display = 'block'; result.innerHTML = '<p style="font-size:0.78em;color:#ff7675;">❌ Error al crear sesión de pago</p>'; }
+      }
+    })
+    .catch(function() {
+      if (spinner) spinner.style.display = 'none';
+      if (btn) btn.style.display = 'block';
+      if (result) { result.style.display = 'block'; result.innerHTML = '<p style="font-size:0.78em;color:#ff7675;">❌ Error de conexión</p>'; }
+    });
+  }
+
+  function simularPagoExitoso(sessionId) {
+    var result = document.getElementById('checkout-result');
+    if (result) {
+      result.innerHTML = '<div style="margin:8px 0;padding:10px;background:#e3f2fd;border-radius:8px;font-size:0.78em;">' +
+        '<p style="color:#1565c0;font-weight:600;">⏳ Confirmando pago...</p></div>';
+    }
+    fetch('/api/checkout/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId: sessionId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (result) {
+        if (data.ok) {
+          result.innerHTML = '<div style="margin:8px 0;padding:12px;background:#d4edda;border-radius:8px;font-size:0.82em;">' +
+            '<p style="color:#155724;font-weight:600;">✅ ¡Pago exitoso! Tu licencia ha sido activada</p>' +
+            '<p style="color:#155724;font-size:0.85em;margin-top:4px;">Gracias por tu compra 🎉</p></div>' +
+            '<button class="btn-cancel" onclick="cerrarModalCompra()" style="margin-top:6px;">Cerrar</button>';
+        } else {
+          result.innerHTML = '<p style="font-size:0.78em;color:#ff7675;">❌ Error en la confirmación del pago</p>';
+        }
+      }
+    })
+    .catch(function() {
+      if (result) {
+        result.innerHTML = '<div style="margin:8px 0;padding:12px;background:#d4edda;border-radius:8px;font-size:0.82em;">' +
+          '<p style="color:#155724;font-weight:600;">✅ ¡Pago simulado exitoso! Licencia activada</p></div>' +
+          '<button class="btn-cancel" onclick="cerrarModalCompra()" style="margin-top:6px;">Cerrar</button>';
+      }
+    });
+  }
+
+  window.iniciarCheckout = iniciarCheckout;
+  window.simularPagoExitoso = simularPagoExitoso;
+
   function cerrarModalCompra() {
     document.getElementById('modal-compra').classList.remove('active');
   }

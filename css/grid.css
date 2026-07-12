@@ -36,7 +36,8 @@
   }
   .hora-cell input {
     width: 100%; border: none; background: transparent;
-    text-align: center; font-weight: bold; font-size: 0.95em; color: #2c3e50;
+    text-align: center; font-weight: 600; font-size: 11px; color: #2c3e50;
+    padding: 0; margin: 0; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis;
   }
   .hora-cell input:focus { outline: none; }
   .del-fila { position: absolute; top: 0; right: 1px; font-size: 0.65em; color: #e74c3c; cursor: pointer; opacity: 0.3; }
@@ -134,7 +135,7 @@
     .sub { font-size: 0.6em; }
     th, td { font-size: 0.55em; padding: 3px 2px; }
     .hora-cell { width: 32px; font-size: 0.5em; }
-    .hora-cell input { font-size: 0.85em; }
+    .hora-cell input { font-size: 10px; }
     table { min-width: 400px; }
     .table-wrap { min-width: 0; padding: 4px; }
     .toolbar button { font-size: 0.6em; padding: 5px 9px; }

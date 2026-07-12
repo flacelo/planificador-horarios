@@ -3011,9 +3011,26 @@
     mostrarPaso(0);
   }
 
+  function conmutarPantallaCompleta() {
+    var btn = document.getElementById('btn-fullscreen');
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(function(){});
+      if (btn) btn.innerHTML = '⛶ Salir pantalla completa';
+    } else {
+      document.exitFullscreen().catch(function(){});
+      if (btn) btn.innerHTML = '⛶ Pantalla completa';
+    }
+  }
+  document.addEventListener('fullscreenchange', function() {
+    var btn = document.getElementById('btn-fullscreen');
+    if (!btn) return;
+    btn.innerHTML = document.fullscreenElement ? '⛶ Salir pantalla completa' : '⛶ Pantalla completa';
+  });
+
   window.iniciarTourInteractivo = iniciarTourInteractivo;
   window.iniciarPollingSesiones = iniciarPollingSesiones;
   window.fetchSesiones = fetchSesiones;
   window.actualizarUIDispositivos = actualizarUIDispositivos;
   window.cerrarOtrasSesiones = cerrarOtrasSesiones;
+  window.conmutarPantallaCompleta = conmutarPantallaCompleta;
 

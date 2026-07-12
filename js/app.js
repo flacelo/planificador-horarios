@@ -1493,6 +1493,7 @@
     initScreenshotProtection();
     initDarkMode();
     initPersonalizacion();
+    initTema();
     actualizarModalCategorias();
     ['sel-nombre','sel-carrera','sel-ciclo'].forEach(id => {
       const el = document.getElementById(id);
@@ -2259,8 +2260,54 @@
     }
   }
 
+  function generarEstrellas() {
+    var existentes = document.querySelectorAll('.estrella');
+    existentes.forEach(function(el) { el.remove(); });
+    for (var i = 0; i < 80; i++) {
+      var estrella = document.createElement('div');
+      estrella.className = 'estrella';
+      estrella.style.left = Math.random() * 100 + '%';
+      estrella.style.top = Math.random() * 100 + '%';
+      estrella.style.width = (Math.random() * 2 + 1) + 'px';
+      estrella.style.height = estrella.style.width;
+      estrella.style.animationDelay = (Math.random() * 3) + 's';
+      estrella.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+      document.body.appendChild(estrella);
+    }
+  }
+
+  function aplicarTemaAvanzado(nombreTema) {
+    var temas = ['tema-estelar', 'tema-cyberpunk', 'tema-ejecutivo', 'tema-pastel'];
+    var body = document.body;
+    temas.forEach(function(t) { body.classList.remove(t); });
+    document.querySelectorAll('.estrella').forEach(function(el) { el.remove(); });
+    if (nombreTema === 'estelar') {
+      body.classList.add('tema-estelar');
+      generarEstrellas();
+    } else if (nombreTema === 'cyberpunk') {
+      body.classList.add('tema-cyberpunk');
+    } else if (nombreTema === 'ejecutivo') {
+      body.classList.add('tema-ejecutivo');
+    } else if (nombreTema === 'pastel') {
+      body.classList.add('tema-pastel');
+    }
+    localStorage.setItem('horario_tema', nombreTema);
+    document.querySelectorAll('.tema-btn').forEach(function(el) {
+      el.style.borderWidth = el.dataset.tema === nombreTema ? '2px' : '1px';
+      el.style.fontWeight = el.dataset.tema === nombreTema ? '700' : '400';
+    });
+  }
+
+  function initTema() {
+    var temaGuardado = localStorage.getItem('horario_tema');
+    if (temaGuardado) {
+      aplicarTemaAvanzado(temaGuardado);
+    }
+  }
+
   window.cambiarTipografia = cambiarTipografia;
   window.aplicarPaletaBase = aplicarPaletaBase;
+  window.aplicarTemaAvanzado = aplicarTemaAvanzado;
 
   // ========== NUEVO PLANIFICADOR VACÍO ==========
   function nuevoPlanificador() {

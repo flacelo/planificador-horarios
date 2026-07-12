@@ -36,7 +36,7 @@
   }
   .hora-cell input {
     width: 100%; border: none; background: transparent;
-    text-align: center; font-weight: 600; font-size: 11px; color: #2c3e50;
+    text-align: center; font-weight: 700; font-size: 11px; color: #1a2530;
     padding: 0; margin: 0; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis;
   }
   .hora-cell input:focus { outline: none; }
@@ -233,11 +233,11 @@
   body.dark .input:hover, body.dark .select:hover { border-color: #4a4d65; }
   body.dark th {
     background: linear-gradient(135deg, #1a1a2e, #162447);
-    color: #e0e0e0;
+    color: #f0f0ff;
   }
   body.dark td, body.dark .hora-cell, body.dark .hora-cell input {
     background: transparent;
-    color: var(--text-secondary);
+    color: #e0e2f0;
     border-color: var(--border-color);
   }
   body.dark .hora-cell {

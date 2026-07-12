@@ -30,7 +30,7 @@
   z-index: 1001;
   transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto; overflow-x: hidden;
-  padding: 24px 18px;
+  padding: 24px 18px 60px;
   box-shadow: 6px 0 40px rgba(0,0,0,0.4), inset -1px 0 0 rgba(255,255,255,0.08);
 }
 .side-panel.open { left: 0; }
@@ -66,7 +66,7 @@
 .side-panel .dropdown-content {
   background: #2c3e50; border: 1px solid rgba(255,255,255,0.1);
   box-shadow: 0 8px 30px rgba(0,0,0,0.4); min-width: 180px;
-  border-radius: 8px;
+  border-radius: 8px; z-index: 1002;
 }
 .side-panel .dropdown-content a { color: rgba(255,255,255,0.85); }
 .side-panel .dropdown-content a:hover {
@@ -124,7 +124,7 @@
     background: rgba(255,255,255,0.05);
     border-radius: var(--radius);
     margin-bottom: var(--space-sm);
-    overflow: hidden;
+    overflow: visible;
     border: 1px solid rgba(255,255,255,0.08);
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
@@ -160,6 +160,7 @@
     transform: translateY(-4px);
     transition: opacity 0.25s ease-out, transform 0.25s ease-out;
     pointer-events: none;
+    overflow: visible;
   }
   .sp-section[open] .sp-body {
     opacity: 1;

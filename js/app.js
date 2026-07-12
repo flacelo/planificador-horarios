@@ -1563,6 +1563,7 @@
     const nombreSel = document.getElementById('sel-nombre');
     if (nombreSel) onRolChange(nombreSel);
     iniciarPollingSesiones();
+    setTimeout(iniciarTourInteractivo, CONFIG.TIME.TUTORIAL_INICIO || 800);
   }
 
   // ========== DASHBOARD ==========
@@ -2957,6 +2958,57 @@
     }, 30000);
   }
 
+  // ========== TOUR INTERACTIVO ==========
+
+  var tourPasos = [
+    { selector: '#tbody', titulo: '📅 Grilla de Horarios', desc: 'Aquí se muestran tus actividades organizadas por día y hora. Haz clic en una celda vacía para agregar una actividad.' },
+    { selector: '.sp-body .toolbar button:nth-child(3)', titulo: '📋 Plantillas', desc: 'Usa el botón "Plantilla" para cargar horarios sugeridos según tu carrera o perfil.' },
+    { selector: '.tema-btn', titulo: '🎨 Temas Visuales', desc: 'Cambia la apariencia completa del planificador: Estelar, Cyberpunk, Ejecutivo o Pastel.' },
+  ];
+
+  function iniciarTourInteractivo() {
+    if (localStorage.getItem('horario_tour_visto')) return;
+    var paso = 0;
+    var overlay = document.createElement('div');
+    overlay.className = 'tour-overlay';
+    document.body.appendChild(overlay);
+    var tooltip = document.createElement('div');
+    tooltip.className = 'tour-tooltip';
+    document.body.appendChild(tooltip);
+
+    function mostrarPaso(idx) {
+      if (idx >= tourPasos.length) {
+        overlay.remove(); tooltip.remove();
+        localStorage.setItem('horario_tour_visto', '1');
+        return;
+      }
+      var p = tourPasos[idx];
+      var target = document.querySelector(p.selector);
+      if (!target) { mostrarPaso(idx + 1); return; }
+      var rect = target.getBoundingClientRect();
+      var top = rect.bottom + 12;
+      var left = rect.left + rect.width / 2;
+      tooltip.innerHTML =
+        '<div class="tour-titulo">' + p.titulo + '</div>' +
+        '<div class="tour-desc">' + p.desc + '</div>' +
+        '<div class="tour-botones">' +
+        '<span class="tour-pasos">' + (idx + 1) + '/' + tourPasos.length + '</span>' +
+        '<div><button class="btn-cancel" style="font-size:.78em;padding:4px 10px;margin-right:6px;" onclick="this.closest(\'.tour-tooltip\').remove();document.querySelector(\'.tour-overlay\').remove();localStorage.setItem(\'horario_tour_visto\',\'1\')">Saltar</button>' +
+        '<button class="btn-ok" style="font-size:.78em;padding:4px 14px;" onclick="iniciarTourInteractivoSiguiente()">' + (idx < tourPasos.length - 1 ? 'Siguiente →' : '✅ Listo') + '</button></div></div>';
+      tooltip.style.top = Math.min(top, window.innerHeight - tooltip.offsetHeight - 20) + 'px';
+      tooltip.style.left = Math.max(8, Math.min(left - tooltip.offsetWidth / 2, window.innerWidth - tooltip.offsetWidth - 8)) + 'px';
+      window._tourPaso = idx + 1;
+    }
+
+    window.iniciarTourInteractivoSiguiente = function() {
+      var idx = window._tourPaso || 0;
+      mostrarPaso(idx);
+    };
+
+    mostrarPaso(0);
+  }
+
+  window.iniciarTourInteractivo = iniciarTourInteractivo;
   window.iniciarPollingSesiones = iniciarPollingSesiones;
   window.fetchSesiones = fetchSesiones;
   window.actualizarUIDispositivos = actualizarUIDispositivos;

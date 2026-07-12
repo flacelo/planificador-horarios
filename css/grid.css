@@ -36,7 +36,7 @@
   }
   .hora-cell input {
     width: 100%; border: none; background: transparent;
-    text-align: center; font-weight: 700; font-size: 11px; color: #1a2530;
+    text-align: center; font-weight: 700 !important; font-size: 11px; color: #1a2530 !important;
     padding: 0; margin: 0; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis;
   }
   .hora-cell input:focus { outline: none; }
@@ -267,8 +267,9 @@
   body.dark .cta-box { background: linear-gradient(135deg, #1e1a2e, #2a1a3e); border-color: #4a3a7e; box-shadow: 0 1px 4px rgba(106,27,154,0.08); }
   body.dark .cta-box p { color: #b4a0ff; }
   body.dark .footer { color: var(--text-lighter); }
-  body.dark .btn-empty-secondary { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.1); }
+  body.dark .btn-empty-secondary { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.1); backdrop-filter: blur(4px); }
   body.dark .btn-empty-secondary:hover { background: rgba(255,255,255,0.15); }
+  body.dark .empty-state { background: linear-gradient(135deg, #1a1a3e, #2a1a3e); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
   body.dark .day-summary { background: var(--surface-card); border-color: var(--border-color); }
   body.dark .day-summary .ds-actions button { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
   body.dark .day-summary .ds-actions button:hover { background: rgba(102,126,234,0.2); color: #fff; }

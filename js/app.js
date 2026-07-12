@@ -999,7 +999,8 @@
         if (cel.rowspan > 1) {
           for (var r = fi + 1; r < fi + cel.rowspan; r++) celdaOcupada[r + '_' + ci] = true;
         }
-        html += `<td class="celda c-${cel.c}${dc}${mergeCls}"${rs} data-fi="${fi}" data-ci="${ci}"><span class="done-check${dk}">${cel.done?'✓':''}</span>${mergeInd}${bell}${cel.t || '—'}</td>`;
+        var draggable = cel.t ? ' draggable="true"' : '';
+        html += `<td class="celda c-${cel.c}${dc}${mergeCls}"${rs} data-fi="${fi}" data-ci="${ci}"${draggable}><span class="done-check${dk}">${cel.done?'✓':''}</span>${mergeInd}${bell}${cel.t || '—'}</td>`;
       }
       html += '</tr>';
     });
@@ -1013,6 +1014,7 @@
     configurarResizers();
     configurarDelegacionCeldas();
     configurarArrastreMerge();
+    configurarDragDrop();
     renderizarLeyenda();
     actualizarInfoMerge();
     actualizarMergeBadge();
@@ -1611,6 +1613,73 @@
         abrirModal(fi, ci);
       }
     });
+  }
+
+  // ========== DRAG AND DROP ==========
+
+  var dragSource = null;
+
+  function configurarDragDrop() {
+    var tb = document.getElementById('tbody');
+    if (!tb || tb.dataset.dragLista) return;
+    tb.dataset.dragLista = '1';
+    tb.addEventListener('dragstart', handleDragStart);
+    tb.addEventListener('dragover', handleDragOver);
+    tb.addEventListener('drop', handleDrop);
+    tb.addEventListener('dragend', function() { dragSource = null; });
+  }
+
+  function handleDragStart(e) {
+    var celda = e.target.closest('.celda');
+    if (!celda) { e.preventDefault(); return; }
+    var fi = parseInt(celda.dataset.fi);
+    var ci = parseInt(celda.dataset.ci);
+    var data = filas[fi] && filas[fi].celdas[ci];
+    if (!data || !data.t) { e.preventDefault(); return; }
+    dragSource = { fi: fi, ci: ci, data: JSON.parse(JSON.stringify(data)) };
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', fi + '_' + ci);
+    celda.classList.add('dragging');
+    setTimeout(function() { celda.classList.remove('dragging'); }, 0);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    var celdaDest = e.target.closest('.celda');
+    if (!celdaDest || !dragSource) return;
+    var fiDest = parseInt(celdaDest.dataset.fi);
+    var ciDest = parseInt(celdaDest.dataset.ci);
+    if (fiDest === dragSource.fi && ciDest === dragSource.ci) { dragSource = null; return; }
+    var filaDest = filas[fiDest];
+    if (!filaDest) { dragSource = null; return; }
+    var destinoActual = filaDest.celdas[ciDest];
+    var contenidoDestino = destinoActual && destinoActual.t;
+    if (!contenidoDestino && destinoActual && destinoActual.c === 'libre') {
+      var choque = verificarChoqueHorario(ciDest, fiDest);
+      if (choque) {
+        var msgs = choque.map(function(ch) { return ch.mensaje; }).join('; ');
+        notificarChoque('⚠️ ' + msgs, '#ef4444');
+        celdaDest.classList.add('grilla-choque');
+        setTimeout(function() { celdaDest.classList.remove('grilla-choque'); }, 2000);
+        if (!confirm('⚠️ El destino está en conflicto con otra actividad.\n\n' + msgs + '\n\n¿Deseas mover la actividad de todas formas?')) { dragSource = null; return; }
+      }
+      var src = dragSource.data;
+      filas[dragSource.fi].celdas[dragSource.ci] = { t: '', c: 'libre', done: false, reminder: false, rowspan: 1 };
+      if (!filaDest.celdas[ciDest]) filaDest.celdas[ciDest] = { t: '', c: 'libre', done: false, rowspan: 1 };
+      filaDest.celdas[ciDest].t = src.t;
+      filaDest.celdas[ciDest].c = src.c;
+      filaDest.celdas[ciDest].done = src.done || false;
+      filaDest.celdas[ciDest].reminder = src.reminder || false;
+      filaDest.celdas[ciDest].rowspan = src.rowspan || 1;
+      dragSource = null;
+      renderizar();
+      autoGuardar();
+    }
   }
 
   // Mostrar tutorial en primera visita

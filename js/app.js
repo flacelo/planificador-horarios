@@ -1563,7 +1563,6 @@
     const nombreSel = document.getElementById('sel-nombre');
     if (nombreSel) onRolChange(nombreSel);
     iniciarPollingSesiones();
-    setTimeout(iniciarTourInteractivo, CONFIG.TIME.TUTORIAL_INICIO || 800);
   }
 
   // ========== DASHBOARD ==========
@@ -1755,6 +1754,8 @@
     else if (overlay.id === 'modal-admin') cerrarAdmin();
     else if (overlay.id === 'tutorial') cerrarTutorial();
   });
+
+  setTimeout(iniciarTourInteractivo, CONFIG.TIME.TUTORIAL_INICIO || 1000);
 
   function configurarDelegacionCeldas() {
     const tb = document.getElementById('tbody');
@@ -2968,6 +2969,10 @@
 
   function iniciarTourInteractivo() {
     if (localStorage.getItem('horario_tour_visto')) return;
+    var tbody = document.getElementById('tbody');
+    if (!tbody || !tbody.querySelector('tr')) return;
+    var toolbar = document.querySelector('.sp-body .toolbar');
+    if (!toolbar || !toolbar.querySelector('button')) return;
     var paso = 0;
     var overlay = document.createElement('div');
     overlay.className = 'tour-overlay';

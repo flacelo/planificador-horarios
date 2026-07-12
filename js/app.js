@@ -1157,6 +1157,16 @@
     const c = document.getElementById('modal-categoria').value;
     const r = document.getElementById('modal-reminder').checked;
     if (modalFila >= 0 && modalCol >= 0) {
+      var choque = verificarChoqueHorario(modalCol, modalFila);
+      if (choque && t.trim() !== '') {
+        var msgs = choque.map(function(ch) { return ch.mensaje; }).join('; ');
+        notificarChoque('⚠️ ' + msgs, '#ef4444');
+        var celda = document.querySelector('td[data-fi="' + modalFila + '"][data-ci="' + modalCol + '"]');
+        if (celda) { celda.classList.add('grilla-choque'); setTimeout(function() { celda.classList.remove('grilla-choque'); }, 2000); }
+        if (!confirm('⚠️ Este bloque coincide con otra actividad.\n\n' + msgs + '\n\n¿Deseas sobreescribirlo?')) {
+          cerrarModal(); return;
+        }
+      }
       if (!filas[modalFila].celdas[modalCol]) filas[modalFila].celdas[modalCol] = {t:'',c:'libre',done:false};
       filas[modalFila].celdas[modalCol].t = t;
       filas[modalFila].celdas[modalCol].c = c;
@@ -1167,6 +1177,48 @@
   }
 
   function cerrarModal() { document.getElementById('modal').classList.remove('active'); modalFila = -1; modalCol = -1; }
+
+  // ========== DETECCIÓN DE CHOQUES HORARIOS ==========
+
+  function verificarChoqueHorario(diaIdx, filaIdx) {
+    var celdaDestino = filas[filaIdx] && filas[filaIdx].celdas[diaIdx];
+    if (!celdaDestino) return null;
+    var filasCubiertas = [filaIdx];
+    if (celdaDestino.rowspan > 1) {
+      for (var r = 1; r < celdaDestino.rowspan; r++) filasCubiertas.push(filaIdx + r);
+    }
+    var choques = [];
+    filas.forEach(function(fila, fi) {
+      fila.celdas.forEach(function(cel, ci) {
+        if (ci !== diaIdx) return;
+        if (fi === filaIdx) return;
+        if (!cel.t && cel.c === 'libre') return;
+        if (cel.rowspan > 1) {
+          var cubreHasta = fi + cel.rowspan - 1;
+          for (var ri = 0; ri < filasCubiertas.length; ri++) {
+            if (filasCubiertas[ri] >= fi && filasCubiertas[ri] <= cubreHasta) {
+              choques.push({ fila: fi, celda: cel, mensaje: 'Se solapa con ' + (cel.t || 'actividad') + ' (filas ' + fi + '-' + cubreHasta + ')' });
+              break;
+            }
+          }
+        }
+      });
+    });
+    return choques.length > 0 ? choques : null;
+  }
+
+  function notificarChoque(mensaje, color) {
+    var notif = document.getElementById('notif-choque');
+    if (!notif) return;
+    notif.textContent = mensaje;
+    notif.style.display = 'block';
+    notif.style.background = color || 'var(--bg-card,#2d3436)';
+    notif.style.color = color === '#ef4444' ? '#fff' : '#55efc4';
+    setTimeout(function() { notif.style.display = 'none'; }, 4000);
+  }
+
+  window.verificarChoqueHorario = verificarChoqueHorario;
+  window.notificarChoque = notificarChoque;
   document.getElementById('modal-texto').addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); okModal(); } });
 
   function cambiarHora(fi, val) { filas[fi].hora = val; autoGuardar(); }

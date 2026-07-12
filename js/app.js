@@ -1734,6 +1734,13 @@
     actualizarInfoMerge();
   }
 
+  window._PALETAS = {
+    default: { '--primary-1': '#667eea', '--primary-2': '#764ba2', '--color-success': '#55efc4', '--color-info': '#74b9ff' },
+    oceano: { '--primary-1': '#2193b0', '--primary-2': '#6dd5ed', '--color-success': '#00b894', '--color-info': '#0984e3' },
+    bosque: { '--primary-1': '#134e5e', '--primary-2': '#71b280', '--color-success': '#55efc4', '--color-info': '#00cec9' },
+    atardecer: { '--primary-1': '#e44d26', '--primary-2': '#f16529', '--color-success': '#fdcb6e', '--color-info': '#e17055' },
+    lavanda: { '--primary-1': '#9b59b6', '--primary-2': '#8e44ad', '--color-success': '#55efc4', '--color-info': '#74b9ff' },
+  };
   iniciar();
 
   // ========== GESTIÓN UNIFICADA DE MODALES ==========
@@ -2222,22 +2229,13 @@
 
   // ========== PERSONALIZACIÓN VISUAL ==========
 
-  var PALETAS = {
-    default: { '--primary-1': '#667eea', '--primary-2': '#764ba2', '--color-success': '#55efc4', '--color-info': '#74b9ff' },
-    oceano: { '--primary-1': '#2193b0', '--primary-2': '#6dd5ed', '--color-success': '#00b894', '--color-info': '#0984e3' },
-    bosque: { '--primary-1': '#134e5e', '--primary-2': '#71b280', '--color-success': '#55efc4', '--color-info': '#00cec9' },
-    atardecer: { '--primary-1': '#e44d26', '--primary-2': '#f16529', '--color-success': '#fdcb6e', '--color-info': '#e17055' },
-    lavanda: { '--primary-1': '#9b59b6', '--primary-2': '#8e44ad', '--color-success': '#55efc4', '--color-info': '#74b9ff' },
-  };
-
   function cambiarTipografia(fuente) {
     document.documentElement.style.setProperty('--fuente-principal', fuente);
     localStorage.setItem('horario_tipografia', fuente);
   }
 
   function aplicarPaletaBase(config) {
-    var paleta = PALETAS[config];
-    if (!paleta) return;
+    var paleta = window._PALETAS[config] || window._PALETAS['default'];
     var root = document.documentElement.style;
     Object.keys(paleta).forEach(function(key) {
       root.setProperty(key, paleta[key]);

@@ -1353,6 +1353,84 @@
   function guardar() { try { localStorage.setItem(CONFIG.STORAGE.COMPLETO, JSON.stringify(getDatosCompletos())); autoGuardar(); alert('✅ Guardado.'); } catch(e) { alert('Error: ' + e); } }
   function cargar() { try { const r = localStorage.getItem(CONFIG.STORAGE.COMPLETO); if (!r) { alert('Sin datos.'); return; } aplicarDatos(JSON.parse(r)); alert('✅ Cargado.'); } catch(e) { alert('Error: ' + e); } }
 
+  // ========== EXPORTACIÓN ==========
+
+  function exportarHorarioJSON() {
+    var data = getDatosCompletos();
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'horario_' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportarHorarioExcel() {
+    var header = ['HORA'];
+    dias.forEach(function(d) { header.push(d); });
+    var rows = [header.join(',')];
+    filas.forEach(function(fila) {
+      var row = [fila.hora];
+      fila.celdas.forEach(function(cel) {
+        var val = cel.t || '';
+        row.push('"' + val.replace(/"/g, '""') + '"');
+      });
+      rows.push(row.join(','));
+    });
+    var bom = '\uFEFF';
+    var blob = new Blob([bom + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'horario_' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function sincronizarGoogleCalendarMock() {
+    var notif = document.getElementById('notif-sync');
+    if (notif) { notif.textContent = '🔄 Sincronizando con Google Calendar...'; notif.style.display = 'block'; }
+    var eventos = [];
+    filas.forEach(function(fila, fi) {
+      fila.celdas.forEach(function(cel, ci) {
+        if (!cel.t || cel.t === '—') return;
+        var dia = dias[ci];
+        var hora = fila.hora.trim();
+        var fechaBase = new Date();
+        var diffDias = 0;
+        if (dia === 'LUNES') diffDias = (8 - fechaBase.getDay()) % 7;
+        else if (dia === 'MARTES') diffDias = (9 - fechaBase.getDay()) % 7;
+        else if (dia === 'MIÉRCOLES') diffDias = (10 - fechaBase.getDay()) % 7;
+        else if (dia === 'JUEVES') diffDias = (11 - fechaBase.getDay()) % 7;
+        else if (dia === 'VIERNES') diffDias = (12 - fechaBase.getDay()) % 7;
+        else if (dia === 'SÁBADO') diffDias = (13 - fechaBase.getDay()) % 7;
+        else if (dia === 'DOMINGO') diffDias = (14 - fechaBase.getDay()) % 7;
+        var fechaEvento = new Date(fechaBase);
+        fechaEvento.setDate(fechaEvento.getDate() + diffDias);
+        var partesHora = hora.split(':');
+        var hh = parseInt(partesHora[0]) || 7;
+        var mm = parseInt(partesHora[1]) || 0;
+        var start = new Date(fechaEvento);
+        start.setHours(hh, mm, 0, 0);
+        var end = new Date(start);
+        end.setHours(end.getHours() + 1);
+        eventos.push({ summary: cel.t, description: 'Categoría: ' + cel.c, start: { dateTime: start.toISOString(), timeZone: 'America/Lima' }, end: { dateTime: end.toISOString(), timeZone: 'America/Lima' } });
+      });
+    });
+    setTimeout(function() {
+      if (notif) { notif.textContent = '✅ ' + eventos.length + ' eventos sincronizados con Google Calendar'; setTimeout(function() { notif.style.display = 'none'; }, 4000); }
+    }, 1500);
+  }
+
+  window.exportarHorarioJSON = exportarHorarioJSON;
+  window.exportarHorarioExcel = exportarHorarioExcel;
+  window.sincronizarGoogleCalendarMock = sincronizarGoogleCalendarMock;
+
   function aplicarDatos(d) {
     const ms = (selId, inpId, val) => {
       const sel = document.getElementById(selId), inp = document.getElementById(inpId);

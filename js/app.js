@@ -631,6 +631,54 @@
     }
   };
 
+  // ========== PLANTILLAS DE HORARIOS POR PERFIL ==========
+  var PLANTILLAS = {
+    'Ingeniería de Sistemas': {
+      label: 'Ing. Sistemas',
+      icon: '💻',
+      sugerencias: {
+        'LUNES': { '07:00': { t:'Programación I', c:'programacion' }, '09:00': { t:'Base de Datos', c:'base-datos' }, '11:00': { t:'Estudio libre', c:'estudio' }, '14:00': { t:'Proyecto integrador', c:'proyectos' }, '16:00': { t:'Trabajo grupal', c:'proyectos' } },
+        'MARTES': { '07:00': { t:'Estructuras Discretas', c:'clase' }, '09:00': { t:'Laboratorio BD', c:'base-datos' }, '11:00': { t:'Estudio', c:'estudio' }, '14:00': { t:'Desarrollo Web', c:'programacion' } },
+        'MIÉRCOLES': { '07:00': { t:'Programación II', c:'programacion' }, '09:00': { t:'Redes', c:'clase' }, '11:00': { t:'Laboratorio Redes', c:'clase' }, '14:00': { t:'Estudio autónomo', c:'estudio' } },
+        'JUEVES': { '07:00': { t:'Ing. Software', c:'clase' }, '09:00': { t:'Taller de proyectos', c:'proyectos' }, '14:00': { t:'Base de Datos Avanzada', c:'base-datos' } },
+        'VIERNES': { '07:00': { t:'Matemática', c:'clase' }, '09:00': { t:'Laboratorio Programación', c:'programacion' }, '11:00': { t:'Estudio', c:'estudio' } }
+      }
+    },
+    'Ingeniería Civil': {
+      label: 'Ing. Civil',
+      icon: '🏗️',
+      sugerencias: {
+        'LUNES': { '07:00': { t:'Mecánica de Suelos', c:'clase' }, '09:00': { t:'Laboratorio Suelos', c:'topografia' }, '11:00': { t:'Estudio', c:'estudio' }, '14:00': { t:'Dibujo AutoCAD', c:'planos' } },
+        'MARTES': { '07:00': { t:'Concreto Armado', c:'clase' }, '09:00': { t:'Topografía', c:'topografia' }, '11:00': { t:'Práctica campo', c:'topografia' }, '14:00': { t:'Planos estructurales', c:'planos' } },
+        'MIÉRCOLES': { '07:00': { t:'Estructuras', c:'estructuras' }, '09:00': { t:'Laboratorio Materiales', c:'laboratorio' }, '14:00': { t:'Proyecto final', c:'proyectos' } },
+        'JUEVES': { '07:00': { t:'Hidráulica', c:'clase' }, '09:00': { t:'Laboratorio Hidráulica', c:'laboratorio' }, '14:00': { t:'Estudio', c:'estudio' } },
+        'VIERNES': { '07:00': { t:'Matemática Aplicada', c:'clase' }, '09:00': { t:'Taller de estructuras', c:'estructuras' }, '11:00': { t:'Revisión de planos', c:'planos' } }
+      }
+    },
+    'Medicina': {
+      label: 'Medicina',
+      icon: '⚕️',
+      sugerencias: {
+        'LUNES': { '06:00': { t:'Anatomía', c:'anatomia' }, '08:00': { t:'Hospital Clínico', c:'hospital' }, '12:00': { t:'Estudio casos', c:'casos-clinicos' }, '14:00': { t:'Guardia', c:'guardia' } },
+        'MARTES': { '06:00': { t:'Fisiología', c:'anatomia' }, '08:00': { t:'Práctica hospitalaria', c:'hospital' }, '12:00': { t:'Estudio', c:'estudio' }, '14:00': { t:'Guardia', c:'guardia' } },
+        'MIÉRCOLES': { '06:00': { t:'Farmacología', c:'anatomia' }, '08:00': { t:'Rotación clínica', c:'hospital' }, '12:00': { t:'Casos clínicos', c:'casos-clinicos' } },
+        'JUEVES': { '06:00': { t:'Patología', c:'anatomia' }, '08:00': { t:'Hospital', c:'hospital' }, '14:00': { t:'Estudio', c:'estudio' } },
+        'VIERNES': { '06:00': { t:'Seminario', c:'anatomia' }, '09:00': { t:'Práctica', c:'hospital' }, '12:00': { t:'Repaso', c:'estudio' } }
+      }
+    },
+    'Derecho': {
+      label: 'Derecho',
+      icon: '⚖️',
+      sugerencias: {
+        'LUNES': { '07:00': { t:'Derecho Civil', c:'clase' }, '09:00': { t:'Lectura de Códigos', c:'lectura-codigos' }, '11:00': { t:'Análisis de casos', c:'analisis-casos' }, '14:00': { t:'Estudio', c:'estudio' } },
+        'MARTES': { '07:00': { t:'Derecho Penal', c:'clase' }, '09:00': { t:'Litigación oral', c:'litigacion' }, '11:00': { t:'Análisis', c:'analisis-casos' }, '14:00': { t:'Debate', c:'debate' } },
+        'MIÉRCOLES': { '07:00': { t:'Derecho Laboral', c:'clase' }, '09:00': { t:'Lectura', c:'lectura-codigos' }, '11:00': { t:'Casos prácticos', c:'analisis-casos' } },
+        'JUEVES': { '07:00': { t:'Derecho Constitucional', c:'clase' }, '09:00': { t:'Simulación juicio', c:'litigacion' }, '14:00': { t:'Estudio', c:'estudio' } },
+        'VIERNES': { '07:00': { t:'Derecho Tributario', c:'clase' }, '09:00': { t:'Taller de argumentación', c:'debate' }, '11:00': { t:'Repaso', c:'estudio' } }
+      }
+    }
+  };
+
   let dias = ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'];
   let filas = [];
   let modalFila = -1, modalCol = -1;
@@ -762,6 +810,46 @@
     localStorage.setItem(CONFIG.STORAGE.PERFIL, perfilId);
     renderizar();
   }
+
+  function perfilIdActual() {
+    var sel = document.getElementById('sel-carrera');
+    var esp = document.getElementById('sel-especialidad');
+    if (sel && sel.value && sel.value !== 'Otra Carrera') {
+      return esp && esp.value && esp.value !== '— Selecciona —' ? esp.value : sel.value;
+    }
+    var nom = document.getElementById('sel-nombre');
+    return (nom && nom.value === 'Freelancer') ? 'Freelancer' : '';
+  }
+
+  function aplicarPlantilla() {
+    var pid = perfilIdActual();
+    if (!pid || !PLANTILLAS[pid]) {
+      notificarChoque('⚠️ No hay plantilla disponible para este perfil', '#ef4444');
+      return;
+    }
+    if (!confirm('📋 ¿Deseas precargar los horarios sugeridos para ' + PLANTILLAS[pid].label + '?\n\nLos bloques se insertarán solo en celdas vacías. Los datos existentes no se modificarán.')) return;
+    var plantilla = PLANTILLAS[pid].sugerencias;
+    filas.forEach(function(fila, fi) {
+      var hora = fila.hora.trim();
+      fila.celdas.forEach(function(cel, ci) {
+        if (cel.t && cel.t !== '—') return;
+        var dia = dias[ci];
+        if (plantilla[dia] && plantilla[dia][hora]) {
+          var sug = plantilla[dia][hora];
+          cel.t = sug.t;
+          cel.c = sug.c;
+          cel.done = false;
+          cel.reminder = false;
+          cel.rowspan = 1;
+        }
+      });
+    });
+    notificarChoque('✅ Plantilla de ' + PLANTILLAS[pid].label + ' cargada en celdas vacías', '#55efc4');
+    renderizar();
+    autoGuardar();
+  }
+
+  window.aplicarPlantilla = aplicarPlantilla;
 
   function actualizarMetasDashboard() {
     const perfilId = localStorage.getItem(CONFIG.STORAGE.PERFIL);

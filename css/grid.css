@@ -17,12 +17,22 @@
     color: #fff; padding: 7px 4px; font-size: 0.74em; position: relative;
     letter-spacing: 0.5px; font-weight: 700;
   }
-  .resizer { position: absolute; right: 0; top: 0; bottom: 0; width: 4px; cursor: col-resize; }
-  .resizer:hover { background: #667eea; }
+  .resizer { position: absolute; right: 0; top: 0; bottom: 0; width: 6px; cursor: col-resize; background: transparent; transition: background 0.2s ease, box-shadow 0.2s ease; border-radius: 3px; }
+  .resizer:hover { background: linear-gradient(180deg, #667eea, #764ba2); box-shadow: 0 0 8px rgba(102,126,234,0.4); }
   .hora-cell {
-    background: linear-gradient(135deg, #f8f9fa, #eceff1);
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     font-weight: 700; color: #2c3e50; width: 55px; font-size: 0.65em;
     cursor: pointer; position: relative;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.35);
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .hora-cell:hover {
+    background: rgba(255,255,255,0.7);
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
   }
   .hora-cell input {
     width: 100%; border: none; background: transparent;
@@ -225,11 +235,20 @@
     color: #e0e0e0;
   }
   body.dark td, body.dark .hora-cell, body.dark .hora-cell input {
-    background: var(--surface-card);
+    background: transparent;
     color: var(--text-secondary);
     border-color: var(--border-color);
   }
-  body.dark .hora-cell { background: var(--surface-hover); }
+  body.dark .hora-cell {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  }
+  body.dark .hora-cell:hover {
+    background: rgba(255,255,255,0.1);
+  }
   body.dark .celda:hover { box-shadow: inset 0 0 0 100px rgba(255,255,255,0.04); }
   body.dark .table-wrap { background: var(--surface-hover); }
   body.dark .c-clase { background: #1e3a5f; color: #8ab4f8; }

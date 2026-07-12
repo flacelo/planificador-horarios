@@ -210,6 +210,29 @@
           <ul id="lista-dispositivos" style="list-style:none;padding:0;margin:0 0 8px 0;font-size:0.82em"></ul>
           <button class="sp-btn" id="btn-cerrar-otras" onclick="cerrarOtrasSesiones()" style="font-size:0.78em;width:100%">🔒 Cerrar sesión en otros dispositivos</button>
         </div>
+        <hr style="border-color:var(--border);margin:12px 0">
+        <div style="font-size:0.85em;font-weight:600;margin-bottom:8px;color:var(--text-muted)">🎨 Personalización de Interfaz</div>
+        <div style="font-size:0.78em;margin-bottom:6px;">
+          <label style="display:block;margin-bottom:3px;color:var(--text-muted);">Tipografía:</label>
+          <select id="sel-tipografia" onchange="cambiarTipografia(this.value)" style="width:100%;padding:5px;border-radius:6px;border:1px solid var(--border,#ddd);background:var(--surface,#fff);color:var(--text-primary);font-size:0.9em;">
+            <option value="'Segoe UI', Arial, sans-serif">Segoe UI (Default)</option>
+            <option value="'Inter', sans-serif">Inter</option>
+            <option value="'Roboto', sans-serif">Roboto</option>
+            <option value="'Montserrat', sans-serif">Montserrat</option>
+            <option value="'Poppins', sans-serif">Poppins</option>
+            <option value="'Nunito', sans-serif">Nunito</option>
+          </select>
+        </div>
+        <div style="font-size:0.78em;">
+          <label style="display:block;margin-bottom:3px;color:var(--text-muted);">Paleta de colores:</label>
+          <div>
+            <span class="paleta-opcion activa" data-paleta="default" style="background:linear-gradient(135deg,#667eea,#764ba2)" onclick="aplicarPaletaBase('default')" title="Default"></span>
+            <span class="paleta-opcion" data-paleta="oceano" style="background:linear-gradient(135deg,#2193b0,#6dd5ed)" onclick="aplicarPaletaBase('oceano')" title="Oceano"></span>
+            <span class="paleta-opcion" data-paleta="bosque" style="background:linear-gradient(135deg,#134e5e,#71b280)" onclick="aplicarPaletaBase('bosque')" title="Bosque"></span>
+            <span class="paleta-opcion" data-paleta="atardecer" style="background:linear-gradient(135deg,#e44d26,#f16529)" onclick="aplicarPaletaBase('atardecer')" title="Atardecer"></span>
+            <span class="paleta-opcion" data-paleta="lavanda" style="background:linear-gradient(135deg,#9b59b6,#8e44ad)" onclick="aplicarPaletaBase('lavanda')" title="Lavanda"></span>
+          </div>
+        </div>
       </div>
     </details>
   </div>

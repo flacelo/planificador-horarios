@@ -97,7 +97,11 @@ async function main() {
     log(f + ': ' + before.toFixed(1) + ' KB → ' + after.toFixed(1) + ' KB (' + (before > 0 ? ((1 - after / before) * 100).toFixed(1) : 0) + '%)');
   }
 
-  // 6) Summary
+  // 6) A11Y + SEO optimization
+  log('A11Y / SEO...');
+  require('./optimize-a11y.js').run();
+
+  // 7) Summary
   console.log('');
   log('Total: ' + totalBefore.toFixed(1) + ' KB → ' + totalAfter.toFixed(1) + ' KB (' + (totalBefore > 0 ? ((1 - totalAfter / totalBefore) * 100).toFixed(1) : 0) + '%)');
   console.log('');

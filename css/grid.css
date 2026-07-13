@@ -13,9 +13,9 @@
     font-size: 0.72em; line-height: 1.25; overflow: hidden; word-wrap: break-word;
   }
   th {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: #f0f4ff; padding: 7px 4px; font-size: 0.74em; position: relative;
-    letter-spacing: 0.5px; font-weight: 800;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    color: #334155; padding: 7px 4px; font-size: 0.74em; position: relative;
+    letter-spacing: 0.5px; font-weight: 700;
     font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
     text-transform: uppercase;
   }

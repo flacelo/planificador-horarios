@@ -1106,6 +1106,7 @@
     renderizarLeyenda();
     actualizarInfoMerge();
     actualizarMergeBadge();
+    forzarEstiloCabeceras();
   }
 
   function renderizarLeyenda() {
@@ -2217,6 +2218,7 @@
     if (document.getElementById('view-dashboard').classList.contains('active') || document.querySelector('#view-dashboard.active')) {
       renderDashboard();
     }
+    forzarEstiloCabeceras();
   }
 
   function initDarkMode() {
@@ -3026,6 +3028,19 @@
     if (!btn) return;
     btn.innerHTML = document.fullscreenElement ? '⛶ Salir pantalla completa' : '⛶ Pantalla completa';
   });
+
+  function forzarEstiloCabeceras() {
+    var dark = document.body.classList.contains('dark');
+    var color = dark ? '#e8eeff' : '#334155';
+    var els = document.querySelectorAll('th, th *');
+    els.forEach(function(el) {
+      el.style.setProperty('color', color, 'important');
+      el.style.setProperty('font-weight', '700', 'important');
+      el.style.setProperty('font-family', "'Montserrat', sans-serif", 'important');
+    });
+  }
+  setTimeout(forzarEstiloCabeceras, 500);
+  setTimeout(forzarEstiloCabeceras, 1500);
 
   window.iniciarTourInteractivo = iniciarTourInteractivo;
   window.iniciarPollingSesiones = iniciarPollingSesiones;

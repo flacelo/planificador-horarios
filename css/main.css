@@ -110,8 +110,10 @@
     text-align: center !important;
     cursor: default !important;
     font-size: 1.5em !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.5px !important;
+    font-weight: 900 !important;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase;
     background: linear-gradient(135deg, #667eea, #764ba2, #f093fb) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -634,7 +636,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   body.tema-estelar, .tema-estelar .celda { --borde-tabla: rgba(100,255,218,.25); --radio-celda: 4px; --fuente-principal: 'Courier New', monospace; }
   .tema-estelar .celda { border-color: rgba(0,255,200,.2) !important; box-shadow: inset 0 0 6px rgba(100,255,218,.08); }
   .tema-estelar #tabla { border-color: rgba(100,255,218,.15); }
-  .tema-estelar thead th { background: rgba(100,255,218,.05) !important; color: #9effdb !important; border-bottom: 1px solid rgba(100,255,218,.2); text-shadow:0 0 6px rgba(100,255,218,.3); }
+  .tema-estelar thead th { background: rgba(100,255,218,.08) !important; color: #9effdb !important; border-bottom: 1px solid rgba(100,255,218,.2); text-shadow:0 0 8px rgba(100,255,218,.4); font-family:'Montserrat','Segoe UI',Arial,sans-serif !important; text-transform:uppercase !important; letter-spacing:1px !important; }
   .tema-estelar .celda:hover { box-shadow: inset 0 0 12px rgba(100,255,218,.15),0 0 6px rgba(100,255,218,.1); }
   .tema-estelar .hora-cell input { background:transparent; color:#9effdb; border-color:transparent; font-weight:700; text-shadow:0 0 4px rgba(100,255,218,.2); }
   .tema-estelar .hora-cell:hover input { color:#b8ffe6; }
@@ -645,7 +647,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   .tema-cyberpunk .celda { --radio-celda: 0px; --borde-tabla: #ff00ff; border-color: #ff00ff !important; box-shadow: 0 0 4px #ff00ff, inset 0 0 4px rgba(255,0,255,.1); border-style:solid; }
   .tema-cyberpunk body, .tema-cyberpunk { background: #0a0014 !important; }
   .tema-cyberpunk #tabla { border-color: #ff00ff; box-shadow: 0 0 12px rgba(255,0,255,.15); }
-  .tema-cyberpunk thead th { background: rgba(255,0,255,.08) !important; color: #0ff !important; border-bottom: 2px solid #0ff; text-shadow:0 0 6px #0ff; }
+  .tema-cyberpunk thead th { background: rgba(255,0,255,.1) !important; color: #0ff !important; border-bottom: 2px solid #0ff; text-shadow:0 0 10px #0ff; font-family:'Montserrat','Segoe UI',Arial,sans-serif !important; text-transform:uppercase !important; letter-spacing:1px !important; }
   .tema-cyberpunk .celda { color: #0ff !important; }
   .tema-cyberpunk .celda:hover { box-shadow: 0 0 12px #ff00ff, inset 0 0 8px rgba(0,255,255,.15); }
   .tema-cyberpunk .hora-cell input { background:transparent; color:#0ff; border-color:transparent; text-shadow:0 0 6px rgba(0,255,255,.5); font-weight:700; }

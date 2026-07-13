@@ -2329,6 +2329,7 @@
     html += `<div style="text-align:center;margin-top:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
       <button onclick="marcarTodo(true);renderDashboard();" style="padding:6px 16px;border:none;border-radius:6px;background:linear-gradient(135deg,#55efc4,#00b894);color:#fff;cursor:pointer;font-size:0.72em;">✅ Marcar todo listo</button>
       <button onclick="resetearCumplimiento()" style="padding:6px 16px;border:1px solid #e74c3c;border-radius:6px;background:#fff;color:#e74c3c;cursor:pointer;font-size:0.72em;">🔄 Reiniciar cumplimiento</button>
+      <button onclick="mostrarReporte()" style="padding:6px 16px;border:none;border-radius:6px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;cursor:pointer;font-size:0.72em;">📧 Enviar Reporte Semanal</button>
     </div>`;
     html += renderProductividad();
     html += actualizarMetasDashboard();
@@ -3312,6 +3313,112 @@
     }, 1200);
   }
 
+  // ========== REPORTE SEMANAL POR CORREO ==========
+
+  function mostrarReporte() {
+    var modal = document.getElementById('modal-report');
+    if (modal) {
+      modal.classList.add('active');
+      document.getElementById('inp-report-email').value = localStorage.getItem('report_email') || '';
+      document.getElementById('msg-report-email').textContent = '';
+    }
+  }
+
+  function cerrarReporte() {
+    var modal = document.getElementById('modal-report');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function getMailReportTemplate() {
+    var totalCells = filas.reduce(function(s, f) { return s + (f.celdas?.length ?? 0); }, 0);
+    var doneCells = filas.reduce(function(s, f) { return s + (f.celdas?.filter(function(c) { return c?.done; })?.length ?? 0); }, 0);
+    var pct = totalCells > 0 ? Math.round(doneCells / totalCells * 100) : 0;
+    var bal = analizarBalanceVida();
+    var balanceLabel = bal.estado === 'critico' ? '⚠️ Crítico' : bal.estado === 'advertencia' ? '⚠️ Advertencia' : '✅ Estable';
+    var balanceMsg = bal.mensajes[0] || '';
+    var today = new Date();
+    var dateStr = today.toLocaleDateString('es-PE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    return `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4f6fb;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:30px 10px;">
+    <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.08);">
+      <!-- HEADER -->
+      <tr><td style="padding:32px 40px 20px;text-align:center;background:linear-gradient(135deg,#1e293b,#334155);">
+        <h1 style="margin:0;font-family:'Montserrat',Arial,sans-serif;font-weight:900;font-size:28px;letter-spacing:2px;color:#ffffff;">PLANIFY</h1>
+        <p style="margin:6px 0 0;font-size:13px;color:#94a3b8;">Reporte Semanal de Rendimiento</p>
+      </td></tr>
+      <!-- FECHA -->
+      <tr><td style="padding:20px 40px 0;text-align:center;">
+        <p style="font-size:14px;color:#64748b;margin:0;">${dateStr}</p>
+      </td></tr>
+      <!-- METRICAS -->
+      <tr><td style="padding:20px 40px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="width:33%;text-align:center;padding:16px 8px;background:#f0f4ff;border-radius:12px;">
+              <div style="font-size:28px;font-weight:800;color:#667eea;">${doneCells}</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px;">✅ Hechas</div>
+            </td>
+            <td style="width:33%;text-align:center;padding:16px 8px;background:#f8f8f8;border-radius:12px;">
+              <div style="font-size:28px;font-weight:800;color:#f39c12;">${totalCells - doneCells}</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px;">⏳ Pendientes</div>
+            </td>
+            <td style="width:33%;text-align:center;padding:16px 8px;background:#e8f8f5;border-radius:12px;">
+              <div style="font-size:28px;font-weight:800;color:#27ae60;">${pct}%</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px;">🎯 Eficiencia</div>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
+      <!-- BALANCE -->
+      <tr><td style="padding:0 40px 20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:${bal.estado === 'critico' ? '#fef2f2' : bal.estado === 'advertencia' ? '#fffbeb' : '#f0fdf4'};border-radius:12px;border-left:4px solid ${bal.estado === 'critico' ? '#ef4444' : bal.estado === 'advertencia' ? '#f59e0b' : '#22c55e'};">
+          <tr><td style="padding:16px 20px;">
+            <div style="font-size:16px;font-weight:700;color:${bal.estado === 'critico' ? '#dc2626' : bal.estado === 'advertencia' ? '#d97706' : '#16a34a'};">${balanceLabel}</div>
+            <div style="font-size:13px;color:#475569;margin-top:6px;line-height:1.5;">${balanceMsg}</div>
+            <div style="font-size:12px;color:#94a3b8;margin-top:8px;">Carga alta: <strong>${bal.altaCarga}h</strong> &nbsp;·&nbsp; Bienestar: <strong>${bal.bienestar}h</strong> &nbsp;·&nbsp; Total: <strong>${bal.total}h</strong></div>
+          </td></tr>
+        </table>
+      </td></tr>
+      <!-- FOOTER -->
+      <tr><td style="padding:20px 40px 28px;text-align:center;border-top:1px solid #e2e8f0;">
+        <p style="font-size:12px;color:#94a3b8;margin:0;">© 2026 PLANIFY — Potencia Tech E.I.R.L.</p>
+        <p style="font-size:11px;color:#cbd5e1;margin:4px 0 0;">Este es un reporte generado automáticamente desde tu planificador.</p>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body>
+</html>`;
+  }
+
+  function enviarReporteSemanal() {
+    var inp = document.getElementById('inp-report-email');
+    var msg = document.getElementById('msg-report-email');
+    var btn = document.getElementById('btn-enviar-reporte');
+    var email = inp ? inp.value.trim() : '';
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (msg) msg.textContent = '⚠️ Ingresa un correo electrónico válido.';
+      return;
+    }
+    if (msg) msg.textContent = '';
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Enviando...'; }
+    localStorage.setItem('report_email', email);
+    var template = getMailReportTemplate();
+    // Simulación de envío
+    setTimeout(function() {
+      if (btn) { btn.disabled = false; btn.textContent = '📩 Enviar reporte'; }
+      cerrarReporte();
+      var notif = document.createElement('div');
+      notif.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;padding:14px 24px;border-radius:12px;font-size:0.9em;z-index:10000;box-shadow:0 6px 20px rgba(39,174,96,0.25);text-align:center;max-width:90%;animation:cardFadeIn 0.4s ease;';
+      notif.innerHTML = '✅ ¡Reporte generado con éxito!<br>El correo ha sido enviado a <strong>' + email.replace(/</g,'&lt;') + '</strong>.';
+      document.body.appendChild(notif);
+      setTimeout(function() { if (notif.parentNode) notif.parentNode.removeChild(notif); }, 4000);
+    }, 1500);
+  }
+
   function forzarEstiloCabeceras() {
     var dark = document.body.classList.contains('dark');
     var color = dark ? '#e8eeff' : '#334155';
@@ -3334,4 +3441,8 @@
   window.conectarGoogleCalendar = conectarGoogleCalendar;
   window.conectarAppleCalendar = conectarAppleCalendar;
   window.mapearEventosGCal = mapearEventosGCal;
+  window.mostrarReporte = mostrarReporte;
+  window.cerrarReporte = cerrarReporte;
+  window.enviarReporteSemanal = enviarReporteSemanal;
+  window.getMailReportTemplate = getMailReportTemplate;
 

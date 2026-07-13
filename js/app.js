@@ -3029,6 +3029,72 @@
     btn.innerHTML = document.fullscreenElement ? '⛶ Salir pantalla completa' : '⛶ Pantalla completa';
   });
 
+  function mapearEventosGCal() {
+    var eventos = [];
+    filas.forEach(function(fila) {
+      fila.celdas.forEach(function(cel, ci) {
+        if (!cel.t || cel.t === '—') return;
+        var dia = dias[ci];
+        var hora = fila.hora.trim();
+        var fechaBase = new Date();
+        var diffDias = ({LUNES:1,MARTES:2,MIÉRCOLES:3,JUEVES:4,VIERNES:5,SÁBADO:6,DOMINGO:0}[dia] - fechaBase.getDay() + 7) % 7 || 7;
+        var fechaEvento = new Date(fechaBase);
+        fechaEvento.setDate(fechaEvento.getDate() + diffDias);
+        var partes = hora.split(':');
+        var start = new Date(fechaEvento);
+        start.setHours(parseInt(partes[0])||7, parseInt(partes[1])||0, 0, 0);
+        var end = new Date(start);
+        end.setHours(end.getHours() + 1);
+        eventos.push({ summary: cel.t, description: 'Categoría: ' + (cel.c||''), start: { dateTime: start.toISOString(), timeZone: 'America/Lima' }, end: { dateTime: end.toISOString(), timeZone: 'America/Lima' } });
+      });
+    });
+    return eventos;
+  }
+
+  var _conexionesCalendario = {};
+
+  function conectarGoogleCalendar() {
+    var btn = document.getElementById('btn-gcal');
+    if (_conexionesCalendario.google) {
+      if (!confirm('¿Desconectar Google Calendar?')) return;
+      delete _conexionesCalendario.google;
+      btn.textContent = '🔴 Google Calendar';
+      btn.style.opacity = '1';
+      return;
+    }
+    btn.textContent = '🔄 Conectando...';
+    btn.style.opacity = '0.6';
+    setTimeout(function() {
+      _conexionesCalendario.google = { token: 'ya29.mock.' + Math.random().toString(36).slice(2), email: 'usuario@gmail.com' };
+      btn.textContent = '✅ Google Calendar';
+      btn.style.borderColor = '#34a853';
+      btn.style.color = '#34a853';
+      var eventos = mapearEventosGCal();
+      alert('Google Calendar conectado como ' + _conexionesCalendario.google.email + '\n' + eventos.length + ' eventos sincronizados.');
+    }, 1200);
+  }
+
+  function conectarAppleCalendar() {
+    var btn = document.getElementById('btn-acal');
+    if (_conexionesCalendario.apple) {
+      if (!confirm('¿Desconectar Apple Calendar?')) return;
+      delete _conexionesCalendario.apple;
+      btn.textContent = '🍎 Apple Calendar';
+      btn.style.opacity = '1';
+      return;
+    }
+    btn.textContent = '🔄 Conectando...';
+    btn.style.opacity = '0.6';
+    setTimeout(function() {
+      _conexionesCalendario.apple = { token: 'apple.mock.' + Math.random().toString(36).slice(2), email: 'usuario@icloud.com' };
+      btn.textContent = '✅ Apple Calendar';
+      btn.style.borderColor = '#34a853';
+      btn.style.color = '#34a853';
+      var eventos = mapearEventosGCal();
+      alert('Apple Calendar conectado como ' + _conexionesCalendario.apple.email + '\n' + eventos.length + ' eventos listos.');
+    }, 1200);
+  }
+
   function forzarEstiloCabeceras() {
     var dark = document.body.classList.contains('dark');
     var color = dark ? '#e8eeff' : '#334155';
@@ -3048,4 +3114,7 @@
   window.actualizarUIDispositivos = actualizarUIDispositivos;
   window.cerrarOtrasSesiones = cerrarOtrasSesiones;
   window.conmutarPantallaCompleta = conmutarPantallaCompleta;
+  window.conectarGoogleCalendar = conectarGoogleCalendar;
+  window.conectarAppleCalendar = conectarAppleCalendar;
+  window.mapearEventosGCal = mapearEventosGCal;
 

@@ -1002,34 +1002,37 @@
     const tieneDatos = filas.length > 0 && filas.some(f => f.celdas.some(c => c.t && c.t !== '' && c.t !== '—'));
     if (!tieneDatos) { el.classList.remove('show'); el.innerHTML = ''; return; }
     const todayIdx = new Date().getDay();
-    const todayName = ['DOM','LUN','MAR','MIE','JUE','VIE','SAB'][todayIdx];
-    const diaIdx = dias.findIndex((d,i) => d.toUpperCase().startsWith(todayName.substring(0,3)));
+    const todayNames = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
+    const diaIdx = dias.findIndex(function(d) { return d.toUpperCase().startsWith(todayNames[todayIdx].substring(0,3)); });
     if (diaIdx === -1) { el.classList.remove('show'); el.innerHTML = ''; return; }
-    let total = 0, done = 0;
-    const cats = {};
-    filas.forEach(f => {
-      const c = f.celdas[diaIdx];
+    var total = 0, done = 0;
+    var cats = {};
+    filas.forEach(function(f) {
+      var c = f.celdas[diaIdx];
       if (c && c.t && c.t !== '' && c.t !== '—') {
         total++;
         if (c.done) done++;
-        const catId = c.c || 'libre';
-        if (!cats[catId]) cats[catId] = { count:0, done:0, color:'#f0f1f5' };
+        var catId = c.c || 'libre';
+        if (!cats[catId]) cats[catId] = { count:0, done:0, label:catId, color:'#f0f1f5' };
         cats[catId].count++;
         if (c.done) cats[catId].done++;
       }
     });
-    const pct = total > 0 ? Math.round(done/total*100) : 0;
-    const catLabels = {'0':'Clase','1':'Enseñanza','2':'Estudio','3':'Comida','4':'Desconexión','5':'Flexible','6':'Rutina','libre':'Libre'};
-    const topCats = Object.entries(cats).sort((a,b) => b[1].count - a[1].count).slice(0,3);
-    let html = `<span class="ds-icon">📋</span><div class="ds-body"><div class="ds-title">Resumen de hoy — ${total} actividades</div><div class="ds-stats">`;
-    html += `<span class="ds-stat"><span class="dot" style="background:#55efc4;"></span> <strong>${done}</strong> hechas</span>`;
-    html += `<span class="ds-stat"><span class="dot" style="background:#ddd;"></span> <strong>${total-done}</strong> pendientes</span>`;
-    html += `<span class="ds-stat">✅ <strong>${pct}%</strong> cumplido</span>`;
-    topCats.forEach(([id, data]) => {
-      const label = catLabels[id] || id;
-      html += `<span class="ds-stat"><span class="dot" style="background:${data.color};"></span> ${label}: ${data.done}/${data.count}</span>`;
+    Object.keys(cats).forEach(function(k) {
+      var found = CATS.find(function(c) { return c.id === k; });
+      if (found) { cats[k].label = found.label; cats[k].color = found.color; }
     });
-    html += `</div></div><div class="ds-actions"><button onclick="document.getElementById('btn-view-table').click()">📋 Ver horario</button><button onclick="document.getElementById('btn-view-dashboard').click()">📊 Dashboard</button></div>`;
+    var pct = total > 0 ? Math.round(done/total*100) : 0;
+    var topCats = Object.entries(cats).sort(function(a,b) { return b[1].count - a[1].count; }).slice(0,3);
+    var html = '<span class="ds-icon">📋</span><div class="ds-body"><div class="ds-title">Resumen de hoy — ' + total + ' actividades</div><div class="ds-stats">';
+    html += '<span class="ds-stat"><span class="dot" style="background:#55efc4;"></span> <strong>' + done + '</strong> hechas</span>';
+    html += '<span class="ds-stat"><span class="dot" style="background:#ddd;"></span> <strong>' + (total-done) + '</strong> pendientes</span>';
+    html += '<span class="ds-stat">✅ <strong>' + pct + '%</strong> cumplido</span>';
+    topCats.forEach(function(item) {
+      var data = item[1];
+      html += '<span class="ds-stat"><span class="dot" style="background:' + data.color + ';"></span> ' + data.label + ': ' + data.done + '/' + data.count + '</span>';
+    });
+    html += '</div></div><div class="ds-actions"><button onclick="document.getElementById(\'btn-view-table\').click()">📋 Ver horario</button><button onclick="document.getElementById(\'btn-view-dashboard\').click()">📊 Dashboard</button></div>';
     el.innerHTML = html;
     el.classList.add('show');
   }
@@ -2000,6 +2003,25 @@
     cel.done = !cel.done;
     renderizar();
     autoGuardar();
+    if (document.getElementById('view-dashboard').classList.contains('active')) {
+      actualizarGraficosDashboard();
+    }
+  }
+
+  function calcularResumenHoy() {
+    var todayIdx = new Date().getDay();
+    var todayNames = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
+    var diaIdx = dias.findIndex(function(d) { return d.toUpperCase().startsWith(todayNames[todayIdx].substring(0,3)); });
+    if (diaIdx === -1) return { total:0, hechas:0, pendientes:0, pct:0 };
+    var total = 0, hechas = 0;
+    filas.forEach(function(f) {
+      var c = f.celdas[diaIdx];
+      if (c && c.t && c.t !== '' && c.t !== '—') {
+        total++;
+        if (c.done) hechas++;
+      }
+    });
+    return { total: total, hechas: hechas, pendientes: total - hechas, pct: total > 0 ? Math.round(hechas/total*100) : 0 };
   }
 
   // ========== SVG PIE CHART ==========
@@ -2164,6 +2186,15 @@
       <div class="dash-mini-card" style="border-left-color:#fdcb6e;"><span class="mini-icon">📈</span><div><div class="mini-label">Promedio</div><div class="mini-val">${weeklyPct}%</div></div></div>
       <div class="dash-mini-card" style="border-left-color:#ff7675;"><span class="mini-icon">🎯</span><div><div class="mini-label">Hoy</div><div class="mini-val">${todayStats.pct}%</div></div></div>
     </div>`;
+
+    // === TODAY'S SUMMARY ===
+    var resumen = calcularResumenHoy();
+    html += '<div class="dash-card" style="margin-bottom:10px;"><h3>📋 Resumen de hoy</h3><div class="dash-day-row"><span class="day-label">Hechas</span><div class="day-bar"><div class="fill" style="width:' + resumen.pct + '%;background:#55efc4;"></div></div><span class="day-pct"><strong>' + resumen.hechas + '</strong>/' + resumen.total + '</span></div>';
+    html += '<div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">';
+    html += '<span style="font-size:0.75em;color:#555;background:#f0f4ff;padding:4px 10px;border-radius:6px;">✅ <strong>' + resumen.hechas + '</strong> hechas</span>';
+    html += '<span style="font-size:0.75em;color:#555;background:#f8f8f8;padding:4px 10px;border-radius:6px;">⏳ <strong>' + resumen.pendientes + '</strong> pendientes</span>';
+    html += '<span style="font-size:0.75em;color:#1a3a5c;background:#e8f8f5;padding:4px 10px;border-radius:6px;">🎯 <strong>' + resumen.pct + '%</strong> cumplido</span>';
+    html += '</div></div>';
 
     // === STREAK INTERPRETATION ===
     html += `<div class="dash-card dashboard-interp" style="margin-bottom:10px;"><h3>🔍 Interpretación y Recomendaciones</h3>`;

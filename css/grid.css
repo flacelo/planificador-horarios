@@ -19,6 +19,7 @@
     font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
     text-transform: uppercase;
   }
+  th * { color: #334155 !important; font-weight: 700 !important; font-family: 'Montserrat', sans-serif !important; }
   .resizer { position: absolute; right: 0; top: 0; bottom: 0; width: 6px; cursor: col-resize; background: transparent; transition: background 0.2s ease, box-shadow 0.2s ease; border-radius: 3px; }
   .resizer:hover { background: linear-gradient(180deg, #667eea, #764ba2); box-shadow: 0 0 8px rgba(102,126,234,0.4); }
   .hora-cell {
@@ -240,6 +241,7 @@
     text-transform: uppercase;
     font-weight: 800;
   }
+  body.dark th * { color: #e8eeff !important; font-weight: 700 !important; font-family: 'Montserrat', sans-serif !important; }
   body.dark td, body.dark .hora-cell, body.dark .hora-cell input {
     background: transparent;
     color: #e0e2f0;

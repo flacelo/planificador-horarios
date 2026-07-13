@@ -1,8 +1,14 @@
-const CACHE = 'planificador-v2';
+const CACHE = 'planify-cache-v1';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon.svg',
+  './js/app.js',
+  './css/main.css',
+  './css/panel.css',
+  './css/dashboard.css',
+  './css/grid.css'
 ];
 
 self.addEventListener('install', e => {

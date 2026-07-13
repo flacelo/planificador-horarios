@@ -2052,6 +2052,51 @@
   var _chartCategoria = null;
   var _chartDiario = null;
 
+  function analizarBalanceVida() {
+    var catHoras = {};
+    var catAltaCarga = { clase:1, ensenanza:1, estudio:1 };
+    var catBienestar = { comida:1, desconexion:1, rutina:1 };
+    var totalSemana = 0;
+    var altaCargaSemana = 0;
+    var bienestarSemana = 0;
+    filas.forEach(function(f) {
+      f.celdas.forEach(function(c) {
+        if (!c || !c.t || c.t === '—') return;
+        var h = c.rowspan || 1;
+        catHoras[c.c] = (catHoras[c.c] || 0) + h;
+        totalSemana += h;
+        if (catAltaCarga[c.c]) altaCargaSemana += h;
+        if (catBienestar[c.c]) bienestarSemana += h;
+      });
+    });
+    var msgs = [];
+    var estado = 'estable';
+    var diarioPromedio = Math.round(totalSemana / 7);
+    var altaDiario = Math.round(altaCargaSemana / 7);
+    var bienestarDiario = Math.round(bienestarSemana / 7);
+    if (altaCargaSemana > 48 || altaDiario > 8) {
+      estado = 'critico';
+      msgs.push('⚠️ Alerta de Saturación: Has agendado <strong>' + altaCargaSemana + 'h</strong> de alta carga esta semana. Prioriza bloques de descanso para mantener tu eficiencia.');
+    } else if (altaCargaSemana > 40 || altaDiario > 7) {
+      estado = 'advertencia';
+      msgs.push('⚠️ Cerca del límite: Llevas <strong>' + altaCargaSemana + 'h</strong> de alta carga. Revisa tu distribución semanal.');
+    }
+    if (bienestarSemana < 7 && totalSemana > 0) {
+      estado = estado === 'critico' ? 'critico' : 'advertencia';
+      msgs.push('🛌 Tiempo de bienestar bajo: Solo <strong>' + bienestarSemana + 'h</strong> esta semana. Agrega pausas activas y desconexión.');
+    }
+    if (bienestarSemana === 0 && totalSemana > 0) {
+      estado = 'critico';
+      msgs.push('🚨 No has registrado horas de descanso. Incluir tiempo de recuperación es clave para tu rendimiento.');
+    }
+    if (msgs.length === 0) {
+      msgs.push('✅ Balance saludable. <strong>' + altaCargaSemana + 'h</strong> de carga / <strong>' + bienestarSemana + 'h</strong> de bienestar esta semana.');
+    }
+    return { estado: estado, mensajes: msgs, altaCarga: altaCargaSemana, bienestar: bienestarSemana, total: totalSemana };
+  }
+
+  var _balanceActual = null;
+
   function actualizarGraficosDashboard() {
     if (typeof Chart === 'undefined') return;
 
@@ -2098,6 +2143,21 @@
         data: { labels: Object.keys(dayHours), datasets: [{ label: 'Horas', data: Object.values(dayHours), backgroundColor: ['#74b9ff','#a29bfe','#55efc4','#ffeaa7','#ff7675','#fab1a0','#dfe6e9'], borderRadius: 4, borderSkipped: false }] },
         options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, title: { display: true, text: 'Horas por Día', font: { size: 13, family: 'Montserrat', weight: '700' }, padding: { bottom: 8 } } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { display: false } }, x: { ticks: { font: { size: 10, family: 'Montserrat' } }, grid: { display: false } } } }
       });
+    }
+
+    _balanceActual = analizarBalanceVida();
+    var balEl = document.querySelector('.balance-card');
+    if (balEl) {
+      var balClass = _balanceActual.estado === 'critico' ? 'balance-critico' : _balanceActual.estado === 'advertencia' ? 'balance-advertencia' : 'balance-estable';
+      balEl.className = 'dash-card balance-card ' + balClass;
+      var msgHtml = '';
+      _balanceActual.mensajes.forEach(function(m) { msgHtml += '<div class="balance-msg">' + m + '</div>'; });
+      msgHtml += '<div class="balance-stats"><span>Carga alta: <strong>' + _balanceActual.altaCarga + 'h</strong></span><span>Bienestar: <strong>' + _balanceActual.bienestar + 'h</strong></span><span>Total: <strong>' + _balanceActual.total + 'h</strong></span></div>';
+      var h3 = balEl.querySelector('h3');
+      if (h3) {
+        while (h3.nextSibling) balEl.removeChild(h3.nextSibling);
+        h3.insertAdjacentHTML('afterend', msgHtml);
+      }
     }
   }
 
@@ -2197,6 +2257,15 @@
     html += '<span style="font-size:0.75em;color:#555;background:#f8f8f8;padding:4px 10px;border-radius:6px;">⏳ <strong>' + resumen.pendientes + '</strong> pendientes</span>';
     html += '<span style="font-size:0.75em;color:#1a3a5c;background:#e8f8f5;padding:4px 10px;border-radius:6px;">🎯 <strong>' + resumen.pct + '%</strong> cumplido</span>';
     html += '</div></div>';
+
+    // === BALANCE DE VIDA ===
+    _balanceActual = analizarBalanceVida();
+    var balClass = _balanceActual.estado === 'critico' ? 'balance-critico' : _balanceActual.estado === 'advertencia' ? 'balance-advertencia' : 'balance-estable';
+    html += '<div class="dash-card balance-card ' + balClass + '" style="margin-bottom:10px;"><h3>⚖️ Balance de vida</h3>';
+    _balanceActual.mensajes.forEach(function(m) {
+      html += '<div class="balance-msg">' + m + '</div>';
+    });
+    html += '<div class="balance-stats"><span>Carga alta: <strong>' + _balanceActual.altaCarga + 'h</strong></span><span>Bienestar: <strong>' + _balanceActual.bienestar + 'h</strong></span><span>Total: <strong>' + _balanceActual.total + 'h</strong></span></div></div>';
 
     // === STREAK INTERPRETATION ===
     html += `<div class="dash-card dashboard-interp" style="margin-bottom:10px;"><h3>🔍 Interpretación y Recomendaciones</h3>`;

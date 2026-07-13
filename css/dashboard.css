@@ -168,3 +168,32 @@
   .dash-chart-box canvas { width:100% !important; height:auto !important; max-height:200px; }
   @media (max-width:700px) { .dash-charts-row { flex-direction:column; } }
   body.dark .dash-chart-box { background:var(--surface-card); border-color:var(--border-color); }
+
+  /* ===== BALANCE DE VIDA ===== */
+  .balance-card { transition: border-color 0.3s, box-shadow 0.3s; }
+  .balance-card.balance-critico {
+    background: linear-gradient(135deg, #fce4e4, #f8d7da);
+    border: 1px solid #e74c3c;
+    box-shadow: 0 2px 12px rgba(231,76,60,0.12);
+  }
+  .balance-card.balance-advertencia {
+    background: linear-gradient(135deg, #fff8e1, #fff3cd);
+    border: 1px solid #f39c12;
+    box-shadow: 0 2px 12px rgba(243,156,18,0.1);
+  }
+  .balance-card.balance-estable {
+    background: linear-gradient(135deg, #e8f8f5, #d4edda);
+    border: 1px solid #27ae60;
+  }
+  body.dark .balance-card.balance-critico { background: linear-gradient(135deg, #4a1a1a, #5c2020); border-color: #e74c3c; }
+  body.dark .balance-card.balance-advertencia { background: linear-gradient(135deg, #4a3a1a, #5c4620); border-color: #f39c12; }
+  body.dark .balance-card.balance-estable { background: linear-gradient(135deg, #1a3a2a, #204a30); border-color: #27ae60; }
+  .balance-msg { font-size: 0.75em; line-height: 1.5; padding: 6px 0; color: #333; }
+  body.dark .balance-msg { color: #ddd; }
+  .balance-stats {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid rgba(0,0,0,0.08); font-size: 0.7em; color: #555;
+  }
+  body.dark .balance-stats { border-top-color: rgba(255,255,255,0.1); color: #aaa; }
+  .balance-stats span { padding: 3px 10px; background: rgba(0,0,0,0.04); border-radius: 6px; }
+  body.dark .balance-stats span { background: rgba(255,255,255,0.06); }

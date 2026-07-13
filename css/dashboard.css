@@ -161,3 +161,10 @@
   .dash-chart-card { transition: transform var(--transition-slow), box-shadow var(--transition-slow); }
   .dash-chart-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
   body.dark .dash-chart-card:hover { box-shadow: var(--shadow-lg); }
+
+  /* ===== CHART.JS CONTAINERS ===== */
+  .dash-charts-row { display:flex; gap:12px; margin-bottom:12px; }
+  .dash-chart-box { flex:1; background:var(--surface-card); border-radius:12px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,0.04); border:1px solid var(--border-light); min-height:200px; position:relative; }
+  .dash-chart-box canvas { width:100% !important; height:auto !important; max-height:200px; }
+  @media (max-width:700px) { .dash-charts-row { flex-direction:column; } }
+  body.dark .dash-chart-box { background:var(--surface-card); border-color:var(--border-color); }

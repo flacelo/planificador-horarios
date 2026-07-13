@@ -4,6 +4,13 @@ const Terser = require('terser');
 
 const ROOT = path.resolve(__dirname, '..');
 
+// ── Pre-build security & env check ──
+const checkEnv = require('./check-env.js');
+const envOk = checkEnv.run();
+if (envOk !== 0) {
+  console.log('  ⚠ Security check produced warnings (continuing build anyway)');
+}
+
 const JS_FILES = ['js/app.js', 'sw.js'];
 const CSS_FILES = ['css/main.css', 'css/panel.css', 'css/dashboard.css', 'css/grid.css'];
 const HTML_FILES = ['index.html'];

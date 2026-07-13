@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node server.js",
     "check": "node --check js/app.js",
-    "build": "node scripts/build.js"
+    "check:env": "node scripts/check-env.js",
+    "build": "node scripts/build.js",
+    "deploy": "npm run build"
   },
   "devDependencies": {
     "terser": "^5.49.0"

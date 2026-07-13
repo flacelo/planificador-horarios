@@ -1776,6 +1776,7 @@
       if (arrastreCompletado) { arrastreCompletado = false; return; }
       const doneCheck = e.target.closest('.done-check');
       if (doneCheck) {
+        e.stopPropagation();
         const celda = doneCheck.closest('.celda');
         if (celda) toggleDone(parseInt(celda.dataset.fi), parseInt(celda.dataset.ci));
         return;
@@ -1808,6 +1809,7 @@
     tb.dataset.dragPtr = '1';
 
     tb.addEventListener('pointerdown', function(e) {
+      if (e.target.closest('.done-check')) return;
       var celda = e.target.closest('.celda');
       if (!celda) return;
       var fi = parseInt(celda.dataset.fi);

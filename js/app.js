@@ -55,6 +55,16 @@
     },
   });
 
+  // ========== TELEMETRÍA ANÓNIMA ==========
+  function trackAnonymEvent(eventName, category) {
+    try {
+      if (typeof gtag === 'function') {
+        gtag('event', eventName, { event_category: category || 'general', anonymize_ip: true });
+      }
+    } catch(_) {}
+    console.log('[📊 TELEMETRÍA]', eventName, category ? '(' + category + ')' : '');
+  }
+
   // ======================================================================
   // SISTEMA DE LICENCIAS
   // ======================================================================
@@ -2026,6 +2036,7 @@
     const cel = filas[fi]?.celdas?.[ci];
     if (!cel) return;
     cel.done = !cel.done;
+    trackAnonymEvent('toggle_done', 'actividad');
     renderizar();
     autoGuardar();
     if (document.getElementById('view-dashboard').classList.contains('active')) {
@@ -2896,8 +2907,9 @@
       localStorage.setItem(CONFIG.STORAGE.INICIO, inicio);
       localStorage.setItem(CONFIG.STORAGE.FIN, fin);
       filas = generarBloques(interval, inicio, fin);
-      renderizar();
-      autoGuardar();
+                renderizar();
+                autoGuardar();
+                trackAnonymEvent('drag_drop', 'actividad');
     }
   }
 
@@ -3288,6 +3300,7 @@
       btn.style.borderColor = '#34a853';
       btn.style.color = '#34a853';
       var eventos = mapearEventosGCal();
+      trackAnonymEvent('connect_calendar', 'google');
       alert('Google Calendar conectado como ' + _conexionesCalendario.google.email + '\n' + eventos.length + ' eventos sincronizados.');
     }, 1200);
   }
@@ -3309,6 +3322,7 @@
       btn.style.borderColor = '#34a853';
       btn.style.color = '#34a853';
       var eventos = mapearEventosGCal();
+      trackAnonymEvent('connect_calendar', 'apple');
       alert('Apple Calendar conectado como ' + _conexionesCalendario.apple.email + '\n' + eventos.length + ' eventos listos.');
     }, 1200);
   }
@@ -3410,6 +3424,7 @@
     // Simulación de envío
     setTimeout(function() {
       if (btn) { btn.disabled = false; btn.textContent = '📩 Enviar reporte'; }
+      trackAnonymEvent('send_report', 'reporte');
       cerrarReporte();
       var notif = document.createElement('div');
       notif.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;padding:14px 24px;border-radius:12px;font-size:0.9em;z-index:10000;box-shadow:0 6px 20px rgba(39,174,96,0.25);text-align:center;max-width:90%;animation:cardFadeIn 0.4s ease;';

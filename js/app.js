@@ -2025,6 +2025,58 @@
     </svg>`;
   }
 
+  var _chartCategoria = null;
+  var _chartDiario = null;
+
+  function actualizarGraficosDashboard() {
+    if (typeof Chart === 'undefined') return;
+
+    var catData = {};
+    var catPalette = { clase:'#74b9ff', ensenanza:'#a29bfe', estudio:'#55efc4', comida:'#ffeaa7', desconexion:'#ff7675', flexible:'#fab1a0', rutina:'#55efc4', libre:'#dfe6e9' };
+    var catLabels = { clase:'Clase', ensenanza:'Enseñanza', estudio:'Estudio', comida:'Comida', desconexion:'Desconexión', flexible:'Flexible', rutina:'Rutina', libre:'Libre' };
+
+    filas.forEach(function(f) {
+      f.celdas.forEach(function(c) {
+        if (!c || !c.t || c.t === '—') return;
+        var cat = c.c || 'libre';
+        catData[cat] = (catData[cat] || 0) + 1;
+      });
+    });
+
+    var labels = Object.keys(catData).map(function(k) { return catLabels[k] || k; });
+    var values = Object.keys(catData).map(function(k) { return catData[k]; });
+    var colors = Object.keys(catData).map(function(k) { return catPalette[k] || '#ccc'; });
+
+    var ctx1 = document.getElementById('chart-categoria');
+    if (ctx1) {
+      if (_chartCategoria) _chartCategoria.destroy();
+      if (values.length > 0) {
+        _chartCategoria = new Chart(ctx1, {
+          type: 'doughnut',
+          data: { labels: labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }] },
+          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 8, font: { size: 11, family: 'Montserrat' } } }, title: { display: true, text: 'Distribución por Categoría', font: { size: 13, family: 'Montserrat', weight: '700' }, padding: { bottom: 8 } } }, cutout: '55%' }
+        });
+      }
+    }
+
+    var dayHours = {};
+    dias.forEach(function(d, ci) {
+      var total = 0;
+      filas.forEach(function(f) { var c = f.celdas[ci]; if (c && c.t && c.t !== '—') total++; });
+      dayHours[d.substring(0,3)] = total;
+    });
+
+    var ctx2 = document.getElementById('chart-diario');
+    if (ctx2) {
+      if (_chartDiario) _chartDiario.destroy();
+      _chartDiario = new Chart(ctx2, {
+        type: 'bar',
+        data: { labels: Object.keys(dayHours), datasets: [{ label: 'Horas', data: Object.values(dayHours), backgroundColor: ['#74b9ff','#a29bfe','#55efc4','#ffeaa7','#ff7675','#fab1a0','#dfe6e9'], borderRadius: 4, borderSkipped: false }] },
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, title: { display: true, text: 'Horas por Día', font: { size: 13, family: 'Montserrat', weight: '700' }, padding: { bottom: 8 } } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { display: false } }, x: { ticks: { font: { size: 10, family: 'Montserrat' } }, grid: { display: false } } } }
+      });
+    }
+  }
+
   function renderDashboard() {
     const container = document.getElementById('view-dashboard');
     if (!container) return;
@@ -2157,6 +2209,7 @@
     html += actualizarMetasDashboard();
     html += `</div>`;
     container.innerHTML = html;
+    actualizarGraficosDashboard();
     } catch(e) { console.error('renderDashboard error:',e); container.innerHTML = `<div class="dashboard" style="padding:20px;text-align:center;"><h2>📊 Dashboard de Cumplimiento</h2><p style="color:#e74c3c;margin-top:12px;">⚠️ Error: ${e.message}</p></div>`; }
   }
 

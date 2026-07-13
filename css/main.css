@@ -114,17 +114,11 @@
     font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif !important;
     letter-spacing: 2px !important;
     text-transform: uppercase;
-    background: linear-gradient(135deg, #667eea, #764ba2, #f093fb) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
-    text-shadow: 0 2px 12px rgba(102,126,234,0.25) !important;
-    transition: transform 0.3s ease !important;
+    color: #1e293b !important;
     border: none !important;
+    transition: transform 0.3s ease !important;
   }
   h1#main-title:hover { transform: scale(1.01) !important; }
-  .title-icon { display:inline-block; transition: transform 0.3s ease, filter 0.3s ease; }
-  .title-icon:hover { transform: rotate(-8deg) scale(1.12); filter: brightness(1.2); }
   .sub { text-align: center; color: var(--text-light); font-size: 0.8em; margin-bottom: var(--space-md); letter-spacing: 0.3px; }
   /* ========== DEMO / LICENCIA ========== */
   .demo-banner {

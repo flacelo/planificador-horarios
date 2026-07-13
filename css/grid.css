@@ -304,3 +304,14 @@
   body.dark .t-btns .t-prev:hover { background: #3a3d55; }
   body.dark .card { background: var(--surface-card); border-color: var(--border-light); }
 
+  /* ===== MÓVIL < 768px ===== */
+  @media (max-width: 767px) {
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 4px; }
+    .table-wrap table { min-width: 500px; }
+    th, td { font-size: 0.6em; padding: 3px 2px; }
+    .hora-cell { width: 28px; font-size: 0.45em; }
+    .hora-cell input { font-size: 9px; }
+    .celda { min-height: 22px; font-size: 0.6em; }
+    .resizer { width: 5px; }
+  }
+

@@ -667,6 +667,7 @@ input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms
   .celda[draggable="true"] { cursor: grab; }
   .celda[draggable="true"]:active { cursor: grabbing; }
   .dragging { opacity: 0.5; outline: 2px dashed #6c5ce7; }
+  .drop-target { outline: 2px solid #667eea !important; box-shadow: 0 0 0 2px rgba(102,126,234,0.3), inset 0 0 0 100px rgba(102,126,234,0.08); }
 
   /* ===== MICROINTERACCIONES ===== */
   .celda { transition: all .25s ease; }

@@ -1,169 +1,135 @@
 {
-  "id": "TASK-20260801-v6.3",
-  "titulo": "Design System profesional + reorganizacion de ajustes v6.3 (reemplaza v6.2)",
-  "version": "6.3",
-  "tipo": "style",
-  "descripcion": "Implementar Design System en el panel #side-panel: variables CSS en :root (sin romper legacy), inputs/selects 38px, botones scoped .btn-primary/.btn-secondary/.btn-ghost, reorganizar #tab-ajustes en 2 bloques (Preferencias + Gestion de Datos), limpieza visual de sombras/bordes, bump cache v=6.2 -> v=6.3. REGLA ORO: SOLO append de reglas nuevas al FINAL de css/main.css y edicion quirurgica de index.html; NUNCA editar reglas anteriores de main.css. Commit 'style: implementacion de design system y reorganizacion de ajustes v6.3' + push.",
+  "id": "TASK-20260801-v6.4",
+  "titulo": "Correccion critica: fondo solido opaco, z-index 99999 y ancho 320px del panel lateral v6.4",
+  "version": "6.4",
+  "tipo": "fix",
+  "descripcion": "BUG reportado: #side-panel se renderiza transparente/fantasma en produccion; calendario y rutina diaria se traslucen detras de botones y textos. Causa raiz CONFIRMADA con navegador real (Chrome headless + CDP): (1) main.css tiene 3 llaves sin cerrar (balance +3: 585 { / 582 }) que devoran TODAS las reglas posteriores al offset 33037 — el navegador solo parsea 330 de 568 reglas y 0 de 135 reglas #side-panel de main.css (verificado: document.styleSheets main.css -> 330 reglas; getComputedStyle del panel SOLIDO rgb(15,23,42) solo gracias al <style> inline v5.5); (2) el panel tiene z-index 1001 (panel.css) y el velo .tutorial-overlay (z-index 9999, rgba(0,0,0,0.6) + backdrop-filter blur) se muestra SIEMPRE en primer acceso (localStorage horario_tutorial_visto vacio) y queda ENCIMA del panel (elementFromPoint sobre el panel abierto devuelve #tutorial) -> el panel se percibe transparente/fantasma; (3) los contenedores internos (.tab-content.active, .card-section, .custom-header, .campo, .panel-tabs) no tienen fondo opaco (reglas muertas en main.css) y los inputs usan rgba(255,255,255,0.08) de panel.css; (4) ancho real 305px (panel.css) / 270px y 220px (media queries de grid.css), NO 320px. Correccion: reparar las 3 llaves (prerrequisito: sin esto cualquier append al final de main.css es IGNORADO por el navegador), append del bloque v6.4 con selectores html body #side-panel (especificidad 1,0,2 para ganar al inline v5.5 #side-panel 1,0,0 + !important que va DESPUES en el documento), bump v=6.3 -> v=6.4 y commit 'fix: fondo solido opaco y z-index correcto para el panel lateral v6.4' + push.",
   "estado_actual": {
-    "git": "HEAD = 78a3f53 'fix: estandarizacion de botones y alto contraste en panel de control v6.2'. Working tree LIMPIO (git status --short vacio).",
+    "git": "HEAD = 163c565 'style: implementacion de design system y reorganizacion de ajustes v6.3'. Working tree LIMPIO (git status --short vacio). Rama main, unica (remotes/origin/main).",
+    "produccion": "GitHub Pages https://flacelo.github.io/planificador-horarios/ servido. SHA256 de index.html y css/main.css de produccion IDENTICOS al working tree (7DD98EB92071AF8E041BDE53411FA40105FA4A8AEAB494D3D8EFD0F413FC5A42) -> el bug se reproduce con estos archivos. vercel.json existe (buildCommand npm run build) pero el despliegue activo es GitHub Pages. sw.js NO esta registrado en index.html (IndexOf('sw.js') = -1) -> no hay service worker que sirva caché vieja.",
     "archivos": {
-      "css/main.css": "65369 bytes, 1 linea, minificado (build.js elimina comentarios). El panel completo vive aqui (178 refs #side-panel). Capas concatenadas: v5.9 (~46140), v6.1 (~53000), v6.2 (~57615-65400). Ultima regla del archivo: '#side-panel .sp-container .config-actions .sp-action-btn{height:38px!important...}' (offset 65176).",
-      "css/panel.css": "7543 bytes, 1 linea. Capa ANTIGUA (.side-panel clase, gradientes, rgba blanco). Se carga DESPUES de main.css pero pierde por especificidad (clase vs id) y por falta de !important.",
-      "css/grid.css": "13586 bytes. Redefine variables legacy en body.dark (--surface:rgba(22,25,45,0.95), --text-secondary:#c0c0d0, --surface-card:#1a1d35).",
-      "css/dashboard.css": "11940 bytes. Consume --surface-card (dash-chart-card), --border-light. Sin :root propio.",
-      "index.html": "63778 bytes, minificado. UN <style> inline en BODY (offset 34571-41120) con: (a) reglas #view-diario (tema claro del diario, !important) y (b) capa v5.5 del panel (#side-panel, !important, duplicada de main.css). IMPORTANTE: este style inline esta DESPUES de los <link> en el documento; para ganarle, las reglas nuevas deben usar selectores MAS ESPECIFICOS (#side-panel .sp-container ...) o !important.",
-      "js/app.js": "137424 bytes, minificado (Terser, mangle).",
-      "orden_carga_css": "index.html offset 22824: <link main.css?v=6.2> -> panel.css -> dashboard.css -> grid.css -> <style> inline en body."
+      "css/main.css": "67522 bytes, 1 linea, minificado. Balance de llaves: 585 { / 582 } = +3 (ROTO). Chrome parsea SOLO 330 reglas (de 568) y 0 reglas #side-panel; el tail desde offset 33037 esta muerto. 3 llaves sin cerrar en offsets 33037, 37621 y 40054 (introducidas en commits 9bee3d0 v3.9, 13a611b v4.0, 3d2ab48 v4.2 - pre-existentes, NO por v6.3: git log -S confirma; v6.2 tambien tenia balance +3).",
+      "css/panel.css": "7543 bytes, balance 0, 66 reglas VIVAS. .side-panel{position:fixed;top:0;left:-330px;width:305px;height:100vh;background:linear-gradient(180deg,#141e28 0%,#1a252f 40%,#2c3e50 100%);z-index:1001;transition:left .25s;overflow-y:auto;overflow-x:hidden;padding:24px 18px 60px;box-shadow:6px 0 40px rgba(0,0,0,0.4),inset -1px 0 0 rgba(255,255,255,0.08)} y .side-panel.open{left:0}. Sin opacity ni backdrop-filter en el panel. Inputs/selects con rgba(255,255,255,0.08).",
+      "css/grid.css": "13586 bytes, balance 0, 112 reglas. @media(max-width:700px): .side-panel{width:270px;left:-290px;padding:18px 14px} + .cloud-btn.open{left:275px}. @media(max-width:480px): .side-panel{width:220px;left:-240px} + .cloud-btn.open{left:230px}. body.dark NO aplica (el body tiene class tema-estelar).",
+      "css/dashboard.css": "11940 bytes, 116 reglas, CERO refs a side-panel.",
+      "index.html": "64179 bytes, 1 linea, minificado. <link main.css?v=6.3> offset 22852, panel.css 22859, dashboard.css 22903, grid.css 22951 (head). UNICO <style> inline en BODY offset 34422-40969 (balance 0): (a) #view-diario (tema claro !important) y (b) capa v5.5 del panel: '#side-panel *{font-family...;box-sizing:border-box!important}' + '#side-panel{background:#0f172a!important;padding:20px 16px!important}' (offset 38926-39005) + sp-* (sp-card #1e293b, sp-select bg #0f172a, sp-lang-btn background:transparent, sp-action-btn #334155, sp-lang-toggle bg #0f172a). NO existe ninguna regla '#side-panel{background:transparent}' ni '#side-panel *{background:transparent}' ni backdrop-filter en el panel en NINGUNA hoja viva.",
+      "js/app.js": "135904 bytes, minificado. NO manipula background/opacity/zIndex del panel (togglePanel solo alterna clases open). Inyecta 1 <style> dinamico SOLO con colores .c-{id} de categorias. Tutorial: localStorage.getItem(horario_tutorial_visto)||setTimeout(mostrarTutorial,800) -> el tour se muestra en TODO primer acceso.",
+      "server.js": "NO maneja query strings: /css/main.css?v=6.3 se resuelve como archivo literal 'css/main.css?v=6.3' -> 404 local. Bug DEV-LOCAL pre-existente (npm run dev), NO afecta produccion (GitHub Pages procesa ?v=).",
+      "scripts": "scripts/build.js: node --check js/app.js, Terser (js/app.js, sw.js), minifyCSS (4 css), minifyHTML (index.html), optimize-a11y. node --check js/app.js OK."
     },
-    "cache_v62": "2 ocurrencias SOLO en index.html: offset 22824 (css/main.css?v=6.2) y offset 63136 (js/app.js?v=6.2). Cero en css/js.",
-    "build": "scripts/build.js: node --check js/app.js, Terser JS, minifyCSS (quita /* */ y colapsa), minifyHTML, optimize-a11y. Se debe ejecutar al final."
+    "cache_v63": "2 ocurrencias SOLO en index.html: offset 22852 (css/main.css?v=6.3) y offset 62717 (js/app.js?v=6.3). Cero en css/ y js/.",
+    "evidencia_cdp": "Chrome headless + CDP (getComputedStyle sobre el sitio servido localmente con los mismos bytes): #side-panel -> backgroundColor rgb(15,23,42) SOLIDO, opacity 1, zIndex 1001, width 305px, left -330px, boxShadow 6px 0 40px rgba(0,0,0,0.4). .tutorial-overlay -> display flex, zIndex 9999, backgroundColor rgba(0,0,0,0.6), backdropFilter blur(4px), width 100%, height 100%. elementFromPoint(150,300) con el panel abierto -> #tutorial (el velo cubre el panel). .tab-content.active/.card-section/.custom-header/.campo/.panel-tabs -> backgroundColor rgba(0,0,0,0) (transparentes). document.styleSheets: main.css 330 reglas, panel.css 66, dashboard.css 116, grid.css 112, inline 78. Con los 3 fixes de llaves aplicados en memoria: 568 reglas (135 #side-panel) y con append v6.4: 571 reglas (138 #side-panel) -> estrategia VALIDADA."
   },
   "hallazgos": [
     {
       "id": "H1",
-      "asunto": ":root actual y colisiones",
-      "detalle": ":root en main.css offset 100 (AL INICIO, como pide el requerimiento). Variables legacy presentes: --primary-1:#667eea, --primary-2:#764ba2, --primary-gradient, --primary-dark, --text-primary:#1a252f, --text-secondary:#2c3e50, --text-muted:#555, --text-light:#888, --surface:#fff, --surface-hover:#f8f9fa, --surface-book:#f0f0f5, --surface-card:#fff, --surface-modal:#fff, --border-color:#ddd, --border-light:#eee, --border-lighter:#e0e0e0, --radius:12px, --radius-sm:8px, --radius-lg:16px, --radius-xl:20px, --space-sm:8px, --space-md:16px, --space-lg:24px. NO existen: --primary, --primary-hover, --border, --text, --radius-md, --space-8, --space-16, --space-24 (se pueden AÑADIR sin riesgo). COLISIONES: --surface (ya #fff), --surface-card (ya #fff), --text-secondary (ya #2c3e50).",
-      "consumidores_fuera_panel": {
-        "--surface": "10 usos en main.css: .dropdown-content{background:var(--surface)} (offset 4157), .view-toggle button.active (12803), .tutorial-box (17815), --fondo-tabla:var(--surface) (24932, tablas/calendario), .input/.select (22268,22664), botones (3466,20502,32036), .custom-header input (10950). grid.css: .table-wrap (43), body.dark .app (8680).",
-        "--surface-card": "main.css 2, grid.css 7 (body.dark: leyenda, day-summary, dropdown, planner-type, view-toggle, celda, card), dashboard.css 5 (dash-chart-card).",
-        "--text-secondary": "9 usos en main.css: .dropdown-content a (4367), .btn-wsp (8716), .custom-header input (11679), .view-toggle button:hover (12743), .btn-secondary:hover (21500), .btn-ghost:hover (21870), .input/.select (22289,22685), boton (33827). grid.css body.dark lo redefine a #c0c0d0."
-      },
-      "recomendacion": "NO redefinir --surface/--surface-card/--text-secondary en :root (rompe tema claro global: dropdown-content y tabla pasarian a fondo oscuro #0f172a con texto #2c3e50 ilegible). ANADIR al :root existente (append de claves, sin borrar nada): --primary:#3b82f6, --primary-hover:#2563eb, --border:#334155, --text:#f8fafc, --radius-md:12px, --space-8:8px, --space-16:16px, --space-24:24px. Las 3 colisionantes se definen con prefijo --ds-* para uso interno del panel: --ds-surface:#0f172a, --ds-card:#1e293b, --ds-text-secondary:#94a3b8. NOTA: --radius-sm y --radius-lg YA existen con el valor pedido (8px y 16px) -> reutilizarlos, no duplicar. ENFOQUE DE MENOR RIESGO: prefijo --ds-* (el scoped #side-panel{--surface:...} tambien es viable pero mutaria var(--surface) dentro del panel para .dropdown-content/.view-toggle sin override; prefijo es 100% aislado).",
-      "verificable": "grep en main.css: '--primary:#3b82f6' 1, '--ds-surface:#0f172a' 1, '--surface:#fff' intacto, '--text-secondary:#2c3e50' intacto."
+      "asunto": "A. Texto exacto de las reglas sobre #side-panel y por que se ve transparente",
+      "detalle": "main.css (TODAS MUERTAS, tail devorado desde 33037): 46488 '#side-panel{background:#0f172a!important;border-color:#334155!important}'; 50870 '#side-panel{background-color:#121212!important;padding:16px!important;...}'; 52987 '#side-panel{background-color:#121826!important;padding:18px!important;...}'; 60227 '#side-panel{background:#0f172a!important}' + '#side-panel .sp-container .card-section{background:transparent!important;border:none!important;border-bottom:1px solid #1e293b!important;...}'; 67297 (append v6.3) '#side-panel{box-shadow:4px 0 24px rgba(0,0,0,0.28)!important}'. NINGUNA regla de main.css sobre el panel tiene opacity, backdrop-filter, transform ni width. panel.css (VIVA, ver estado_actual) y inline v5.5 (VIVA, offset 38926). NO existe '#side-panel *{background:transparent}' ni '.side-panel{background:transparent}' ni backdrop-filter en ancestros vivos aplicables (el .app tiene backdrop-filter:blur(10px) pero el panel es hijo y tiene fondo propio solido). grid.css body.dark reasigna --surface a rgba(22,25,45,0.95) pero NO aplica (body es tema-estelar). POR QUE SE VE TRANSPARENTE SI EL INLINE DICE SOLIDO: el panel SI es solido rgb(15,23,42) (medido); la percepcion de fantasma/transparencia la producen: (1) el velo .tutorial-overlay (z 9999 > panel 1001; rgba(0,0,0,0.6) + blur(4px); activo SIEMPRE en primer acceso por JS) que queda ENCIMA del panel y lo oscurece junto con el calendario de atras (backdrop blur mezcla ambas capas -> 'se traslucen detras de botones y textos'); (2) los contenedores internos sin fondo opaco (sus reglas estan muertas) y controles rgba(255,255,255,0.08); (3) z-index 1001 pierde contra los 9999.",
+      "verificable": "grep 'background:transparent' en css/*.css + inline: solo .sp-lang-btn (inline), #side-panel .tab-btn (muerta), .sp-btn-outline/.side-overlay (panel.css) -> ninguna afecta al fondo del contenedor #side-panel."
     },
     {
       "id": "H2",
-      "asunto": "Reglas actuales de inputs/selects del panel",
-      "detalle": "Regla FINAL (offset 60642, ultima en cascada): '#side-panel .sp-container .card-section select,#side-panel .sp-container .card-section input{height:36px!important;min-height:36px!important;padding:8px 12px!important;background:#0f172a!important;border:1px solid #334155!important;border-radius:6px!important;color:#e2e8f0!important;box-sizing:border-box!important}'. .sp-select final (offset ~60390): height:36px, bg #0f172a, border #334155, radius 6px, color #e2e8f0, width 100%; + .config-row .sp-select (62638): width:auto, flex:1, max-width:220px. .custom-header input/.campo input/.interval-row select (55218): width 100%, bg #0f172a, border 1px #334155, radius 8px, padding 8px 10px, font-size 13px. Capa v6.0 (58441) tenia height:38px pero la v6.2 posterior (60642) mando 36px -> EL PANEL ACTUAL USA 36px. CONFIRMA el reporte v5.9: height 36px, bg #0f172a, border #334155.",
-      "recomendacion": "Append al final de main.css con selectores MAS especificos que los existentes y !important: '#side-panel .sp-container .card-section select,#side-panel .sp-container .card-section input,#side-panel .sp-container .sp-select,#side-panel .interval-row select,#side-panel .interval-row input,#side-panel .custom-header input{height:38px!important;min-height:38px!important;border-radius:var(--radius-sm)!important;border:1px solid var(--border)!important;background:var(--ds-card)!important;color:var(--text)!important;padding:0 12px!important}'. NOTA: el style inline v5.5 del body usa '#side-panel .sp-select' (1,1,0); el nuevo '#side-panel .sp-container .sp-select' (1,2,0) gana por especificidad aunque este en main.css (cargado antes).",
-      "verificable": "Ultima ocurrencia de '.card-section select' en main.css contiene 'height:38px' y 'var(--radius-sm)'."
+      "asunto": "B. Que cambio v6.3 y el desbalance de llaves (CAUSA RAIZ)",
+      "detalle": "git show 163c565: main.css cambio SOLO en el prepend de ':root{--primary:#3b82f6;...--space-24:24px}' (offset 0, balanceado, 13 pares) antes de '#view-semanal{...}'; index.html solo reorganizo #tab-ajustes + bump v=6.2->v=6.3. El :root prepended NO rompio nada (la primera regla #view-semanal sigue intacta). El desbalance +3 ES PRE-EXISTENTE (v6.2 tambien 572/569): las 3 llaves sin cerrar estan en 33037 ('.cal-container{padding:4px 0' falta } antes de '.cal-header{'), 37621 ('body.tema-estelar .cal-grid{...gap:3px' falta } antes de '#view-mensual') y 40054 ('.cal-dia-nombre{...justify-content:center!important' falta } antes de '.cal-dia:hover{'); introducidas por 9bee3d0 (v3.9), 3d2ab48 (v4.2) y 13a611b (v4.0). CONSECUENCIA (verificada con Chrome): el navegador descarta todo el CSS posterior a 33037 -> 238 reglas muertas (todo el design system v6.1-v6.3 del panel, .panel-tabs, .tab-btn scoped, calendario cyan, .tutorial-box, .bottom-nav, media queries, append v6.3 de sombras). El :root prepended (offset 0) SI vive. IMPLICACION CRITICA: si el append v6.4 se pone al final de main.css SIN reparar las llaves, quedara en la zona muerta y NO aplicara (0 reglas).",
+      "verificable": "Balance de llaves del main.css COMPILADO: 585 { / 582 } = +3. Tras T1: balance 0 y 568 reglas top-level parseables (script node)."
     },
     {
       "id": "H3",
-      "asunto": "Botones .btn-primary/.btn-secondary/.btn-ghost",
-      "detalle": "SI existen (globales): .btn-primary (main.css 21200) background:var(--primary-gradient) [linear-gradient(135deg,#667eea,#764ba2)], color:#fff, box-shadow:var(--shadow-button). .btn-secondary (21355) background:var(--surface-hover)[#f8f9fa], color:var(--text-muted)[#555], box-shadow:var(--shadow-xs). .btn-ghost (21761) background:transparent, color:var(--text-muted). .toolbar .btn-primary (3649) tambien con gradiente. USOS FUERA DEL PANEL (modales!): index.html 49893 #btn-pagar-tarjeta.btn-primary, 55172 generarLicenciaAdmin.btn-primary, 56325 cargarPanelAdmin.btn-primary. En el panel NO se usan (usa .sp-btn/.sp-action-btn/.sp-btn-primary). grid.css usa body.dark .btn-secondary:hover y body.dark .btn-ghost:hover.",
-      "recomendacion": "SCOPED: definir '#side-panel .btn-primary{background:var(--primary)!important;color:#fff!important;border:1px solid var(--primary)!important;height:38px!important;border-radius:var(--radius-md)!important;padding:0 16px!important;font-size:0.85rem!important;font-weight:500!important;box-shadow:none!important}' (+ hover var(--primary-hover)) y analogos .btn-secondary (bg var(--ds-card), color var(--text), border var(--border)) y .btn-ghost (bg transparent, color var(--text-secondary), border var(--border)). NO definir .btn-primary global (romperia el gradiente purpura de los 3 modales). El pedido 'globales' se cumple funcionalmente: clases reutilizables dentro del panel sin tocar modales.",
-      "verificable": "grep main.css: '#side-panel .btn-primary' 1 regla (con height:38px y var(--primary)); '.btn-primary{background:var(--primary-gradient)' (global 21200) sin modificacion."
+      "asunto": "C. Inventario z-index actual y justificacion de 99999",
+      "detalle": "#side-panel: 1001 (panel.css; sin z-index en main.css vivo). .modal-overlay: 1000 (main.css offset 5591, VIVA). .side-overlay: 1000 (panel.css). .dropdown-content: 100 (main.css 4495, VIVA) y 1002 scoped (panel.css). .bottom-nav: auto (main.css 32018, VIVA). .tutorial-overlay: 9999 (main.css 17922, VIVA; display:flex cuando .active -> el tour de bienvenida lo activa en TODO primer acceso). .screenshot-warning: 9999 (main.css 13450, VIVA). #notif-sync: 9999 (main.css ~17455, VIVA). .tour-overlay: 9998 y .tour-tooltip: 9999 (main.css 30071, VIVAS). .cloud-btn: 500 (panel.css). z-index 99999 JUSTIFICADO: es el unico valor que supera al maximo actual (9999) y garantiza el panel SIEMPRE por encima de tutorial/screenshot/notif/tour; la capa v5.5 del inline no define z-index, asi que no hay conflicto por especificidad.",
+      "verificable": "getComputedStyle(#side-panel).zIndex = '99999' (CDP) y > 9999 de .tutorial-overlay."
     },
     {
       "id": "H4",
-      "asunto": "HTML exacto de #tab-ajustes (offset 29643 index.html)",
-      "detalle": "Estructura actual: <div class=\"tab-content\" id=\"tab-ajustes\"> [1] <div class=\"card-section\"> titulo 'Archivos' + <div class=\"toolbar\"> 4 botones .sp-btn con onclick INLINE (guardar(), cargar(), resetear(), nuevoPlanificador()) + <div class=\"dropdown\"> boton 'Exportar' + .dropdown-content con 4 <a onclick> (exportarPDF(), exportarExcel(), exportarWord(), imprimir()) </div> [2] <div class=\"card-section\" id=\"config-section\"> titulo 'Configuracion' + 3 .config-row: (a) Idioma: .sp-lang-toggle con 2 .sp-lang-btn[data-lang=es/en], (b) Tipografia: select#font-select.sp-select, (c) Exportar: .config-actions con button#btn-export-json.sp-action-btn y button#btn-export-excel.sp-action-btn. #config-section NO tiene CSS (0 en main.css) ni JS (0 en app.js) -> renombrar su titulo es seguro.",
-      "bindings_js": {
-        "riesgo_alto_addEventListener": ["btn-export-json -> exportarHorarioJSON (getElementById + addEventListener, app.js 137243)", "btn-export-excel -> exportarHorarioExcel (idem 137349)", "font-select -> change cambiarTipografia (137243)", ".sp-lang-btn -> click aplicarIdioma (querySelectorAll, 136497)", "#side-panel .tab-btn -> data-tab + getElementById(tabId).classList.add('active') (136700)"],
-        "seguros_inline_onclick": ["guardar()", "cargar()", "resetear()", "nuevoPlanificador()", "aplicarIntervalo()", "exportarPDF()", "exportarExcel()", "exportarWord()", "imprimir()", "dividirCelda()"],
-        "runtime_getElementById": ["sel-intervalo (6), inp-hora-inicio (3), inp-hora-fin (3), merge-info, inp-titulo-header (7) -> seguros mientras los ids persistan"],
-        "dropdown": "delegacion global document.addEventListener('click') con .closest('.dropdown') + .dropdown-content.open (app.js 102301) -> seguro al mover el bloque.",
-        "conclusion": "Los handlers INLINE no se rompen al reorganizar. Los addEventListener se adjuntan al nodo en init: mover los nodos en HTML estatico CONSERVA los listeners, pero los ids/classes deben seguir existiendo en el DOM (nunca eliminar btn-export-json, btn-export-excel, font-select, sp-lang-btn, data-tab, tab-*)."
-      },
-      "recomendacion": "MINIMO CAMBIO ESTRUCTURAL: (1) Renombrar titulo de #config-section a 'Preferencias' (mantener id y las 2 filas Idioma+Tipografia intactas). (2) MOVER la fila .config-row 'Exportar' (con .config-actions, btn-export-json, btn-export-excel, CONSERVANDO ids y classes sp-action-btn/config-actions) a un NUEVO <div class=\"card-section\"> despues de #config-section con titulo 'Gestion de Datos'; a los botones se les ANADE clase .btn-primary/.btn-secondary (manteniendo sp-action-btn para no perder estilos y listeners). (3) El bloque 'Archivos' (Guardar/Cargar/Restaurar/Nuevo/Exportar dropdown) se queda EXACTAMENTE como esta (no mencionado en el pedido; moverlo agrega riesgo sin beneficio). (4) TITULOS DE BLOQUE: usar .card-section-title existente (texto 'Preferencias' y 'Gestion de Datos').",
-      "verificable": "grep index.html: 'btn-export-json' 1, 'btn-export-excel' 1, 'font-select' 1, 'sp-lang-btn' 2, 'data-tab=\"tab-ajustes\"' 1, 'Gestion de Datos' 1, 'Preferencias' 1, 'onclick=\"guardar()\"' 1."
+      "asunto": "D. Ancho real del panel",
+      "detalle": "NO existe 350px en ninguna hoja. Reglas vivas: panel.css width:305px (desktop, left:-330px, sin transform: usa left + transition), grid.css @media(max-width:700px) width:270px left:-290px y @media(max-width:480px) width:220px left:-240px. El panel NO se aplasta por flex del body (body no es flex; .app es block max-width:1100px). El panel queda anclado al borde de .app (x=154 en desktop a 1440px) porque .app tiene backdrop-filter:blur(10px) VIVO (crea containing block para fixed descendants) -> tras el fix de llaves (T1) revive 'body.tema-estelar .app{background:#0d1117!important;backdrop-filter:none!important}' (main.css 37462) y el panel vuelve a anclarse al viewport en el tema por defecto. width:320px!important;min-width:320px!important (1,0,2 + !important) vence a 305/270/220 y a las media queries.",
+      "verificable": "getComputedStyle(#side-panel).width = '320px' y minWidth = '320px' (desktop y a 390px de viewport)."
     },
     {
       "id": "H5",
-      "asunto": "Limpieza visual: sombras y bordes",
-      "detalle": "box-shadow ESTRIDENTES: (a) #side-panel NO tiene box-shadow en main.css (4 reglas #side-panel{} en 46237/50619/52736/59976, ninguna con shadow) -> aplica la de panel.css: '.side-panel{box-shadow:6px 0 40px rgba(0,0,0,0.4),inset -1px 0 0 rgba(255,255,255,0.08)}'. (b) .dropdown-content global: box-shadow:var(--shadow-md) (main.css 4157) y panel.css: '.side-panel .dropdown-content{box-shadow:0 8px 30px rgba(0,0,0,0.4)}'; la regla del panel en main.css 64650 solo pone bg/border, NO anula shadow. (c) .sp-card@53154 box-shadow:0 4px 12px rgba(0,0,0,0.15) pero anulado en .sp-container (58098 box-shadow:none). Bordes dobles/pesados: NO hay dobles flagrantes en v6.2 (card-section -> border:none + border-bottom:1px solid #1e293b separador fino; card-section-title border-bottom:none desde 60180); .panel-tabs tiene border:1px solid #1e293b. Etiquetas secundarias: .sp-hint ya #94a3b8 (57342), .merge-info ya #94a3b8 (57244) -> equivalentes a var(--ds-text-secondary); placeholders: SOLO existe .input::placeholder (main.css 22495) y .side-panel .custom-header input::placeholder (panel.css, rgba(255,255,255,0.35)); los demas inputs del panel NO tienen ::placeholder -> el color del placeholder no cambiara con CSS estandar (documentar, no intentar).",
-      "recomendacion": "Append al final de main.css: '#side-panel{box-shadow:none!important}', '#side-panel .dropdown-content{box-shadow:0 4px 16px rgba(0,0,0,0.25)!important}', '#side-panel .sp-hint,#side-panel .merge-info{color:var(--ds-text-secondary)!important}'. No tocar bordes que ya son finos (v6.2 ok). No crear reglas ::placeholder para inputs del panel (no funcionan universalmente).",
-      "verificable": "Ultima ocurrencia de '#side-panel{' en main.css incluye 'box-shadow:none'; ultima de '#side-panel .dropdown-content{' incluye 'box-shadow:0 4px 16px'."
+      "asunto": "E. Cache v=6.3, HEAD y scripts",
+      "detalle": "v=6.3 EXACTAMENTE 2 ocurrencias en index.html (22852 main.css, 62717 app.js); 0 en css/ y js/. HEAD 163c565 limpio (git status vacio). node --check js/app.js OK. scripts/build.js existe y es idempotente para archivos ya minificados (el fix de 3 llaves y el append en main.css sobreviven minifyCSS; minifyHTML deja el inline intacto). sw.js NO registrado -> sin caché vieja. server.js con bug dev-local de query strings (404 ?v=) -> documentar, NO tocar en v6.4.",
+      "verificable": "grep 'v=6.4' index.html = 2 tras T4; 'v=6.3' = 0."
     },
     {
       "id": "H6",
-      "asunto": "Cascada: append al final de main.css gana",
-      "detalle": "CONFIRMADO. (1) vs panel.css: las reglas de panel.css usan .side-panel (clase, especificidad 0,1,0) y casi sin !important; las nuevas usan #side-panel (id 1,0,0) + !important -> ganan. (2) vs style inline v5.5 del body (cargado despues en el documento): gana por ESPECIFICIDAD si el selector nuevo incluye '#side-panel .sp-container' (1,2,0+ vs 1,1,0 del inline). Si un selector nuevo tuviera la MISMA especificidad que el inline, perderia (inline va despues) -> regla: todos los selectores nuevos del panel DEBEN llevar .sp-container o mas clases. (3) vs reglas anteriores del MISMO main.css: append al final + mas especificidad + !important -> gana. (4) variables: las nuevas claves (:root) no tienen override en body.dark (grid.css) -> estables en ambos temas.",
-      "verificable": "Revision manual del diff: no se edito ninguna linea anterior a 65369 en main.css."
+      "asunto": "F. Estrategia de especificidad vs inline v5.5 (orden de carga real)",
+      "detalle": "Orden de carga REAL: head <link main.css (22852) -> panel.css (22859) -> dashboard.css (22903) -> grid.css (22951) -> BODY <style> inline (34422, ULTIMO en el documento). El inline v5.5 define '#side-panel{background:#0f172a!important;padding:20px 16px!important}' (especificidad 1,0,0 + !important). Un append en main.css con '#side-panel{...!important}' (1,0,0) PERDERIA contra el inline para background/background-color (misma especificidad, gana el ultimo = inline). ESTRATEGIA CORRECTA: usar 'html body #side-panel' (2 elementos + 1 id = 1,0,2) que vence al inline (1,0,0) SIEMPRE, y 'html body #side-panel .sp-container ...' (1,2,2) para hijos, que vence al inline '#side-panel .sp-select' (1,1,0) y a las reglas revividas '#side-panel .sp-container .card-section' (1,2,0) y '#side-panel select,#side-panel input' (1,1,0). Las props sin conflicto (z-index, opacity, width, box-shadow, border-right) van en la MISMA regla (1,0,2) por robustez.",
+      "verificable": "CDP tras implementar: backgroundColor rgb(15,23,42), opacity 1, zIndex 99999, width 320px -> el inline v5.5 no gana a ninguna prop del bloque v6.4."
     }
   ],
   "subtareas": [
     {
       "id": "T1",
-      "titulo": "Añadir variables del Design System al :root de main.css",
-      "detalle": "Editar el :root existente (offset 100) SOLO para ANADIR claves al final del bloque (antes del '}'): --primary:#3b82f6; --primary-hover:#2563eb; --border:#334155; --text:#f8fafc; --radius-md:12px; --space-8:8px; --space-16:16px; --space-24:24px; --ds-surface:#0f172a; --ds-card:#1e293b; --ds-text-secondary:#94a3b8. NO tocar ninguna variable existente (--surface:#fff, --text-secondary:#2c3e50, --surface-card:#fff quedan intactas). Reutilizar --radius-sm (8px) y --radius-lg (16px) existentes (valores identicos, no duplicar).",
+      "titulo": "PRERREQUISITO: reparar las 3 llaves faltantes en css/main.css",
+      "detalle": "Editar SOLO 3 inserciones de '}' (cada string de busqueda es UNICO en el archivo, verificado con IndexOf y git log -S). (1) offset ~33037: reemplazar 'padding:4px 0.cal-header' por 'padding:4px 0}.cal-header' (cierra .cal-container antes de .cal-header). (2) offset ~37621: reemplazar 'gap:3px#view-mensual' por 'gap:3px}#view-mensual' (cierra body.tema-estelar .cal-grid antes de #view-mensual). (3) offset ~40054: reemplazar 'center!important.cal-dia:hover' por 'center!important}.cal-dia:hover' (cierra .cal-dia-nombre antes de .cal-dia:hover). NO tocar ninguna otra regla del archivo. EFECTO: balance 0 y se reviven ~238 reglas (568 parseables), incluidas las 135 de #side-panel del design system v6.1-v6.3 y 'body.tema-estelar .app{backdrop-filter:none!important}'. Sin T1, el append v6.4 (T2) quedaria en la zona muerta y el bug persistiria.",
       "criterios": [
-        "grep main.css: '--primary:#3b82f6' => 1 ocurrencia",
-        "grep main.css: '--ds-surface:#0f172a' => 1, '--ds-card:#1e293b' => 1, '--ds-text-secondary:#94a3b8' => 1",
-        "grep main.css: '--surface:#fff' => 1 (intacta) y '--text-secondary:#2c3e50' => 1 (intacta)",
-        "El :root conserva TODAS las claves legacy (diff muestra solo inserciones antes del '}' final)",
-        "no se usa --radius-md duplicado si ya existia"
+        "grep main.css: 'padding:4px 0}.cal-header' => 1 ocurrencia",
+        "grep main.css: 'gap:3px}#view-mensual' => 1 ocurrencia",
+        "grep main.css: 'center!important}.cal-dia:hover' => 1 ocurrencia",
+        "Balance de llaves de main.css = 0 (contar { y }: 585/585)",
+        "Script node de parseo: 568 reglas top-level (antes 330)",
+        "git diff de main.css muestra SOLO 3 inserciones de '}' (sin otros cambios)"
       ]
     },
     {
       "id": "T2",
-      "titulo": "Inputs/Selects del panel: alto 38px y tokens del design system",
-      "detalle": "Append al FINAL de css/main.css (nunca editar reglas anteriores): '#side-panel .sp-container .card-section select,#side-panel .sp-container .card-section input,#side-panel .sp-container .sp-select,#side-panel .interval-row select,#side-panel .interval-row input,#side-panel .custom-header input{height:38px!important;min-height:38px!important;box-sizing:border-box!important;border-radius:var(--radius-sm)!important;border:1px solid var(--border)!important;background:var(--ds-card)!important;color:var(--text)!important;padding:0 12px!important}'. NOTA: los .sp-select dentro de .config-row usan width:auto/flex:1 (regla 62638) -> no sobrescribir width (no incluir width en el append).",
+      "titulo": "Append del bloque v6.4 al FINAL de css/main.css (panel opaco, z-index 99999, ancho 320px, contenedores internos)",
+      "detalle": "Append EXACTO (minificado, 1 linea; selectores html body #side-panel => especificidad 1,0,2 para vencer al inline v5.5 '#side-panel' 1,0,0 + !important, ver H6): (a) 'html body #side-panel{background-color:#0f172a!important;background:#0f172a!important;opacity:1!important;z-index:99999!important;box-shadow:8px 0 30px rgba(0,0,0,0.5)!important;border-right:1px solid #1e293b!important;width:320px!important;min-width:320px!important}' (requisito 1 y 3: reemplaza la sombra 6px 0 40px de panel.css y los 305/270/220px; background-color+background explicitos por requisito). (b) 'html body #side-panel .sp-container{background:#0f172a!important}' (hijo directo opaco, requisito 1). (c) 'html body #side-panel .sp-container .card-section{background:#1e293b!important;border:none!important;border-bottom:1px solid #1e293b!important}' (anula la regla revivida 60227 'background:transparent!important' (1,2,0): la nuestra es (1,2,2)). (d) 'html body #side-panel .sp-container .tab-content.active{background:#1e293b!important}' (requisito 2). (e) 'html body #side-panel .sp-container input,html body #side-panel .sp-container select{background:#1e293b!important;color:#e2e8f0!important;border-color:#334155!important}' (requisito 2; vence al inline '#side-panel .sp-select' (1,1,0) y a '#side-panel select,#side-panel input' (1,1,0) y al rgba(255,255,255,0.08) de panel.css). NO incluir width en (e) (los .sp-select de .config-row usan width:auto/flex:1). NO tocar el <style> inline de index.html ni ninguna regla anterior de main.css.",
       "criterios": [
-        "Ultima ocurrencia de '.card-section select' en main.css contiene 'height:38px!important'",
-        "Ultima ocurrencia contiene 'border:1px solid var(--border)' y 'background:var(--ds-card)'",
-        "grep main.css: 'height:38px!important' aparece al menos 1 vez despues del offset 65300 (bloque nuevo)",
-        "Ninguna regla anterior del archivo fue modificada (diff solo anade lineas al final)"
+        "grep main.css: 'html body #side-panel{background-color:#0f172a!important' => 1",
+        "grep main.css: 'background:#0f172a!important;opacity:1!important;z-index:99999!important' => 1",
+        "grep main.css: 'box-shadow:8px 0 30px rgba(0,0,0,0.5)!important;border-right:1px solid #1e293b!important;width:320px!important;min-width:320px!important' => 1",
+        "grep main.css: 'html body #side-panel .sp-container .card-section{background:#1e293b' => 1",
+        "grep main.css: 'html body #side-panel .sp-container .tab-content.active{background:#1e293b' => 1",
+        "grep main.css: 'html body #side-panel .sp-container input,html body #side-panel .sp-container select{background:#1e293b' => 1",
+        "Balance de llaves de main.css sigue = 0 y el script de parseo reporta 571 reglas top-level (330 + 238 revividas + 3 nuevas)",
+        "VERIFICACION CDP (chrome headless contra el sitio servido): getComputedStyle(#side-panel): backgroundColor 'rgb(15, 23, 42)', opacity '1', zIndex '99999', width '320px', minWidth '320px', boxShadow contiene '8px 0px 30px' y 'rgba(0, 0, 0, 0.5)', borderRightWidth '1px'",
+        "VERIFICACION CDP: con .tutorial-overlay activo y el panel abierto, elementFromPoint en el centro del panel devuelve un descendiente de #side-panel (no #tutorial)",
+        "VERIFICACION CDP: getComputedStyle(#side-panel .tab-content.active).backgroundColor = 'rgb(30, 41, 59)' y de un input del panel idem"
       ]
     },
     {
       "id": "T3",
-      "titulo": "Botones scoped #side-panel .btn-primary/.btn-secondary/.btn-ghost",
-      "detalle": "Append al final de main.css (SCOPED a #side-panel, NO global para no romper modales): '#side-panel .btn-primary{background:var(--primary)!important;border:1px solid var(--primary)!important;color:#fff!important}' + hover '#side-panel .btn-primary:hover{background:var(--primary-hover)!important;border-color:var(--primary-hover)!important}' + '#side-panel .btn-secondary{background:var(--ds-card)!important;border:1px solid var(--border)!important;color:var(--text)!important}' + hover '#side-panel .btn-secondary:hover{border-color:var(--primary)!important;color:var(--primary-hover)!important}' + '#side-panel .btn-ghost{background:transparent!important;border:1px solid var(--border)!important;color:var(--ds-text-secondary)!important}' + hover '#side-panel .btn-ghost:hover{border-color:var(--primary)!important;color:var(--text)!important}'. COMUN a los tres: 'height:38px!important;border-radius:var(--radius-md)!important;padding:0 16px!important;font-size:0.85rem!important;font-weight:500!important;box-shadow:none!important;cursor:pointer!important'. El .btn-primary GLOBAL (offset 21200, modales) queda intacto.",
+      "titulo": "RECOMENDADO (no bloqueante): alinear .cloud-btn.open al nuevo ancho 320px",
+      "detalle": "El boton flotante de apertura en estado abierto queda en left:305px (panel.css) / 275px / 230px (media queries grid.css) y con el panel a 320px quedaria 15px superpuesto. Append al final de main.css: 'html body .cloud-btn.open{left:320px!important}' (especificidad 1,0,2 + !important vence a (0,2,0) de panel.css y a las media queries). No modificar panel.css ni grid.css.",
       "criterios": [
-        "grep main.css: '#side-panel .btn-primary{' => 1 regla nueva con height:38px y var(--primary)",
-        "grep main.css: '#side-panel .btn-secondary{' => 1 y '#side-panel .btn-ghost{' => 1",
-        "El bloque '.btn-primary{background:var(--primary-gradient)' (offset 21200) NO fue modificado",
-        "No existe '.btn-primary{' global nuevo (solo '#side-panel .btn-primary')"
+        "grep main.css: 'html body .cloud-btn.open{left:320px!important}' => 1",
+        "panel.css y grid.css sin modificaciones (git diff solo main.css + index.html)"
       ]
     },
     {
       "id": "T4",
-      "titulo": "Reorganizar #tab-ajustes en index.html (2 bloques)",
-      "detalle": "En #tab-ajustes (offset 29643): (1) cambiar titulo del card-section#config-section de 'Configuracion' a 'Preferencias' (mantener id config-section). (2) SACAR la fila <div class=\"config-row\"> de Exportar (con .config-actions, button#btn-export-json.sp-action-btn y button#btn-export-excel.sp-action-btn) de dentro de #config-section y colocarla en un NUEVO <div class=\"card-section\"> justo despues de #config-section, con <div class=\"card-section-title\">Gestion de Datos</div>. (3) A los botones exportar: ANADIR clase .btn-primary (btn-export-json) y .btn-secondary (btn-export-excel) CONSERVANDO id y clase .sp-action-btn (no eliminar: los listeners addEventListener de app.js 137243/137349 dependen de los ids, y .sp-action-btn da estilos base). (4) El bloque 'Archivos' (Guardar/Cargar/Restaurar/Nuevo/Exportar dropdown) NO se mueve ni se modifica. (5) NO tocar las filas Idioma (sp-lang-toggle/sp-lang-btn/data-lang) ni Tipografia (font-select/sp-select).",
+      "titulo": "Bump cache v=6.3 -> v=6.4 (2 ocurrencias en index.html)",
+      "detalle": "offset 22852 'css/main.css?v=6.3' -> 'css/main.css?v=6.4' y offset 62717 'js/app.js?v=6.3' -> 'js/app.js?v=6.4'. No hay mas ocurrencias en el repo.",
       "criterios": [
-        "grep index.html: 'id=\"btn-export-json\"' => 1 y 'id=\"btn-export-excel\"' => 1 (ids intactos)",
-        "grep index.html: 'Gestion de Datos' => 1 y 'Preferencias' => 1",
-        "grep index.html: 'sp-lang-btn' => 2, 'font-select' => 1, 'data-lang=\"es\"' => 1, 'data-lang=\"en\"' => 1",
-        "grep index.html: 'onclick=\"guardar()\"' => 1, 'onclick=\"cargar()\"' => 1, 'onclick=\"resetear()\"' => 1, 'onclick=\"nuevoPlanificador()\"' => 1, 'onclick=\"exportarPDF()\"' => 1, 'onclick=\"exportarExcel()\"' => 1, 'onclick=\"exportarWord()\"' => 1, 'onclick=\"imprimir()\"' => 1",
-        "grep index.html: 'data-tab=\"tab-ajustes\"' => 1, 'id=\"tab-ajustes\"' => 1 (estructura de tabs intacta)",
-        "El bloque Archivos conserva: 'class=\"toolbar\"' con 4 botones y el div.dropdown con .dropdown-content (4 <a>)",
-        "btn-export-json tiene clase 'sp-action-btn btn-primary' y btn-export-excel 'sp-action-btn btn-secondary'",
-        "El nuevo card-section de Gestion de Datos esta dentro de #tab-ajustes y despues de #config-section"
+        "grep index.html: 'v=6.4' => 2 ocurrencias",
+        "grep index.html: 'v=6.3' => 0 ocurrencias",
+        "grep css/ y js/: 'v=6.3' => 0 y 'v=6.4' => 0 (solo index.html)"
       ]
     },
     {
       "id": "T5",
-      "titulo": "Limpieza visual: sombras y etiquetas secundarias",
-      "detalle": "Append al final de main.css: '#side-panel{box-shadow:none!important}' (anula 6px 0 40px rgba(0,0,0,0.4) de panel.css); '#side-panel .dropdown-content{box-shadow:0 4px 16px rgba(0,0,0,0.25)!important}' (anula var(--shadow-md) global y 0 8px 30px de panel.css); '#side-panel .sp-hint,#side-panel .merge-info{color:var(--ds-text-secondary)!important}'. NO crear ::placeholder (los inputs del panel no tienen regla placeholder salvo .custom-header input; el color de placeholder no es controlable por CSS estandar en todos los navegadores). NO tocar bordes finos ya limpios (card-section border-bottom separador, panel-tabs border 1px #1e293b).",
-      "criterios": [
-        "Ultima regla '#side-panel{' del archivo incluye 'box-shadow:none!important'",
-        "Ultima regla '#side-panel .dropdown-content{' incluye 'box-shadow:0 4px 16px'",
-        "grep main.css: '#side-panel .sp-hint' => 1 regla con var(--ds-text-secondary)",
-        "No se anade ninguna regla ::placeholder nueva"
-      ]
-    },
-    {
-      "id": "T6",
-      "titulo": "Bump cache v=6.2 -> v=6.3 (2 ocurrencias)",
-      "detalle": "En index.html: offset 22824 'css/main.css?v=6.2' -> 'css/main.css?v=6.3' y offset 63136 'js/app.js?v=6.2' -> 'js/app.js?v=6.3'. No hay otras ocurrencias de v=6.2 en el repo.",
-      "criterios": [
-        "grep index.html: 'v=6.3' => 2 ocurrencias",
-        "grep index.html: 'v=6.2' => 0 ocurrencias",
-        "grep css/js: 'v=6.2' => 0 y 'v=6.3' => 0 (solo index.html)"
-      ]
-    },
-    {
-      "id": "T7",
-      "titulo": "Verificacion, build, commit y push",
-      "detalle": "(1) Verificar criterios de T1-T6 via grep. (2) Ejecutar 'node scripts/build.js' (node --check js/app.js + minifica JS/CSS/HTML; no debe fallar). (3) git status: solo index.html y css/main.css modificados (y js/app.js/sw.js si build los re-minifica, lo cual es normal). (4) git add de los archivos modificados, commit con mensaje EXACTO 'style: implementacion de design system y reorganizacion de ajustes v6.3' y push a origin. NO incluir .opencode/ en el commit salvo que el repo lo haya incluido antes.",
+      "titulo": "Verificacion final, build, commit y push",
+      "detalle": "(1) Verificar criterios de T1-T4 (grep + balance + script de parseo + CDP si disponible). (2) Ejecutar 'node scripts/build.js' (node --check js/app.js + Terser + minifyCSS + minifyHTML; no debe fallar; es idempotente sobre archivos ya minificados). (3) git status: SOLO css/main.css e index.html modificados (js/app.js, sw.js, css/panel.css, css/dashboard.css, css/grid.css solo si build los re-escribe identicos en formato -> revisar git diff para confirmar que no hubo cambios semanticos). (4) git add de los archivos modificados, commit con mensaje EXACTO 'fix: fondo solido opaco y z-index correcto para el panel lateral v6.4' y push a origin main. NO incluir .opencode/ en el commit.",
       "criterios": [
         "node scripts/build.js termina con 'Build OK' (exit 0)",
-        "git status --porcelain: solo archivos esperados modificados",
-        "git log -1: mensaje exacto 'style: implementacion de design system y reorganizacion de ajustes v6.3'",
-        "git push origin HEAD exitoso y 'git rev-parse HEAD' nuevo (no 78a3f53)",
+        "git status --porcelain: solo archivos esperados",
+        "git log -1: mensaje exacto 'fix: fondo solido opaco y z-index correcto para el panel lateral v6.4'",
+        "git push origin main exitoso y 'git rev-parse HEAD' nuevo (no 163c565)",
         "git status --porcelain vacio tras el push"
       ]
     }
   ],
-  "orden_ejecucion": ["T1", "T2", "T3", "T5", "T4", "T6", "T7"],
+  "orden_ejecucion": ["T1", "T2", "T3", "T4", "T5"],
   "riesgos": [
-    "REDEFINIR --surface/--text-secondary/--surface-card en :root rompe tema claro (dropdown global, tabla, tutorial-box, modales) -> usar --ds-* (H1).",
-    "Definir .btn-primary global rompe el gradiente purpura de los 3 modales (#btn-pagar-tarjeta, generarLicenciaAdmin, cargarPanelAdmin) -> scoped #side-panel (H3).",
-    "Eliminar ids btn-export-json/btn-export-excel/font-select o re-renderizar sus nodos pierde listeners addEventListener de app.js -> conservar ids y clases, mover solo en HTML estatico (H4).",
-    "Selectores nuevos con especificidad <= a la capa v5.5 del <style> inline del body pierden en cascada -> todos los selectores nuevos del panel llevan '#side-panel .sp-container' o mas (H6).",
-    "build.js re-minifica TODO al final: revisar git diff tras build para confirmar que solo cambio formato, no semantica."
+    "NO ejecutar T1 antes del append T2: cualquier regla al final de main.css queda en la zona muerta (el navegador descarta el tail desde offset 33037) -> el bug persiste. T1 es PRERREQUISITO ABSOLUTO.",
+    "Tras T1 se REVIVEN ~238 reglas (calendario cyan, .panel-tabs, .tab-btn scoped, .tutorial-box, .bottom-nav, sombras v6.3, body.tema-estelar .app oscuro #0d1117 con backdrop-filter:none): la pagina cambia visualmente al diseno v6.1-v6.3 intencionado. Es el comportamiento esperado (restauracion del design system), pero el ejecutor debe revisar el diff.",
+    "La regla revivida 60227 '#side-panel .sp-container .card-section{background:transparent!important}' (1,2,0) volveria a dejar las card-sections transparentes si el append usara especificidad menor -> T2 (c) usa (1,2,2) con html body.",
+    "Inline v5.5 (1,0,0) + !important gana ante cualquier append '#side-panel{...}' (1,0,0) porque va DESPUES en el documento -> NUNCA usar '#side-panel{' simple en el append; usar 'html body #side-panel' (H6).",
+    "z-index 99999 coloca el panel POR ENCIMA de .tutorial-overlay/.screenshot-warning/#notif-sync/.tour-*: el tour de bienvenida quedara debajo del panel cuando este abierto (comportamiento solicitado explicitamente por el requisito).",
+    "build.js re-minifica TODO al final (Terser app.js/sw.js, minifyHTML index.html): revisar git diff tras build para confirmar solo cambios de formato, no semantica.",
+    "server.js local no sirve archivos con ?v= (404 en dev) - bug pre-existente, NO tocar en v6.4; la produccion (GitHub Pages) procesa ?v= correctamente."
   ],
-  "notas_finales": "Este plan reemplaza TASK-20260801-v6.2. El ejecutor NO debe modificar reglas CSS anteriores a la posicion del append (offset 65369 en main.css) ni el <style> inline de index.html (v5.5 del panel + #view-diario) ni los bloques tab-perfil/tab-personalizar. Si el analisis final del ejecutor contradice algun hallazgo, detenerse y reportar."
+  "notas_finales": "Este plan reemplaza TASK-20260801-v6.3. CAUSA RAIZ: 3 llaves faltantes en main.css (offsets 33037, 37621, 40054; desde v3.9/v4.0/v4.2) + z-index del panel (1001) inferior a los overlays (9999) + contenedores internos sin fondo opaco. La correccion restaura el design system v6.1-v6.3 (568 reglas) y aplica los requisitos v6.4 (571 reglas). Evidencia de produccion: GitHub Pages sirve bytes identicos al working tree (SHA256), el bug se reproduce localmente con Chrome. El ejecutor NO debe modificar el <style> inline de index.html (v5.5), ni panel.css/grid.css/dashboard.css, ni reglas de main.css anteriores a los 3 fixes; los strings de busqueda de T1 son unicos (verificados con git log -S e IndexOf). Si el analisis del ejecutor contradice algun hallazgo, detenerse y reportar."
 }

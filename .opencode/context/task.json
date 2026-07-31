@@ -1,0 +1,140 @@
+{
+  "id": "TASK-20260731-v5.7",
+  "titulo": "Restaurar Panel de Control completo en #side-panel con módulo de configuración",
+  "version": "5.7",
+  "tipo": "feat",
+  "descripcion": "Reconstruir el contenido de #side-panel (index.html) con las secciones completas del panel de control usando tarjetas oscuras .card-section (title + contenido): General, Vista, Plantillas, Horario, Archivos, y MANTENER al final las 3 tarjetas sp-card existentes (Idioma, Personalización, Acciones de Archivo). Agregar estilos .card-section oscuros y grilla 2 columnas en css/main.css. Reforzar validaciones condicionales en js/app.js. Bump de versión a 5.7. El HTML de referencia (v5.4, commit fc8b147~1) sobrevive en git y debe adaptarse de <details class=\"sp-section\"> a <div class=\"card-section\">.",
+  "estado_actual": {
+    "side_panel_html": "#side-panel contiene solo .sp-container > .sp-header(.sp-title 'Configuración') + 3 .sp-card: Idioma (sp-lang-toggle es/en), Personalización (select#font-select), Acciones de Archivo (#btn-export-json, #btn-export-excel). Secciones General/Vista/Plantillas/Horario/Archivos fueron eliminadas en v5.5 (commit fc8b147).",
+    "guardas_v56": "js/app.js tiene guardas defensivas activas: 'document.getElementById(\"sel-intervalo\")&&(...)', '||{value:15}' en aplicarIntervalo, 'if(!e)return' en onCarreraChange/actualizarHeaderPreview, '(MESES_ES||[])' en renderizarCalendario, 'document.getElementById(\"btn-merge-split\")&&'. Estas quedan inactivas (código muerto) hasta restaurar el HTML.",
+    "versiones_actuales": "index.html referencia css/main.css?v=5.6 y js/app.js?v=5.6.",
+    "css_existente": ".card-section ya existe en main.css como tarjeta CLARA (!important) para la libreta de #view-diario (~línea 41131). Ya existen: .planner-type-selector, .view-toggle, .toolbar, .dropdown, .header-preview, .custom-header, .interval-row, .sp-card oscuro (#1e293b/#334155/12px/16px). NO existe: .merge-toolbar.",
+    "html_referencia": "git show fc8b147~1:index.html contiene el panel completo v5.4 con todos los IDs y handlers requeridos."
+  },
+  "archivos_afectados": [
+    "index.html",
+    "css/main.css",
+    "js/app.js"
+  ],
+  "sub_tareas": [
+    {
+      "id": 1,
+      "nombre": "Reconstruir HTML de #side-panel en index.html",
+      "detalle": "Dentro de .sp-container (conservar .sp-header > .sp-title), insertar 5 secciones .card-section oscuras (title + contenido) en orden, adaptadas del HTML v5.4 (git show fc8b147~1): (1) General: .custom-header con input#inp-titulo-header (oninput=\"actualizarHeaderPreview()\") + .header-preview#header-preview; select#sel-nombre (onchange=\"onRolChange(this)\") + input#inp-nombre.oculto; .campo#carrera-container > select#sel-carrera (onchange=\"onCarreraChange()\"); .campo#especialidad-container[style=display:none] > select#sel-especialidad (onchange=\"onEspecialidadChange()\") + input#inp-especialidad.oculto; .campo#ciclo-container > select#sel-ciclo (onchange=\"cambioSelect(this,'inp-ciclo')\") + input#inp-ciclo.oculto; select#sel-objetivo (onchange=\"cambioSelect(this,'inp-objetivo')\") + input#inp-objetivo.oculto. (2) Vista: .planner-type-selector con 5 botones (data-type semanal/diario/mensual/anual/personalizado, onclick=\"cambiarTipoPlanificador('...')\", botón semanal con class active) + .view-toggle con #btn-view-table (active, onclick=\"cambiarVista('table')\") y #btn-view-dashboard (onclick=\"cambiarVista('dashboard')\"). (3) Plantillas: .toolbar con 4 botones onclick=\"cargarModelo('estudiante'|'trabajador'|'freelancer'|'vacio')\". (4) Horario: .interval-row con select#sel-intervalo (onchange=\"cambiarIntervalo(parseInt(this.value))\", opciones 5/10/15/20/25/30/45/60, 15 selected), input#inp-hora-inicio[type=time value=06:00], input#inp-hora-fin[type=time value=23:30], botón onclick=\"aplicarIntervalo()\"; botones agregarFila/agregarDia/eliminarUltimoDia; .merge-toolbar > button#btn-merge-split (onclick=\"dividirCelda()\", style=display:none); .merge-info#merge-info; hint de arrastre. (5) Archivos: .toolbar con guardar()/cargar()/resetear()/nuevoPlanificador() + .dropdown Exportar con 4 enlaces (exportarPDF/exportarExcel/exportarWord/imprimir). MANTENER al final, sin duplicar, las 3 .sp-card existentes (Idioma sp-lang-toggle, Personalización #font-select, Acciones #btn-export-json/#btn-export-excel).",
+      "criterio_aceptacion": [
+        "Los IDs existen exactamente: inp-titulo-header, header-preview, sel-nombre, inp-nombre, carrera-container, sel-carrera, especialidad-container, sel-especialidad, inp-especialidad, ciclo-container, sel-ciclo, inp-ciclo, sel-objetivo, inp-objetivo, sel-intervalo, inp-hora-inicio, inp-hora-fin, btn-merge-split, merge-info.",
+        "Los handlers onclick/onchange coinciden con las funciones existentes en app.js (verificado con grep en js/app.js).",
+        "Las 3 tarjetas sp-card previas se conservan una sola vez y aparecen al final, dentro del mismo .sp-container.",
+        "El .sp-header > .sp-title se conserva sin duplicados.",
+        "La estructura es HTML válido (se puede verificar con el build)."
+      ]
+    },
+    {
+      "id": 2,
+      "nombre": "Agregar estilos .card-section oscuros y grilla 2 columnas en css/main.css",
+      "detalle": "Agregar reglas SCOPED a #side-panel (para no pisar el .card-section claro del diario que usa !important): '#side-panel .card-section{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:12px}' y título bold ('#side-panel .card-section .title' o clase de título, color #f8fafc). Agregar grilla 2 columnas para .planner-type-selector, .view-toggle y .toolbar dentro de #side-panel (display:grid;grid-template-columns:repeat(2,1fr);gap:8px). Agregar estilos para .merge-toolbar (no existe en main.css) y para .sp-title (el header actual usa <span class=\"sp-title\"> pero el CSS existente solo estiliza '.sp-header h3').",
+      "criterio_aceptacion": [
+        "Las reglas nuevas están scoped bajo '#side-panel' (grep '#side-panel .card-section' y '#side-panel .toolbar' dan match).",
+        "El .card-section claro del diario (#view-diario .card-section / .card-section sin prefijo) NO se modifica.",
+        "Existe .merge-toolbar y estilos para .sp-title.",
+        "Los selectores existentes (.planner-type-selector, .view-toggle, .toolbar, .dropdown, .header-preview, .custom-header, .interval-row, .oculto, .visible) no se duplican ni se alteran sus reglas base fuera de #side-panel."
+      ]
+    },
+    {
+      "id": 3,
+      "nombre": "Validaciones condicionales y wrappers de exportación en js/app.js",
+      "detalle": "Reforzar/verificar patrones defensivos (if(elem) / ?.) antes de leer o asignar propiedades en inputs de General (inp-titulo-header, header-preview, inp-nombre, sel-nombre, sel-carrera, inp-especialidad, sel-especialidad, sel-ciclo, inp-ciclo, sel-objetivo, inp-objetivo), Vista (btn-view-table, btn-view-dashboard, botones .planner-type-selector) y Configuración (font-select, btn-export-json, btn-export-excel). MANTENER las guardas v5.6 (sel-intervalo&&, ||{value:15}, (MESES_ES||[])) y la verificación defensiva de renderizarCalendario. CREAR las funciones que el HTML de Archivos requiere y NO existen: exportarPDF(), exportarExcel(), exportarWord(), imprimir() — mapear a las capacidades existentes (exportarHorarioExcel para Excel, window.print para Imprimir, generarBlobHTML .doc para Word, HTML imprimible/ventana para PDF); no romper exportarHorarioJSON/exportarHorarioExcel.",
+      "criterio_aceptacion": [
+        "npm run check (node --check js/app.js) pasa sin errores de sintaxis.",
+        "Las 4 funciones exportarPDF/exportarExcel/exportarWord/imprimir existen (grep da match) y no lanzan ReferenceError al invocarse.",
+        "Las guardas v5.6 se conservan (grep 'sel-intervalo' &&, 'MESES_ES' ||, 'btn-merge-split' &&).",
+        "No se registran cambios funcionales en la lógica de horario (solo defensas y wrappers)."
+      ]
+    },
+    {
+      "id": 4,
+      "nombre": "Bump de versión a 5.7 en index.html",
+      "detalle": "Cambiar las referencias de asset en index.html: css/main.css?v=5.6 -> css/main.css?v=5.7 y js/app.js?v=5.6 -> js/app.js?v=5.7.",
+      "criterio_aceptacion": [
+        "grep de '?v=5.7' en index.html devuelve exactamente 2 coincidencias (main.css y app.js).",
+        "No quedan referencias '?v=5.6' en index.html."
+      ]
+    },
+    {
+      "id": 5,
+      "nombre": "Verificación, commit y push",
+      "detalle": "Ejecutar la suite de verificación local y publicar: (1) cmd /c \"npm run build\" debe terminar con Build OK; (2) git status y git diff para revisar solo los 3 archivos afectados (index.html, css/main.css, js/app.js) más .opencode/context/task.json si aplica; (3) git add de los archivos de código y commit con mensaje exacto 'feat: restaurar panel de control completo con modulo de configuracion v5.7'; (4) git push origin main.",
+      "criterio_aceptacion": [
+        "cmd /c \"npm run build\" finaliza con salida de éxito (Build OK) y código de salida 0.",
+        "El diff solo toca archivos previstos (index.html, css/main.css, js/app.js); sin archivos de secretos ni .env.",
+        "El commit tiene el mensaje exacto 'feat: restaurar panel de control completo con modulo de configuracion v5.7'.",
+        "git push origin main finaliza sin errores (git status limpio tras el push)."
+      ]
+    }
+  ],
+  "riesgos": [
+    {
+      "id": "R1",
+      "criticidad": "ALTA",
+      "descripcion": "El dropdown Exportar del panel v5.4 llama a exportarPDF(), exportarExcel(), exportarWord() e imprimir(), que NO existen en js/app.js (grep: 0 coincidencias). Clonar el HTML tal cual produciría ReferenceError al hacer clic. Mitigación: sub-tarea 3 debe crear los wrappers mapeando a exportarHorarioExcel, exportarHorarioJSON y window.print."
+    },
+    {
+      "id": "R2",
+      "criticidad": "MEDIA",
+      "descripcion": ".card-section ya existe en main.css con fondo claro y !important para la libreta del diario (#view-diario). Agregar un .card-section oscuro global rompería la libreta. Mitigación: scope estricto '#side-panel .card-section' (sub-tarea 2)."
+    },
+    {
+      "id": "R3",
+      "criticidad": "MEDIA",
+      "descripcion": "Guardas v5.6 (if(elem)&&, ||{value:15}, (MESES_ES||[]), if(!e)return) quedan como código muerto/inactivo al restaurar el HTML. NO eliminarlas (defensa ante futuros cambios); solo verificar que no causen regresiones."
+    },
+    {
+      "id": "R4",
+      "criticidad": "BAJA",
+      "descripcion": "El header actual usa <span class=\"sp-title\"> pero el CSS existente estiliza '.sp-header h3'. Puede quedar sin estilo hasta agregar .sp-title (incluido en sub-tarea 2)."
+    },
+    {
+      "id": "R5",
+      "criticidad": "BAJA",
+      "descripcion": "app.js referencia tanto 'sel-tipografia' como 'font-select' (cambiarTipografia usa getElementById('sel-tipografia')||getElementById('font-select')). El HTML solo tendrá #font-select; no duplicar selectores de tipografía."
+    },
+    {
+      "id": "R6",
+      "criticidad": "BAJA",
+      "descripcion": "Los botones .planner-type-selector y .view-toggle dependen de clases 'active' iniciales y de los IDs btn-view-table/btn-view-dashboard (cambiarVista usa getElementById('btn-view-'+e)). Restaurar con los states activos correctos para evitar estados visuales inconsistentes."
+    }
+  ],
+  "verificacion": {
+    "comandos": [
+      "cmd /c \"npm run build\"  (debe salir con Build OK)",
+      "npm run check  (node --check js/app.js)",
+      "grep '?v=5.7' index.html  (2 coincidencias: main.css y app.js)",
+      "grep 'exportarPDF|exportarExcel|exportarWord|imprimir' js/app.js  (4 funciones definidas)",
+      "grep 'sel-intervalo|MESES_ES|btn-merge-split' js/app.js  (guardas v5.6 intactas)",
+      "git status / git diff --stat  (solo index.html, css/main.css, js/app.js)",
+      "git commit -m \"feat: restaurar panel de control completo con modulo de configuracion v5.7\"",
+      "git push origin main"
+    ],
+    "criterio_exito": "Build OK + node --check sin errores + commit y push exitosos con el mensaje exacto."
+  },
+  "contexto_extra": {
+    "html_referencia_git": "git show fc8b147~1:index.html (contenido completo del panel v5.4)",
+    "ids_que_js_ya_espera": [
+      "inp-titulo-header", "header-preview", "inp-nombre", "sel-nombre", "carrera-container",
+      "sel-carrera", "especialidad-container", "sel-especialidad", "inp-especialidad",
+      "ciclo-container", "sel-ciclo", "inp-ciclo", "sel-objetivo", "inp-objetivo",
+      "sel-intervalo", "inp-hora-inicio", "inp-hora-fin", "btn-merge-split", "merge-info",
+      "btn-view-table", "btn-view-dashboard", "font-select"
+    ],
+    "funciones_requeridas_por_html": [
+      "onRolChange", "onCarreraChange", "onEspecialidadChange", "cambioSelect",
+      "cambiarTipoPlanificador", "cambiarVista", "cambiarIntervalo", "aplicarIntervalo",
+      "agregarFila", "agregarDia", "eliminarUltimoDia", "dividirCelda", "cargarModelo",
+      "guardar", "cargar", "resetear", "nuevoPlanificador", "actualizarHeaderPreview",
+      "exportarPDF", "exportarExcel", "exportarWord", "imprimir"
+    ],
+    "funciones_faltantes_a_crear": ["exportarPDF", "exportarExcel", "exportarWord", "imprimir"],
+    "version_anterior": "5.6",
+    "assets_a_bumpear": ["css/main.css", "js/app.js"]
+  }
+}

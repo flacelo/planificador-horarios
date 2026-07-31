@@ -1,119 +1,120 @@
 {
-  "id": "TASK-20260801-v6.1",
-  "titulo": "Navegacion por Pestanas en el Panel de Control v6.1 (reemplaza v6.0 revertida)",
-  "version": "6.1",
-  "tipo": "feat",
-  "descripcion": "Agregar navegacion por pestañas al panel lateral (#side-panel): barra .panel-tabs con 3 botones .tab-btn (data-tab: tab-perfil/tab-personalizar/tab-ajustes; el primero con class active) justo debajo del header .sp-header. Agrupar los 6 bloques del panel en 3 contenedores .tab-content: #tab-perfil (General), #tab-personalizar (Vista + Plantillas + Horario), #tab-ajustes (Archivos + Configuracion). Solo #tab-perfil visible (class active). MANTENER todos los ids/clases existentes intactos. Bump cache v=5.9 -> v=6.1 (2 ocurrencias). CSS: bloque v6.1 scoped #side-panel appended al final de css/main.css. JS: conmutador de pestañas scoped a #side-panel + parche a cambiarTab para que la bottom-nav no desactive las pestañas del panel. Commit 'feat: navegacion por pestanas en el panel de control v6.1' + push.",
+  "id": "TASK-20260801-v6.2",
+  "titulo": "Contraste y Estandarizacion Visual del Panel de Control v6.2 (reemplaza v6.1)",
+  "version": "6.2",
+  "tipo": "fix",
+  "descripcion": "Estandarizar el alto contraste del panel lateral #side-panel (tabs, titulos/labels, botones, dropdown, config-row/config-actions) con reglas v6.2 SCOPED a #side-panel appended al FINAL de css/main.css (nunca editar reglas anteriores). Bump cache v=6.1 -> v=6.2 (2 ocurrencias en index.html: main.css y app.js). Commit 'fix: estandarizacion de botones y alto contraste en panel de control v6.2' + push.",
   "estado_actual": {
-    "git": "HEAD = cab9897 'Revert \"refactor: purga completa de CSS antiguo y maquetacion plana v6.0\"'. TREE IDENTICO a 7974611 (git rev-parse HEAD^{tree} == 7974611^{tree} == ae59f11...) => el contenido actual ES v5.9 (revert exacto). Working tree LIMPIO (git status --porcelain vacio). Rama: main. Remote: origin https://github.com/flacelo/planificador-horarios.git.",
-    "html": "index.html minificado (fs: 1 linea, 62711 UTF-16 units). Panel: '<div class=\"side-panel\" id=\"side-panel\">' @22385 -> '<div class=\"sp-container\">' -> '<div class=\"sp-header\"><span class=\"sp-title\">⚙️ Panel de Control</span></div>' @22463 (cierra con UN '</div>' @22516: literal '</span></div><div class=\"card-section\">'). Secciones: General <div class=\"card-section\"> @22529 (2928 chars, termina @25457 con literal '</div></div><div class=\"card-section\"><div class=\"card-section-title\">🎨 Vista'), Vista @25457 -> Plantillas @26340 (literal previo '</div></div><div class=\"card-section\">'), Horario @26808 -> Archivos @28130 (literal previo 'as</p></div><div class=\"card-section\">'), Archivos @28130 -> #config-section @28791. Cola del panel: '...btn-export-excel\" class=\"sp-action-btn\">📊 Descargar Excel</button></div></div></div></div></div><div class=\"main-card-container\">' = 5 '</div>' tras el boton (config-actions, config-row Exportar, config-section, sp-container, side-panel). main-card-container @29727. v=5.9 @21823 (css/main.css?v=5.9) y @61276 (js/app.js?v=5.9): EXACTAMENTE 2 ocurrencias.",
-    "colision_html_tab_btn": "CRITICO: 'class=\"tab-btn\"' existe 3 veces FUERA del panel (bottom-nav del area principal): @29819 (class=\"tab-btn active\" data-tab=\"semanal\" onclick=\"cambiarTab('semanal')\"), @29957 (data-tab=\"mensual\"), @30088 (data-tab=\"diario\"), todos dentro de <nav class=\"bottom-nav\"> @29799, tras main-card-container. 'data-tab' @29842/29973/30104 (mismos botones, valores semanal/mensual/diario). 'tab-content' => 0 en HTML. 'tab-perfil'/'tab-personalizar'/'tab-ajustes' => 0. No existe <div class=\"tab-content\" en el HTML actual (las vistas semanal/mensual/diario son .view-content, no .tab-content).",
-    "colision_css": "main.css (minificado, 62713 chars, 1 linea) YA TIENE reglas GLOBALES: (a) '.tab-content{display:none}.tab-content.active{display:block}' @~31742; (b) '.tab-btn{padding:8px 18px;border:1px solid var(--border-color);border-radius:var(--radius-xl);background:var(--surface);color:var(--text-muted);...}.tab-btn:hover{...}.tab-btn.active{background:var(--primary-gradient);color:#fff;...}' @~31932 (estilo bottom-nav); (c) '.tab-btn{font-size:0.65em;padding:6px 10px}' dentro de @media(max-width:480px) @~32729; (d) LEGACY: '.tab-content{display:none}.tab-content.active{display:block!important}.tab-content#view-mensual{display:block!important;...}' @~37613; (e) LEGACY PELIGROSA: '.tab-content{position:relative;z-index:10;margin:20px auto;max-width:1200px;overflow:visible!important}' + 'body.tema-estelar .tab-content{...!important}' @~38690 (si los nuevos wrappers del panel matchean .tab-content global, reciben margin:20px auto y max-width:1200px). 'nav-tab' => 0. panel.css / dashboard.css / grid.css: 0 ocurrencias de tab-btn/tab-content/nav-tab/bottom-nav/panel-tabs.",
-    "colision_js": "CRITICO: js/app.js (minificado, 1 linea, 135414 chars): 'function cambiarTab(e)' @70006 contiene 'document.querySelectorAll(\".tab-btn, .nav-tab, [onclick*=cambiarTab]\").forEach(function(e){e.classList.remove(\"active\")})' @70221 — selector GLOBAL: cada click en bottom-nav (Semanal/Mensual/Diario, onclick=cambiarTab, FUERA del panel) elimina .active de TODOS los .tab-btn, incluidos los nuevos botones del panel. A la inversa, un conmutador global querySelectorAll('.tab-btn') quitaria .active del boton Semanal de bottom-nav sin cambiar la vista (estado roto). => OBLIGATORIO: (1) el snippet nuevo debe usar '#side-panel .tab-btn' / '#side-panel .tab-content'; (2) parche 1-token en cambiarTab: '.tab-btn' -> '.tab-btn:not(#side-panel .tab-btn)' (1 unica ocurrencia @70221). 'data-tab' en app.js => 0. 'cambiarTipoPlanificador' usa '.planner-type-selector button' (4 refs) y 'cambiarVista' usa '.view-toggle button' (1 ref): NINGUNA toca .tab-btn => sin interferencia con las pestanas nuevas. tourPasos: selectors '#tbody' (fuera del panel), '.sp-body .toolbar button:nth-child(3)' y '.tema-btn' NO EXISTEN en el HTML v5.9 (guardados por if(r) -> se saltan).",
-    "punto_insercion_js": "app.js termina con: '...})})});var _fs=document.getElementById(\"font-select\");_fs&&_fs.addEventListener(\"change\",function(){cambiarTipografia(this.value)});var _ej=...btn-export-json...;var _ex=...btn-export-excel...' — 'var _fs=' @135075, ultimo binding top-level, precedido por '})})});' (cierre de DOMContentLoaded de idioma). El <script src=\"js/app.js?v=5.9\"> esta al FINAL del body (index @61276, antes de los divs notif-* y </body></html>): DOM listo en top-level => insertar el snippet del conmutador INMEDIATAMENTE antes de 'var _fs=document.getElementById(\"font-select\")' @135075. Confirmado: los handlers DOMContentLoaded existentes (@130309 y @134772) son para idioma/traduccion y no interfieren.",
-    "mediciones_oculto": "SEGURO: ninguna funcion mide elementos DENTRO de las secciones del panel con display:none. getBoundingClientRect: @~58676 ('#tabla tbody tr', fuera del panel), @~65220 (drag de celda en #tabla, fuera), @~120843 (tooltip de tour, solo si el selector existe). offsetWidth/offsetHeight: resizer de #tabla (fuera), posicionamiento del tour (fuera). renderizar() usa '#tbody'/'#header-row' (fuera del panel, @38203); renderizarCalendario() pinta en #view-mensual (fuera); resizers se atan a '#tabla' (fuera); togglePanel solo hace classList sobre #side-panel. Los bindings que referencian elementos del panel que quedaran ocultos (#font-select @135075, .sp-lang-btn en DOMContentLoaded @134772, .planner-type-selector button en cambiarTipoPlanificador) solo toman medidas CERO: getElementById + addEventListener / classList — funcionan con display:none.",
-    "css_v59_panel": "El bloque v5.9 (FINAL de main.css) estiliza plano: '#side-panel .sp-container .card-section{background:transparent!important;border:none!important;border-bottom:1px solid #1e293b!important;border-radius:0!important;box-shadow:none!important;padding:14px 4px!important;margin:0!important}' + ':last-child{border-bottom:none!important}' + ':hover{background:#1e293b!important}' + '.card-section-title{font-size:0.85rem!important;font-weight:500!important;color:#94a3b8!important;border-bottom:none!important}'. CONFIRMADO: separadores flat border-bottom entre secciones. Las pestanas NO rompen esto: .card-section mantiene su estilo dentro de los wrappers .tab-content; ':last-child' se evalua por grupo (cada pestana muestra su ultima seccion sin borde inferior — aspecto consistente).",
-    "npm_scripts": "package.json: check = 'node --check js/app.js' (EXISTE, es el validador), build = 'node scripts/build.js' (OJO: DESTRUCTIVO — terser-minifica en su lugar js/app.js y sw.js, y minifica css/html; NO usarlo como verificacion salvo que el usuario pida deploy), dev = 'node server.js', check:env, deploy = npm run build."
+    "git": "HEAD = f9d73b9 'feat: navegacion por pestanas en el panel de control v6.1'. Working tree LIMPIO (git status --porcelain vacio, 0 lineas). Rama main. Remote: origin (github.com/flacelo/planificador-horarios.git).",
+    "html": "index.html minificado (1 linea). Panel: '<div class=\"side-panel\" id=\"side-panel\">' @23066 -> '<div class=\"sp-container\">' @23094 -> sp-header/sp-title @23137 -> '<div class=\"panel-tabs\">' (3 .tab-btn: Perfil active / Vista / Ajustes) -> '<div class=\"tab-content active\" id=\"tab-perfil\">' @23434 (General) -> '<div class=\"tab-content\" id=\"tab-personalizar\">' @26492 (Vista: planner-type-selector @26625, view-toggle @27162, toolbar @27531; Horario: interval-row @28002 unico; btn-merge-split @~28520) -> '<div class=\"tab-content\" id=\"tab-ajustes\">' @29270 (Archivos: toolbar @29401 con Guardar/Cargar/Restaurar/Nuevo/Exportar; dropdown Exportar @29788 UNICO; '#config-section' @30023: 3 .config-row Idioma @30172 (.sp-lang-toggle con 2 .sp-lang-btn @30217 active/@30298), Tipografia @30455 (.sp-select), Exportar @~30750 (.config-actions con 2 .sp-action-btn btn-export-json/btn-export-excel)). Panel cierra con 6 '</div>' (config-actions, config-row, config-section, tab-ajustes, sp-container, side-panel) justo antes de '<div class=\"main-card-container\">' @~30868.",
+    "inline_styles_panel": "DENTRO del panel (rango side-panel@23066 -> main-card-container@30950) hay EXACTAMENTE 2 atributos style=: (1) '<div class=\"campo\" id=\"especialidad-container\" style=\"display:none;\">' (oculto select de especialidad) y (2) '<button class=\"btn-merge-split\" id=\"btn-merge-split\" onclick=\"dividirCelda()\" style=\"display:none;\">'. AMBOS son solo display:none. NO existe NINGUN estilo inline con color blanco, borde blanco ni texto negro en el panel.",
+    "style_block_inline": "index.html tiene UN solo bloque '<style>' @34223 (DENTRO del body, DESPUES del panel y de los <link> css): contiene (a) estilos de #view-diario y (b) la seccion v5.5 del panel: '#side-panel .sp-label{font-size:13px!important;color:#94a3b8!important;display:block!important;margin-bottom:6px!important}', '#side-panel .sp-lang-btn{flex:1!important;border:none!important;background:transparent!important;color:#94a3b8!important;padding:10px!important;font-size:14px!important;font-weight:600!important;border-radius:6px!important;cursor:pointer!important}', '#side-panel .sp-lang-btn.active{background:#2563eb!important;color:#ffffff!important}', '#side-panel .sp-action-btn{width:100%!important;background:#334155!important;color:#ffffff!important;border:none!important;border-radius:8px!important;padding:12px!important;font-size:14px!important;font-weight:600!important;cursor:pointer!important}', mas #side-panel{background:#0f172a!important}, .sp-container flex column, .sp-title, .sp-card, .sp-card-title, .sp-lang-toggle, .sp-select, .sp-btn-stack. TODAS con !important. IMPORTANTE: este bloque va DESPUES de main.css en el documento => con igual especificidad y !important, el inline gana. Las reglas v6.2 DEBEN superar en especificidad: '#side-panel .sp-container .X' (1 id + 2 clases) gana a '#side-panel .X' (1 id + 1 clase) del inline; '#side-panel .sp-container .sp-lang-btn.active' (1,3,0) gana a '#side-panel .sp-lang-btn.active' (1,2,0).",
+    "css_v61_tabs": "main.css (minificado, 1 linea) termina con el bloque v6.1: '#side-panel .panel-tabs{display:flex;gap:4px;background-color:#0f172a;padding:4px;border-radius:8px;margin-bottom:12px;border:1px solid #1e293b}' + '#side-panel .tab-btn{flex:1;background:transparent;border:none;color:#94a3b8;padding:8px 4px;font-size:0.78rem;font-weight:500;border-radius:6px;cursor:pointer;transition:all 0.2s ease}' + '#side-panel .tab-btn.active{background-color:#3b82f6;color:#ffffff}' + '#side-panel .tab-content{display:none}' + '#side-panel .tab-content.active{display:block}'. Inmediatamente antes (mismo bloque v6.1): '.sp-lang-btn{flex:1!important;border:none!important;background:transparent!important;color:#94a3b8!important;...}' y '.sp-lang-btn.active{background:#2563eb!important;color:#ffffff!important}' UNSCOPED (pierden por especificidad vs v5.9), '.planner-type-selector button{padding:6px 14px;border:2px solid var(--border-lighter);border-radius:var(--radius-xl);background:var(--surface);cursor:pointer;font-size:0.7em;font-weight:500;transition:all var(--transition-base);color:var(--text-muted)}' y '.view-toggle button{padding:6px 18px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:0.72em;font-weight:500;transition:all var(--transition-base);background:transparent;color:var(--text-light)}' UNSCOPED, mas '#side-panel .planner-type-selector button.active,#side-panel .view-toggle button.active{background:#3b82f6!important;color:#fff!important;border-color:#3b82f6!important}' y '#side-panel .dropdown-content a{color:#e2e8f0!important;background:#0f172a!important;border-radius:8px!important;margin:2px 0!important;padding:8px 12px!important;cursor:pointer!important}'.",
+    "css_v59_reglas_clave": "Reglas v5.9 que las v6.2 deben sobreescribir (todas !important, en main.css): (R20) '#side-panel .sp-container .card-section button,#side-panel .sp-container .sp-btn,#side-panel .sp-container .sp-action-btn,#side-panel .sp-container .sp-lang-btn{height:36px!important;min-height:36px!important;border-radius:6px!important;background:#334155!important;color:#e2e8f0!important;border:1px solid #334155!important;box-sizing:border-box!important;box-shadow:none!important}' => el RESTING actual de casi todos los botones es #334155; v6.2 pide #1e293b. (R21) '#side-panel .sp-container .planner-type-selector button.active,#side-panel .sp-container .view-toggle button.active,#side-panel .sp-container .sp-lang-btn.active,#side-panel .sp-container .sp-btn:hover,#side-panel .sp-container .sp-btn-primary:hover,#side-panel .sp-container .sp-action-btn:hover,#side-panel .sp-container .sp-lang-btn:hover{background:#3b82f6!important;color:#ffffff!important;border-color:#3b82f6!important}' => active/hover ya es #3b82f6/#fff, re-assert igual en v6.2 (gana por orden) y anadir .sp-btn-sm/.btn-merge-split. (R12) '#side-panel .sp-container .sp-btn-primary,#side-panel .sp-container .sp-action-btn{background:rgba(99,102,241,0.16)!important;color:#a5b4fc!important;border:1px solid rgba(99,102,241,0.45)!important}' (tinte indigo, vencida por R20 en .sp-action-btn y .card-section button; sp-btn-primary dentro de .card-section cae en R20). (R22) '#side-panel .sp-container .config-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:10px 0!important;border-bottom:1px solid #1e293b!important}' + (R23) '.config-row:last-child{border-bottom:none!important}'. (R24) '#side-panel .sp-container .config-label{font-size:0.8rem!important;color:#94a3b8!important;white-space:nowrap!important}'. (R25) '#side-panel .sp-container .config-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;flex:1!important;max-width:62%!important}'. (R17) '#side-panel .sp-container .card-section-title{font-size:0.85rem!important;font-weight:500!important;color:#94a3b8!important;border-bottom:none!important;margin-bottom:10px!important;padding-bottom:0!important}' (hay 2 versiones, rules 3 y 17; gana la 17). Otras: '.sp-card-title{...color:#94a3b8...}', '.sp-container .dropdown{grid-column:1/-1!important}', '.sp-container .config-row .sp-select{width:auto!important;flex:1!important;max-width:220px!important}', '.planner-type-selector,.view-toggle,.toolbar,.sp-btn-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}'.",
+    "css_globales": "Reglas GLOBALES relevantes en main.css: '.dropdown{position:relative;display:inline-block}'; '.dropdown-content{display:none;position:absolute;background:var(--surface);min-width:160px;box-shadow:var(--shadow-md);border-radius:var(--radius);z-index:100;top:100%;left:0;overflow:hidden}' => background var(--surface)=#fff (BLANCO) — pero DENTRO del panel lo gana panel.css '.side-panel .dropdown-content{background:#2c3e50;border:1px solid rgba(255,255,255,0.1);...}' (0,2,0 > 0,1,0) => el dropdown del panel hoy es #2c3e50 oscuro con items #0f172a (main.css v6.1 #side-panel .dropdown-content a); '.dropdown-content a{display:block;padding:10px 14px;text-decoration:none;color:var(--text-secondary);font-size:var(--font-size-base);cursor:pointer;transition:var(--transition-fast)}' (texto oscuro #2c3e50, vencida dentro del panel); '.dropdown-content a:hover{background:var(--primary-light)}' (vencida por '#side-panel .dropdown-content a' (1,1,1) => HOY NO HAY efecto hover visible en el dropdown del panel); '.dropdown:hover>.dropdown-content{display:block}'. '.interval-row label{font-size:0.7em;color:var(--text-light);font-weight:500}' => color #888 (var(--text-light) CONFIRMADO #888 en :root). '.interval-row{display:flex;gap:var(--space-xs);align-items:center;margin:var(--space-xs) 0;flex-wrap:wrap;justify-content:center}'. '.section-title{font-weight:bold!important;font-size:14px!important;color:#4a4a4a!important;...}' (GLOBAL). '.tab-btn{padding:8px 18px;...}' x4 (bottom-nav, fuera del panel; NO tocar).",
+    "css_panel_css_legacy": "css/panel.css (7543 chars, linked SIN version DESPUES de main.css) tiene reglas legacy '.side-panel ...' (0,2,x) que pierden contra '#side-panel .sp-container ...' (1,2,x) por especificidad, PERO hay 3 que v6.2 debe vencer explicitamente: '.side-panel .dropdown-content{background:#2c3e50;border:1px solid rgba(255,255,255,0.1);box-shadow:0 8px 30px rgba(0,0,0,0.4);min-width:180px;border-radius:8px;z-index:1002}', '.side-panel .dropdown-content a{color:rgba(255,255,255,0.85)}', '.side-panel .dropdown-content a:hover{background:rgba(102,126,234,0.2);color:#fff}' y '.side-panel .btn-merge-split{background:linear-gradient(135deg,#e74c3c,#ff7675);color:#fff;font-size:0.68em;padding:5px 9px;border:none;border-radius:5px;cursor:pointer}' (boton rojo gradiente). Todas se vencen con selector '#side-panel .X' (1 id) por especificidad.",
+    "clases_inexistentes": "VERIFICADO: '.card-header' => 0 en HTML y 0 en main.css. '.section-title' => 8 en HTML (todas @41222-43777, DENTRO de #view-diario, FUERA del panel) + 1 global en main.css + inline '#view-diario .section-title' => NO existe en el panel (documentar). '.btn-pill' => 0 en HTML y 0 en main.css. '.sp-label' => 0 en HTML (solo regla CSS inline v5.5, CSS muerto; se anade regla v6.2 defensiva igual). '.sp-card' / '.sp-card-title' / '.sp-btn-stack' => 0 en HTML (solo CSS legacy). '.sp-btn-sm' => 0 en main.css como regla propia (solo 8 usos en HTML 'class=\"sp-btn sp-btn-sm\"' y 1 'sp-btn sp-btn-sm sp-btn-primary' @28568) — queda cubierto por R20/v6.2. '.sp-btn-primary' => 3 en HTML (@28568 Aplicar intervalo, @29418 Guardar, @29720 Exportar trigger del dropdown).",
+    "botones_html": "Targets en HTML del panel: .sp-btn/.sp-btn-sm x9 en toolbars (Vista/Plantillas/Horario/Archivos), .sp-btn-primary x3, .sp-lang-btn x2 (@30217 active, @30298), .sp-action-btn x2 (btn-export-json/btn-export-excel dentro de .config-actions), .btn-merge-split x1 (@~28520, inline display:none), .planner-type-selector button (Semanal/Mensual, @26625+), .view-toggle button (Vista/Noche, @27162+), .dropdown trigger = button.sp-btn.sp-btn-primary 'Exportar' @29720. Todos DENTRO de .card-section => matchean R20 (1,2,1) y R21. v6.2 debe usar el mismo patron de selector (incluir '.card-section button') para ganar por orden con especificidad >= (1,2,1).",
+    "dropddown_anidado": "CONFIRMADO: el UNICO .dropdown-content de index.html esta @29788 DENTRO del panel (tab-ajustes, seccion Archivos, toolbar @29401): '<div class=\"dropdown\"><button class=\"sp-btn sp-btn-primary\">Exportar</button><div class=\"dropdown-content\"><a onclick=\"exportarPDF()\">PDF</a><a onclick=\"exportarExcel()\">Excel</a><a onclick=\"exportarWord()\">Word</a><a onclick=\"imprimir()\">Imprimir</a></div></div>' dentro de '.card-section .toolbar'. Regla de hover existente: global '.dropdown-content a:hover{background:var(--primary-light)}' (sin efecto real, vencida) + panel.css '.side-panel .dropdown-content a:hover{background:rgba(102,126,234,0.2);color:#fff}' (0,3,1, vencida por '#side-panel .dropdown-content a' (1,1,1)). => v6.2 anade '#side-panel .dropdown-content a:hover' (1,2,1) que SI aplica.",
+    "cache_v61": "Conteo '?v=6.1' en TODO el repo (excluyendo task.json viejo): EXACTAMENTE 2, ambas en index.html: 'css/main.css?v=6.1' @22434 y 'js/app.js?v=6.1' @62765. panel.css/dashboard.css/grid.css se linkean SIN version. Assets externos (fonts.googleapis.com) no se tocan.",
+    "especificidad_ganadora": "CONFIRMADO que las reglas v6.2 appended al final de main.css ganan: (1) vs v5.9 '#side-panel .sp-container .X' (1 id + 2 clases): misma especificidad, v6.2 gana por ORDEN (append al final del archivo); (2) vs inline v5.5 '#side-panel .X' (1 id + 1 clase): v6.2 '#side-panel .sp-container .X' gana por ESPECIFICIDAD (2 clases > 1) — CRITICO porque el bloque <style> inline @34223 va DESPUES de main.css en el documento; (3) vs panel.css '.side-panel .X' (0 ids): v6.2 '#side-panel' gana por el ID; (4) vs globales (0 ids): gana por especificidad; (5) vs v6.1 '#side-panel .panel-tabs'/'#side-panel .tab-btn' (1,1,0): misma especificidad, gana por orden. REQUISITO: todas las propiedades que compiten llevan !important; v6.2 DEBE usar !important tambien y, para '.sp-lang-btn.active', usar '#side-panel .sp-container .sp-lang-btn.active' (1,3,0) porque el inline '#side-panel .sp-lang-btn.active' (1,2,0) es posterior y con igual especificidad ganaria. Para botones, incluir el selector '#side-panel .sp-container .card-section button' (1,2,1) porque R20 (1,2,1) superaria a un v6.2 con solo (1,2,0).",
+    "npm_scripts": "package.json: check = 'node --check js/app.js' (EXISTE, validador), build = 'node scripts/build.js' (DESTRUCTIVO: minifica en su lugar js/app.js, sw.js, css/html; NO usar salvo deploy), dev = 'node server.js', check:env, deploy = npm run build."
   },
-  "recomendacion_colision": "DECISION: opcion (b) SCOPED a #side-panel. Justificacion: (1) .tab-btn y .tab-content son clases GLOBALES ya en uso por el sistema de vistas (bottom-nav + .view-content del area principal); (2) cambiarTab borra .active de TODOS los .tab-btn al hacer click en Semanal/Mensual/Diario; (3) el CSS legacy .tab-content (margin/max-width/display) golpearia los wrappers del panel; (4) data-tab ya se usa con valores semanal/mensual/diario. El CSS nuevo y el JS nuevo van SCOPED (#side-panel ...), y se anade el parche 1-token en cambiarTab para exclusion. Los valores tab-perfil/tab-personalizar/tab-ajustes no existen y no colisionan.",
+  "recomendacion_colision": "DECISION: bloque v6.2 UNICO appended al FINAL de css/main.css, minificado 1 linea, 100% scoped con prefijos '#side-panel' y '#side-panel .sp-container', TODAS las propiedades con !important (porque todas las reglas que compiten lo usan). NUNCA editar/eliminar reglas previas (v5.9 flat, v6.1 tabs, inline v5.5). NO tocar js/app.js (no requiere cambios: tabs y botones funcionan; solo bump de cache). El unico riesgo de especificidad es el bloque <style> inline @34223 (posterior en el documento): se mitiga usando '#side-panel .sp-container .X' (1,2,0) / '.sp-lang-btn.active' (1,3,0) / '.card-section button' (1,2,1).",
   "archivos_afectados": [
-    "index.html",
     "css/main.css",
-    "js/app.js"
+    "index.html",
+    ".opencode/context/task.json"
   ],
   "sub_tareas": [
     {
       "id": 1,
       "orden": 1,
-      "nombre": "index.html: insertar barra .panel-tabs tras el cierre del sp-header (anchor unico @22516)",
-      "detalle": "Con node (indexOf + substring exacto, sin editor que reformatee): localizar el literal UNICO '<span class=\"sp-title\">⚙️ Panel de Control</span></div><div class=\"card-section\">' @22516 (cierre del span, cierre del sp-header, apertura de General) y reemplazarlo por '<span class=\"sp-title\">⚙️ Panel de Control</span></div><div class=\"panel-tabs\"><button type=\"button\" class=\"tab-btn active\" data-tab=\"tab-perfil\">👤 Perfil</button><button type=\"button\" class=\"tab-btn\" data-tab=\"tab-personalizar\">🎨 Personalizar</button><button type=\"button\" class=\"tab-btn\" data-tab=\"tab-ajustes\">⚙️ Ajustes</button></div><div class=\"card-section\">'. SIN data-i18n en los botones nuevos (el diccionario i18n no tiene keys para ellos y aplicarIdioma podria vaciar el texto). El primer boton lleva class 'tab-btn active'; los otros 2 solo 'tab-btn'.",
+      "nombre": "css/main.css: appender bloque v6.2 (PESTANAS) al FINAL del archivo",
+      "detalle": "Con node (append al final, sin tocar nada anterior): agregar el bloque v6.2 pestanas: '/* ===== v6.2 - CONTRASTE Y ESTANDARIZACION VISUAL (scoped #side-panel) ===== */#side-panel .panel-tabs{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:4px!important;background-color:#0f172a!important;padding:4px!important;border-radius:8px!important;margin-bottom:12px!important;border:1px solid #1e293b!important}#side-panel .tab-btn{background:#1e293b!important;border:1px solid #334155!important;color:#94a3b8!important;flex:1!important;padding:8px 4px!important;font-size:0.78rem!important;font-weight:500!important;border-radius:6px!important;cursor:pointer!important;transition:all 0.2s ease!important}#side-panel .tab-btn:hover{background:#3b82f6!important;border-color:#3b82f6!important;color:#ffffff!important}#side-panel .tab-btn.active{background:#3b82f6!important;border-color:#3b82f6!important;color:#ffffff!important;font-weight:600!important}'. Gana a v6.1 por orden (misma especificidad 1,1,0) y no afecta a los .tab-btn de bottom-nav (scoped). Nota: .panel-tabs cambia de flex a grid repeat(3,1fr) gap 4px manteniendo bg #0f172a/border #1e293b/padding 4px.",
       "criterio_aceptacion": [
-        "node: html.indexOf('class=\"panel-tabs\"') === 1 ocurrencia; 'data-tab=\"tab-perfil\"' === 1; 'data-tab=\"tab-personalizar\"' === 1; 'data-tab=\"tab-ajustes\"' === 1.",
-        "El literal '<span class=\"sp-title\">⚙️ Panel de Control</span></div><div class=\"panel-tabs\">' existe (barra inmediatamente despues del header, antes de General).",
-        "Los 3 botones bottom-nav (@29819/29957/30088) quedan INTACTOS (mismas posiciones relativas; sigan existiendo 'onclick=\"cambiarTab' 3 veces).",
-        "Balance de divs del panel: opens/closes netos sin cambio (panel-tabs abre y cierra en el mismo fragmento)."
+        "node/grep en main.css: '#side-panel .panel-tabs{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:4px!important' === 1 ocurrencia (la nueva).",
+        "El bloque v6.2 es el ULTIMO contenido de main.css (main.css crece; el ultimo '}' cierra '#side-panel .tab-btn.active').",
+        "Regla v6.1 previa '#side-panel .panel-tabs{display:flex' sigue intacta en su posicion (se mantiene, vencida por orden).",
+        "bottom-nav: '.tab-btn{padding:8px 18px' global intacto (el scoping v6.2 no lo toca)."
       ]
     },
     {
       "id": 2,
       "orden": 2,
-      "nombre": "index.html: envolver las 6 secciones en 3 contenedores .tab-content (aperturas y cierres con literales unicos)",
-      "detalle": "4 inserciones con node sobre literales UNICOS (por el emoji del titulo): (a) ANTES de General: insertar '<div class=\"tab-content active\" id=\"tab-perfil\">' delante del literal '<div class=\"card-section\"><div class=\"card-section-title\">👤 General</div>' @22529; (b) ANTES de Vista: reemplazar el literal '</div></div><div class=\"card-section\"><div class=\"card-section-title\">🎨 Vista</div>' @25457 por '</div></div></div><div class=\"tab-content\" id=\"tab-personalizar\"><div class=\"card-section\"><div class=\"card-section-title\">🎨 Vista</div>' (el '</div>' anadido cierra #tab-perfil); (c) ANTES de Archivos: reemplazar el literal 'as</p></div><div class=\"card-section\"><div class=\"card-section-title\">💾 Archivos</div>' @28130 por 'as</p></div></div><div class=\"tab-content\" id=\"tab-ajustes\"><div class=\"card-section\"><div class=\"card-section-title\">💾 Archivos</div>' (el '</div>' anadido cierra #tab-personalizar); (d) CIERRE de #tab-ajustes: reemplazar el literal UNICO '📊 Descargar Excel</button></div></div></div></div></div><div class=\"main-card-container\">' por '📊 Descargar Excel</button></div></div></div></div></div></div><div class=\"main-card-container\">' (anadir UN '</div>' => 6 cierres: config-actions, config-row, config-section, tab-ajustes, sp-container, side-panel). Resultado: #tab-perfil contiene solo General; #tab-personalizar contiene Vista+Plantillas+Horario; #tab-ajustes contiene Archivos+Configuracion. TODOS los ids/clases internos intactos (inp-titulo-header, font-select, sel-intervalo, btn-export-json/excel, sp-lang-btn, config-*, card-section, etc.).",
+      "nombre": "css/main.css: bloque v6.2 (TITULOS Y LABELS) appended tras las pestanas",
+      "detalle": "Agregar (mismo append, tras la sub-tarea 1): '#side-panel .sp-container .card-section-title{font-size:0.85rem!important;font-weight:600!important;color:#f8fafc!important;border-bottom:1px solid #1f2937!important;margin-bottom:12px!important;padding-bottom:6px!important}#side-panel .sp-container .config-label{font-size:0.8rem!important;font-weight:500!important;color:#cbd5e1!important;white-space:nowrap!important}#side-panel .sp-container .sp-label{font-size:13px!important;font-weight:500!important;color:#cbd5e1!important;display:block!important;margin-bottom:6px!important}#side-panel .interval-row label{font-size:0.7em!important;font-weight:500!important;color:#cbd5e1!important}'. card-section-title: #94a3b8 -> #f8fafc (gana a v5.9 rules 3/17 por orden, misma especificidad 1,2,0). config-label: #94a3b8 -> #cbd5e1. sp-label: CSS muerto hoy (0 usos en HTML) pero se estandariza defensivamente (1,2,0 > inline 1,1,0). interval-row label: #888 (var(--text-light)) -> #cbd5e1 (1,1,1 > 0,1,1). DOCUMENTAR: '.section-title' y '.card-header' NO existen en el panel (section-title x8 solo en #view-diario fuera del panel; card-header 0 en HTML/CSS) — sin accion.",
       "criterio_aceptacion": [
-        "node: 'id=\"tab-perfil\"' === 1, 'id=\"tab-personalizar\"' === 1, 'id=\"tab-ajustes\"' === 1; '<div class=\"tab-content' === 3; solo tab-perfil lleva 'active' (literal '<div class=\"tab-content active\" id=\"tab-perfil\">' === 1).",
-        "Orden verificable: indexOf(tab-perfil) < indexOf('👤 General') < indexOf(tab-personalizar) < indexOf('🎨 Vista') < indexOf('⏱️ Horario') < indexOf(tab-ajustes) < indexOf('💾 Archivos') < indexOf('🛠️ Configuración') < indexOf('main-card-container').",
-        "Cola: literal '</button></div></div></div></div></div></div><div class=\"main-card-container\">' === 1 (6 cierres); conteo neto entre config-section y main-card-container: opens +1, closes +1 (delta neta 0 vs v5.9).",
-        "Conteos de secciones intactos: 'class=\"card-section\"' (aperturas sin id) === 5 y 'id=\"config-section\"' === 1; titulos con emoji 1 vez cada uno; ids '#font-select', '#btn-export-json', '#btn-export-excel', '#inp-titulo-header', '#sel-intervalo' === 1 cada uno.",
-        "bottom-nav y sus 3 tab-btn/data-tab/onclick=cambiarTab intactos (fuera del panel, sin cambios).",
-        "npm run check pasa (js/app.js aun no tocado en este paso; no se abre en editores que reformateen)."
+        "grep main.css: '#side-panel .sp-container .card-section-title{font-size:0.85rem!important;font-weight:600!important;color:#f8fafc!important' === 1; '#side-panel .sp-container .config-label{font-size:0.8rem!important;font-weight:500!important;color:#cbd5e1!important' === 1; '#side-panel .sp-container .sp-label{font-size:13px!important;font-weight:500!important;color:#cbd5e1!important' === 1; '#side-panel .interval-row label{font-size:0.7em!important;font-weight:500!important;color:#cbd5e1!important' === 1.",
+        "Las reglas v5.9 previas (.card-section-title color:#94a3b8; .config-label color:#94a3b8) siguen intactas en su posicion (vencidas por especificidad/orden).",
+        "Regla global '.interval-row label{...color:var(--text-light)...}' intacta."
       ]
     },
     {
       "id": 3,
       "orden": 3,
-      "nombre": "index.html: bump de cache v=5.9 -> v=6.1 (2 ocurrencias exactas @21823 y @61276)",
-      "detalle": "Reemplazar las 2 ocurrencias 'v=5.9': @21823 (link rel=stylesheet href=\"css/main.css?v=5.9\") y @61276 (script src=\"js/app.js?v=5.9\") por 'v=6.1'. Ningun otro asset local lleva query string de version (los externos fonts.googleapis.com / api.qrserver.com NO se tocan).",
+      "nombre": "css/main.css: bloque v6.2 (BOTONES resting/active/hover) appended tras titulos",
+      "detalle": "Agregar: '#side-panel .sp-container .card-section button,#side-panel .sp-container .sp-btn,#side-panel .sp-container .sp-btn-sm,#side-panel .sp-container .sp-btn-primary,#side-panel .sp-container .sp-action-btn,#side-panel .sp-container .sp-lang-btn,#side-panel .sp-container .btn-merge-split{background:#1e293b!important;border:1px solid #334155!important;color:#e2e8f0!important;height:36px!important;min-height:36px!important;border-radius:6px!important;box-sizing:border-box!important;box-shadow:none!important}#side-panel .sp-container .planner-type-selector button,#side-panel .sp-container .view-toggle button{background:#1e293b!important;border:1px solid #334155!important;color:#e2e8f0!important;min-height:36px!important;border-radius:6px!important;padding:6px 14px!important}#side-panel .sp-container .planner-type-selector button.active,#side-panel .sp-container .view-toggle button.active,#side-panel .sp-container .sp-lang-btn.active,#side-panel .sp-container .sp-btn:hover,#side-panel .sp-container .sp-btn-sm:hover,#side-panel .sp-container .sp-btn-primary:hover,#side-panel .sp-container .sp-action-btn:hover,#side-panel .sp-container .sp-lang-btn:hover,#side-panel .sp-container .btn-merge-split:hover{background:#3b82f6!important;color:#ffffff!important;border-color:#3b82f6!important}'. Cambios reales vs estado actual: resting #334155 -> #1e293b (R20/R12 vencidas por orden, incluye '.card-section button' (1,2,1) para empatar/vencer R20); .btn-merge-split pasa de gradiente rojo panel.css (0,2,0) y sin estilo main.css a #1e293b estandar (1,2,0 gana por ID); .planner-type-selector/.view-toggle resting explicito #1e293b (vencen globales (0,1,1) y R20 por orden); active/hover re-assert #3b82f6/#fff anadiendo .sp-btn-sm y .btn-merge-split (vencen R21 por orden; '.sp-lang-btn.active' con (1,3,0) vence al inline (1,2,0) posterior).",
       "criterio_aceptacion": [
-        "node: 'v=6.1' en index.html === 2 coincidencias (main.css y app.js); 'v=5.9' === 0.",
-        "Las URLs externas (fonts.googleapis.com/css2?, api.qrserver.com/v1?) no se modifican."
+        "grep main.css: cadena '#side-panel .sp-container .card-section button,#side-panel .sp-container .sp-btn,#side-panel .sp-container .sp-btn-sm,#side-panel .sp-container .sp-btn-primary,#side-panel .sp-container .sp-action-btn,#side-panel .sp-container .sp-lang-btn,#side-panel .sp-container .btn-merge-split{background:#1e293b!important;border:1px solid #334155!important;color:#e2e8f0!important' === 1.",
+        "grep main.css: '#side-panel .sp-container .planner-type-selector button,#side-panel .sp-container .view-toggle button{background:#1e293b!important' === 1.",
+        "grep main.css: la cadena active/hover incluye '.sp-lang-btn.active' con prefijo '.sp-container' === 1 ('#side-panel .sp-container .planner-type-selector button.active,#side-panel .sp-container .view-toggle button.active,#side-panel .sp-container .sp-lang-btn.active' === 1).",
+        "R20/R21/R12 v5.9 intactas en su posicion; regla global '.tab-btn' bottom-nav intacta; inline v5.5 intacto."
       ]
     },
     {
       "id": 4,
       "orden": 4,
-      "nombre": "css/main.css: appender bloque v6.1 AL FINAL, SCOPED a #side-panel (nada de selectores globales)",
-      "detalle": "Agregar al FINAL de css/main.css (tras la cola v5.9) el bloque v6.1 con prefijo '#side-panel': '#side-panel .panel-tabs{display:flex;gap:6px;padding:10px 4px 14px!important;border-bottom:1px solid #1e293b!important;margin-bottom:14px!important}#side-panel .tab-btn{flex:1;padding:8px 10px!important;border:1px solid #334155!important;border-radius:8px!important;background:#1e293b!important;color:#94a3b8!important;cursor:pointer;font-size:0.75rem!important;font-weight:500!important;transition:all .2s;box-sizing:border-box!important}#side-panel .tab-btn:hover{border-color:#3b82f6!important;color:#e2e8f0!important}#side-panel .tab-btn.active{background:#3b82f6!important;border-color:#3b82f6!important;color:#ffffff!important}#side-panel .tab-content{display:none}#side-panel .tab-content.active{display:block;margin:0!important;max-width:none!important}'. Justificacion del scoping: (1) las reglas globales .tab-btn (bottom-nav) y .tab-content (vistas) NO deben cambiar; (2) 'margin:0!important;max-width:none!important' en .tab-content.active anula la legacy GLOBAL '.tab-content{margin:20px auto;max-width:1200px}' @~38690 que, sin scoping, deformaria los wrappers del panel; (3) '#side-panel .tab-btn' (especificidad 1 id + 1 clase) gana a '.tab-btn' global y a la media query 480px sin tocar bottom-nav. NO modificar NADA anterior del archivo.",
+      "nombre": "css/main.css: bloque v6.2 (DROPDOWN) appended tras botones",
+      "detalle": "Agregar: '#side-panel .dropdown-content{display:none;position:absolute;background:#1e293b!important;border:1px solid #334155!important;min-width:160px;box-shadow:var(--shadow-md);border-radius:8px!important;z-index:100;top:100%;left:0;overflow:hidden}#side-panel .dropdown-content a{display:block;padding:8px 12px!important;text-decoration:none;color:#e2e8f0!important;background:#1e293b!important;border-radius:8px!important;margin:2px 0!important;cursor:pointer!important;font-size:var(--font-size-base);transition:var(--transition-fast)}#side-panel .dropdown-content a:hover{background:#3b82f6!important;color:#ffffff!important}#side-panel .dropdown:hover>.dropdown-content{display:block}'. CONFIRMADO: el dropdown de Exportar @29788 esta DENTRO del panel. Hoy: contenedor #2c3e50 (panel.css (0,2,0)) sobre fondo del toolbar, items #0f172a/#e2e8f0 (v6.1), SIN hover visible (vencido). v6.2: contenedor #1e293b + border #334155 (1,1,0 gana por ID), items resting #1e293b/#e2e8f0 (1,1,1 gana a v6.1 por orden y a panel.css por ID), hover #3b82f6/#fff (1,2,1 gana a global (0,2,1) y panel.css (0,3,1) por ID). OBLIGATORIO incluir '#side-panel .dropdown:hover>.dropdown-content{display:block}' (1,2,1): sin ella, el display:none propio (1,1,0) venceria al hover global (0,2,1) y el dropdown nunca abriria.",
       "criterio_aceptacion": [
-        "El bloque v6.1 es el ULTIMO contenido del archivo (main.css crece y el ultimo '}' cierra '#side-panel .tab-content.active').",
-        "grep en main.css: '#side-panel .panel-tabs' === 1; '#side-panel .tab-btn' === 3 (base, :hover, .active); '#side-panel .tab-content' === 2 (base y .active); 'margin:0!important;max-width:none!important' presente.",
-        "Las reglas globales previas '.tab-btn{...}' (bottom-nav @~31932) y '.tab-content{...}' legacy @~38690 siguen INTACTAS en sus posiciones (solo adiciones al final).",
-        "El bloque v5.9 previo del panel (card-section flat con border-bottom #1e293b) NO se toca; sigue existiendo tal cual."
+        "grep main.css: '#side-panel .dropdown-content{display:none;position:absolute;background:#1e293b!important;border:1px solid #334155!important' === 1.",
+        "grep main.css: '#side-panel .dropdown-content a:hover{background:#3b82f6!important;color:#ffffff!important}' === 1; '#side-panel .dropdown:hover>.dropdown-content{display:block}' === 1.",
+        "Reglas globales '.dropdown-content{...background:var(--surface)...}' y '.dropdown-content a:hover{background:var(--primary-light)}' intactas; panel.css intacto (no se edita)."
       ]
     },
     {
       "id": 5,
       "orden": 5,
-      "nombre": "js/app.js: insertar conmutador de pestanas SCOPED a #side-panel antes de 'var _fs=' @135075",
-      "detalle": "Con node: localizar 'var _fs=document.getElementById(\"font-select\")' @135075 (unico) e insertar ANTES el snippet top-level (minificado, 1 linea, DOM listo porque el script esta al final del body): 'document.querySelectorAll(\"#side-panel .tab-btn\").forEach(function(btn){btn.addEventListener(\"click\",function(){document.querySelectorAll(\"#side-panel .tab-btn\").forEach(function(b){b.classList.remove(\"active\")}),document.querySelectorAll(\"#side-panel .tab-content\").forEach(function(t){t.classList.remove(\"active\")}),btn.classList.add(\"active\");var c=document.getElementById(btn.getAttribute(\"data-tab\"));c&&c.classList.add(\"active\")})});'. SCOPED OBLIGATORIO: un querySelectorAll('.tab-btn') global quitaria .active del boton Semanal de bottom-nav (colision probada en estado_actual.colision_js). El snippet solo toca botones y contenidos DENTRO de #side-panel.",
+      "nombre": "css/main.css: bloque v6.2 (config-row / config-actions) appended tras dropdown",
+      "detalle": "Agregar: '#side-panel .sp-container .config-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;margin-bottom:12px!important;padding:10px 0!important;border-bottom:1px solid #1e293b!important}#side-panel .sp-container .config-row:last-child{border-bottom:none!important;margin-bottom:0!important}#side-panel .sp-container .config-actions{display:flex!important;flex-direction:column!important;width:100%!important;max-width:none!important;flex:none!important;gap:8px!important;margin-top:8px!important}#side-panel .sp-container .config-actions .sp-action-btn{width:100%!important;height:38px!important;min-height:38px!important;background:#1e293b!important;border:1px solid #334155!important;color:#e2e8f0!important;border-radius:8px!important;padding:0 12px!important;font-size:14px!important;font-weight:600!important;cursor:pointer!important}'. config-row: mantiene flex space-between align center (R22) y anade margin-bottom:12px (R22 vencida por orden, misma especificidad 1,2,0; :last-child (1,3,0) gana a R23 (1,3,0) por orden). config-actions: grid 2col max-width 62% (R25) -> columna width:100% (1,2,0 gana por orden; max-width:none y flex:none anulan R25). .sp-action-btn: height 36->38px con (1,3,0) que vence a R20 (1,2,0) y al inline v5.5 (1,1,0). El row 'Exportar' (ultimo config-row) ya no lleva borde inferior y su margen extra se anula con :last-child margin-bottom:0.",
       "criterio_aceptacion": [
-        "node: en app.js 'querySelectorAll(\"#side-panel .tab-btn\")' === 2 (forEach y forEach interno); 'querySelectorAll(\"#side-panel .tab-content\")' === 1; 'getAttribute(\"data-tab\")' === 1.",
-        "El snippet queda ANTES de 'var _fs=' (indexOf del snippet < indexOf('var _fs=')).",
-        "npm run check (node --check js/app.js) pasa SIN errores.",
-        "No existen selectores GLOBALES nuevos de .tab-btn/.tab-content en el snippet (grep '.tab-btn\"' sin prefijo #side-panel === 0 fuera de la cadena '#side-panel .tab-btn')."
+        "grep main.css: '#side-panel .sp-container .config-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;margin-bottom:12px!important' === 1; '#side-panel .sp-container .config-row:last-child{border-bottom:none!important;margin-bottom:0!important}' === 1.",
+        "grep main.css: '#side-panel .sp-container .config-actions{display:flex!important;flex-direction:column!important;width:100%!important;max-width:none!important' === 1; '#side-panel .sp-container .config-actions .sp-action-btn{width:100%!important;height:38px!important;min-height:38px!important' === 1.",
+        "R22/R23/R25 v5.9 intactas en su posicion; inline v5.5 '#side-panel .sp-action-btn{...}' intacto."
       ]
     },
     {
       "id": 6,
       "orden": 6,
-      "nombre": "js/app.js: parche 1-token en cambiarTab para excluir las pestanas del panel",
-      "detalle": "Con node: en 'function cambiarTab(e)' @70006, reemplazar la UNICA ocurrencia del selector 'document.querySelectorAll(\".tab-btn, .nav-tab, [onclick*=cambiarTab]\")' @70221 por 'document.querySelectorAll(\".tab-btn:not(#side-panel .tab-btn), .nav-tab, [onclick*=cambiarTab]\")'. Efecto: al hacer click en Semanal/Mensual/Diario (bottom-nav), cambiarTab sigue limpiando .active de las vistas y de los botones de la bottom-nav ([onclick*=cambiarTab] los cubre), pero YA NO desactiva la pestana activa del panel. Sin este parche, cada click en bottom-nav dejaria el panel sin pestana activa visualmente (bug de interaccion). NADA mas cambia en app.js.",
+      "nombre": "index.html: bump de cache v=6.1 -> v=6.2 (2 ocurrencias exactas @22434 y @62765)",
+      "detalle": "Con node (indexOf + replace exacto): reemplazar las 2 ocurrencias 'v=6.1' por 'v=6.2': @22434 ('<link rel=\"stylesheet\" href=\"css/main.css?v=6.1\">') y @62765 ('<script src=\"js/app.js?v=6.1\"></script>'). Ningun otro asset local lleva query version; externos intactos.",
       "criterio_aceptacion": [
-        "node: '.tab-btn:not(#side-panel .tab-btn)' en app.js === 1 (dentro de cambiarTab); la cadena vieja exacta '\".tab-btn, .nav-tab' === 0.",
-        "node --check js/app.js pasa SIN errores.",
-        "La funcion cambiarTab conserva su logica (view-content display none/block, classList active en view-*) intacta: git diff muestra SOLO el selector cambiado en esa linea."
+        "node: 'v=6.2' en index.html === 2 coincidencias (css/main.css y js/app.js); 'v=6.1' === 0.",
+        "Las URLs externas (fonts.googleapis.com/css2?, api.qrserver.com/v1?) no se modifican."
       ]
     },
     {
       "id": 7,
       "orden": 7,
-      "nombre": "Verificacion final (node --check + conteos + balance + git diff)",
-      "detalle": "Ejecutar: (1) npm run check (node --check js/app.js) sin errores; (2) conteos node sobre index.html: 'v=6.1' === 2, 'v=5.9' === 0, 'class=\"panel-tabs\"' === 1, '<div class=\"tab-content' === 3, 'id=\"tab-perfil\"' === 1 con class active, 'id=\"tab-personalizar\"' === 1, 'id=\"tab-ajustes\"' === 1, 'data-tab=\"tab-' === 3 (tab-perfil/tab-personalizar/tab-ajustes), bottom-nav 'onclick=\"cambiarTab' === 3 intacto, cola 6 cierres antes de main-card-container; (3) conteos sobre main.css: bloque v6.1 al final (ultimos 700 chars contienen '#side-panel .tab-content.active'), reglas globales previas intactas; (4) conteos sobre app.js: snippet scoped presente (2x #side-panel .tab-btn), parche :not(#side-panel .tab-btn) === 1, cadena vieja === 0; (5) git diff --stat: SOLO index.html, css/main.css, js/app.js (y .opencode/context/task.json); sin secretos. NO ejecutar npm run build (destructivo: terser-minifica en su lugar js/app.js y sw.js y reescribe css/html) salvo pedido explicito de deploy.",
+      "nombre": "Verificacion final (node --check + conteos + especificidad + git diff)",
+      "detalle": "Ejecutar: (1) npm run check (node --check js/app.js) sin errores; (2) conteos node sobre main.css: las 12 cadenas v6.2 de los criterios de las sub-tareas 1-5 === 1 cada una, y el bloque v6.2 es el ULTIMO contenido del archivo (ultimos 700 chars contienen '#side-panel .dropdown:hover>.dropdown-content{display:block}'); reglas v5.9/v6.1 previas intactas en posicion; (3) conteos node sobre index.html: 'v=6.2' === 2, 'v=6.1' === 0, 'style=\"' dentro del rango panel->main-card-container sigue === 2 (solo display:none), 'class=\"panel-tabs\"' === 1, 3 .tab-btn, 6 .card-section-title, 3 .config-row, 1 .config-actions, 1 .dropdown-content; (4) git diff --stat: SOLO css/main.css, index.html y .opencode/context/task.json (js/app.js NO cambia); main.css con 1 unico hunk de adicion al final; index.html con 2 cambios de token (v=6.1 -> v=6.2); (5) NO ejecutar npm run build (destructivo) salvo pedido explicito de deploy.",
       "criterio_aceptacion": [
         "npm run check exit 0.",
-        "Todos los conteos del detalle coinciden exactamente.",
-        "git diff --stat muestra solo los 3 archivos previstos; el diff de js/app.js tiene exactamente 2 hunks (snippet + parche); el diff de main.css es solo adicion al final.",
-        "El HTML resultante abre en navegador sin errores de consola (verificacion manual opcional del ejecutor con npm run dev)."
+        "Todas las cadenas v6.2 === 1 en main.css; bloque v6.2 al final del archivo.",
+        "git diff --stat muestra solo los 3 archivos previstos; diff de main.css solo adiciones al final; diff de index.html solo los 2 tokens de cache.",
+        "Verificacion manual opcional: npm run dev + abrir panel -> pestanas con grid 3fr, botones #1e293b resting / #3b82f6 active, dropdown Exportar oscuro con hover azul, Exportar JSON/Excel a ancho completo."
       ]
     },
     {
       "id": 8,
       "orden": 8,
       "nombre": "Commit y push (requerido por el usuario)",
-      "detalle": "git add index.html css/main.css js/app.js .opencode/context/task.json; commit con mensaje EXACTO: 'feat: navegacion por pestanas en el panel de control v6.1'; git push origin main. NO incluir otros archivos; el working tree queda limpio tras el push.",
+      "detalle": "git add css/main.css index.html .opencode/context/task.json; commit con mensaje EXACTO: 'fix: estandarizacion de botones y alto contraste en panel de control v6.2'; git push origin main. NO incluir otros archivos; el working tree queda limpio tras el push.",
       "criterio_aceptacion": [
-        "git log -1 --oneline === 'feat: navegacion por pestanas en el panel de control v6.1'.",
+        "git log -1 --oneline === 'fix: estandarizacion de botones y alto contraste en panel de control v6.2'.",
         "git push origin main sin errores; git status --short vacio tras el push.",
-        "El commit contiene SOLO los 4 archivos previstos (index.html, css/main.css, js/app.js, task.json)."
+        "El commit contiene SOLO los 3 archivos previstos (css/main.css, index.html, task.json)."
       ]
     }
   ],
@@ -121,98 +122,122 @@
     {
       "id": "R1",
       "criticidad": "ALTA",
-      "descripcion": "COLISION .tab-btn con bottom-nav: cambiarTab (app.js @70006) usa querySelectorAll('.tab-btn, .nav-tab, [onclick*=cambiarTab]') GLOBAL y borra .active de TODOS los .tab-btn en cada click de vista. Sin el parche de la sub-tarea 6, la pestana activa del panel quedaria desactivada tras cualquier click en Semanal/Mensual/Diario.",
-      "mitigacion": "Sub-tareas 5 y 6: conmutador scoped a #side-panel y exclusion ':not(#side-panel .tab-btn)' en cambiarTab. Verificar con conteos (cadena vieja === 0)."
+      "descripcion": "Bloque <style> inline @34223 va DESPUES de main.css en el documento y todas sus reglas v5.5 usan !important: '#side-panel .sp-label' (1,1,0), '#side-panel .sp-lang-btn' (1,1,0), '#side-panel .sp-lang-btn.active' (1,2,0), '#side-panel .sp-action-btn' (1,1,0). Con igual especificidad, el inline ganaria por orden.",
+      "mitigacion": "Todas las reglas v6.2 que compiten usan '#side-panel .sp-container .X' (1,2,0) o superior; '.sp-lang-btn.active' usa (1,3,0); '.sp-action-btn' dentro de config-actions usa (1,3,0). Verificado por criterio de aceptacion de la sub-tarea 3 (cadena con '.sp-container .sp-lang-btn.active')."
     },
     {
       "id": "R2",
       "criticidad": "ALTA",
-      "descripcion": "CSS GLOBAL legacy: main.css ya define '.tab-content{display:none}.tab-content.active{display:block(!important)}' y '.tab-content{position:relative;z-index:10;margin:20px auto;max-width:1200px;overflow:visible!important}'. Si el bloque v6.1 usara selectores sin prefijo, (a) cambiaria el estilo de los .tab-btn de bottom-nav y (b) los wrappers del panel heredarian margin/max-width legacy.",
-      "mitigacion": "Sub-tarea 4: TODAS las reglas v6.1 con prefijo '#side-panel' + override explicito 'margin:0!important;max-width:none!important' en '#side-panel .tab-content.active'. Especificidad 1id+1clase gana a las reglas globales por especificidad y orden."
+      "descripcion": "R20 v5.9 '#side-panel .sp-container .card-section button' tiene especificidad (1,2,1) (elemento 'button' extra). Un v6.2 con solo (1,2,0) para .sp-btn/.sp-btn-sm NO venceria a R20 para los botones <button> del panel (quedarian #334155).",
+      "mitigacion": "El grupo resting de la sub-tarea 3 incluye el selector '#side-panel .sp-container .card-section button' (1,2,1) al inicio: empata especificidad con R20 y gana por orden (append al final)."
     },
     {
       "id": "R3",
-      "criticidad": "MEDIA",
-      "descripcion": "HTML minificado en 1 linea: cualquier insercion con editor que reformatee o re-codifique (UTF-8/emoji) romperia el archivo. Los anchors deben ser literales UNICOS (con emoji del titulo) y las operaciones con node indexOf/substring.",
-      "mitigacion": "Sub-tareas 1-2 especifican literales exactos verificados (posiciones fs-accurate @22385/22529/25457/26340/26808/28130/28791/29727) + criterios de conteo + balance de cierres (6 '</div>' antes de main-card-container)."
+      "criticidad": "ALTA",
+      "descripcion": "Si v6.2 redeclara display:none en '#side-panel .dropdown-content' (1,1,0) sin la regla hover, el dropdown de Exportar JAMAS abriria: '.dropdown:hover>.dropdown-content{display:block}' global (0,2,1) perderia contra (1,1,0) por el ID.",
+      "mitigacion": "Sub-tarea 4 incluye '#side-panel .dropdown:hover>.dropdown-content{display:block}' (1,2,1) obligatoria; criterio de aceptacion explicito."
     },
     {
       "id": "R4",
-      "criticidad": "BAJA",
-      "descripcion": "display:none en secciones del panel: si alguna funcion midiera offsetWidth/getBoundingClientRect de elementos dentro de #tab-personalizar/#tab-ajustes (ocultos al inicio), devolveria 0 y romperia el layout. Investigado: TODAS las mediciones (renderizar, renderizarCalendario, resizers, tour, drag) apuntan a #tabla/#tbody/#view-mensual (fuera del panel) y los bindings de elementos del panel solo usan classList/addEventListener, sin mediciones.",
-      "mitigacion": "Documentado en estado_actual.mediciones_oculto; sin accion requerida. Verificacion manual con npm run dev en el paso 7."
+      "criticidad": "MEDIA",
+      "descripcion": "HTML minificado en 1 linea: cualquier insercion con editor que reformatee o re-codifique (UTF-8/emoji) romperia el archivo. El bump de cache debe ser un replace de tokens exactos con node.",
+      "mitigacion": "Sub-tarea 6 especifica los 2 literales exactos con posiciones (@22434 y @62765) y criterios de conteo; no se abre el archivo en editores que reformateen."
     },
     {
       "id": "R5",
-      "criticidad": "BAJA",
-      "descripcion": "i18n: los botones nuevos SIN data-i18n evitan que aplicarIdioma vacie su texto (las keys tab_perfil/tab-personalizar/tab-ajustes no existen en el diccionario). Los botones bottom-nav conservan sus data-i18n (tab_semanal/tab_mensual/tab_diario) intactos.",
-      "mitigacion": "Sub-tarea 1 especifica botones sin data-i18n; verificar que 'data-i18n=\"tab_' nuevo === 0 (solo los 3 existentes de bottom-nav)."
+      "criticidad": "MEDIA",
+      "descripcion": "panel.css (legacy, linked sin version DESPUES de main.css) define '.side-panel .dropdown-content' #2c3e50, '.side-panel .dropdown-content a{color:rgba(255,255,255,0.85)}', '.side-panel .dropdown-content a:hover' y '.side-panel .btn-merge-split' gradiente rojo con especificidad (0,2,x). Si v6.2 usara selectores sin el prefijo #side-panel, perderia.",
+      "mitigacion": "Todas las reglas v6.2 de dropdown y btn-merge-split usan prefijo '#side-panel' (1 id) que vence a (0,2,x) por especificidad; verificado en sub-tareas 3 y 4."
     },
     {
       "id": "R6",
       "criticidad": "BAJA",
-      "descripcion": "npm run build es DESTRUCTIVO (terser-minifica en su lugar js/app.js, sw.js, css, html). Usarlo como verificacion alteraria archivos no previstos (sw.js).",
+      "descripcion": "npm run build es DESTRUCTIVO (terser-minifica en su lugar js/app.js, sw.js, css, html). Usarlo como verificacion alteraria archivos no previstos.",
       "mitigacion": "Verificar solo con npm run check + conteos node + git diff; build solo si el usuario pide deploy."
+    },
+    {
+      "id": "R7",
+      "criticidad": "BAJA",
+      "descripcion": "Reglas v6.2 que duplican el estado actual (p.ej. active/hover #3b82f6/#fff ya presente en R21, .config-row flex ya en R22) pueden parecer redundantes, pero son necesarias para: (a) cubrir .sp-btn-sm/.btn-merge-split no incluidos en R21 y (b) garantizar el orden (append) frente a futuras ediciones. No eliminar reglas v6.2 'redundantes'.",
+      "mitigacion": "Documentado; los criterios de aceptacion exigen las cadenas exactas === 1."
     }
   ],
   "verificacion": {
     "comandos": [
       "npm run check  (node --check js/app.js; script existe en package.json)",
-      "node: conteos index.html — 'v=6.1'=2, 'v=5.9'=0, 'class=\"panel-tabs\"'=1, '<div class=\"tab-content'=3, 'id=\"tab-perfil\"'=1 (con active), 'id=\"tab-personalizar\"'=1, 'id=\"tab-ajustes\"'=1, 'data-tab=\"tab-'=3, 'onclick=\"cambiarTab'=3 (bottom-nav intacta)",
-      "node: literal cola panel — '</button></div></div></div></div></div></div><div class=\"main-card-container\">' === 1 (6 cierres: config-actions, config-row, config-section, tab-ajustes, sp-container, side-panel)",
-      "node: conteos main.css — bloque v6.1 al final (ultimos 700 chars contienen '#side-panel .tab-content.active'); reglas globales .tab-btn/.tab-content previas intactas",
-      "node: conteos app.js — 'querySelectorAll(\"#side-panel .tab-btn\")'=2, 'querySelectorAll(\"#side-panel .tab-content\")'=1, '.tab-btn:not(#side-panel .tab-btn)'=1, cadena '\".tab-btn, .nav-tab'=0, snippet ANTES de 'var _fs='",
-      "git diff --stat: solo index.html, css/main.css, js/app.js (+ task.json); js/app.js con 2 hunks (snippet + parche); main.css solo adiciones",
-      "git commit -m 'feat: navegacion por pestanas en el panel de control v6.1' + git push origin main",
+      "node: conteos main.css — las 12 cadenas v6.2 (sub-tareas 1-5) === 1 cada una; ultimos 700 chars contienen '#side-panel .dropdown:hover>.dropdown-content{display:block}'; reglas v5.9 (R20/R21/R22/R23/R24/R25) y v6.1 (.panel-tabs display:flex, .tab-btn) intactas en posicion",
+      "node: conteos index.html — 'v=6.2' === 2, 'v=6.1' === 0; 'style=\"' en rango panel->main-card-container === 2 (solo display:none en #especialidad-container y #btn-merge-split); 'class=\"panel-tabs\"' === 1; 'class=\"tab-btn' === 3 (panel) + 3 (bottom-nav) sin cambios; 'class=\"card-section-title\"' === 6; 'class=\"config-row\"' === 3; 'class=\"config-actions\"' === 1; 'dropdown-content' === 1 (@29788)",
+      "git diff --stat: solo css/main.css, index.html y .opencode/context/task.json; main.css 1 hunk adicion al final; index.html 2 tokens v=6.1 -> v=6.2",
+      "git commit -m 'fix: estandarizacion de botones y alto contraste en panel de control v6.2' + git push origin main",
       "NO usar npm run build (destructivo) salvo pedido explicito de deploy"
     ],
-    "criterio_exito": "node --check sin errores + 3 .tab-content con solo #tab-perfil activo + barra .panel-tabs tras el header con 3 .tab-btn (data-tab tab-perfil/tab-personalizar/tab-ajustes) + todos los ids v5.9 intactos (1 ocurrencia c/u) + v=6.1 x2 + CSS v6.1 scoped al final de main.css + conmutador scoped a #side-panel + parche :not(#side-panel .tab-btn) en cambiarTab + commit/push con el mensaje exacto."
+    "criterio_exito": "node --check sin errores + bloque v6.2 scoped (#side-panel) al final de main.css con: pestanas grid repeat(3,1fr) gap 4px, .tab-btn resting #1e293b/#94a3b8 y active #3b82f6/#fff weight 600, titulos/labels #f8fafc/#cbd5e1, botones resting #1e293b/border #334155/texto #e2e8f0 y active/hover #3b82f6/#fff, dropdown #1e293b/#334155 con hover azul funcional, config-row margin-bottom 12px, config-actions columna width 100% con .sp-action-btn height 38px + cache v=6.2 x2 + commit/push con el mensaje exacto."
   },
   "contexto_extra": {
     "posiciones_clave_index_html": {
-      "side_panel_open": 22385,
-      "sp_header_open": 22463,
-      "sp_title_cierre_y_general_abre": 22516,
-      "general_section": 22529,
-      "vista_section": 25457,
-      "plantillas_section": 26340,
-      "horario_section": 26808,
-      "archivos_section": 28130,
-      "config_section_open": 28791,
-      "main_card_container": 29727,
-      "bottom_nav": 29799,
-      "tab_btn_bottom_nav": [29819, 29957, 30088],
-      "data_tab_bottom_nav": [29842, 29973, 30104],
-      "link_css_v59": 21823,
-      "script_js_v59": 61276,
-      "anchors_insertion": {
-        "panel_tabs": "tras '<span class=\"sp-title\">⚙️ Panel de Control</span></div>' y antes de '<div class=\"card-section\"><div class=\"card-section-title\">👤 General</div>'",
-        "abre_tab_perfil": "antes de '<div class=\"card-section\"><div class=\"card-section-title\">👤 General</div>'",
-        "cierra_perfil_abre_personalizar": "en '</div></div><div class=\"card-section\"><div class=\"card-section-title\">🎨 Vista</div>' (anadir '</div>' entre los 2 cierres y el card-section)",
-        "cierra_personalizar_abre_ajustes": "en 'as</p></div><div class=\"card-section\"><div class=\"card-section-title\">💾 Archivos</div>' (anadir '</div>')",
-        "cierra_tab_ajustes": "en '📊 Descargar Excel</button></div></div></div></div></div><div class=\"main-card-container\">' -> 6 cierres"
-      }
-    },
-    "posiciones_clave_app_js": {
-      "cambiarTab_function": 70006,
-      "selector_global_peligroso": 70221,
-      "var_fs_binding": 135075,
-      "domcontentloaded": [130309, 134772],
-      "longitud_total": 135414
+      "side_panel_open": 23066,
+      "sp_container_open": 23094,
+      "sp_header_title": 23137,
+      "tab_perfil_open": 23434,
+      "tab_personalizar_open": 26492,
+      "planner_type_selector": 26625,
+      "view_toggle": 27162,
+      "interval_row_unico": 28002,
+      "btn_merge_split": 28520,
+      "tab_ajustes_open": 29270,
+      "toolbar_archivos": 29401,
+      "dropdown_exportar": 29788,
+      "config_section_open": 30023,
+      "config_row_idioma": 30172,
+      "sp_lang_btn_active": 30217,
+      "sp_lang_btn_inactive": 30298,
+      "config_row_tipografia": 30455,
+      "config_actions": 30750,
+      "main_card_container": 30868,
+      "style_block_inline": 34223,
+      "link_css_v61": 22434,
+      "script_js_v61": 62765,
+      "section_titles_fuera_panel": "x8 @41222-43777 (dentro de #view-diario, NO en el panel)"
     },
     "posiciones_clave_main_css": {
-      "tab_content_global_display": 31742,
-      "tab_btn_global_bottom_nav": 31932,
-      "tab_btn_media_query_480": 32729,
-      "tab_content_legacy_important": 37613,
-      "tab_content_legacy_margin_maxwidth": 38690,
-      "bloque_v59_final": "ultimo bloque del archivo (card-section flat border-bottom #1e293b, 14px 4px, :last-child sin borde)",
-      "append_v61": "FINAL del archivo (tras la cola v5.9)"
+      "bloque_v61_final": "ULTIMO bloque antes de v6.2: '#side-panel .panel-tabs{display:flex...}' + '.tab-btn' + '.tab-btn.active' + '.tab-content{display:none}' + '.tab-content.active{display:block}'",
+      "regla_20_botones": "#side-panel .sp-container .card-section button,... {background:#334155!important;color:#e2e8f0!important;border:1px solid #334155!important;height:36px!important}",
+      "regla_21_active_hover": "#side-panel .sp-container .planner-type-selector button.active,#side-panel .sp-container .view-toggle button.active,#side-panel .sp-container .sp-lang-btn.active,#side-panel .sp-container .sp-btn:hover,... {background:#3b82f6!important;color:#ffffff!important;border-color:#3b82f6!important}",
+      "regla_22_config_row": "#side-panel .sp-container .config-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:10px 0!important;border-bottom:1px solid #1e293b!important}",
+      "regla_24_config_label": "#side-panel .sp-container .config-label{font-size:0.8rem!important;color:#94a3b8!important;white-space:nowrap!important}",
+      "regla_25_config_actions": "#side-panel .sp-container .config-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;flex:1!important;max-width:62%!important}",
+      "regla_17_card_section_title": "#side-panel .sp-container .card-section-title{font-size:0.85rem!important;font-weight:500!important;color:#94a3b8!important;border-bottom:none!important;margin-bottom:10px!important;padding-bottom:0!important}",
+      "global_dropdown_content": ".dropdown-content{display:none;position:absolute;background:var(--surface);min-width:160px;box-shadow:var(--shadow-md);border-radius:var(--radius);z-index:100;top:100%;left:0;overflow:hidden}",
+      "global_dropdown_a": ".dropdown-content a{display:block;padding:10px 14px;text-decoration:none;color:var(--text-secondary);font-size:var(--font-size-base);cursor:pointer;transition:var(--transition-fast)}",
+      "global_dropdown_hover": ".dropdown-content a:hover{background:var(--primary-light)}",
+      "global_interval_label": ".interval-row label{font-size:0.7em;color:var(--text-light);font-weight:500}",
+      "append_v62": "FINAL del archivo (tras la cola v6.1)"
     },
-    "recomendacion_final": "(b) SCOPED: CSS y JS nuevos con prefijo '#side-panel' + parche 1-token ':not(#side-panel .tab-btn)' en cambiarTab. No usar el CSS/JS global del usuario literalmente porque .tab-btn/.tab-content ya pertenecen al sistema de vistas (bottom-nav) y cambiarTab los manipula globalmente.",
-    "commit_mensaje": "feat: navegacion por pestanas en el panel de control v6.1",
+    "css_panel_css_legacy_claves": [
+      ".side-panel .dropdown-content{background:#2c3e50;border:1px solid rgba(255,255,255,0.1);min-width:180px;border-radius:8px;z-index:1002}",
+      ".side-panel .dropdown-content a{color:rgba(255,255,255,0.85)}",
+      ".side-panel .dropdown-content a:hover{background:rgba(102,126,234,0.2);color:#fff}",
+      ".side-panel .btn-merge-split{background:linear-gradient(135deg,#e74c3c,#ff7675);color:#fff;border:none;border-radius:5px}"
+    ],
+    "inline_v55_claves": [
+      "#side-panel .sp-label{font-size:13px!important;color:#94a3b8!important;display:block!important;margin-bottom:6px!important}",
+      "#side-panel .sp-lang-btn{flex:1!important;border:none!important;background:transparent!important;color:#94a3b8!important;padding:10px!important;font-size:14px!important;font-weight:600!important;border-radius:6px!important;cursor:pointer!important}",
+      "#side-panel .sp-lang-btn.active{background:#2563eb!important;color:#ffffff!important}",
+      "#side-panel .sp-action-btn{width:100%!important;background:#334155!important;color:#ffffff!important;border:none!important;border-radius:8px!important;padding:12px!important;font-size:14px!important;font-weight:600!important;cursor:pointer!important}"
+    ],
+    "hallazgos_requeridos": {
+      "card_header": "0 en HTML y 0 en main.css — NO existe en el panel (documentado, sin accion)",
+      "section_title": "8 en HTML pero TODAS fuera del panel (#view-diario @41222-43777) — NO existe en el panel (documentado, sin accion)",
+      "btn_pill": "0 en HTML y 0 en main.css — NO existe (documentado, sin accion)",
+      "sp_label": "0 en HTML (solo CSS inline v5.5) — regla v6.2 defensiva incluida",
+      "estilos_inline_panel": "2, ambos display:none (#especialidad-container, #btn-merge-split); NINGUNO con color/borde blanco o texto negro",
+      "dropdown_dentro_panel": "SI, unico @29788 (tab-ajustes Archivos, toolbar Exportar); regla exacta global = background var(--surface) #fff + a color var(--text-secondary) #2c3e50, pero DENTRO del panel lo vence panel.css #2c3e50; hover actual sin efecto visible",
+      "cache_v61": "2 (css/main.css?v=6.1 @22434, js/app.js?v=6.1 @62765)",
+      "especificidad_v62": "CONFIRMADA: '#side-panel .sp-container .X' (1,2,0) gana a inline v5.5 (1,1,0); '.card-section button' (1,2,1) gana a R20; '.sp-lang-btn.active' (1,3,0) gana a inline (1,2,0); '#side-panel .dropdown-content' (1,1,0) gana a panel.css (0,2,0); mismas especificidades que v5.9/v6.1 ganan por ORDEN (append al final)"
+    },
+    "commit_mensaje": "fix: estandarizacion de botones y alto contraste en panel de control v6.2",
     "working_tree": "limpio",
-    "head_actual": "cab9897 (revert de 7262ffd; tree identico a 7974611 = contenido v5.9)",
+    "head_actual": "f9d73b9",
     "npm_scripts": {
       "check": "node --check js/app.js",
       "build": "node scripts/build.js (DESTRUCTIVO: minifica en su lugar; no usar para verificar)"

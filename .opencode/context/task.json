@@ -1,96 +1,101 @@
 {
-  "id": "TASK-20260801-v5.8",
-  "titulo": "Rediseño minimalista del Panel de Control: acordeón Configuración, estandarización de títulos y bump v5.8",
-  "version": "5.8",
+  "id": "TASK-20260801-v5.9",
+  "titulo": "Reestructuración Estructural del Panel v5.9: secciones planas sin sub-cajas y filas .config-row en Configuración",
+  "version": "5.9",
   "tipo": "style",
-  "descripcion": "Rediseño minimalista del Panel de Control: agrupar las 3 tarjetas .sp-card inferiores (Idioma/Language, Personalización, Acciones de Archivo) dentro de UN único contenedor tipo acordeón/tarjeta '🛠️ Configuración' al final del panel (#side-panel). Estandarizar los encabezados de sección (.card-section-title) a font-size 0.85rem, font-weight 500, color #94a3b8. Bump de caché a v=5.8 (css/main.css?v=5.8 y js/app.js?v=5.8). Agregar estilos minimalistas en css/main.css (append al final): tarjetas planas sin sombras pesadas, gap 16px, controles de 38px, retículas de 2 columnas, acento azul/púrpura en botones activos. js/app.js: SIN cambios funcionales, solo confirmar que las validaciones condicionales (guards) siguen presentes.",
+  "descripcion": "Reestructuración estructural del panel de control: eliminar TODAS las sub-cajas anidadas dentro de las secciones (especialmente las 3 .sp-card de Configuración, .sp-field, .sp-btn-stack, .sp-card-title, .sp-label). Cada sección principal (General, Vista, Plantillas, Horario, Archivos, Configuración) queda como contenedor plano sin tarjetas internas. En Configuración: 3 filas simples .config-row (Idioma / Tipografía / Exportar) con etiqueta de texto a la izquierda y selector/botones a la derecha. Bump cache v=5.8 → v=5.9 (2 ocurrencias). Appender bloque v5.9 al final de css/main.css con prefijo '#side-panel .sp-container' para SOBREESCRIBIR v5.8 (que usaba #111827, #1f2937, radius 10, rgba(99,102,241,...)) por orden de fuente. ADVERTENCIA TÉCNICA CRÍTICA (hallazgo): el <style> inline v5.5 usa !important y es inline → en cascada, 'important inline' GANA SIEMPRE a 'important externo' SIN importar especificidad. Por eso la sub-tarea 2 es OBLIGATORIA: neutralizar las reglas inline v5.5 que apuntan a elementos retenidos (.sp-lang-btn, .sp-lang-btn.active, .sp-select, .sp-action-btn) y a clases eliminadas (.sp-card, .sp-card-title, .sp-label, .sp-lang-toggle, .sp-btn-stack); de lo contrario v5.9 NO podrá imponer alto 36px, radius 6px, padding 8px 12px ni el azul #3b82f6. js/app.js: SIN cambios.",
   "estado_actual": {
-    "html": "index.html minificado (61180 chars, 29 líneas). #side-panel abre en pos 21727; .sp-container 21751; .sp-header > span.sp-title '⚙️ Panel de Control' 21765. 5 secciones .card-section con .card-section-title: 👤 General (21869), 🎨 Vista (24797), 📁 Plantillas (25680), ⏱️ Horario (26148), 💾 Archivos (27470). Las 3 tarjetas finales .sp-card: 'Idioma / Language' abre en 28105 (contiene .sp-lang-toggle con 2 botones .sp-lang-btn data-lang es/en), 'Personalización' abre en 28369 (contiene select#font-select), 'Acciones de Archivo' abre en 28699 (contiene #btn-export-json y #btn-export-excel en .sp-btn-stack). El bloque de las 3 tarjetas termina en 28991, seguido de '</div></div><div class=\"main-card-container\">' en 28993 (cierra .sp-container y #side-panel).",
-    "conteos_html": "sp-card: 8 (6 en markup: 3 aperturas <div class=\"sp-card\"> + 3 títulos sp-card-title; 2 en el <style> inline). sp-lang: 6 (3 markup: sp-lang-toggle + 2 sp-lang-btn; 3 en <style>). font-select: 1 (solo markup). btn-export: 2 (btn-export-json, btn-export-excel). ?v=5.7: 2 (link CSS en 21128, script JS en 60531). ?v=5.6: 0. card-section-title en HTML: 5. card-header en HTML: 0. iniciarTourInteractivo en HTML: 0.",
-    "style_inline": "Bloque <style> de alta prioridad v5.5: posiciones 32243 a 38790 (6547 chars). Selectores que apuntan a las sp-card: #side-panel .sp-card, #side-panel .sp-card-title, #side-panel .sp-label, #side-panel .sp-lang-toggle, #side-panel .sp-lang-btn, #side-panel .sp-lang-btn.active, #side-panel .sp-select, #side-panel .sp-btn-stack, #side-panel .sp-action-btn, #side-panel .sp-container, #side-panel .sp-title. TODOS son descendientes de #side-panel (sin selectores de hijo directo), por lo que anidar las 3 tarjetas dentro de un contenedor 'Configuración' NO rompe el estilado.",
-    "css_v57": "main.css minificado (57482 chars, 1 línea). .card-section base (libreta diario, CLARA): background:#ffffff!important;border-radius:12px!important;padding:14px!important;box-shadow:0 2px 8px rgba(0,0,0,0.04)!important;border:1px solid #f0ece1!important. #side-panel .card-section (oscura): background:#1e293b!important;border:1px solid #334155!important;border-radius:12px!important;padding:16px!important;margin-bottom:16px!important (sin shadow). #side-panel .card-section-title: font-size:15px!important;font-weight:700!important;color:#f1f5f9!important;margin-bottom:12px!important;border-bottom:1px solid #334155!important;padding-bottom:6px!important. #side-panel .sp-card: background:#1e293b!important;border:1px solid #334155!important;border-radius:12px!important;padding:16px!important;margin-bottom:16px!important;box-shadow:0 4px 12px rgba(0,0,0,0.15)!important (sombra pesada a eliminar en v5.8). .card-header NO existe (0 en main.css y 0 en index.html); la clase a estandarizar es .card-section-title. Ocurrencias en main.css: card-section 13, card-section-title 1, planner-type-selector 11, view-toggle 10, toolbar 15, interval-row 17, merge-toolbar 1, sp-hint 2, sp-card 1, sp-lang-toggle 1, oculto 2, sp-lang-btn 2, sp-select 1, sp-label 1, sp-action-btn 2, sp-header 2, sp-btn 12, header-preview 2, custom-header 7. Tail v5.7: #side-panel .interval-row, .sp-divider, .merge-toolbar, .btn-merge-split, .merge-info, .sp-hint, '#side-panel .card-section .oculto{display:none!important}'.",
-    "js_v57": "app.js minificado (135414 chars, 1 línea). Guards PRESENTES: 'if(!e)return' x10; 'getElementById(...)&&' x10; restore con guards: 't&&document.getElementById(\"sel-intervalo\")&&', 'o&&document.getElementById(\"inp-hora-inicio\")&&', 'n&&document.getElementById(\"inp-hora-fin\")&&'. Fallbacks de objeto X||{...} x8: ||{value:15}, ||{value:60}, ||{value:\"07:00\"}, ||{value:\"23:00\"}, ||{pct:0,done:0,total:0}, ||{t:\"\",c:\"libre\",done:!1,rowspan:1}, ||{t:\"\",c:\"libre\"}, ||{t:\"\",c:\"\"} (NOTA: el patrón literal '(el||{' da 0 porque la variable no se llama 'el'; el patrón de fallback equivalente sí existe). Refs: inp-hora-inicio x3, sel-intervalo x6, actualizarHeaderPreview 1 def, font-select x2, sel-tipografia x1 (fallback en cambiarTipografia). Wrappers de exportación EXISTEN: function exportarPDF(){window.print()}, function exportarExcel(){exportarHorarioExcel()}, function exportarWord(){...blob .doc...}, function imprimir(){window.print()} (1 ref c/u = su definición). Idioma: document.querySelectorAll(\".lang-selector-global .lang-btn, .sp-lang-btn\") x2 (document-wide, no se rompe al anidar).",
-    "tour_onboarding": "iniciarTourInteractivo existe en app.js (6 refs; def en 118726; window.iniciarTourInteractivo exportado). tourPasos usa selectores: '#tbody', '.sp-body .toolbar button:nth-child(3)', '.tema-btn' — NINGUNO referencia .sp-card/.sp-lang-toggle/#font-select del panel, por lo que agrupar las 3 tarjetas NO rompe el tour.",
-    "git": "Último commit: b68e28b 'feat: restaurar panel de control completo con modulo de configuracion v5.7'. Working tree LIMPIO (git status --short vacío).",
-    "npm_scripts": "package.json scripts: dev (node server.js), check (node --check js/app.js), check:env (node scripts/check-env.js), build (node scripts/build.js), deploy (npm run build)."
+    "html": "index.html minificado (61630 chars de texto; 62419 bytes por emojis UTF-8). #side-panel abre en 22042; .sp-container en 22082; .sp-header > span.sp-title '⚙️ Panel de Control' en ~22096. 6 secciones .card-section: 👤 General 22186, 🎨 Vista 25114, 📁 Plantillas 25997, ⏱️ Horario 26465, 💾 Archivos 27787, 🛠️ Configuración (id=config-section) 28448. Las secciones 1-5 NO contienen sub-cajas .sp-card/.sp-field/.sp-label/.sp-btn-stack (solo grupos funcionales: planner-type-selector, view-toggle, toolbar, dropdown, custom-header, info-row, sp-btn-grid). TODAS las sub-cajas sp-* están EXCLUSIVAMENTE dentro del bloque Configuración 28448–29467.",
+    "bloque_config_exacto": "Texto EXACTO del bloque (1019 chars, pos 28448–29467, antes de '<div class=\"main-card-container\">' en 29467): '<div class=\"card-section\" id=\"config-section\"><div class=\"card-section-title\">🛠️ Configuración</div><div class=\"sp-card\"><div class=\"sp-card-title\">Idioma / Language</div><div class=\"sp-lang-toggle\"><button type=\"button\" class=\"sp-lang-btn active\" data-lang=\"es\">Español</button><button type=\"button\" class=\"sp-lang-btn\" data-lang=\"en\">English</button></div></div><div class=\"sp-card\"><div class=\"sp-card-title\">Personalización</div><div class=\"sp-field\"><label class=\"sp-label\">Tipografía</label><select id=\"font-select\" class=\"sp-select\"><option value=\"Segoe UI\">Segoe UI (Predeterminado)</option><option value=\"Roboto\">Roboto</option><option value=\"Arial\">Arial</option></select></div></div><div class=\"sp-card\"><div class=\"sp-card-title\">Acciones de Archivo</div><div class=\"sp-btn-stack\"><button type=\"button\" id=\"btn-export-json\" class=\"sp-action-btn\">📥 Exportar JSON</button><button type=\"button\" id=\"btn-export-excel\" class=\"sp-action-btn\">📊 Descargar Excel</button></div></div></div></div></div>'. Anchors: apertura sp-card#1 (Idioma) 28554, sp-card-title#1 28575, sp-lang-toggle 28625, sp-card#2 (Personalización) 28818, sp-card-title#2 28839, sp-field 28887, sp-label 28911, select#font-select.sp-select 28971 (opciones: value=\"Segoe UI\" texto 'Segoe UI (Predeterminado)', value=\"Roboto\", value=\"Arial\"), sp-card#3 (Acciones de Archivo) 29148, sp-card-title#3 29169, sp-btn-stack 29221, btn-export-json 29285, btn-export-excel 29376. Cola final: 5 cierres '>' consecutivos '&#x3C;/div></div></div></div></div><div class=\"main-card-container\">' que cierran: sp-btn-stack, sp-card#3, config-section, sp-container, side-panel (los 2 últimos abiertos FUERA del bloque, en 22082/22042). Balance verificado: opens del bloque 7, closes 9 (= 7 internos + sp-container + side-panel).",
+    "conteos_html": "class=\"sp-card...\": 6 (3 aperturas sp-card + 3 sp-card-title); sp-field 1; sp-label 1; sp-btn-stack 1; sp-lang-toggle 1; sp-action-btn 2 (btn-export-json, btn-export-excel); sp-select 1; config-row 0 (clase nueva). Todas dentro de 28448–29467. Ocurrencias crudas de 'sp-card': 8 = 6 del markup + 2 DENTRO del <style> inline (reglas CSS, pos 37570 y 37723).",
+    "style_inline": "Bloque <style> inline: 32693–39240 (6547 chars). Contiene: (a) reglas #view-diario (libreta, NO tocar); (b) bloque v5.5 'LIMPIEZA TOTAL SIDE-PANEL' al final con 13 reglas TODAS !important: '#side-panel *' (font/box-sizing), '#side-panel{background:#0f172a!important;padding:20px 16px!important}', '#side-panel .sp-container{display:flex;flex-direction:column;gap:16px}', '#side-panel .sp-title', '#side-panel .sp-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px}', '#side-panel .sp-card-title', '#side-panel .sp-label', '#side-panel .sp-lang-toggle{display:flex;gap:6px;background:#0f172a;padding:4px;border-radius:8px}', '#side-panel .sp-lang-btn{flex:1;border:none;background:transparent;color:#94a3b8;padding:10px;font-size:14px;font-weight:600;border-radius:6px}', '#side-panel .sp-lang-btn.active{background:#2563eb;color:#fff}', '#side-panel .sp-select{width:100%;background:#0f172a;color:#fff;border:1px solid #334155;border-radius:8px;padding:10px;font-size:14px}', '#side-panel .sp-btn-stack', '#side-panel .sp-action-btn{width:100%;background:#334155;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600}'. NOTA: NO existe regla inline para .sp-field. REGLA DE CASCADA: important-inline > important-externo (sin importar especificidad) → v5.9 NO puede anular .sp-lang-btn/.sp-select/.sp-action-btn inline; hay que neutralizarlas (sub-tarea 2).",
+    "css_main": "main.css minificado (59976 chars, 1 línea, SIN comentarios de versión). Reglas relevantes: (a) 41132: '.card-section{background:#ffffff!important;border-radius:12px!important;padding:14px!important;box-shadow:0 2px 8px rgba(0,0,0,0.04)!important;border:1px solid #f0ece1!important}' — SIN prefijo, CLARA (libreta diario): golpea las secciones del panel si no se anula con prefijo #side-panel; (b) 52766: '#side-panel{background-color:#121826!important;padding:18px!important;font-family:...}' (v5.3; ya es superado por el inline v5.5 #0f172a, mismo valor que pide v5.9); (c) BLOQUE v5.8 = ÚLTIMOS 2576 chars (57400–59976, FINAL CONFIRMADO del archivo): '#side-panel .sp-container .card-section{background:#111827!important;border:1px solid #1f2937!important;border-radius:10px!important;box-shadow:none!important;padding:16px!important;margin-bottom:16px!important}', ':last-child{margin-bottom:0}', '.card-section-title{font-size:0.85rem!important;font-weight:500!important;color:#94a3b8!important;border-bottom:1px solid #1f2937!important;margin-bottom:12px!important;padding-bottom:6px!important}', '.card-section .sp-card{background:transparent!important;border:none!important;...}', 'select/input[type=time]/input[type=text]/.sp-select{height:38px!important;min-height:38px!important;padding:6px 12px!important}', 'button/.sp-btn{height:38px!important;...}', '.planner-type-selector/.view-toggle/.toolbar/.sp-btn-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}', '.planner-type-selector button.active/.view-toggle button.active{background:rgba(99,102,241,0.16)!important;color:#a5b4fc!important;border-color:rgba(99,102,241,0.45)!important}', '.sp-btn-primary/.sp-action-btn{background:rgba(99,102,241,0.16)!important;color:#a5b4fc!important;border:1px solid rgba(99,102,241,0.45)!important}', '.sp-lang-btn.active{background:rgba(99,102,241,0.16)!important;color:#a5b4fc!important}'. v5.9 se appendea DESPUÉS de 59976 (fin de archivo). Las retículas 2-col (grid) del v5.8 se CONSERVAN (no se redeclaran).",
+    "orden_css": "CONFIRMADO: link css/main.css?v=5.8 en 21480 → link css/panel.css → link css/dashboard.css → <style> inline en 32693. main.css va ANTES del inline; el inline v5.5 gana empates (y por ser !important-inline gana TODO). Por eso v5.9 usa prefijo '#side-panel .sp-container' para empatar/ganar a v5.8 por orden de fuente, y la sub-tarea 2 neutraliza el inline. panel.css: .side-panel{background:linear-gradient(180deg,#141e28,...)} SIN !important (irrelevante: inline v5.5 lo supera).",
+    "js_v58": "app.js minificado (135414 chars, 1 línea). Refs a clases/ids del panel: '.sp-card' 0, '.sp-card-title' 0, '.sp-field' 0, '.sp-label' 0, '.sp-btn-stack' 0, '.sp-action-btn' 0, '.sp-lang-toggle' 0, '.sp-select' 0, 'config-section' 0 → el rediseño NO rompe JS. Refs QUE DEBEN SEGUIR EXISTIENDO: '.sp-lang-btn' 2 (document.querySelectorAll(\".lang-selector-global .lang-btn, .sp-lang-btn\") para sync de clase active + click handlers; document-wide, no depende del contenedor); '#font-select' 2 (getElementById con fallback 'sel-tipografia'; change → cambiarTipografia); '#btn-export-json' 1 (click → exportarHorarioJSON); '#btn-export-excel' 1 (click → exportarHorarioExcel). Sin script inline en index.html que referencie sp-card (los 2 <script> inline no tocan el panel).",
+    "git": "Último commit: 7386183 'style: redesino minimalista y simplificacion UI del panel de control v5.8'. Working tree LIMPIO (git status --short vacío). Rama: main.",
+    "npm_scripts": "package.json scripts: dev (node server.js), check (node --check js/app.js) — SÍ EXISTE, check:env (node scripts/check-env.js), build (node scripts/build.js), deploy (npm run build).",
+    "sw": "sw.js: CACHE=\"planify-cache-v1\" con cache-first (ASSETS incluyen index.html, css/main.css, js/app.js). El bump ?v=5.9 NO refresca el SW en producción hasta re-activación; irrelevante en dev (server.js)."
   },
   "archivos_afectados": [
     "index.html",
-    "css/main.css",
-    "js/app.js"
+    "css/main.css"
   ],
   "sub_tareas": [
     {
       "id": 1,
       "orden": 1,
-      "nombre": "Agrupar las 3 .sp-card en contenedor acordeón '🛠️ Configuración' y estandarizar títulos en index.html",
-      "detalle": "En index.html (línea principal minificada), reemplazar el bloque de las 3 tarjetas finales (posiciones 28105 a 28991: desde '<div class=\"sp-card\"><div class=\"sp-card-title\">Idioma / Language</div>...' hasta el cierre de la 3ª tarjeta, justo antes de '</div></div><div class=\"main-card-container\">' en 28993) por UN único contenedor tipo acordeón/tarjeta con class 'sp-config' (o 'card-section config') cuyo título sea '🛠️ Configuración', que contenga las 3 sub-secciones actuales como bloques internos (Idioma/Language con .sp-lang-toggle + botones .sp-lang-btn es/en; Personalización con select#font-select; Acciones de Archivo con #btn-export-json y #btn-export-excel). Conservar TODOS los IDs y clases internas intactos (sp-lang-toggle, sp-lang-btn, data-lang, font-select, sp-field, sp-label, sp-select, sp-btn-stack, sp-action-btn, btn-export-json, btn-export-excel). No duplicar ni eliminar el .sp-header > .sp-title existente. Aplicar el estilo de encabezado estandarizado v5.8 (font-size 0.85rem; font-weight 500; color #94a3b8) a los .card-section-title del panel.",
+      "nombre": "index.html: reemplazar bloque Configuración (28448–29467) por 3 filas .config-row planas",
+      "detalle": "Con node (indexOf/substring, NO editor que reformatee): localizar '<div class=\"card-section\" id=\"config-section\">' (28448) y 'main-card-container' (29467). Reemplazar TODO el bloque (1019 chars, texto exacto en estado_actual.bloque_config_exacto) por: '<div class=\"card-section\" id=\"config-section\"><div class=\"card-section-title\">🛠️ Configuración</div><div class=\"config-row\"><span class=\"config-label\">Idioma / Language</span><div class=\"config-control\"><button type=\"button\" class=\"sp-lang-btn active\" data-lang=\"es\">Español</button><button type=\"button\" class=\"sp-lang-btn\" data-lang=\"en\">English</button></div></div><div class=\"config-row\"><span class=\"config-label\">Tipografía</span><select id=\"font-select\" class=\"sp-select\"><option value=\"Segoe UI\">Segoe UI (Predeterminado)</option><option value=\"Roboto\">Roboto</option><option value=\"Arial\">Arial</option></select></div><div class=\"config-row\"><span class=\"config-label\">Exportar</span><div class=\"config-control\"><button type=\"button\" id=\"btn-export-json\" class=\"sp-action-btn\">📥 Exportar JSON</button><button type=\"button\" id=\"btn-export-excel\" class=\"sp-action-btn\">📊 Descargar Excel</button></div></div></div></div></div>'. SIN eliminar .card-section#config-section ni su .card-section-title. La cola tras el último botón queda en 5 cierres: config-control#3, config-row#3, config-section, sp-container, side-panel (balance: opens 6, closes 8 = 6 internos + sp-container + side-panel), seguido inmediatamente de '<div class=\"main-card-container\">'. Se ELIMINAN del markup: sp-card x3, sp-card-title x3, sp-lang-toggle, sp-field, sp-label, sp-btn-stack. Se CONSERVAN: .sp-lang-btn (x2, con data-lang es/en y class active en es), #font-select + .sp-select + 3 opciones, #btn-export-json/.sp-action-btn, #btn-export-excel/.sp-action-btn. Las secciones 1-5 NO se tocan.",
       "criterio_aceptacion": [
-        "El bloque reemplazado va de la posición del '<div class=\"sp-card\"><div class=\"sp-card-title\">Idioma' (28105 en v5.7) hasta antes de '</div></div><div class=\"main-card-container\">' (28993 en v5.7), sin tocar nada más.",
-        "Exactamente UN contenedor '🛠️ Configuración' nuevo al final del panel (grep 'Configuración' en la zona del panel: 1 en título del contenedor, 0 duplicados).",
-        "Las 3 sub-secciones existen exactamente 1 vez dentro del contenedor: 'Idioma / Language', 'Personalización', 'Acciones de Archivo'.",
-        "IDs preservados (1 ocurrencia c/u en markup): font-select, btn-export-json, btn-export-excel; clases internas preservadas: sp-lang-toggle, sp-lang-btn (x2), sp-btn-stack.",
-        "Los .card-section-title del panel usan font-size 0.85rem, font-weight 500, color #94a3b8 (grep de la regla v5.8 y/o atributos en HTML si se aplica inline).",
-        "El HTML sigue siendo válido: cmd /c \"npm run build\" (scripts/build.js) termina con éxito.",
-        "La estructura no rompe los selectores CSS descendientes del <style> inline (#side-panel .sp-card, .sp-lang-toggle, etc.) ni los bindings JS document-wide."
+        "node: html.indexOf('<div class=\"sp-card\"') === -1 y html.indexOf('sp-card-title') === -1 y html.indexOf('sp-field') === -1 y html.indexOf('sp-label') === -1 y html.indexOf('sp-btn-stack') === -1 y html.indexOf('sp-lang-toggle') === -1 en TODO index.html (0 sub-cajas).",
+        "html.indexOf('class=\"config-row\"') da exactamente 3 coincidencias; 'config-label' 3; 'config-control' 2.",
+        "IDs conservados (1 c/u): '#font-select' 1, '#btn-export-json' 1, '#btn-export-excel' 1; '.sp-lang-btn' 2; 'data-lang=\"es\"' 1 con class active; 'data-lang=\"en\"' 1; opciones del select: 'value=\"Segoe UI\"' 1, 'value=\"Roboto\"' 1, 'value=\"Arial\"' 1.",
+        "html.indexOf('main-card-container') sigue existiendo INMEDIATAMENTE después del bloque (sin duplicar); los 6 títulos de sección (👤 General, 🎨 Vista, 📁 Plantillas, ⏱️ Horario, 💾 Archivos, 🛠️ Configuración) aparecen exactamente 1 vez c/u.",
+        "El bloque nuevo y el viejo tienen el MISMO saldo de cierres (delta neta = 1 div menos): balance verificado con contador de <div>/</div> entre config-section y main-card-container = 0.",
+        "cmd /c \"npm run build\" (node scripts/build.js) termina con Build OK y exit 0.",
+        "npm run check (node --check js/app.js) pasa sin errores (js/app.js NO se toca)."
       ]
     },
     {
       "id": 2,
       "orden": 2,
-      "nombre": "Bump de caché a v=5.8 en index.html (css/main.css?v=5.8 y js/app.js?v=5.8)",
-      "detalle": "Reemplazar las 2 ocurrencias actuales '?v=5.7' en index.html (link rel=stylesheet css/main.css?v=5.7 en pos ~21128 y script src js/app.js?v=5.7 en pos ~60531) por '?v=5.8'.",
+      "nombre": "index.html: neutralizar reglas inline v5.5 colisionantes en el <style> (32693–39240)",
+      "detalle": "HALLAZGO CRÍTICO: las reglas del <style> inline v5.5 usan !important y al ser inline ganan SIEMPRE a main.css v5.9 (aunque v5.9 use '#side-panel .sp-container' con mayor especificidad). Por lo tanto, dentro del bloque v5.5 (desde '/* ===== v5.5 — LIMPIEZA TOTAL SIDE-PANEL (alta prioridad) ===== */' hasta el cierre de '#side-panel .sp-action-btn{...}', justo antes de </style> en 39240), ELIMINAR las 9 reglas: '#side-panel .sp-card', '#side-panel .sp-card-title', '#side-panel .sp-label', '#side-panel .sp-lang-toggle', '#side-panel .sp-lang-btn', '#side-panel .sp-lang-btn.active', '#side-panel .sp-select', '#side-panel .sp-btn-stack', '#side-panel .sp-action-btn' (las 5 primeras quedan muertas por la sub-tarea 1; las 4 últimas apuntan a elementos RETENIDOS y deben caer para que v5.9 controle alto 36px, radius 6px, padding 8px 12px, neutro #334155 y activo #3b82f6 en lugar del inline #2563eb/padding 10px/radius 8px). CONSERVAR: '#side-panel *{font-family...}', '#side-panel{background:#0f172a!important;padding:20px 16px!important}', '#side-panel .sp-container{...}', '#side-panel .sp-title{...}'. NO tocar las reglas #view-diario (antes del comentario v5.5).",
       "criterio_aceptacion": [
-        "grep '?v=5.8' en index.html devuelve exactamente 2 coincidencias (main.css y app.js).",
-        "grep '?v=5.7' en index.html devuelve 0 coincidencias."
+        "En el rango del <style> inline: 0 ocurrencias de '.sp-card', '.sp-card-title', '.sp-label', '.sp-lang-toggle', '.sp-lang-btn', '.sp-select', '.sp-btn-stack', '.sp-action-btn'.",
+        "html.indexOf('#side-panel{background:#0f172a') sigue presente (1 ocurrencia); '#side-panel .sp-container{display:flex' presente.",
+        "Conteo de selectores '#view-diario' en el <style> IDÉNTICO al de v5.8 (las reglas de la libreta no se modifican).",
+        "El bloque v5.5 resultante conserva estructura CSS válida: el <style> termina con el cierre correcto '}' + '</style>' (validar con npm run build).",
+        "Conteo crudo 'sp-card' en TODO index.html = 0 (antes eran 8: 6 markup + 2 inline)."
       ]
     },
     {
       "id": 3,
       "orden": 3,
-      "nombre": "Estilos minimalistas v5.8 appended al final de css/main.css",
-      "detalle": "Agregar AL FINAL de css/main.css (estilo appended por versión) reglas SCOPED bajo '#side-panel' (para no afectar el .card-section claro de la libreta del diario que usa !important): (a) tarjeta .card-section del panel con fondo plano uniforme #111827 o #1e293b, SIN box-shadow (anular la sombra pesada de #side-panel .sp-card: box-shadow:0 4px 12px rgba(0,0,0,0.15)!important), border 1px solid #1f2937, border-radius 10px; (b) gap vertical de 16px entre secciones (margin-bottom de .card-section o gap del contenedor); (c) inputs/selects/buttons con altura uniforme height:38px; (d) botones en retículas simétricas de 2 columnas: display:grid;grid-template-columns:1fr 1fr;gap:8px (aplicar a .planner-type-selector, .view-toggle, .toolbar, .sp-btn-stack y botones del contenedor Configuración); (e) botones activos/primarios con acento azul o púrpura tenue (p. ej. background derivado de --primary-1:#667eea/--primary-2:#764ba2 con alpha bajo y borde/borde-izquierdo de acento). No duplicar ni modificar reglas base existentes fuera de #side-panel.",
+      "nombre": "index.html: bump de caché v=5.8 → v=5.9 (2 ocurrencias exactas)",
+      "detalle": "Reemplazar las 2 ocurrencias 'v=5.8': pos 21480 (link rel=stylesheet href=\"css/main.css?v=5.8\") y pos 60988 (script src=\"js/app.js?v=5.8\") por 'v=5.9'. No hay otros assets locales con query string (solo fonts.googleapis.com y api.qrserver.com, que NO se tocan).",
       "criterio_aceptacion": [
-        "grep '#side-panel' en la zona final de main.css encuentra las nuevas reglas v5.8 (conteo total de ocurrencias '#side-panel' aumenta respecto a v5.7).",
-        "grep 'grid-template-columns:1fr 1fr' (o 'repeat(2,1fr)') en main.css da match en las retículas nuevas del panel.",
-        "grep 'height:38px' en main.css da match para inputs/selects/buttons del panel.",
-        "El .card-section claro base (libreta diario, sin prefijo #side-panel) NO se modifica (grep 'background:#ffffff!important' intacto).",
-        "Las reglas nuevas solo usan selectores scoped '#side-panel ...' (no selectores globales que colisionen con otras vistas)."
+        "grep/node: 'v=5.9' en index.html = exactamente 2 coincidencias (main.css y app.js).",
+        "grep/node: 'v=5.8' en index.html = 0 coincidencias.",
+        "Las URLs externas (fonts.googleapis.com/css2?, api.qrserver.com/v1?) no se modifican."
       ]
     },
     {
       "id": 4,
       "orden": 4,
-      "nombre": "Verificar guards condicionales en js/app.js (SIN cambios funcionales)",
-      "detalle": "Confirmar por grep que las validaciones condicionales v5.6/v5.7 siguen presentes y NO se introducen cambios en js/app.js: (a) 'if(!e)return' (10 ocurrencias, incluye actualizarHeaderPreview); (b) guards con getElementById(...)&& (10 ocurrencias); (c) fallbacks de objeto X||{...} en calcularEstadisticasSemanales/cambiarIntervalo/aplicarIntervalo (8 ocurrencias: ||{value:15}, ||{value:60}, ||{value:\"07:00\"}, ||{value:\"23:00\"}, ||{pct:0,done:0,total:0}, ||{t:\"\",c:\"libre\",done:!1,rowspan:1}, ||{t:\"\",c:\"libre\"}, ||{t:\"\",c:\"\"}); (d) guards de restore en init: 'document.getElementById(\"sel-intervalo\")&&', 'document.getElementById(\"inp-hora-inicio\")&&', 'document.getElementById(\"inp-hora-fin\")&&'; (e) wrappers de exportación existentes: function exportarPDF(){window.print()}, function exportarExcel(){exportarHorarioExcel()}, function exportarWord(){...}, function imprimir(){window.print()}; (f) bindings de idioma document.querySelectorAll(\".lang-selector-global .lang-btn, .sp-lang-btn\") intactos. No editar js/app.js.",
+      "nombre": "css/main.css: appender bloque v5.9 AL FINAL (después de 59976), con prefijo #side-panel .sp-container",
+      "detalle": "Agregar al FINAL de css/main.css (que hoy termina en 59976 con la cola v5.8 '.sp-lang-btn.active{background:rgba(99,102,241,0.16)!important;color:#a5b4fc!important}') el bloque v5.9 (mismo prefijo que v5.8 para ganar por orden de fuente; !important): (1) '#side-panel{background-color:#0f172a!important}' (safeguard vs v5.3 #121826 de 52766; el inline v5.5 ya da #0f172a, mismo valor); (2) '#side-panel .sp-container .card-section{background:transparent!important;border:none!important;border-radius:0!important;box-shadow:none!important;padding:12px 0!important;margin:0!important;border-bottom:1px solid #1e293b!important}' + ':hover{background:#1e293b!important}' + ':last-child{border-bottom:none!important}' (secciones planas, separador entre secciones, última sin borde); (3) '.card-section-title{font-size:0.85rem!important;font-weight:500!important;color:#94a3b8!important;border-bottom:none!important;margin-bottom:12px!important}' (tipografía v5.8 se MANTIENE; el borde inferior del título se elimina porque el separador pasa a la sección); (4) inputs/selects: '#side-panel .sp-container select, #side-panel .sp-container input[type=time], #side-panel .sp-container input[type=text], #side-panel .sp-container .sp-select{height:36px!important;min-height:36px!important;padding:8px 12px!important;background:#0f172a!important;border:1px solid #334155!important;border-radius:6px!important;color:#e2e8f0!important;box-sizing:border-box!important}' (reemplaza alto 38px/padding 6px 12px de v5.8 y padding 10px inline v5.5 — neutralizado en sub-tarea 2); (5) botones: '#side-panel .sp-container button, #side-panel .sp-container .sp-btn{height:36px!important;min-height:36px!important;padding:0 12px!important;border-radius:6px!important;background:#334155!important;color:#f1f5f9!important;border:1px solid #334155!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}' (neutros; también normaliza .btn-merge-split, .dropdown>button, .toolbar button — decisión intencional del requerimiento); (6) activo/primario azul: '#side-panel .sp-container .planner-type-selector button.active, #side-panel .sp-container .view-toggle button.active, #side-panel .sp-container .sp-lang-btn.active, #side-panel .sp-container .sp-btn-primary{background:#3b82f6!important;border-color:#3b82f6!important;color:#ffffff!important}' (reemplaza rgba(99,102,241,0.16)/#a5b4fc de v5.8; .sp-action-btn queda NEUTRO #334155 — no es primario); (7) '.config-row': '#side-panel .sp-container .config-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:12px 0!important;border-bottom:1px solid #1e293b!important}' + ':last-child{border-bottom:none!important}' + '.config-label{font-size:13px!important;color:#94a3b8!important;font-weight:500!important;white-space:nowrap!important}' + '.config-control{display:flex!important;gap:8px!important;align-items:center!important}' + '.config-row select{flex:0 1 auto!important;min-width:160px!important}' (el select a la derecha, SIN width:100% que tenía el inline v5.5). NO redeclarar las retículas grid 2-col de v5.8 (.planner-type-selector/.view-toggle/.toolbar/.sp-btn-grid se CONSERVAN). NO tocar el .card-section claro de la libreta (41132) ni nada anterior a 59976.",
       "criterio_aceptacion": [
-        "npm run check (node --check js/app.js) pasa sin errores de sintaxis.",
-        "grep 'if(!e)return' en js/app.js devuelve 10 coincidencias (idéntico a v5.7).",
-        "grep 'inp-hora-inicio' devuelve 3, 'sel-intervalo' 6, 'exportarPDF|exportarExcel|exportarWord|imprimir' devuelve 1 c/u (sus definiciones), 'iniciarTourInteractivo' 6.",
-        "git diff --stat sobre js/app.js muestra 0 cambios (archivo intacto)."
+        "El bloque v5.9 es el ÚLTIMO contenido del archivo: último '}' de main.css es el cierre de la regla '.config-row select' v5.9; la longitud crece de 59976 a >60000 chars.",
+        "En main.css, índice de la 1ª regla v5.9 > índice de la última 'rgba(99,102,241' (cola v5.8) → v5.9 gana empates por orden de fuente.",
+        "grep en main.css: '#1e293b' (separadores) presente; '#3b82f6' presente; 'height:36px' presente (≥3 selectores: inputs, buttons, y referencias v5.8 38px NO se eliminan pero quedan antes); 'border-radius:6px' presente; '.config-row' presente (≥4 ocurrencias de selector); 'background:#111827' (v5.8) sigue existiendo ANTES del bloque v5.9.",
+        "El .card-section claro de la libreta ('background:#ffffff!important' en ~41132) NO se modifica (índice de 'background:#ffffff!important' intacto).",
+        "Todas las reglas v5.9 usan prefijo '#side-panel' (o '#side-panel .sp-container ...'); ninguna regla global nueva.",
+        "Las retículas grid 2-col v5.8 siguen intactas (grep 'grid-template-columns:1fr 1fr' = 1, sin duplicado)."
       ]
     },
     {
       "id": 5,
       "orden": 5,
-      "nombre": "Verificación final (validación node + build)",
-      "detalle": "Ejecutar la suite de verificación local: (1) npm run check (node --check js/app.js) sin errores; (2) cmd /c \"npm run build\" (node scripts/build.js) debe terminar con código de salida 0 y Build OK; (3) revisar git status y git diff --stat para confirmar que SOLO se tocaron index.html, css/main.css (y .opencode/context/task.json si aplica); (4) re-verificar conteos: '?v=5.8' x2, '?v=5.7' x0, 3 sub-secciones de Configuración x1 c/u, guardas JS intactas.",
+      "nombre": "Verificación final (node --check + build + conteos + git diff)",
+      "detalle": "Ejecutar suite local: (1) npm run check (node --check js/app.js) sin errores; (2) cmd /c \"npm run build\" (node scripts/build.js) con Build OK y exit 0; (3) conteos node/grep: 'v=5.9' x2 / 'v=5.8' x0; 'sp-card' crudo en index.html = 0; 'config-row' = 3; '.sp-lang-btn' = 2; '#font-select' = 1; '#btn-export-json' = 1; '#btn-export-excel' = 1; en el <style> inline: 0 ocurrencias de .sp-card/.sp-lang-btn/.sp-select/.sp-action-btn; (4) js/app.js INTACTO: git diff --stat muestra 0 cambios en js/app.js y refs JS sin alterar (.sp-lang-btn 2, font-select 2, btn-export-json 1, btn-export-excel 1); (5) main.css: solo ADICIONES al final (git diff muestra el bloque v5.9 append); (6) git status y git diff --stat: SOLO index.html y css/main.css (más .opencode/context/task.json si aplica).",
       "criterio_aceptacion": [
-        "cmd /c \"npm run build\" finaliza con salida de éxito (Build OK) y código de salida 0.",
-        "node --check js/app.js sin errores.",
-        "El diff solo toca archivos previstos (index.html, css/main.css); sin secretos ni .env.",
-        "Conteos de verificación correctos: '?v=5.8' = 2, '?v=5.7' = 0, sp-lang-toggle = 1, font-select = 1, btn-export-json = 1, btn-export-excel = 1."
+        "npm run check y cmd /c \"npm run build\" terminan sin errores (exit 0).",
+        "Conteos: 'v=5.9' = 2, 'v=5.8' = 0, 'sp-card' en index.html = 0, 'config-row' = 3, 'sp-lang-btn' = 2, '#font-select' = 1, '#btn-export-json' = 1, '#btn-export-excel' = 1.",
+        "En el <style> inline: 0 ocurrencias de '.sp-card', '.sp-lang-btn', '.sp-select', '.sp-action-btn' (neutralizadas).",
+        "git diff --stat: js/app.js con 0 cambios; main.css solo con adiciones al final (sin modificaciones en líneas previas).",
+        "El diff no contiene secretos ni .env; solo archivos previstos."
       ]
     },
     {
       "id": 6,
       "orden": 6,
-      "nombre": "Commit y push con mensaje exacto",
-      "detalle": "Publicar los cambios: (1) git add index.html css/main.css (y .opencode/context/task.json si el usuario lo pide); (2) commit con el mensaje EXACTO 'style: redesino minimalista y simplificacion UI del panel de control v5.8' (nota: 'redesino' con una sola 'e', tal como lo escribió el usuario); (3) git push origin main.",
+      "nombre": "Commit y push (OPCIONAL — solo si el usuario lo solicita)",
+      "detalle": "Si el usuario lo pide: git add index.html css/main.css (y .opencode/context/task.json); commit con mensaje sugerido 'style: reestructuracion estructural del panel (secciones planas y config rows) v5.9'; git push origin main. NO ejecutar sin autorización explícita.",
       "criterio_aceptacion": [
-        "git log -1 --oneline muestra exactamente: style: redesino minimalista y simplificacion UI del panel de control v5.8",
-        "git push origin main finaliza sin errores.",
-        "git status --short queda limpio tras el push."
+        "git log -1 --oneline muestra el mensaje aprobado por el usuario.",
+        "git push origin main sin errores.",
+        "git status --short limpio tras el push."
       ]
     }
   ],
@@ -98,80 +103,100 @@
     {
       "id": "R1",
       "criticidad": "ALTA",
-      "descripcion": "El HTML está minificado en 29 líneas con la línea principal gigante. Un reemplazo de texto con posiciones/indexOf (node) debe usar el texto exacto de apertura/cierre (sp1 28105 y cierre 28991, antes de '</div></div><div class=\"main-card-container\">' en 28993). Cualquier desviación de índices rompe la estructura del panel. Mitigación: sub-tarea 1 especifica los índices y el ancla textual exacta; verificar con build.",
-      "mitigacion": "Usar anclas textuales completas ('<div class=\"sp-card\"><div class=\"sp-card-title\">Idioma / Language</div>...' hasta el final de la 3ª tarjeta) en lugar de índices numéricos aislados; validar balance de <div> con node antes y después."
+      "descripcion": "CASCADA CSS: las reglas del <style> inline v5.5 son !important-inline y ganan SIEMPRE a main.css v5.9 (incluso con prefijo '#side-panel .sp-container', mayor especificidad, y aunque v5.9 use !important). La premisa 'ganar por especificidad' del requerimiento NO aplica a important-inline. Si no se neutralizan las reglas inline de .sp-lang-btn/.sp-lang-btn.active/.sp-select/.sp-action-btn, v5.9 no podrá imponer 36px/radius 6/padding 8px 12px/azul #3b82f6 (seguirían #2563eb, padding 10px, radius 8px).",
+      "mitigacion": "Sub-tarea 2 (obligatoria): eliminar las 9 reglas inline v5.5 colisionantes; conservar solo #side-panel*, #side-panel, .sp-container, .sp-title. Verificar con el conteo 'sp-card = 0' en index.html."
     },
     {
       "id": "R2",
-      "criticidad": "MEDIA",
-      "descripcion": "El <style> inline v5.5 (pos 32243-38790) y main.css aplican estilos !important a #side-panel .sp-card (incluida box-shadow 0 4px 12px rgba(0,0,0,0.15)). Si el nuevo contenedor 'Configuración' no usa la clase .sp-card, la sombra pesada puede persistir o faltar estilos; si la usa, hay que anular la sombra con !important en la capa v5.8.",
-      "mitigacion": "Sub-tarea 3 agrega reglas v5.8 scoped con !important al final de main.css (última capa, mayor precedencia) para anular sombras y fijar fondo plano/borde/radio."
+      "criticidad": "ALTA",
+      "descripcion": "HTML minificado en 1 línea principal: el reemplazo del bloque Configuración (28448–29467, 1019 chars) con node indexOf/substring debe usar el texto EXACTO anclado (estado_actual.bloque_config_exacto); cualquier desviación rompe el balance de divs y todo el panel.",
+      "mitigacion": "Sub-tarea 1 usa anclas textuales completas + verificación de saldo de cierres (opens 6 / closes 8) + npm run build como validador."
     },
     {
       "id": "R3",
       "criticidad": "MEDIA",
-      "descripcion": ".card-section base en main.css es CLARA con !important para la libreta del diario. Cualquier regla global nueva sobre .card-section la rompería. Mitigación: todas las reglas v5.8 scoped bajo '#side-panel'.",
-      "mitigacion": "Sub-tarea 3 usa selectores '#side-panel ...' exclusivamente; verificación con grep de que 'background:#ffffff!important' queda intacto."
+      "descripcion": "La regla GLOBAL '.card-section{background:#ffffff!important...}' (main.css 41132, libreta del diario) golpea también las secciones del panel. v5.9 debe usar '#side-panel .sp-container .card-section' (mismo prefijo que v5.8, orden posterior) para anularla.",
+      "mitigacion": "Sub-tarea 4 especifica el prefijo exacto; criterio de aceptación verifica que 'background:#ffffff!important' queda intacto en su índice original."
     },
     {
       "id": "R4",
-      "criticidad": "BAJA",
-      "descripcion": "Estandarizar .card-section-title a 0.85rem/500/#94a3b8 puede reducir legibilidad del título de sección actual (15px/700/#f1f5f9). Es un cambio visual intencional del requerimiento; verificar contraste mínimo sobre #111827/#1e293b (94a3b8 cumple ~7:1).",
-      "mitigacion": "No requerida (requerimiento explícito); mantener solo la regla v5.8 y no alterar el resto del título."
+      "criticidad": "MEDIA",
+      "descripcion": "La regla de botones v5.9 '#side-panel .sp-container button' es amplia: normaliza .btn-merge-split (gradiente rojo), .dropdown>button, .toolbar button a neutro #334155. Es coherente con el requerimiento ('botones neutros') pero cambia acentos visuales existentes fuera de Configuración.",
+      "mitigacion": "Decisión documentada en sub-tarea 4; el activo/primario azul #3b82f6 se limita a .planner-type-selector button.active/.view-toggle button.active/.sp-lang-btn.active/.sp-btn-primary."
     },
     {
       "id": "R5",
-      "criticidad": "BAJA",
-      "descripcion": "El tour (iniciarTourInteractivo) NO referencia .sp-card/.sp-lang-toggle/#font-select (usa #tbody, .sp-body .toolbar button:nth-child(3), .tema-btn) y los bindings de idioma usan querySelectorAll document-wide: agrupar las tarjetas no rompe onboarding ni idioma. Riesgo residual: si en el futuro el tour apuntara a las tarjetas, cambiaría el selector.",
-      "mitigacion": "Confirmado por grep (0 refs a sp-card en tourPasos); sin acción requerida."
+      "criticidad": "MEDIA",
+      "descripcion": "Las retículas grid 2-col de v5.8 (.planner-type-selector/.view-toggle/.toolbar/.sp-btn-grid) y las alturas 38px v5.8 permanecen en main.css (por orden de fuente las anula v5.9 para los selectores redeclarados, pero NO para los no redeclarados). Si v5.9 no redeclara un selector, gana v5.8.",
+      "mitigacion": "Sub-tarea 4 lista explícitamente todos los selectores a redeclarar; los grids NO se redeclaran (se conservan) y se verifica 'grid-template-columns:1fr 1fr' = 1."
     },
     {
       "id": "R6",
       "criticidad": "BAJA",
-      "descripcion": "app.js es una sola línea de 135 KB; aunque NO se modifica en v5.8, cualquier editor con autoformato podría alterarla accidentalmente. Mitigación: sub-tarea 4 exige git diff --stat js/app.js = 0 cambios.",
-      "mitigacion": "No abrir js/app.js en editores que reformateen; verificar con git diff que quede intacto."
+      "descripcion": "sw.js (cache-first, CACHE='planify-cache-v1') puede servir index.html/main.css viejos en producción hasta que el SW se re-actualice; el bump ?v=5.9 ayuda tras la primera revalidación. Irrelevante en dev (server.js).",
+      "mitigacion": "Verificar en navegador con hard-reload / desregistrar SW; sin cambios de código (fuera de alcance)."
+    },
+    {
+      "id": "R7",
+      "criticidad": "BAJA",
+      "descripcion": "js/app.js es 1 línea de 135 KB y NO se toca en v5.9; cualquier editor con autoformato la alteraría. Las refs verificadas (.sp-lang-btn 2, font-select 2, btn-export-json 1, btn-export-excel 1) siguen resolviéndose porque los elementos retenidos conservan clases/ids.",
+      "mitigacion": "No abrir js/app.js en editores que reformateen; sub-tarea 5 exige git diff --stat js/app.js = 0."
     }
   ],
   "verificacion": {
     "comandos": [
-      "cmd /c \"npm run build\"  (node scripts/build.js; debe salir con Build OK y exit 0)",
-      "npm run check  (node --check js/app.js)",
-      "grep '?v=5.8' index.html  (exactamente 2 coincidencias)",
-      "grep '?v=5.7' index.html  (0 coincidencias)",
-      "grep 'sp-lang-toggle|font-select|btn-export-json|btn-export-excel' index.html  (1 coincidencia c/u en markup)",
-      "grep 'if(!e)return' js/app.js  (10 coincidencias)",
-      "grep 'inp-hora-inicio|sel-intervalo|exportarPDF|exportarExcel|exportarWord|imprimir' js/app.js  (guardas y wrappers intactos)",
-      "git status / git diff --stat  (solo index.html, css/main.css; js/app.js sin cambios)",
-      "git commit -m \"style: redesino minimalista y simplificacion UI del panel de control v5.8\"",
-      "git push origin main"
+      "npm run check  (node --check js/app.js; script SÍ existe en package.json)",
+      "cmd /c \"npm run build\"  (node scripts/build.js; Build OK y exit 0)",
+      "node: html.indexOf('<div class=\"sp-card\"') === -1; 'config-row' = 3; 'v=5.9' = 2; 'v=5.8' = 0",
+      "node: en <style> inline 0 ocurrencias de .sp-card/.sp-lang-btn/.sp-select/.sp-action-btn",
+      "node: en js/app.js refs intactas: '.sp-lang-btn' 2, 'font-select' 2, 'btn-export-json' 1, 'btn-export-excel' 1",
+      "node: main.css termina con el bloque v5.9 (fin del archivo > 59976; última regla .config-row select)",
+      "git status / git diff --stat  (solo index.html y css/main.css; js/app.js sin cambios; main.css solo adiciones al final)",
+      "git commit / push SOLO si el usuario lo solicita"
     ],
-    "criterio_exito": "Build OK + node --check sin errores + js/app.js sin cambios + commit y push exitosos con el mensaje exacto 'style: redesino minimalista y simplificacion UI del panel de control v5.8'."
+    "criterio_exito": "Build OK + node --check sin errores + 0 sub-cajas (sp-card/sp-field/sp-label/sp-btn-stack/sp-lang-toggle fuera del HTML) + 3 .config-row con label izquierda y control derecha + 9 reglas inline v5.5 neutralizadas + bloque v5.9 al final de main.css (secciones planas con separador #1e293b, inputs 36px/8px 12px/#0f172a/#334155, botones 36px/radius 6/neutros #334155, activos #3b82f6, config-row flex) + cache v=5.9 x2 + js/app.js intacto."
   },
   "contexto_extra": {
     "posiciones_clave_index_html": {
-      "side_panel_open": 21727,
-      "sp_container_open": 21751,
-      "sp_header": 21765,
-      "cards_3_bloque_inicio": 28105,
-      "cards_3_bloque_fin": 28991,
-      "cierre_contenedores": 28993,
-      "style_inline_inicio": 32243,
-      "style_inline_fin": 38790,
-      "link_css_v57": 21128,
-      "script_js_v57": 60531
+      "side_panel_open": 22042,
+      "sp_container_open": 22082,
+      "general_section": 22186,
+      "vista_section": 25114,
+      "plantillas_section": 25997,
+      "horario_section": 26465,
+      "archivos_section": 27787,
+      "config_section_open": 28448,
+      "config_block_fin": 29467,
+      "main_card_container": 29467,
+      "link_css_v58": 21480,
+      "script_js_v58": 60988,
+      "style_inline_inicio": 32693,
+      "style_inline_fin": 39240,
+      "style_inline_v55_comentario": "desde '/* ===== v5.5 — LIMPIEZA TOTAL SIDE-PANEL (alta prioridad) ===== */' hasta antes de </style>"
     },
-    "selector_estandar_titulo": "card-section-title (el único que existe; .card-header NO existe ni en CSS ni en HTML)",
-    "guardas_confirmadas_v57": [
-      "if(!e)return x10",
-      "getElementById(...)&& x10",
-      "restore: sel-intervalo/inp-hora-inicio/inp-hora-fin con guards",
-      "fallbacks objeto x8 (||{value:15} entre otros)",
-      "wrappers exportarPDF/exportarExcel/exportarWord/imprimir existentes"
+    "posiciones_clave_main_css": {
+      "card_section_clara_global": 41132,
+      "side_panel_v53_bg_121826": 52766,
+      "v58_block_inicio": 57400,
+      "v58_block_fin": 59976,
+      "append_v59_desde": 59976
+    },
+    "orden_css_confirmado": "link css/main.css?v=5.8 (21480) < link panel.css < link dashboard.css < <style> inline v5.5 (32693). Inline-important gana a externo-important; por eso sub-tarea 2 neutraliza el inline y v5.9 gana a v5.8 por orden de fuente con el MISMO prefijo '#side-panel .sp-container'.",
+    "refs_js_criticas": [
+      "document.querySelectorAll('.lang-selector-global .lang-btn, .sp-lang-btn') x2 (idioma; document-wide)",
+      "getElementById('font-select') x2 (con fallback 'sel-tipografia'; change → cambiarTipografia)",
+      "getElementById('btn-export-json') x1 (→ exportarHorarioJSON)",
+      "getElementById('btn-export-excel') x1 (→ exportarHorarioExcel)"
     ],
-    "mensaje_commit_exacto": "style: redesino minimalista y simplificacion UI del panel de control v5.8",
-    "version_anterior": "5.7",
+    "clases_eliminadas_html": ["sp-card", "sp-card-title", "sp-field", "sp-label", "sp-btn-stack", "sp-lang-toggle"],
+    "clases_retenidas": ["sp-lang-btn (x2, data-lang es/en)", "sp-select (en #font-select)", "sp-action-btn (x2)"],
+    "clases_nuevas": ["config-row (x3)", "config-label (x3)", "config-control (x2)"],
+    "reglas_inline_a_eliminar": ["#side-panel .sp-card", "#side-panel .sp-card-title", "#side-panel .sp-label", "#side-panel .sp-lang-toggle", "#side-panel .sp-lang-btn", "#side-panel .sp-lang-btn.active", "#side-panel .sp-select", "#side-panel .sp-btn-stack", "#side-panel .sp-action-btn"],
+    "reglas_inline_a_conservar": ["#side-panel *", "#side-panel (bg #0f172a)", "#side-panel .sp-container", "#side-panel .sp-title"],
+    "v58_a_sobrescribir": "card-section #111827/#1f2937/radius 10/box; card-section-title 0.85rem/500/#94a3b8 (mantener tipografía); inputs/selects 38px/6px 12px; botones activos rgba(99,102,241,0.16)/#a5b4fc; sp-btn-primary/sp-action-btn rgba indigo; sp-lang-btn.active rgba indigo",
+    "version_anterior": "5.8",
     "assets_a_bumpear": ["css/main.css", "js/app.js"],
-    "commit_actual": "b68e28b feat: restaurar panel de control completo con modulo de configuracion v5.7",
+    "commit_actual": "7386183 style: redesino minimalista y simplificacion UI del panel de control v5.8",
     "working_tree": "limpio",
     "npm_scripts": {
       "check": "node --check js/app.js",

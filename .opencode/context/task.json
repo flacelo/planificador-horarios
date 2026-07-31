@@ -1,101 +1,213 @@
 {
-  "id": "TASK-20260801-v5.9",
-  "titulo": "Reestructuración Estructural del Panel v5.9: secciones planas sin sub-cajas y filas .config-row en Configuración",
-  "version": "5.9",
-  "tipo": "style",
-  "descripcion": "Reestructuración estructural del panel de control: eliminar TODAS las sub-cajas anidadas dentro de las secciones (especialmente las 3 .sp-card de Configuración, .sp-field, .sp-btn-stack, .sp-card-title, .sp-label). Cada sección principal (General, Vista, Plantillas, Horario, Archivos, Configuración) queda como contenedor plano sin tarjetas internas. En Configuración: 3 filas simples .config-row (Idioma / Tipografía / Exportar) con etiqueta de texto a la izquierda y selector/botones a la derecha. Bump cache v=5.8 → v=5.9 (2 ocurrencias). Appender bloque v5.9 al final de css/main.css con prefijo '#side-panel .sp-container' para SOBREESCRIBIR v5.8 (que usaba #111827, #1f2937, radius 10, rgba(99,102,241,...)) por orden de fuente. ADVERTENCIA TÉCNICA CRÍTICA (hallazgo): el <style> inline v5.5 usa !important y es inline → en cascada, 'important inline' GANA SIEMPRE a 'important externo' SIN importar especificidad. Por eso la sub-tarea 2 es OBLIGATORIA: neutralizar las reglas inline v5.5 que apuntan a elementos retenidos (.sp-lang-btn, .sp-lang-btn.active, .sp-select, .sp-action-btn) y a clases eliminadas (.sp-card, .sp-card-title, .sp-label, .sp-lang-toggle, .sp-btn-stack); de lo contrario v5.9 NO podrá imponer alto 36px, radius 6px, padding 8px 12px ni el azul #3b82f6. js/app.js: SIN cambios.",
+  "id": "TASK-20260801-v6.0",
+  "titulo": "Limpieza Extrema v6.0: panel plano (aside#panel-control), purga total de CSS sp-*/side-panel y rewire JS a ids nuevos",
+  "version": "6.0",
+  "version_anterior": "5.9",
+  "tipo": "refactor",
+  "descripcion": "Reemplazar TODO el contenido del panel lateral por una estructura plana nueva (aside#panel-control con clases sidebar-clean/panel-header-clean/panel-section/section-title/input-clean/select-clean/grid-2/btn-clean/row-clean/select-clean-sm y ids panel-control/btn-cerrar-panel/input-nombre-area/select-soy/select-carrera/select-nivel/select-idioma/select-tipografia/btn-export-json/btn-export-excel). Eliminar de css/main.css TODAS las reglas #side-panel/.side-panel/.sp-*/config-*; aÃ±adir al final estilos planos nuevos; re-scopear el LAYOUT del panel en css/panel.css y css/grid.css de .side-panel a #panel-control (si se elimina position:fixed el panel se rompe); rewire JS de ids viejos a nuevos con guards; bump v=5.9 -> v=6.0 (2 ocurrencias); commit 'refactor: purga completa de CSS antiguo y maquetacion plana v6.0' + push.",
   "estado_actual": {
-    "html": "index.html minificado (61630 chars de texto; 62419 bytes por emojis UTF-8). #side-panel abre en 22042; .sp-container en 22082; .sp-header > span.sp-title '⚙️ Panel de Control' en ~22096. 6 secciones .card-section: 👤 General 22186, 🎨 Vista 25114, 📁 Plantillas 25997, ⏱️ Horario 26465, 💾 Archivos 27787, 🛠️ Configuración (id=config-section) 28448. Las secciones 1-5 NO contienen sub-cajas .sp-card/.sp-field/.sp-label/.sp-btn-stack (solo grupos funcionales: planner-type-selector, view-toggle, toolbar, dropdown, custom-header, info-row, sp-btn-grid). TODAS las sub-cajas sp-* están EXCLUSIVAMENTE dentro del bloque Configuración 28448–29467.",
-    "bloque_config_exacto": "Texto EXACTO del bloque (1019 chars, pos 28448–29467, antes de '<div class=\"main-card-container\">' en 29467): '<div class=\"card-section\" id=\"config-section\"><div class=\"card-section-title\">🛠️ Configuración</div><div class=\"sp-card\"><div class=\"sp-card-title\">Idioma / Language</div><div class=\"sp-lang-toggle\"><button type=\"button\" class=\"sp-lang-btn active\" data-lang=\"es\">Español</button><button type=\"button\" class=\"sp-lang-btn\" data-lang=\"en\">English</button></div></div><div class=\"sp-card\"><div class=\"sp-card-title\">Personalización</div><div class=\"sp-field\"><label class=\"sp-label\">Tipografía</label><select id=\"font-select\" class=\"sp-select\"><option value=\"Segoe UI\">Segoe UI (Predeterminado)</option><option value=\"Roboto\">Roboto</option><option value=\"Arial\">Arial</option></select></div></div><div class=\"sp-card\"><div class=\"sp-card-title\">Acciones de Archivo</div><div class=\"sp-btn-stack\"><button type=\"button\" id=\"btn-export-json\" class=\"sp-action-btn\">📥 Exportar JSON</button><button type=\"button\" id=\"btn-export-excel\" class=\"sp-action-btn\">📊 Descargar Excel</button></div></div></div></div></div>'. Anchors: apertura sp-card#1 (Idioma) 28554, sp-card-title#1 28575, sp-lang-toggle 28625, sp-card#2 (Personalización) 28818, sp-card-title#2 28839, sp-field 28887, sp-label 28911, select#font-select.sp-select 28971 (opciones: value=\"Segoe UI\" texto 'Segoe UI (Predeterminado)', value=\"Roboto\", value=\"Arial\"), sp-card#3 (Acciones de Archivo) 29148, sp-card-title#3 29169, sp-btn-stack 29221, btn-export-json 29285, btn-export-excel 29376. Cola final: 5 cierres '>' consecutivos '&#x3C;/div></div></div></div></div><div class=\"main-card-container\">' que cierran: sp-btn-stack, sp-card#3, config-section, sp-container, side-panel (los 2 últimos abiertos FUERA del bloque, en 22082/22042). Balance verificado: opens del bloque 7, closes 9 (= 7 internos + sp-container + side-panel).",
-    "conteos_html": "class=\"sp-card...\": 6 (3 aperturas sp-card + 3 sp-card-title); sp-field 1; sp-label 1; sp-btn-stack 1; sp-lang-toggle 1; sp-action-btn 2 (btn-export-json, btn-export-excel); sp-select 1; config-row 0 (clase nueva). Todas dentro de 28448–29467. Ocurrencias crudas de 'sp-card': 8 = 6 del markup + 2 DENTRO del <style> inline (reglas CSS, pos 37570 y 37723).",
-    "style_inline": "Bloque <style> inline: 32693–39240 (6547 chars). Contiene: (a) reglas #view-diario (libreta, NO tocar); (b) bloque v5.5 'LIMPIEZA TOTAL SIDE-PANEL' al final con 13 reglas TODAS !important: '#side-panel *' (font/box-sizing), '#side-panel{background:#0f172a!important;padding:20px 16px!important}', '#side-panel .sp-container{display:flex;flex-direction:column;gap:16px}', '#side-panel .sp-title', '#side-panel .sp-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px}', '#side-panel .sp-card-title', '#side-panel .sp-label', '#side-panel .sp-lang-toggle{display:flex;gap:6px;background:#0f172a;padding:4px;border-radius:8px}', '#side-panel .sp-lang-btn{flex:1;border:none;background:transparent;color:#94a3b8;padding:10px;font-size:14px;font-weight:600;border-radius:6px}', '#side-panel .sp-lang-btn.active{background:#2563eb;color:#fff}', '#side-panel .sp-select{width:100%;background:#0f172a;color:#fff;border:1px solid #334155;border-radius:8px;padding:10px;font-size:14px}', '#side-panel .sp-btn-stack', '#side-panel .sp-action-btn{width:100%;background:#334155;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600}'. NOTA: NO existe regla inline para .sp-field. REGLA DE CASCADA: important-inline > important-externo (sin importar especificidad) → v5.9 NO puede anular .sp-lang-btn/.sp-select/.sp-action-btn inline; hay que neutralizarlas (sub-tarea 2).",
-    "css_main": "main.css minificado (59976 chars, 1 línea, SIN comentarios de versión). Reglas relevantes: (a) 41132: '.card-section{background:#ffffff!important;border-radius:12px!important;padding:14px!important;box-shadow:0 2px 8px rgba(0,0,0,0.04)!important;border:1px solid #f0ece1!important}' — SIN prefijo, CLARA (libreta diario): golpea las secciones del panel si no se anula con prefijo #side-panel; (b) 52766: '#side-panel{background-color:#121826!important;padding:18px!important;font-family:...}' (v5.3; ya es superado por el inline v5.5 #0f172a, mismo valor que pide v5.9); (c) BLOQUE v5.8 = ÚLTIMOS 2576 chars (57400–59976, FINAL CONFIRMADO del archivo): '#side-panel .sp-container .card-section{background:#111827!important;border:1px solid #1f2937!important;border-radius:10px!important;box-shadow:none!important;padding:16px!important;margin-bottom:16px!important}', ':last-child{margin-bottom:0}', '.card-section-title{font-size:0.85rem!important;font-weight:500!important;color:#94a3b8!important;border-bottom:1px solid #1f2937!important;margin-bottom:12px!important;padding-bottom:6px!important}', '.card-section .sp-card{background:transparent!important;border:none!important;...}', 'select/input[type=time]/input[type=text]/.sp-select{height:38px!important;min-height:38px!important;padding:6px 12px!important}', 'button/.sp-btn{height:38px!important;...}', '.planner-type-selector/.view-toggle/.toolbar/.sp-btn-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}', '.planner-type-selector button.active/.view-toggle button.active{background:rgba(99,102,241,0.16)!important;color:#a5b4fc!important;border-color:rgba(99,102,241,0.45)!important}', '.sp-btn-primary/.sp-action-btn{background:rgba(99,102,241,0.16)!important;color:#a5b4fc!important;border:1px solid rgba(99,102,241,0.45)!important}', '.sp-lang-btn.active{background:rgba(99,102,241,0.16)!important;color:#a5b4fc!important}'. v5.9 se appendea DESPUÉS de 59976 (fin de archivo). Las retículas 2-col (grid) del v5.8 se CONSERVAN (no se redeclaran).",
-    "orden_css": "CONFIRMADO: link css/main.css?v=5.8 en 21480 → link css/panel.css → link css/dashboard.css → <style> inline en 32693. main.css va ANTES del inline; el inline v5.5 gana empates (y por ser !important-inline gana TODO). Por eso v5.9 usa prefijo '#side-panel .sp-container' para empatar/ganar a v5.8 por orden de fuente, y la sub-tarea 2 neutraliza el inline. panel.css: .side-panel{background:linear-gradient(180deg,#141e28,...)} SIN !important (irrelevante: inline v5.5 lo supera).",
-    "js_v58": "app.js minificado (135414 chars, 1 línea). Refs a clases/ids del panel: '.sp-card' 0, '.sp-card-title' 0, '.sp-field' 0, '.sp-label' 0, '.sp-btn-stack' 0, '.sp-action-btn' 0, '.sp-lang-toggle' 0, '.sp-select' 0, 'config-section' 0 → el rediseño NO rompe JS. Refs QUE DEBEN SEGUIR EXISTIENDO: '.sp-lang-btn' 2 (document.querySelectorAll(\".lang-selector-global .lang-btn, .sp-lang-btn\") para sync de clase active + click handlers; document-wide, no depende del contenedor); '#font-select' 2 (getElementById con fallback 'sel-tipografia'; change → cambiarTipografia); '#btn-export-json' 1 (click → exportarHorarioJSON); '#btn-export-excel' 1 (click → exportarHorarioExcel). Sin script inline en index.html que referencie sp-card (los 2 <script> inline no tocan el panel).",
-    "git": "Último commit: 7386183 'style: redesino minimalista y simplificacion UI del panel de control v5.8'. Working tree LIMPIO (git status --short vacío). Rama: main.",
-    "npm_scripts": "package.json scripts: dev (node server.js), check (node --check js/app.js) — SÍ EXISTE, check:env (node scripts/check-env.js), build (node scripts/build.js), deploy (npm run build).",
-    "sw": "sw.js: CACHE=\"planify-cache-v1\" con cache-first (ASSETS incluyen index.html, css/main.css, js/app.js). El bump ?v=5.9 NO refresca el SW en producción hasta re-activación; irrelevante en dev (server.js)."
+    "correccion_al_requerimiento": "El panel NO es <aside id='side-panel'>: es <div class='side-panel' id='side-panel'> en index.html pos 22706. El layout position:fixed NO estÃ¡ en main.css sino en css/panel.css (.side-panel{position:fixed;top:0;left:-330px;width:305px;height:100vh;z-index:1001;transition:left 0.25s;overflow-y:auto;overflow-x:hidden;...}) con overrides responsive en css/grid.css (max-width:700px: width 270px/left -290px; max-width:400px: width 220px/left -240px). main.css tiene 143 ocurrencias de '#side-panel' pero TODAS son skin (colores/alturas/padding internos). El elemento es hijo directo de #app, hermano de #side-overlay y #cloud-btn; NO existe botÃ³n cerrar hoy (el .sp-close solo existe como CSS muerto en panel.css).",
+    "estructura_html": {
+      "index_html_bytes": 62683,
+      "side_panel_open": 22706,
+      "tag_exacto": "<div class=\"side-panel\" id=\"side-panel\"> (precedido por <div class=\"cloud-btn\" id=\"cloud-btn\" onclick=\"togglePanel()\"...> y antes <div class=\"side-overlay\" id=\"side-overlay\" onclick=\"togglePanel()\" aria-hidden=\"true\">; h1#main-title antes; todos hijos de <div class=\"app licenciado\" id=\"app\">)",
+      "contenido_interno": "1 contenedor .sp-container > [.sp-header > span.sp-title 'Panel de Control'] + 6 .card-section: General (custom-header: inp-titulo-header + header-preview; info-row: sel-nombre/inp-nombre, sel-carrera, sel-especialidad/inp-especialidad, sel-ciclo/inp-ciclo, sel-objetivo/inp-objetivo) | Vista (planner-type-selector 5 botones data-type + view-toggle btn-view-table/btn-view-dashboard) | Plantillas (toolbar sp-btn cargarModelo x4) | Horario (interval-row sel-intervalo/inp-hora-inicio/inp-hora-fin/aplicarIntervalo; toolbar agregarFila/agregarDia/eliminarUltimoDia; merge-toolbar btn-merge-split + merge-info; sp-hint) | Archivos (toolbar guardar/cargar/resetear/nuevoPlanificador + dropdown exportarPDF/Excel/Word/imprimir) | ConfiguraciÃ³n (config-row Idioma con sp-lang-toggle/sp-lang-btn data-lang es/en; config-row TipografÃ­a con select#font-select.sp-select; config-row Exportar con config-actions > btn-export-json/btn-export-excel)",
+      "cierre_panel": "El panel se cierra con la cola '</div></div></div></div></div>' que sigue a btn-export-excel (pos ~30197-30201): cierran config-actions, config-row, card-section#config-section, sp-container, side-panel. DespuÃ©s (pos 30203) viene '<div class=\"main-card-container\"></div>' (VACÃO, sin contenido) y en 30242 el main-card-container real con bottom-nav. Balance: side-panel abre 1 div, contiene 1 (sp-container); el rebuild debe producir exactamente el mismo saldo hasta main-card-container.",
+      "style_inline": "Bloque <style> 33476-40025 (6549 chars). Parte 1 (33476-37784): reglas #view-diario (28 ocurrencias; libreta del diario, FUERA del panel; NO TOCAR). Parte 2 (37785-40025, desde '/* ===== v5.5 - LIMPIEZA TOTAL SIDE-PANEL (alta prioridad) ===== */'): 13 reglas #side-panel TODAS !important (skin del panel: #side-panel *, #side-panel{background:#0f172a;padding:20px 16px}, .sp-container, .sp-title, .sp-card, .sp-card-title, .sp-label, .sp-lang-toggle, .sp-lang-btn, .sp-lang-btn.active, .sp-select, .sp-btn-stack, .sp-action-btn) -> ELIMINAR ENTERA (solo skin del panel; el layout no estÃ¡ aquÃ­).",
+      "v_5_9": "2 ocurrencias: pos 22128 (href css/main.css?v=5.9) y pos 62041 (src js/app.js?v=5.9). sw.js lista ASSETS sin query (no tocar)."
+    },
+    "clasificacion_layout_vs_skin_panel_css": {
+      "panel_css_bytes": 7543,
+      "layout_conservar": [
+        "pos 881: .side-panel{position:fixed;top:0;left:-330px;width:305px;height:100vh;background:linear-gradient(180deg,#141e28 0%,#1a252f 40%,#2c3e50 100%);z-index:1001;transition:left 0.25s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;overflow-x:hidden;padding:24px 18px 60px;box-shadow:6px 0 40px rgba(0,0,0,0.4),inset -1px 0 0 rgba(255,255,255,0.08)} -> LAYOUT: position/top/left/width/height/z-index/transition/overflow; SKIN a DROP: background/padding/box-shadow. REESCRIBIR como '#panel-control{position:fixed;top:0;left:-330px;width:305px;height:100vh;z-index:1001;transition:left 0.25s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;overflow-x:hidden}'",
+        "pos 1217: .side-panel.open{left:0} -> REESCRIBIR '#panel-control.open{left:0}' (CRÃTICO: sin esto el panel nunca se abre)",
+        "pos 2010: .side-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);z-index:1000;opacity:0;transition:opacity 0.15s ease} + pos 2229 .side-overlay.open{display:block;opacity:1} -> CONSERVAR TAL CUAL (fuera del panel)",
+        "pos 0-880: .cloud-btn (5 reglas: base/hover/.open/.open:hover/::after) -> CONSERVAR TAL CUAL (botÃ³n flotante fuera del panel; .cloud-btn.open{left:305px} depende de width 305px que se conserva)"
+      ],
+      "scrollbar": "pos 1240-1370: .side-panel::-webkit-scrollbar{width:3px}, ::-webkit-scrollbar-track{background:transparent}, ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:3px} -> RE-SCOPEAR a #panel-control::-webkit-scrollbar* (3 reglas, mismo texto)",
+      "skin_purge_panel_css": [
+        "pos 1431-2009: .sp-header{display:flex;...} + .sp-header h3 + .sp-close{...} + .sp-close:hover -> PURGAR (clases muertas tras rebuild)",
+        "pos 2271-5017: .side-panel .dropdown-content, .dropdown-content a, a:hover, .dropdown>button:not(.sp-btn-primary)(+hover), .planner-type-selector(+margin), .planner-type-selector button(+.active, +:hover), .custom-header input(+::placeholder, +:focus), .custom-header .header-preview, .info-row, .info-row .campo, .info-row select/input(+option, +:focus), .toolbar, .toolbar button(+:hover), .view-toggle, .view-toggle button(+.active), .merge-info, .btn-merge-split -> PURGAR (skin scoped al panel viejo)",
+        "pos 5187-6056: .sp-section (+[open], summary, summary::-webkit-details-marker, summary::after, summary:hover, summary span) -> PURGAR",
+        "pos 6057-6335: .sp-body (+.sp-section[open] .sp-body, .sp-body .toolbar) -> PURGAR",
+        "pos 6336-6440: .sp-divider -> PURGAR; pos 6441-6547: .sp-hint -> PURGAR; pos 6548-7450: .sp-btn(+:hover), .sp-btn-sm, .sp-btn-primary(+:hover), .sp-btn-danger, .sp-btn-success, .sp-btn-purple, .sp-btn-outline(+:hover) -> PURGAR; pos 7451-7543: .sp-label -> PURGAR"
+      ]
+    },
+    "clasificacion_grid_css": {
+      "grid_css_bytes": 13586,
+      "layout_reescribir": [
+        "DENTRO de @media (max-width:700px) (media abre en 5065): pos 5674 '.side-panel{width:270px;left:-290px;padding:18px 14px}' -> '#panel-control{width:270px;left:-290px}' (padding es skin; drop) y pos 5752 '.side-panel.open{left:0}' -> '#panel-control.open{left:0}'",
+        "DENTRO de @media (max-width:400px) (media abre en 7812): pos 8004 '.side-panel{width:220px;left:-240px}' -> '#panel-control{width:220px;left:-240px}'",
+        ".cloud-btn.open:hover{left:278px} (max-width:700px) y .cloud-btn.open{left:230px} (max-width:400px) -> CONSERVAR (consistente con anchos 270/220)"
+      ],
+      "skin_purge_grid_css": [
+        "max-width:700px: .sp-header h3{font-size:0.75em} (5752+), .side-panel .planner-type-selector button, .side-panel .toolbar button, .side-panel .view-toggle button, .sp-section summary, .sp-body, .sp-btn{font-size:0.65em;padding:4px 7px}, .sp-btn-sm -> PURGAR",
+        "CONSERVAR GLOBALES: .planner-type-selector button{font-size:0.65em;padding:4px 8px} y .view-toggle button{font-size:0.6em;padding:4px 10px} (max-width:700px) -> aplican a los botones retenidos (se conservan las clases hook en el HTML nuevo)"
+      ]
+    },
+    "purga_main_css": {
+      "bytes": 62713,
+      "lineas": 1,
+      "desbalance": "LLAVES DESBALANCEADAS (553 aperturas vs 550 cierres) POR 3 ROTURAS PRE-EXISTENTES en la cola appendeada (pos 32771+): '.cal-container{padding:4px 0.cal-header{' (falta '}' antes de .cal-header), '.cal-dia-nombre{...center!important.cal-dia:hover{' (falta '}' antes de .cal-dia:hover), 'body.tema-estelar .cal-grid{...gap:3px#view-mensual,#cal-container,.cal-container{' (selector pegado a decls). NINGUNA de las 3 contiene #side-panel/.sp-* -> el parser de purga por fragmentos (split por '}' y corte en primer '{') es SEGURO. NO 'arreglar' el desbalance (fuera de alcance).",
+      "no_hay_comentarios_version": "main.css NO contiene 'v5.5'/'v5.8'/'v5.9' (sin marcadores de versiÃ³n). Los bloques v5.8/v5.9 son los ÃšLTIMOS 2733 chars (pos 59980-62712): empiezan en '#side-panel{background:#0f172a!important}#side-panel .sp-container .card-section{background:transparent!important;...' y terminan en 62712 con '#side-panel .sp-container .config-row .sp-select{width:auto!important;flex:1!important;max-width:220px!important}' (EOF confirmado).",
+      "reglas_a_purgar": "52 grupos de selector Ãºnicos con '#side-panel' (~90 reglas tras expandir listas de selectores; primera #side-panel en 46140, Ãºltima en 62599) + 4 reglas scoped a '.side-panel' (clase): 19656 .side-panel .interval-row, 20012 .side-panel .interval-row select/input, 20334 .side-panel .interval-row .sp-btn, 49786 (#side-panel .info-row,.side-panel .planner-type-selector,#side-panel .view-toggle) + 1 regla '#side-panel .card-section .oculto{display:none!important}' (57424). CLAVE: la regla GLOBAL '.card-section{background:#ffffff!important...}' (~41132, libreta diario) y '.section-title{...}' global (~61150) NO se tocan (no contienen #side-panel/.sp-*).",
+      "reglas_compartidas_a_refinar": "NO BORRAR ENTERAS (selector compartido con clases que siguen existiendo): pos 29551 '.sp-btn,.btn-primary,.btn-cancel,.btn-ok{transition:transform .15s ease,box-shadow .2s ease}' -> quitar '.sp-btn,' quedando '.btn-primary,.btn-cancel,.btn-ok{...}'; pos ~29641 '.sp-btn:active,.btn-primary:active,.btn-cancel:active,.btn-ok:active{transform:scale(.95)}' -> quitar '.sp-btn:active,'. REGLAS 100% MUERTAS a borrar enteras: pos 31272 ':fullscreen .sp-sidebar,:-webkit-full-screen .sp-sidebar{display:none}' y pos 31657 ':fullscreen .sp-body,:-webkit-full-screen .sp-body{overflow-y:auto;max-height:60vh}'.",
+      "media_blocks": "2 @media en main.css, AMBOS (max-width:480px), AMBOS SIN reglas #side-panel: pos 32667 (.bottom-nav/.tab-btn) y pos 36930 (.cal-*). Sin riesgo para el parser.",
+      "clases_sp_inexistentes": ".sp-field: 0 ocurrencias en main.css; .sp-title: 0; .sp-btn-stack: 0; .sp-group: 0 (solo sp-group-title). No hay que purgar lo que no existe.",
+      "clases_sp_presentes": "sp-action-btn, sp-body, sp-btn, sp-btn-grid, sp-btn-primary, sp-card, sp-card-title, sp-close, sp-container, sp-divider, sp-group-title, sp-header, sp-hint, sp-label, sp-lang-btn, sp-lang-toggle, sp-section, sp-select, sp-sidebar."
+    },
+    "wiring_js": {
+      "app_js_bytes": 140229,
+      "togglePanel": "pos 69961: function togglePanel(){const e=document.getElementById(\"side-panel\"),a=document.getElementById(\"side-overlay\"),t=document.getElementById(\"cloud-btn\"),o=e.classList.toggle(\"open\");a.classList.toggle(\"open\",o),t.classList.toggle(\"open\",o)} -> ÃšNICA ref a 'side-panel' en app.js (1 ocurrencia). PATCH: \"side-panel\" -> \"panel-control\". side-overlay y cloud-btn se conservan.",
+      "onRolChange": "pos 32771: function onRolChange(e){const a=document.getElementById(\"inp-nombre\");\"otros\"===e.value?(a.classList.remove(\"oculto\"),a.classList.add(\"visible\"),a.value=\"\",a.focus()):(a.classList.remove(\"visible\"),a.classList.add(\"oculto\"),a.value=e.value);const t=document.getElementById(\"carrera-container\"),o=document.getElementById(\"especialidad-container\"),n=document.getElementById(\"ciclo-container\"),r=document.getElementById(\"sel-carrera\"),i=document.getElementById(\"sel-especialidad\"),l=document.getElementById(\"sel-ciclo\");\"Freelancer\"===e.value?(t&&(t.style.display=\"none\",r.selectedIndex=0),o&&(o.style.display=\"none\",i&&(i.selectedIndex=0)),n&&(n.style.display=\"none\",l&&(l.selectedIndex=0)),document.getElementById(\"inp-ciclo\")&&(...),profiles.Freelancer&&cargarPerfil(\"Freelancer\")):(t&&(t.style.display=\"\"),n&&(\"Estudiante\"===e.value?n.style.display=\"\":(n.style.display=\"none\")),r&&(r.selectedIndex=0)...} -> PATCHES: (1) envolver primer bloque con guard: const a=document.getElementById(\"inp-nombre\"); a&&(\"otros\"===e.value?...:...) (NO renombrar a input-nombre-area: input-nombre-area es el campo de Ã¡rea SIEMPRE visible; el auto-llenado/ocultado debe quedar como no-op); (2) \"sel-carrera\" -> \"select-carrera\" (2 refs); (3) \"sel-ciclo\" -> \"select-nivel\" (1 ref); (4) resto ya tiene guards (t&&/o&&/n&&/i&&/l&&/inp-ciclo&&).",
+      "onCarreraChange": "pos 35088: function onCarreraChange(){const e=document.getElementById(\"sel-carrera\"),a=document.getElementById(\"especialidad-container\"),t=document.getElementById(\"sel-especialidad\"),o=document.getElementById(\"inp-especialidad\");if(!e)return;const n=e.value;\"Freelancer\"===n?(a.style.display=\"none\",profiles.Freelancer&&cargarPerfil(\"Freelancer\")):n&&profiles[n]?(a.style.display=\"none\",cargarPerfil(n)):n?poblarEspecialidad(n):a.style.display=\"none\",t&&(t.value=\"\"),o&&(o.value=\"\",o.classList.add(\"oculto\"))} -> PATCHES CRÃTICOS: (1) \"sel-carrera\" -> \"select-carrera\"; (2) a=especialidad-container serÃ¡ null (elemento NO existe en HTML nuevo) y las 3 ramas usan a.style SIN guard -> AÃ‘ADIR guard: a&&(\"Freelancer\"===n?(a.style.display=\"none\",...):...:a.style.display=\"none\"). poblarEspecialidad ya tiene if(!a||!t)return (pos 33762) y onEspecialidadChange if(e&&e.value) (pos 35586): seguros.",
+      "aplicarDatos": "pos 51793: function aplicarDatos(e){const a=(e,a,t)=>{const o=document.getElementById(e),n=document.getElementById(a);Array.from(o.options).find(e=>e.value===t)?(o.value=t,n&&(n.classList.remove(\"visible\"),n.classList.add(\"oculto\"),n.value=\"\")):n&&(o.value=\"otros\",n.classList.remove(\"oculto\"),n.classList.add(\"visible\"),n.value=t||\"\")};if(e.nombre&&(a(\"sel-nombre\",\"inp-nombre\",e.nombre),onRolChange(document.getElementById(\"sel-nombre\"))),e.carrera){const a=document.getElementById(\"sel-carrera\");a&&Array.from(a.options).some(a=>a.value===e.carrera)&&(a.value=e.carrera),a&&a.value&&\"Freelancer\"!==a.value&&!profiles[a.value]&&poblarEspecialidad(a.value)}e.ciclo&&a(\"sel-ciclo\",\"inp-ciclo\",e.ciclo),e.objetivo&&a(\"sel-objetivo\",\"inp-objetivo\",e.objetivo),void 0!==e.header&&(document.getElementById(\"inp-titulo-header\").value=e.header,actualizarHeaderPreview()),e.dias&&(dias=e.dias),e.filas&&(filas=e.filas)} -> PATCHES: (1) helper: aÃ±adir 'if(!o)return' al inicio (protege TODAS las llamadas con selectores ausentes); (2) a(\"sel-nombre\",\"inp-nombre\",e.nombre) -> a(\"select-soy\",\"inp-nombre\",e.nombre); (3) onRolChange(document.getElementById(\"sel-nombre\")) -> onRolChange(document.getElementById(\"select-soy\")); (4) a(\"sel-ciclo\",\"inp-ciclo\",e.ciclo) -> a(\"select-nivel\",\"inp-ciclo\",e.ciclo); (5) la lÃ­nea e.objetivo queda cubierta por el guard del helper; (6) e.header: \"inp-titulo-header\" -> \"input-nombre-area\".",
+      "resetear": "pos 52707: function resetear(){if(!confirm(\"Restaurar ejemplo?\"))return;\"semanal\"!==plannerType&&cambiarTipoPlanificador(\"semanal\"),dias=[...],filas=JSON.parse(JSON.stringify(DEFAULT)),[\"sel-nombre\",\"sel-carrera\",\"sel-ciclo\",\"sel-objetivo\"].forEach(e=>document.getElementById(e).selectedIndex=0),[\"inp-nombre\",\"inp-ciclo\",\"inp-objetivo\",\"inp-especialidad\"].forEach(e=>{const a=document.getElementById(e);a&&(a.value=\"\",a.className=\"oculto\")});const e=document.getElementById(\"especialidad-container\"),a=document.getElementById(\"sel-especialidad\");e&&(e.style.display=\"none\"),a&&(a.innerHTML='<option value=\"\">Selecciona</option>'),document.getElementById(\"inp-titulo-header\").value=\"\",actualizarHeaderPreview(),onRolChange(document.getElementById(\"sel-nombre\")),renderizar(),autoGuardar(),alert(\"Restablecido.\")} -> PATCHES (3 puntos SIN guard que CRASHEAN): (1) la lista .forEach de selectedIndex=0 -> [\"select-soy\",\"select-carrera\",\"select-nivel\"]; (2) document.getElementById(\"inp-titulo-header\").value=\"\" -> document.getElementById(\"input-nombre-area\").value=\"\"; (3) onRolChange(document.getElementById(\"sel-nombre\")) -> onRolChange(document.getElementById(\"select-soy\")). El resto ya estÃ¡ guarded (a&&/e&&/actualizarHeaderPreview con if(!e)return).",
+      "valInfo_getDatosCompletos": "pos ~49620: function valInfo(e,a){const t=document.getElementById(e),o=document.getElementById(a);return o&&o.classList.contains(\"visible\")?o.value:t.options[t.selectedIndex]?.value||\"\"} -> PATCH: aÃ±adir 'if(!t)return\"\"' al inicio (hoy CRASHEA con selector ausente). getDatosCompletos(): {nombre:valInfo(\"sel-nombre\",\"inp-nombre\"),carrera:valInfo(\"sel-carrera\",\"inp-carrera\"),ciclo:valInfo(\"sel-ciclo\",\"inp-ciclo\"),objetivo:valInfo(\"sel-objetivo\",\"inp-objetivo\"),header:document.getElementById(\"inp-titulo-header\")?.value?.trim()||\"\",...} -> PATCH: \"sel-nombre\"->\"select-soy\", \"sel-carrera\"->\"select-carrera\", \"sel-ciclo\"->\"select-nivel\", \"inp-titulo-header\"->\"input-nombre-area\" (la lÃ­nea objetivo queda segura por el guard de valInfo; inp-nombre/inp-ciclo/inp-carrera quedan como segundo arg de valInfo con guard o&&).",
+      "cambiarTipografia": "pos 95381: function cambiarTipografia(e){document.documentElement.style.setProperty(\"--fuente-principal\",e),localStorage.setItem(\"horario_tipografia\",e)} -> acepta el VALOR como string; NO lee DOM. Restore en initPersonalizacion (pos 96139): var a=document.getElementById(\"sel-tipografia\")||document.getElementById(\"font-select\");a&&(a.value=e,...) -> PATCH: reemplazar la expresiÃ³n por document.getElementById(\"select-tipografia\").",
+      "init_bindings": "FINAL del archivo: document.addEventListener(\"DOMContentLoaded\",function(){var e=\"es\";try{e=localStorage.getItem(\"planify_idioma\")||\"es\"}catch(e){}aplicarIdioma(e),document.querySelectorAll(\".lang-selector-global .lang-btn, .sp-lang-btn\").forEach(function(e){e.addEventListener(\"click\",function(){aplicarIdioma(this.getAttribute(\"data-lang\"))})})});var _fs=document.getElementById(\"font-select\");_fs&&_fs.addEventListener(\"change\",function(){cambiarTipografia(this.value)});var _ej=document.getElementById(\"btn-export-json\");_ej&&_ej.addEventListener(\"click\",exportarHorarioJSON);var _ex=document.getElementById(\"btn-export-excel\");_ex&&_ex.addEventListener(\"click\",exportarHorarioExcel); -> PATCH: (1) var _fs=document.getElementById(\"select-tipografia\")||document.getElementById(\"font-select\"); (2) _ej/_ex SIN cambios (los ids btn-export-json/btn-export-excel se conservan en HTML nuevo -> NO poner onclick inline en esos botones o se dispara doble). El binding .sp-lang-btn queda como no-op inofensivo (querySelectorAll vacÃ­o).",
+      "aplicarIdioma": "pos 135428: function aplicarIdioma(e){var a=TRADUCCIONES[_idiomaActual=e||\"es\"]||TRADUCCIONES.es;document.querySelectorAll(\"[data-i18n]\").forEach(...),document.querySelectorAll(\"[data-i18n-placeholder]\").forEach(...),document.querySelectorAll(\".lang-selector-global .lang-btn, .sp-lang-btn\").forEach(function(e){e.getAttribute(\"data-lang\")===_idiomaActual?e.classList.add(\"active\"):e.classList.remove(\"active\")});try{void 0!==dias&&(dias=\"en\"===_idiomaActual?DIAS_EN.slice():DIAS_ES.slice()),\"function\"==typeof renderizar&&renderizar()}catch(e){}...} -> FUNCIÃ“N GLOBAL invocable con string (aplicarIdioma('en')). PATCH menor: aÃ±adir sincronizaciÃ³n del select nuevo al final: document.getElementById(\"select-idioma\")&&(document.getElementById(\"select-idioma\").value=_idiomaActual) (sin esto, al cargar la pÃ¡gina el select queda en 'es' aunque el idioma guardado sea 'en'). El HTML nuevo enlaza select-idioma con onchange=\"aplicarIdioma(this.value)\" (funciÃ³n global).",
+      "cambiarVista": "pos 70189: function cambiarVista(e){document.querySelectorAll(\".view-content\").forEach(e=>e.classList.remove(\"active\"));const a=document.getElementById(\"view-\"+e);a&&a.classList.add(\"active\"),document.querySelectorAll(\".view-toggle button\").forEach(e=>e.classList.remove(\"active\"));const t=document.getElementById(\"btn-view-\"+e);t&&t.classList.add(\"active\"),\"dashboard\"===e&&renderDashboard(),window.innerWidth<=CONFIG.LIMITES.RESPONSIVE_BREAK&&togglePanel()} -> ACEPTA string. SIN PATCH si el HTML nuevo conserva: clase .view-toggle en el contenedor de los 2 botones y los ids btn-view-table/btn-view-dashboard (DECISIÃ“N: conservar estos hooks; el active-marking funciona sin tocar JS).",
+      "cambiarTipoPlanificador": "pos ~52795: function cambiarTipoPlanificador(e){if(e===plannerType)return;guardarDatosTipo(plannerType),plannerType=e,localStorage.setItem(CONFIG.STORAGE.PLANNER_TYPE,e),document.querySelectorAll(\".planner-type-selector button\").forEach(a=>{a.classList.toggle(\"active\",a.dataset.type===e)});...} -> ACEPTA string ('semanal'|'diario'|'mensual'|'anual'|'personalizado'). SIN PATCH si el HTML nuevo conserva la clase .planner-type-selector y el atributo data-type en los 5 botones (DECISIÃ“N: conservar hook).",
+      "tour": "iniciarTourInteractivo (pos 120157) GUARDADO DOBLE: no arranca si falta #tbody con tr o .sp-body .toolbar (ambos ausentes en HTML nuevo -> no arranca, sin crash). tourPasos: [{selector:'#tbody'...},{selector:'.sp-body .toolbar button:nth-child(3)'...},{selector:'.tema-btn'...}]. El avance n(e): si el paso no existe, else n(e+1) (CONFIRMADO: '...window._tourPaso=e+1}else n(e+1)') -> los pasos inexistentes se saltan. SIN CAMBIOS.",
+      "huÃ©rfanas_con_guard": "CONFIRMADO NO CRASHEAN sin elementos: cambiarIntervalo (pos 110969, guard document.getElementById(\"sel-intervalo\")&&), aplicarIntervalo (pos 111091, (getElementById(\"sel-intervalo\")||{value:15}).value), agregarFila (data-only + renderizar), agregarDia (prompt + data), eliminarUltimoDia (eliminarDia data-only), dividirCelda (if(0!==mergeSeleccion.length) data-only), cargarModelo (try/catch + if(!a)return + querySelectorAll seguros), guardar (try/catch, solo localStorage), cargar (try/catch; riesgo solo vÃ­a aplicarDatos -> cubierto por el patch de aplicarDatos), resetear (3 parches arriba), nuevoPlanificador (querySelectorAll seguro + data-only), exportarPDF (window.print), exportarExcel (exportarHorarioExcel data-only + createElement), exportarWord (e?e.outerHTML:\"\" GUARDADO), imprimir (window.print).",
+      "oculto": "clase .oculto: SOLO dentro del panel (4 en index.html: inp-nombre/inp-especialidad/inp-ciclo/inp-objetivo; 12 refs en app.js todas sobre inp-*). Modales/onboarding NO usan .oculto. Reglas CSS .oculto: '.info-row input.oculto' (main.css 5152, panel) y '#side-panel .card-section .oculto' (57424) -> ambas se purgan; no queda ningÃºn elemento .oculto en HTML nuevo (no hace falta regla global).",
+      "btn_fullscreen_dark": "btn-fullscreen y btn-dark-mode NO EXISTEN en index.html (0 ocurrencias); solo referencias guarded en app.js (e&&) dentro de conmutarPantallaCompleta (pos 121729) y toggleDarkMode (pos 94849). btn-cerrar-otras: 0 en ambos archivos. NO hay .sp-btn fuera del aside."
+    },
+    "git": "HEAD 7974611 'refactor: reestructuracion profunda y simplificacion de maquetacion del panel v5.9'. Working tree LIMPIO. Remote origin = https://github.com/flacelo/planificador-horarios.git (push disponible). Rama: main.",
+    "npm_scripts": "dev: node server.js | check: node --check js/app.js (EXISTE) | check:env: node scripts/check-env.js | build: node scripts/build.js | deploy: npm run build."
   },
   "archivos_afectados": [
     "index.html",
-    "css/main.css"
+    "css/main.css",
+    "css/panel.css",
+    "css/grid.css",
+    "js/app.js"
   ],
   "sub_tareas": [
     {
       "id": 1,
       "orden": 1,
-      "nombre": "index.html: reemplazar bloque Configuración (28448–29467) por 3 filas .config-row planas",
-      "detalle": "Con node (indexOf/substring, NO editor que reformatee): localizar '<div class=\"card-section\" id=\"config-section\">' (28448) y 'main-card-container' (29467). Reemplazar TODO el bloque (1019 chars, texto exacto en estado_actual.bloque_config_exacto) por: '<div class=\"card-section\" id=\"config-section\"><div class=\"card-section-title\">🛠️ Configuración</div><div class=\"config-row\"><span class=\"config-label\">Idioma / Language</span><div class=\"config-control\"><button type=\"button\" class=\"sp-lang-btn active\" data-lang=\"es\">Español</button><button type=\"button\" class=\"sp-lang-btn\" data-lang=\"en\">English</button></div></div><div class=\"config-row\"><span class=\"config-label\">Tipografía</span><select id=\"font-select\" class=\"sp-select\"><option value=\"Segoe UI\">Segoe UI (Predeterminado)</option><option value=\"Roboto\">Roboto</option><option value=\"Arial\">Arial</option></select></div><div class=\"config-row\"><span class=\"config-label\">Exportar</span><div class=\"config-control\"><button type=\"button\" id=\"btn-export-json\" class=\"sp-action-btn\">📥 Exportar JSON</button><button type=\"button\" id=\"btn-export-excel\" class=\"sp-action-btn\">📊 Descargar Excel</button></div></div></div></div></div>'. SIN eliminar .card-section#config-section ni su .card-section-title. La cola tras el último botón queda en 5 cierres: config-control#3, config-row#3, config-section, sp-container, side-panel (balance: opens 6, closes 8 = 6 internos + sp-container + side-panel), seguido inmediatamente de '<div class=\"main-card-container\">'. Se ELIMINAN del markup: sp-card x3, sp-card-title x3, sp-lang-toggle, sp-field, sp-label, sp-btn-stack. Se CONSERVAN: .sp-lang-btn (x2, con data-lang es/en y class active en es), #font-select + .sp-select + 3 opciones, #btn-export-json/.sp-action-btn, #btn-export-excel/.sp-action-btn. Las secciones 1-5 NO se tocan.",
+      "nombre": "index.html: reemplazar el panel completo (pos 22706-30202) por la estructura plana nueva",
+      "detalle": "Con node (indexOf/substring, SIN editor que reformatee): localizar '<div class=\"side-panel\" id=\"side-panel\">' (22706) y '<div class=\"main-card-container\">' (30203). Reemplazar TODO el rango (incluida la cola de 5 cierres que cierra side-panel) por el HTML nuevo EXACTO: '<aside id=\"panel-control\" class=\"sidebar-clean\" aria-label=\"Panel de control\"><header class=\"panel-header-clean\"><span class=\"panel-title-clean\">Panel de Control</span><button id=\"btn-cerrar-panel\" class=\"btn-clean\" type=\"button\" onclick=\"togglePanel()\" aria-label=\"Cerrar panel\">âœ•</button></header><section class=\"panel-section\"><h2 class=\"section-title\">General</h2><div class=\"row-clean\"><label for=\"input-nombre-area\">Nombre de Ã¡rea / empresa / hogar</label><input id=\"input-nombre-area\" class=\"input-clean\" placeholder=\"Nombre de Ã¡rea / empresa / hogar...\" oninput=\"actualizarHeaderPreview()\"></div><div class=\"row-clean\"><label for=\"select-soy\">Soy...</label><select id=\"select-soy\" class=\"select-clean\" onchange=\"onRolChange(this)\"><option value=\"\">Soy...</option><option value=\"Estudiante\">Estudiante</option><option value=\"Docente\">Docente</option><option value=\"Egresado\">Egresado</option><option value=\"Profesional\">Profesional</option><option value=\"Freelancer\">Freelancer</option><option value=\"otros\">Otros</option></select></div><div class=\"row-clean\"><label for=\"select-carrera\">Carrera / Ãrea</label><select id=\"select-carrera\" class=\"select-clean\" onchange=\"onCarreraChange()\"><option value=\"\">Carrera / Ãrea</option><option value=\"IngenierÃ­a\">IngenierÃ­a</option><option value=\"Medicina\">Medicina</option><option value=\"Derecho\">Derecho</option><option value=\"Arquitectura\">Arquitectura</option><option value=\"EnfermerÃ­a\">EnfermerÃ­a</option><option value=\"PsicologÃ­a\">PsicologÃ­a</option><option value=\"Freelancer\">Freelancer</option><option value=\"Otra Carrera\">Otra Carrera</option></select></div><div class=\"row-clean\"><label for=\"select-nivel\">Nivel / Ciclo</label><select id=\"select-nivel\" class=\"select-clean\"><option value=\"\">Nivel / Ciclo</option><option value=\"1er Ciclo\">1er Ciclo</option><option value=\"2do Ciclo\">2do Ciclo</option><option value=\"3er Ciclo\">3er Ciclo</option><option value=\"4to Ciclo\">4to Ciclo</option><option value=\"5to Ciclo\">5to Ciclo</option><option value=\"6to Ciclo\">6to Ciclo</option><option value=\"7mo Ciclo\">7mo Ciclo</option><option value=\"8vo Ciclo\">8vo Ciclo</option><option value=\"9no Ciclo\">9no Ciclo</option><option value=\"10mo Ciclo\">10mo Ciclo</option><option value=\"otros\">Otros</option></select></div></section><section class=\"panel-section\"><h2 class=\"section-title\">Vista</h2><div class=\"planner-type-selector grid-2\"><button type=\"button\" class=\"btn-clean active\" data-type=\"semanal\" onclick=\"cambiarTipoPlanificador('semanal')\">Semanal</button><button type=\"button\" class=\"btn-clean\" data-type=\"diario\" onclick=\"cambiarTipoPlanificador('diario')\">Diario</button><button type=\"button\" class=\"btn-clean\" data-type=\"mensual\" onclick=\"cambiarTipoPlanificador('mensual')\">Mensual</button><button type=\"button\" class=\"btn-clean\" data-type=\"anual\" onclick=\"cambiarTipoPlanificador('anual')\">Anual</button><button type=\"button\" class=\"btn-clean\" data-type=\"personalizado\" onclick=\"cambiarTipoPlanificador('personalizado')\">Personalizado</button></div><div class=\"view-toggle grid-2\"><button type=\"button\" class=\"btn-clean active\" id=\"btn-view-table\" onclick=\"cambiarVista('table')\">Planificador</button><button type=\"button\" class=\"btn-clean\" id=\"btn-view-dashboard\" onclick=\"cambiarVista('dashboard')\">Dashboard</button></div></section><section class=\"panel-section\"><h2 class=\"section-title\">ConfiguraciÃ³n</h2><div class=\"row-clean\"><label for=\"select-idioma\">Idioma</label><select id=\"select-idioma\" class=\"select-clean select-clean-sm\" onchange=\"aplicarIdioma(this.value)\"><option value=\"es\">EspaÃ±ol</option><option value=\"en\">English</option></select></div><div class=\"row-clean\"><label for=\"select-tipografia\">TipografÃ­a</label><select id=\"select-tipografia\" class=\"select-clean select-clean-sm\"><option value=\"Segoe UI\">Segoe UI (Predeterminado)</option><option value=\"Roboto\">Roboto</option><option value=\"Arial\">Arial</option></select></div><div class=\"row-clean grid-2\"><button type=\"button\" id=\"btn-export-json\" class=\"btn-clean\">Exportar JSON</button><button type=\"button\" id=\"btn-export-excel\" class=\"btn-clean\">Descargar Excel</button></div></section></aside>'. NOTAS CRÃTICAS: (1) los botones btn-export-json/btn-export-excel NO llevan onclick inline (el binding JS _ej/_ex ya existe); (2) select-tipografia NO lleva onchange inline (binding _fs patcheado en sub-tarea 7); (3) se CONSERVAN las clases hook .planner-type-selector/.view-toggle + ids btn-view-table/btn-view-dashboard + data-type (cambiarVista/cambiarTipoPlanificador marcan active con querySelectorAll globales); (4) NO se incluyen: custom-header/header-preview/especialidad-container/ciclo-container/carrera-container/sel-especialidad/inp-* (las funciones quedan cubiertas por guards de la sub-tarea 7); (5) el select-idioma inicia en value='es'; aplicarIdioma (patcheada) lo sincroniza al cargar.",
       "criterio_aceptacion": [
-        "node: html.indexOf('<div class=\"sp-card\"') === -1 y html.indexOf('sp-card-title') === -1 y html.indexOf('sp-field') === -1 y html.indexOf('sp-label') === -1 y html.indexOf('sp-btn-stack') === -1 y html.indexOf('sp-lang-toggle') === -1 en TODO index.html (0 sub-cajas).",
-        "html.indexOf('class=\"config-row\"') da exactamente 3 coincidencias; 'config-label' 3; 'config-control' 2.",
-        "IDs conservados (1 c/u): '#font-select' 1, '#btn-export-json' 1, '#btn-export-excel' 1; '.sp-lang-btn' 2; 'data-lang=\"es\"' 1 con class active; 'data-lang=\"en\"' 1; opciones del select: 'value=\"Segoe UI\"' 1, 'value=\"Roboto\"' 1, 'value=\"Arial\"' 1.",
-        "html.indexOf('main-card-container') sigue existiendo INMEDIATAMENTE después del bloque (sin duplicar); los 6 títulos de sección (👤 General, 🎨 Vista, 📁 Plantillas, ⏱️ Horario, 💾 Archivos, 🛠️ Configuración) aparecen exactamente 1 vez c/u.",
-        "El bloque nuevo y el viejo tienen el MISMO saldo de cierres (delta neta = 1 div menos): balance verificado con contador de <div>/</div> entre config-section y main-card-container = 0.",
-        "cmd /c \"npm run build\" (node scripts/build.js) termina con Build OK y exit 0.",
-        "npm run check (node --check js/app.js) pasa sin errores (js/app.js NO se toca)."
+        "node: html.indexOf('id=\"side-panel\"') === -1; html.indexOf('id=\"panel-control\"') === 1; html.indexOf('class=\"sidebar-clean\"') === 1.",
+        "Conteos en index.html: 'id=\"input-nombre-area\"' 1, 'id=\"select-soy\"' 1, 'id=\"select-carrera\"' 1, 'id=\"select-nivel\"' 1, 'id=\"select-idioma\"' 1, 'id=\"select-tipografia\"' 1, 'id=\"btn-cerrar-panel\"' 1, 'id=\"btn-export-json\"' 1, 'id=\"btn-export-excel\"' 1, 'id=\"btn-view-table\"' 1, 'id=\"btn-view-dashboard\"' 1.",
+        "0 ocurrencias en index.html de: 'sp-container', 'sp-header', 'sp-title', 'sp-card', 'sp-lang-', 'sp-select', 'sp-action', 'sp-btn', 'sp-divider', 'sp-hint', 'card-section', 'config-row', 'config-label', 'config-actions', 'inp-titulo-header', 'header-preview', 'sel-nombre', 'sel-carrera', 'sel-ciclo', 'sel-objetivo', 'sel-especialidad', 'inp-ciclo', 'inp-objetivo', 'font-select' (FUERA del <style> inline; ojo: 'card-section'/'section-title'/'lang-btn' existen en #view-diario y fuera del panel -> verificar solo en el rango del panel o con contexto).",
+        "Balance de divs: entre 'id=\"panel-control\"' y 'main-card-container' el conteo neto de <div>/</div> es 0; el aside cierra con '</aside>' y el siguiente elemento es '<div class=\"main-card-container\">'.",
+        "Los hooks JS conservados: 'class=\"planner-type-selector' 1, 'class=\"view-toggle' 1, 'data-type=' 5, 'onclick=\"cambiarVista' 2, 'onclick=\"cambiarTipoPlanificador' 5, 'onclick=\"togglePanel()\"' 3 (cloud-btn + side-overlay + btn-cerrar-panel), 'onchange=\"aplicarIdioma(this.value)\"' 1, 'oninput=\"actualizarHeaderPreview()\"' 1, 'onchange=\"onRolChange(this)\"' 1, 'onchange=\"onCarreraChange()\"' 1.",
+        "side-overlay y cloud-btn intactos (mismos ids y onclick)."
       ]
     },
     {
       "id": 2,
       "orden": 2,
-      "nombre": "index.html: neutralizar reglas inline v5.5 colisionantes en el <style> (32693–39240)",
-      "detalle": "HALLAZGO CRÍTICO: las reglas del <style> inline v5.5 usan !important y al ser inline ganan SIEMPRE a main.css v5.9 (aunque v5.9 use '#side-panel .sp-container' con mayor especificidad). Por lo tanto, dentro del bloque v5.5 (desde '/* ===== v5.5 — LIMPIEZA TOTAL SIDE-PANEL (alta prioridad) ===== */' hasta el cierre de '#side-panel .sp-action-btn{...}', justo antes de </style> en 39240), ELIMINAR las 9 reglas: '#side-panel .sp-card', '#side-panel .sp-card-title', '#side-panel .sp-label', '#side-panel .sp-lang-toggle', '#side-panel .sp-lang-btn', '#side-panel .sp-lang-btn.active', '#side-panel .sp-select', '#side-panel .sp-btn-stack', '#side-panel .sp-action-btn' (las 5 primeras quedan muertas por la sub-tarea 1; las 4 últimas apuntan a elementos RETENIDOS y deben caer para que v5.9 controle alto 36px, radius 6px, padding 8px 12px, neutro #334155 y activo #3b82f6 en lugar del inline #2563eb/padding 10px/radius 8px). CONSERVAR: '#side-panel *{font-family...}', '#side-panel{background:#0f172a!important;padding:20px 16px!important}', '#side-panel .sp-container{...}', '#side-panel .sp-title{...}'. NO tocar las reglas #view-diario (antes del comentario v5.5).",
+      "nombre": "index.html: eliminar el bloque v5.5 del <style> inline (pos 37785-40025)",
+      "detalle": "Dentro del <style> inline (33476-40025), eliminar desde '/* ===== v5.5 - LIMPIEZA TOTAL SIDE-PANEL' (pos 37785) hasta el cierre de '#side-panel .sp-action-btn{...}' justo antes de '</style>' (pos 40025). Resultado: el <style> queda solo con las reglas #view-diario (28 ocurrencias) y termina con '}' + '</style>'. NO tocar las reglas #view-diario.",
       "criterio_aceptacion": [
-        "En el rango del <style> inline: 0 ocurrencias de '.sp-card', '.sp-card-title', '.sp-label', '.sp-lang-toggle', '.sp-lang-btn', '.sp-select', '.sp-btn-stack', '.sp-action-btn'.",
-        "html.indexOf('#side-panel{background:#0f172a') sigue presente (1 ocurrencia); '#side-panel .sp-container{display:flex' presente.",
-        "Conteo de selectores '#view-diario' en el <style> IDÉNTICO al de v5.8 (las reglas de la libreta no se modifican).",
-        "El bloque v5.5 resultante conserva estructura CSS válida: el <style> termina con el cierre correcto '}' + '</style>' (validar con npm run build).",
-        "Conteo crudo 'sp-card' en TODO index.html = 0 (antes eran 8: 6 markup + 2 inline)."
+        "node: html.indexOf('v5.5') === -1 (el comentario v5.5 desaparece).",
+        "En el rango del <style>: 0 ocurrencias de '#side-panel'; 0 de '.sp-card', '.sp-lang-', '.sp-select', '.sp-action', '.sp-btn-stack', '.sp-container', '.sp-title', '.sp-label'.",
+        "Conteo de '#view-diario' en index.html IDÃ‰NTICO al previo (28).",
+        "El <style> sigue vÃ¡lido: contiene '}' + '</style>' al final y el bloque #view-diario termina con su cierre completo."
       ]
     },
     {
       "id": 3,
       "orden": 3,
-      "nombre": "index.html: bump de caché v=5.8 → v=5.9 (2 ocurrencias exactas)",
-      "detalle": "Reemplazar las 2 ocurrencias 'v=5.8': pos 21480 (link rel=stylesheet href=\"css/main.css?v=5.8\") y pos 60988 (script src=\"js/app.js?v=5.8\") por 'v=5.9'. No hay otros assets locales con query string (solo fonts.googleapis.com y api.qrserver.com, que NO se tocan).",
+      "nombre": "css/panel.css: re-scopear layout a #panel-control y purgar skin .sp-*",
+      "detalle": "panel.css es 1 lÃ­nea de 7543 chars. (1) REESCRIBIR la regla en 881-1216: '.side-panel{...}' -> '#panel-control{position:fixed;top:0;left:-330px;width:305px;height:100vh;z-index:1001;transition:left 0.25s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;overflow-x:hidden}' (SE ELIMINAN background/padding/box-shadow: skin nueva en main.css); (2) REESCRIBIR 1217-1239: '.side-panel.open{left:0}' -> '#panel-control.open{left:0}'; (3) RE-SCOPEAR scrollbar 1240-1370: '.side-panel::-webkit-scrollbar' -> '#panel-control::-webkit-scrollbar' (3 reglas: width/track/thumb, mismo contenido); (4) PURGAR todo el resto de reglas panel-scoped y sp-*: .sp-header (1431), .sp-header h3, .sp-close (1757) + :hover, .side-panel .dropdown-content (+a, +a:hover, +.dropdown>button:not(.sp-btn-primary) + :hover), .side-panel .planner-type-selector (+margin), +button, +.active, +:hover, .side-panel .custom-header input (+::placeholder, +:focus), .header-preview, .side-panel .info-row (+.campo, +select/input, +option, +:focus), .side-panel .toolbar (+button, +:hover), .side-panel .view-toggle (+button, +.active), .side-panel .merge-info, .side-panel .btn-merge-split, .sp-section (5187, +[open], +summary, +summary::-webkit-details-marker, +summary::after, +[open] summary::after, +summary:hover, +summary span), .sp-body (6057, +.sp-section[open] .sp-body, +.sp-body .toolbar), .sp-divider (6336), .sp-hint (6441), .sp-btn (6548, +:hover), .sp-btn-sm, .sp-btn-primary (+:hover), .sp-btn-danger, .sp-btn-success, .sp-btn-purple, .sp-btn-outline (+:hover), .sp-label (7451). CONSERVAR SIN CAMBIOS: .cloud-btn (0-880, 5 reglas) y .side-overlay (2010) + .side-overlay.open (2229). Resultado esperado: panel.css queda con cloud-btn x5 + #panel-control + #panel-control.open + #panel-control::-webkit-scrollbar x3 + side-overlay x2.",
       "criterio_aceptacion": [
-        "grep/node: 'v=5.9' en index.html = exactamente 2 coincidencias (main.css y app.js).",
-        "grep/node: 'v=5.8' en index.html = 0 coincidencias.",
-        "Las URLs externas (fonts.googleapis.com/css2?, api.qrserver.com/v1?) no se modifican."
+        "grep panel.css: '.side-panel' = 0 ocurrencias; '#panel-control' presente >= 3 ('#panel-control{', '#panel-control.open{', '#panel-control::-webkit-scrollbar'); '.sp-' = 0 ocurrencias.",
+        "'.cloud-btn' presente (5 reglas: base, :hover, .open, .open:hover, ::after); '.side-overlay' presente (2 reglas); '.side-overlay.open{display:block;opacity:1}' intacto.",
+        "La regla #panel-control base conserva exactamente: position:fixed;top:0;left:-330px;width:305px;height:100vh;z-index:1001;transition:left .25s;overflow-y:auto;overflow-x:hidden y NADA mÃ¡s.",
+        "'#panel-control.open{left:0}' presente exacto.",
+        "TamaÃ±o resultante < 3500 bytes (se purgaron ~4100 bytes de skin)."
       ]
     },
     {
       "id": 4,
       "orden": 4,
-      "nombre": "css/main.css: appender bloque v5.9 AL FINAL (después de 59976), con prefijo #side-panel .sp-container",
-      "detalle": "Agregar al FINAL de css/main.css (que hoy termina en 59976 con la cola v5.8 '.sp-lang-btn.active{background:rgba(99,102,241,0.16)!important;color:#a5b4fc!important}') el bloque v5.9 (mismo prefijo que v5.8 para ganar por orden de fuente; !important): (1) '#side-panel{background-color:#0f172a!important}' (safeguard vs v5.3 #121826 de 52766; el inline v5.5 ya da #0f172a, mismo valor); (2) '#side-panel .sp-container .card-section{background:transparent!important;border:none!important;border-radius:0!important;box-shadow:none!important;padding:12px 0!important;margin:0!important;border-bottom:1px solid #1e293b!important}' + ':hover{background:#1e293b!important}' + ':last-child{border-bottom:none!important}' (secciones planas, separador entre secciones, última sin borde); (3) '.card-section-title{font-size:0.85rem!important;font-weight:500!important;color:#94a3b8!important;border-bottom:none!important;margin-bottom:12px!important}' (tipografía v5.8 se MANTIENE; el borde inferior del título se elimina porque el separador pasa a la sección); (4) inputs/selects: '#side-panel .sp-container select, #side-panel .sp-container input[type=time], #side-panel .sp-container input[type=text], #side-panel .sp-container .sp-select{height:36px!important;min-height:36px!important;padding:8px 12px!important;background:#0f172a!important;border:1px solid #334155!important;border-radius:6px!important;color:#e2e8f0!important;box-sizing:border-box!important}' (reemplaza alto 38px/padding 6px 12px de v5.8 y padding 10px inline v5.5 — neutralizado en sub-tarea 2); (5) botones: '#side-panel .sp-container button, #side-panel .sp-container .sp-btn{height:36px!important;min-height:36px!important;padding:0 12px!important;border-radius:6px!important;background:#334155!important;color:#f1f5f9!important;border:1px solid #334155!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}' (neutros; también normaliza .btn-merge-split, .dropdown>button, .toolbar button — decisión intencional del requerimiento); (6) activo/primario azul: '#side-panel .sp-container .planner-type-selector button.active, #side-panel .sp-container .view-toggle button.active, #side-panel .sp-container .sp-lang-btn.active, #side-panel .sp-container .sp-btn-primary{background:#3b82f6!important;border-color:#3b82f6!important;color:#ffffff!important}' (reemplaza rgba(99,102,241,0.16)/#a5b4fc de v5.8; .sp-action-btn queda NEUTRO #334155 — no es primario); (7) '.config-row': '#side-panel .sp-container .config-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:12px 0!important;border-bottom:1px solid #1e293b!important}' + ':last-child{border-bottom:none!important}' + '.config-label{font-size:13px!important;color:#94a3b8!important;font-weight:500!important;white-space:nowrap!important}' + '.config-control{display:flex!important;gap:8px!important;align-items:center!important}' + '.config-row select{flex:0 1 auto!important;min-width:160px!important}' (el select a la derecha, SIN width:100% que tenía el inline v5.5). NO redeclarar las retículas grid 2-col de v5.8 (.planner-type-selector/.view-toggle/.toolbar/.sp-btn-grid se CONSERVAN). NO tocar el .card-section claro de la libreta (41132) ni nada anterior a 59976.",
+      "nombre": "css/grid.css: re-scopear layout responsive a #panel-control y purgar skin",
+      "detalle": "grid.css 1 lÃ­nea de 13586 chars. DENTRO de @media (max-width:700px) (abre en 5065): (1) pos 5674 '.side-panel{width:270px;left:-290px;padding:18px 14px}' -> '#panel-control{width:270px;left:-290px}'; (2) pos ~5752 '.side-panel.open{left:0}' -> '#panel-control.open{left:0}'; (3) PURGAR: '.sp-header h3{font-size:0.75em}', '.side-panel .planner-type-selector button{font-size:0.65em;padding:4px 7px}', '.side-panel .toolbar button{...}', '.side-panel .view-toggle button{...}', '.sp-section summary{padding:9px 11px;font-size:0.75em}', '.sp-body{padding:6px 11px 10px}', '.sp-btn{font-size:0.65em;padding:4px 7px}', '.sp-btn-sm{font-size:0.6em;padding:3px 6px}'; (4) CONSERVAR: '.planner-type-selector button{font-size:0.65em;padding:4px 8px}' y '.view-toggle button{font-size:0.6em;padding:4px 10px}' (GLOBALES, aplican a los hooks conservados). DENTRO de @media (max-width:400px) (abre en 7812): pos 8004 '.side-panel{width:220px;left:-240px}' -> '#panel-control{width:220px;left:-240px}'. CONSERVAR '.cloud-btn.open{left:230px}' y '.cloud-btn.open:hover{left:278px}' (consistentes con anchos 220/270). @media 767 y 480 de grid.css NO tienen reglas del panel (no tocar).",
       "criterio_aceptacion": [
-        "El bloque v5.9 es el ÚLTIMO contenido del archivo: último '}' de main.css es el cierre de la regla '.config-row select' v5.9; la longitud crece de 59976 a >60000 chars.",
-        "En main.css, índice de la 1ª regla v5.9 > índice de la última 'rgba(99,102,241' (cola v5.8) → v5.9 gana empates por orden de fuente.",
-        "grep en main.css: '#1e293b' (separadores) presente; '#3b82f6' presente; 'height:36px' presente (≥3 selectores: inputs, buttons, y referencias v5.8 38px NO se eliminan pero quedan antes); 'border-radius:6px' presente; '.config-row' presente (≥4 ocurrencias de selector); 'background:#111827' (v5.8) sigue existiendo ANTES del bloque v5.9.",
-        "El .card-section claro de la libreta ('background:#ffffff!important' en ~41132) NO se modifica (índice de 'background:#ffffff!important' intacto).",
-        "Todas las reglas v5.9 usan prefijo '#side-panel' (o '#side-panel .sp-container ...'); ninguna regla global nueva.",
-        "Las retículas grid 2-col v5.8 siguen intactas (grep 'grid-template-columns:1fr 1fr' = 1, sin duplicado)."
+        "grep grid.css: '.side-panel' = 0; '#panel-control' presente 3 veces (700px: width 270/left -290 y .open; 400px: width 220/left -240).",
+        "'.sp-header', '.sp-section', '.sp-body', '.sp-btn' = 0 ocurrencias en grid.css.",
+        "'.planner-type-selector button{font-size:0.65em;padding:4px 8px}' y '.view-toggle button{font-size:0.6em;padding:4px 10px}' siguen presentes (hooks retenidos).",
+        "'.cloud-btn.open{left:230px}' y '.cloud-btn.open:hover{left:278px}' intactos.",
+        "Las 5 @media queries conservan su apertura original (600/700/400/767/480)."
       ]
     },
     {
       "id": 5,
       "orden": 5,
-      "nombre": "Verificación final (node --check + build + conteos + git diff)",
-      "detalle": "Ejecutar suite local: (1) npm run check (node --check js/app.js) sin errores; (2) cmd /c \"npm run build\" (node scripts/build.js) con Build OK y exit 0; (3) conteos node/grep: 'v=5.9' x2 / 'v=5.8' x0; 'sp-card' crudo en index.html = 0; 'config-row' = 3; '.sp-lang-btn' = 2; '#font-select' = 1; '#btn-export-json' = 1; '#btn-export-excel' = 1; en el <style> inline: 0 ocurrencias de .sp-card/.sp-lang-btn/.sp-select/.sp-action-btn; (4) js/app.js INTACTO: git diff --stat muestra 0 cambios en js/app.js y refs JS sin alterar (.sp-lang-btn 2, font-select 2, btn-export-json 1, btn-export-excel 1); (5) main.css: solo ADICIONES al final (git diff muestra el bloque v5.9 append); (6) git status y git diff --stat: SOLO index.html y css/main.css (más .opencode/context/task.json si aplica).",
+      "nombre": "css/main.css: purgar TODAS las reglas #side-panel/.side-panel/.sp-*/.config-*/personalizacion",
+      "detalle": "main.css es 1 lÃ­nea (62713 chars) con 3 roturas de llaves pre-existentes (ver estado_actual.purga_main_css.desbalance; ninguna en reglas objetivo). ALGORITMO SEGURO con node: partir el contenido por '}' (los fragmentos son reglas completas salvo el Ãºltimo); para cada fragmento, el selector es el texto hasta el primer '{'; si el selector contiene '#side-panel' o '.side-panel' o '.sp-' o '.config-' o 'personalizacion' -> ELIMINAR el fragmento (regla completa); reconstruir uniendo el resto con '}'. REGLAS COMPARTIDAS (NO borrar enteras, refinar): pos 29551 '.sp-btn,.btn-primary,.btn-cancel,.btn-ok{transition:transform .15s ease,box-shadow .2s ease}' -> '.btn-primary,.btn-cancel,.btn-ok{transition:transform .15s ease,box-shadow .2s ease}'; pos ~29641 '.sp-btn:active,.btn-primary:active,.btn-cancel:active,.btn-ok:active{transform:scale(.95)}' -> '.btn-primary:active,.btn-cancel:active,.btn-ok:active{transform:scale(.95)}'. REGLAS MUERTAS a borrar enteras: ':fullscreen .sp-sidebar,:-webkit-full-screen .sp-sidebar{display:none}' (31272) y ':fullscreen .sp-body,:-webkit-full-screen .sp-body{overflow-y:auto;max-height:60vh}' (31657). CONSERVAR SIEMPRE las reglas globales de la libreta: '.card-section{background:#ffffff!important...}' (~41132), '.section-title{font-weight:bold...}' (~61150), '.goals-section/.grateful-section/.affirmations-section/.morning-section', '.aesthetic-input', '.mood-btn', '.routine-checkboxes', '.todo-input-group', '.aesthetic-btn', '.header-controls', '.lang-selector', '.lang-btn' (no llevan #side-panel/.sp-). NO intentar equilibrar llaves (desbalance pre-existente se conserva tal cual).",
       "criterio_aceptacion": [
-        "npm run check y cmd /c \"npm run build\" terminan sin errores (exit 0).",
-        "Conteos: 'v=5.9' = 2, 'v=5.8' = 0, 'sp-card' en index.html = 0, 'config-row' = 3, 'sp-lang-btn' = 2, '#font-select' = 1, '#btn-export-json' = 1, '#btn-export-excel' = 1.",
-        "En el <style> inline: 0 ocurrencias de '.sp-card', '.sp-lang-btn', '.sp-select', '.sp-action-btn' (neutralizadas).",
-        "git diff --stat: js/app.js con 0 cambios; main.css solo con adiciones al final (sin modificaciones en líneas previas).",
-        "El diff no contiene secretos ni .env; solo archivos previstos."
+        "node: main.css.indexOf('#side-panel') === -1; indexOf('.side-panel') === -1; indexOf('.sp-') === -1; indexOf('.config-') === -1; indexOf('personalizacion') === -1.",
+        "'.btn-primary,.btn-cancel,.btn-ok{transition' presente (sin .sp-btn) y '.btn-primary:active,.btn-cancel:active,.btn-ok:active{transform:scale(.95)}' presente.",
+        "'.card-section{background:#ffffff!important' presente en su Ã­ndice original (~41132, intacto); '.section-title{font-weight:bold!important' presente (~61150).",
+        "Conteo de llaves tras purga = 553 - (reglas eliminadas) aperturas y 550 - (reglas eliminadas) cierres (el delta de 3 del desbalance pre-existente se mantiene).",
+        "Las 2 @media (max-width:480px) intactas ('.bottom-nav' en 32667 y '.cal-dia' en 36930)."
       ]
     },
     {
       "id": 6,
       "orden": 6,
-      "nombre": "Commit y push (OPCIONAL — solo si el usuario lo solicita)",
-      "detalle": "Si el usuario lo pide: git add index.html css/main.css (y .opencode/context/task.json); commit con mensaje sugerido 'style: reestructuracion estructural del panel (secciones planas y config rows) v5.9'; git push origin main. NO ejecutar sin autorización explícita.",
+      "nombre": "css/main.css: aÃ±adir al final los estilos planos nuevos (sidebar-clean, panel-header-clean, panel-section, section-title, input-clean, select-clean, grid-2, btn-clean, row-clean, select-clean-sm)",
+      "detalle": "Append al FINAL de main.css (despuÃ©s de la Ãºltima regla actual) el bloque v6.0 (usar !important donde sea necesario para vencer residuos; todo scoped a #panel-control salvo las clases componentes): (1) '#panel-control.sidebar-clean{display:flex;flex-direction:column;gap:18px!important;padding:18px 16px!important;background:#0f172a!important;color:#e2e8f0!important;font-family:\"Segoe UI\",system-ui,sans-serif!important;border-right:1px solid #1e293b!important}'; (2) '#panel-control .panel-header-clean{display:flex!important;align-items:center!important;justify-content:space-between!important;padding-bottom:12px!important;border-bottom:1px solid #1e293b!important;margin-bottom:4px!important}'; (3) '#panel-control .panel-title-clean{font-size:17px!important;font-weight:700!important;color:#f8fafc!important}'; (4) '#panel-control .panel-section{display:flex!important;flex-direction:column!important;gap:10px!important;padding:14px 4px!important;border-bottom:1px solid #1e293b!important}'; (5) '#panel-control .panel-section:last-child{border-bottom:none!important}'; (6) '#panel-control .section-title{font-size:0.85rem!important;font-weight:700!important;color:#94a3b8!important;text-transform:uppercase!important;letter-spacing:0.5px!important;margin:0 0 6px!important;padding:0!important;border:none!important}'; (7) '.input-clean,.select-clean{width:100%!important;height:38px!important;min-height:38px!important;padding:8px 12px!important;background:#0f172a!important;border:1px solid #334155!important;border-radius:6px!important;color:#f8fafc!important;font-size:14px!important;box-sizing:border-box!important;font-family:\"Segoe UI\",system-ui,sans-serif!important}'; (8) '.select-clean-sm{height:32px!important;min-height:32px!important;font-size:13px!important}'; (9) '.row-clean{display:flex!important;flex-direction:column!important;gap:5px!important}'; (10) '.row-clean label{font-size:12px!important;color:#94a3b8!important;font-weight:600!important}'; (11) '.grid-2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}'; (12) '.btn-clean{height:36px!important;min-height:36px!important;padding:6px 12px!important;border-radius:6px!important;background:#334155!important;color:#f1f5f9!important;border:1px solid #334155!important;font-size:13px!important;font-weight:600!important;cursor:pointer!important;font-family:\"Segoe UI\",system-ui,sans-serif!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}'; (13) '.btn-clean:hover{background:#3b82f6!important;border-color:#3b82f6!important;color:#ffffff!important}'; (14) '#panel-control .planner-type-selector button.active,#panel-control .view-toggle button.active{background:#2563eb!important;border-color:#2563eb!important;color:#fff!important}'; (15) '#btn-cerrar-panel{width:32px!important;height:32px!important;padding:0!important;background:#1e293b!important;border:1px solid #334155!important;color:#94a3b8!important;font-size:14px!important;border-radius:6px!important;cursor:pointer!important}'; (16) '#btn-cerrar-panel:hover{background:#334155!important;color:#fff!important}'. NO incluir reglas #side-panel ni .sp-*. El foco/outline queda por defecto del navegador.",
       "criterio_aceptacion": [
-        "git log -1 --oneline muestra el mensaje aprobado por el usuario.",
-        "git push origin main sin errores.",
-        "git status --short limpio tras el push."
+        "main.css termina con la regla '#btn-cerrar-panel:hover{...}' y el archivo crece (len > 35000 chars tras purga+append).",
+        "Cada clase nueva presente: '.sidebar-clean' 1, '.panel-header-clean' 1, '.panel-section' 3 (2 selectores + :last-child), '.section-title' 1 (scoped #panel-control .section-title), '.input-clean' 1, '.select-clean' 2 (.input-clean,.select-clean + .select-clean-sm), '.grid-2' 1, '.btn-clean' 2 (+:hover), '.row-clean' 2 (+label).",
+        "0 ocurrencias nuevas de '#side-panel', '.sp-', 'config-' en el bloque aÃ±adido.",
+        "Conteo total main.css: '#side-panel' 0, '.sp-' 0 (post purga, confirmado tambiÃ©n en la verificaciÃ³n final)."
+      ]
+    },
+    {
+      "id": 7,
+      "orden": 7,
+      "nombre": "js/app.js: rewire de ids viejos a nuevos + guards (lista EXACTA de parches)",
+      "detalle": "app.js es 1 lÃ­nea (140229 bytes). Aplicar con node (reemplazos exactos de string, NUNCA editor que reformatee): (1) togglePanel (pos 69961): 'getElementById(\"side-panel\")' -> 'getElementById(\"panel-control\")'; (2) onRolChange (pos 32771): envolver el primer bloque en guard -> reemplazar 'const a=document.getElementById(\"inp-nombre\");\"otros\"===e.value?' por 'const a=document.getElementById(\"inp-nombre\");a&&(\"otros\"===e.value?' y cerrar el parÃ©ntesis en 'a.value=e.value);' -> 'a.value=e.value));' (SOLO el primer bloque); 'getElementById(\"sel-carrera\")' -> 'getElementById(\"select-carrera\")' (2 refs dentro de esta funciÃ³n); 'getElementById(\"sel-ciclo\")' -> 'getElementById(\"select-nivel\")' (1 ref); (3) onCarreraChange (pos 35088): 'getElementById(\"sel-carrera\")' -> 'getElementById(\"select-carrera\")' y reemplazar 'const n=e.value;\"Freelancer\"===n?' por 'const n=e.value;a&&(\"Freelancer\"===n?' cerrando 'n?poblarEspecialidad(n):a.style.display=\"none\",t&&(t.value=\"\"),o&&(o.value=\"\",o.classList.add(\"oculto\"))' -> 'n?poblarEspecialidad(n):a.style.display=\"none\"),t&&(t.value=\"\"),o&&(o.value=\"\",o.classList.add(\"oculto\"))'; (4) aplicarDatos (pos 51793): helper -> aÃ±adir 'if(!o)return;' tras 'const o=document.getElementById(e),n=document.getElementById(a);'; 'a(\"sel-nombre\",\"inp-nombre\",e.nombre)' -> 'a(\"select-soy\",\"inp-nombre\",e.nombre)'; 'onRolChange(document.getElementById(\"sel-nombre\"))' (esta funciÃ³n) -> 'onRolChange(document.getElementById(\"select-soy\"))'; 'a(\"sel-ciclo\",\"inp-ciclo\",e.ciclo)' -> 'a(\"select-nivel\",\"inp-ciclo\",e.ciclo)'; 'document.getElementById(\"inp-titulo-header\").value=e.header' -> 'document.getElementById(\"input-nombre-area\").value=e.header'; (5) resetear (pos 52707): '[\"sel-nombre\",\"sel-carrera\",\"sel-ciclo\",\"sel-objetivo\"].forEach(e=>document.getElementById(e).selectedIndex=0)' -> '[\"select-soy\",\"select-carrera\",\"select-nivel\"].forEach(e=>document.getElementById(e).selectedIndex=0)'; 'document.getElementById(\"inp-titulo-header\").value=\"\"' (dentro de resetear) -> 'document.getElementById(\"input-nombre-area\").value=\"\"'; 'onRolChange(document.getElementById(\"sel-nombre\"))' (dentro de resetear) -> 'onRolChange(document.getElementById(\"select-soy\"))'; (6) actualizarHeaderPreview (pos 69603): 'getElementById(\"inp-titulo-header\")' -> 'getElementById(\"input-nombre-area\")' y aÃ±adir guard del preview: reemplazar 'if(!e)return;const t=e.value.trim();' por 'if(!e||!a)return;const t=e.value.trim();'; (7) restore header init (pos ~55770): 'getElementById(\"inp-titulo-header\")' -> 'getElementById(\"input-nombre-area\")'; (8) valInfo (pos ~49620): 'const t=document.getElementById(e),o=document.getElementById(a);return' -> 'const t=document.getElementById(e),o=document.getElementById(a);if(!t)return\"\";return'; (9) getDatosCompletos: 'valInfo(\"sel-nombre\",\"inp-nombre\")' -> 'valInfo(\"select-soy\",\"inp-nombre\")'; 'valInfo(\"sel-carrera\",\"inp-carrera\")' -> 'valInfo(\"select-carrera\",\"inp-carrera\")'; 'valInfo(\"sel-ciclo\",\"inp-ciclo\")' -> 'valInfo(\"select-nivel\",\"inp-ciclo\")'; 'getElementById(\"inp-titulo-header\")?.value?.trim()' -> 'getElementById(\"input-nombre-area\")?.value?.trim()' (3 ocurrencias de este patrÃ³n: getDatosCompletos, renderDashboard, generarCaptura); (10) initPersonalizacion (pos 96139): 'document.getElementById(\"sel-tipografia\")||document.getElementById(\"font-select\")' -> 'document.getElementById(\"select-tipografia\")'; (11) init bindings (final del archivo): 'var _fs=document.getElementById(\"font-select\");' -> 'var _fs=document.getElementById(\"select-tipografia\")||document.getElementById(\"font-select\");'; (12) aplicarIdioma (pos 135428): aÃ±adir al final antes del cierre: ',document.getElementById(\"select-idioma\")&&(document.getElementById(\"select-idioma\").value=_idiomaActual)' (insertar tras el Ãºltimo try/catch de la funciÃ³n). NO tocar nada mÃ¡s: los querySelectorAll '.planner-type-selector button' (x4), '.view-toggle button' (cambiarVista), '.sp-lang-btn' (x2), tour, exportar*, cargarModelo, guardar, cargar, nuevoPlanificador, agregarFila/Dia, dividirCelda quedan con sus guards/selectores vÃ¡lidos (verificado).",
+      "criterio_aceptacion": [
+        "npm run check (node --check js/app.js) pasa SIN errores.",
+        "node: app.js.indexOf('side-panel') === -1; indexOf('\"panel-control\"') === 1; indexOf('\"inp-titulo-header\"') === -1; indexOf('\"input-nombre-area\"') === 4 (onRolChange NO, actualizarHeaderPreview, resetear, init restore, aplicarDatos e.header + getDatosCompletos/renderDashboard/generarCaptura con ?.); indexOf('\"sel-carrera\"') === -1 (todas a select-carrera); indexOf('\"sel-ciclo\"') === -1; indexOf('\"sel-nombre\"') === -1.",
+        "indexOf('if(!o)return') presente (helper aplicarDatos); indexOf('if(!e||!a)return') presente (actualizarHeaderPreview); indexOf('if(!t)return\"\"') presente (valInfo); indexOf('a&&(\"otros\"===e.value?') presente (onRolChange); indexOf('a&&(\"Freelancer\"===n?') presente (onCarreraChange).",
+        "indexOf('\"select-tipografia\"') >= 2 (initPersonalizacion + _fs). indexOf('\"select-idioma\"') >= 2 (aplicarIdioma sync + ...).",
+        "Conteos intactos: 'btn-export-json' 1, 'btn-export-excel' 1, '.planner-type-selector' 4, '.view-toggle' 1, 'inp-ciclo' 7 (guards), 'inp-nombre' 5 (guards).",
+        "git diff de app.js muestra SOLO los parches listados (sin reformateo: el archivo sigue en 1 lÃ­nea)."
+      ]
+    },
+    {
+      "id": 8,
+      "orden": 8,
+      "nombre": "index.html: bump de cachÃ© v=5.9 -> v=6.0 (2 ocurrencias exactas)",
+      "detalle": "Reemplazar las 2 ocurrencias 'v=5.9': pos 22128 (link rel=stylesheet href=\"css/main.css?v=5.9\") y pos 62041 (script src=\"js/app.js?v=5.9\") por 'v=6.0'. No hay otras versiones locales (v=5.8/5.7/5.6/5.5 = 0). sw.js no lleva query strings (no tocar).",
+      "criterio_aceptacion": [
+        "node: 'v=6.0' en index.html = exactamente 2 coincidencias (main.css y app.js).",
+        "node: 'v=5.9' en index.html = 0 coincidencias.",
+        "URLs externas (fonts.googleapis.com, api.qrserver.com) sin cambios."
+      ]
+    },
+    {
+      "id": 9,
+      "orden": 9,
+      "nombre": "VerificaciÃ³n integral (node --check + conteos + git diff)",
+      "detalle": "Ejecutar: (1) npm run check (node --check js/app.js) exit 0; (2) node --check sobre el HTML no aplica; validar balance del panel: conteo <div vs </div> entre 'id=\"panel-control\"' y 'main-card-container' = 0 y '</aside>' presente; (3) conteos globales: index.html: 'id=\"side-panel\"' 0, 'id=\"panel-control\"' 1, 'v=6.0' 2, 'v=5.9' 0, '#side-panel' 0 en <style>, 'sp-card' 0, 'sp-lang' 0, 'font-select' 0 (solo <style> #view-diario queda); main.css: '#side-panel' 0, '.side-panel' 0, '.sp-' 0, '.config-' 0, y termina con el bloque v6.0 (Ãºltima regla '#btn-cerrar-panel:hover'); panel.css: '.side-panel' 0, '.sp-' 0, '#panel-control' >= 3; grid.css: '.side-panel' 0, '.sp-' 0, '#panel-control' 3; app.js: 'side-panel' 0, 'inp-titulo-header' 0, 'sel-carrera' 0, 'sel-nombre' 0, 'sel-ciclo' 0; (4) git status --short y git diff --stat: SOLO index.html, css/main.css, css/panel.css, css/grid.css, js/app.js (mÃ¡s .opencode/context/task.json); (5) verificaciÃ³n visual rÃ¡pida opcional: npm run dev + abrir / en navegador (panel abre con cloud-btn, cierra con âœ•, selects funcionan, exportar JSON/Excel responde).",
+      "criterio_aceptacion": [
+        "npm run check exit 0.",
+        "Todos los conteos de (3) se cumplen exactamente.",
+        "git diff --stat: 5 archivos previstos; sin cambios en dashboard.css ni sw.js ni server.js.",
+        "Sin secretos ni .env en el diff."
+      ]
+    },
+    {
+      "id": 10,
+      "orden": 10,
+      "nombre": "Commit y push (REQUERIDO por el usuario): 'refactor: purga completa de CSS antiguo y maquetacion plana v6.0'",
+      "detalle": "git add index.html css/main.css css/panel.css css/grid.css js/app.js (y .opencode/context/task.json); git commit -m 'refactor: purga completa de CSS antiguo y maquetacion plana v6.0'; git push origin main. Revisar antes: git status, git diff --stat, git log --oneline -3.",
+      "criterio_aceptacion": [
+        "git log -1 --oneline = 'refactor: purga completa de CSS antiguo y maquetacion plana v6.0'.",
+        "git push origin main sin errores (remote verificado: origin https://github.com/flacelo/planificador-horarios.git).",
+        "git status --short vacÃ­o tras el push."
       ]
     }
   ],
@@ -103,104 +215,171 @@
     {
       "id": "R1",
       "criticidad": "ALTA",
-      "descripcion": "CASCADA CSS: las reglas del <style> inline v5.5 son !important-inline y ganan SIEMPRE a main.css v5.9 (incluso con prefijo '#side-panel .sp-container', mayor especificidad, y aunque v5.9 use !important). La premisa 'ganar por especificidad' del requerimiento NO aplica a important-inline. Si no se neutralizan las reglas inline de .sp-lang-btn/.sp-lang-btn.active/.sp-select/.sp-action-btn, v5.9 no podrá imponer 36px/radius 6/padding 8px 12px/azul #3b82f6 (seguirían #2563eb, padding 10px, radius 8px).",
-      "mitigacion": "Sub-tarea 2 (obligatoria): eliminar las 9 reglas inline v5.5 colisionantes; conservar solo #side-panel*, #side-panel, .sp-container, .sp-title. Verificar con el conteo 'sp-card = 0' en index.html."
+      "descripcion": "El layout del panel (position:fixed/left:-330px/width:305px/z-index:1001/transition/.open{left:0}) vive en css/panel.css (+ overrides en grid.css) y NO en main.css. Si solo se purga main.css y se cambia el id a panel-control sin re-scopear panel.css/grid.css, el panel queda estÃ¡tico en el flujo del documento (se rompe).",
+      "mitigacion": "Sub-tareas 3 y 4 re-escriben .side-panel -> #panel-control conservando SOLO propiedades layout; togglePanel (sub-tarea 7) apunta a panel-control; .cloud-btn.open{left:305px} se conserva (misma anchura)."
     },
     {
       "id": "R2",
       "criticidad": "ALTA",
-      "descripcion": "HTML minificado en 1 línea principal: el reemplazo del bloque Configuración (28448–29467, 1019 chars) con node indexOf/substring debe usar el texto EXACTO anclado (estado_actual.bloque_config_exacto); cualquier desviación rompe el balance de divs y todo el panel.",
-      "mitigacion": "Sub-tarea 1 usa anclas textuales completas + verificación de saldo de cierres (opens 6 / closes 8) + npm run build como validador."
+      "descripcion": "main.css tiene llaves desbalanceadas (553 vs 550) por 3 roturas pre-existentes en la cola appendeada (cal-container/cal-dia-nombre/cal-grid). Un parser de llaves naive (depth counting) NO sirve para purgar; los fragmentos rotos contienen '{' dentro de las 'declaraciones'.",
+      "mitigacion": "Sub-tarea 5 usa el algoritmo split-by-'}' + selector hasta primer '{' (robusto al desbalance; ninguna de las 3 roturas contiene #side-panel/.sp-). NO se equilibran llaves (fuera de alcance)."
     },
     {
       "id": "R3",
-      "criticidad": "MEDIA",
-      "descripcion": "La regla GLOBAL '.card-section{background:#ffffff!important...}' (main.css 41132, libreta del diario) golpea también las secciones del panel. v5.9 debe usar '#side-panel .sp-container .card-section' (mismo prefijo que v5.8, orden posterior) para anularla.",
-      "mitigacion": "Sub-tarea 4 especifica el prefijo exacto; criterio de aceptación verifica que 'background:#ffffff!important' queda intacto en su índice original."
+      "criticidad": "ALTA",
+      "descripcion": "JS con puntos SIN guard que crashean con el HTML nuevo: onRolChange (a.classList sin a&&), onCarreraChange (a.style.display sin a&& en 3 ramas), aplicarDatos helper (o.options sin o), resetear (3 puntos: selectedIndex=0 de sel-*, inp-titulo-header.value, onRolChange(null)), valInfo (t.options sin t), actualizarHeaderPreview (a.textContent sin a&&).",
+      "mitigacion": "Sub-tarea 7 lista el parche EXACTO de cada uno con los guards; criterios de aceptaciÃ³n verifican la presencia de 'if(!o)return', 'if(!e||!a)return', 'if(!t)return\"\"', 'a&&('."
     },
     {
       "id": "R4",
       "criticidad": "MEDIA",
-      "descripcion": "La regla de botones v5.9 '#side-panel .sp-container button' es amplia: normaliza .btn-merge-split (gradiente rojo), .dropdown>button, .toolbar button a neutro #334155. Es coherente con el requerimiento ('botones neutros') pero cambia acentos visuales existentes fuera de Configuración.",
-      "mitigacion": "Decisión documentada en sub-tarea 4; el activo/primario azul #3b82f6 se limita a .planner-type-selector button.active/.view-toggle button.active/.sp-lang-btn.active/.sp-btn-primary."
+      "descripcion": "Las reglas compartidas '.sp-btn,.btn-primary,.btn-cancel,.btn-ok' y '.sp-btn:active,...' en main.css no se pueden borrar enteras: btn-primary/btn-cancel/btn-ok se usan en modales/tour fuera del panel. Igual ':fullscreen .sp-sidebar' y ':fullscreen .sp-body' son 100% muertas.",
+      "mitigacion": "Sub-tarea 5 refina las 2 reglas compartidas (quitar .sp-btn del selector) y elimina enteras las 2 reglas :fullscreen muertas."
     },
     {
       "id": "R5",
       "criticidad": "MEDIA",
-      "descripcion": "Las retículas grid 2-col de v5.8 (.planner-type-selector/.view-toggle/.toolbar/.sp-btn-grid) y las alturas 38px v5.8 permanecen en main.css (por orden de fuente las anula v5.9 para los selectores redeclarados, pero NO para los no redeclarados). Si v5.9 no redeclara un selector, gana v5.8.",
-      "mitigacion": "Sub-tarea 4 lista explícitamente todos los selectores a redeclarar; los grids NO se redeclaran (se conservan) y se verifica 'grid-template-columns:1fr 1fr' = 1."
+      "descripcion": "El querySelectorAll('.planner-type-selector button') (cambiarTipoPlanificador/cargarModelo/nuevoPlanificador) y '.view-toggle button' (cambiarVista) + getElementById('btn-view-'+e) marcan el active. Si el HTML nuevo no conserva estas clases/ids, el active-marking muere (la lÃ³gica de datos sigue OK por los guards t&&/querySelectorAll vacÃ­o).",
+      "mitigacion": "DECISIÃ“N: el HTML nuevo (sub-tarea 1) conserva las clases hook .planner-type-selector/.view-toggle, los ids btn-view-table/btn-view-dashboard y los data-type; verificado por criterios de la sub-tarea 1."
     },
     {
       "id": "R6",
-      "criticidad": "BAJA",
-      "descripcion": "sw.js (cache-first, CACHE='planify-cache-v1') puede servir index.html/main.css viejos en producción hasta que el SW se re-actualice; el bump ?v=5.9 ayuda tras la primera revalidación. Irrelevante en dev (server.js).",
-      "mitigacion": "Verificar en navegador con hard-reload / desregistrar SW; sin cambios de código (fuera de alcance)."
+      "criticidad": "MEDIA",
+      "descripcion": "La clase .section-title existe GLOBAL en main.css (libreta diario, ~61150). Las reglas nuevas '#panel-control .section-title{...}' quedan scoped para no afectar la libreta; pero el append define tambiÃ©n clases globales (.input-clean/.select-clean/.btn-clean/.grid-2/.row-clean) que solo existen dentro del panel -> sin colisiÃ³n real.",
+      "mitigacion": "Sub-tarea 6 define .section-title SIEMPRE scoped como '#panel-control .section-title'; verificar que el .section-title global de la libreta queda intacto (criterio sub-tarea 5)."
     },
     {
       "id": "R7",
       "criticidad": "BAJA",
-      "descripcion": "js/app.js es 1 línea de 135 KB y NO se toca en v5.9; cualquier editor con autoformato la alteraría. Las refs verificadas (.sp-lang-btn 2, font-select 2, btn-export-json 1, btn-export-excel 1) siguen resolviéndose porque los elementos retenidos conservan clases/ids.",
-      "mitigacion": "No abrir js/app.js en editores que reformateen; sub-tarea 5 exige git diff --stat js/app.js = 0."
+      "descripcion": "app.js es 1 lÃ­nea de 140KB; cualquier editor que reformatee arruinarÃ­a el diff y el node --check.",
+      "mitigacion": "Todas las ediciones con node (reemplazo de substrings exactos); sub-tarea 7 exige 'el archivo sigue en 1 lÃ­nea' + npm run check."
+    },
+    {
+      "id": "R8",
+      "criticidad": "BAJA",
+      "descripcion": "sw.js (cache-first) puede servir assets viejos en producciÃ³n; el bump ?v=6.0 refresca tras revalidaciÃ³n.",
+      "mitigacion": "VerificaciÃ³n en navegador con hard-reload; sin cambios en sw.js (fuera de alcance)."
     }
   ],
   "verificacion": {
     "comandos": [
-      "npm run check  (node --check js/app.js; script SÍ existe en package.json)",
-      "cmd /c \"npm run build\"  (node scripts/build.js; Build OK y exit 0)",
-      "node: html.indexOf('<div class=\"sp-card\"') === -1; 'config-row' = 3; 'v=5.9' = 2; 'v=5.8' = 0",
-      "node: en <style> inline 0 ocurrencias de .sp-card/.sp-lang-btn/.sp-select/.sp-action-btn",
-      "node: en js/app.js refs intactas: '.sp-lang-btn' 2, 'font-select' 2, 'btn-export-json' 1, 'btn-export-excel' 1",
-      "node: main.css termina con el bloque v5.9 (fin del archivo > 59976; última regla .config-row select)",
-      "git status / git diff --stat  (solo index.html y css/main.css; js/app.js sin cambios; main.css solo adiciones al final)",
-      "git commit / push SOLO si el usuario lo solicita"
+      "npm run check  (node --check js/app.js; exit 0)",
+      "node one-liners de conteo sobre index.html, css/main.css, css/panel.css, css/grid.css, js/app.js (lista en sub-tarea 9)",
+      "git status --short / git diff --stat (solo 5 archivos previstos)",
+      "git log -1 --oneline (mensaje v6.0) y git push origin main",
+      "Opcional: npm run dev y smoke test manual en navegador (toggle panel, selects, exportar)"
     ],
-    "criterio_exito": "Build OK + node --check sin errores + 0 sub-cajas (sp-card/sp-field/sp-label/sp-btn-stack/sp-lang-toggle fuera del HTML) + 3 .config-row con label izquierda y control derecha + 9 reglas inline v5.5 neutralizadas + bloque v5.9 al final de main.css (secciones planas con separador #1e293b, inputs 36px/8px 12px/#0f172a/#334155, botones 36px/radius 6/neutros #334155, activos #3b82f6, config-row flex) + cache v=5.9 x2 + js/app.js intacto."
+    "criterio_exito": "node --check OK + 0 ocurrencias de #side-panel/.sp-*/config-*/personalizacion en main.css + 0 .side-panel/.sp- en panel.css y grid.css + #panel-control (con .open y scrollbar) re-scopeado en panel.css/grid.css + HTML plano nuevo con los 11 ids nuevos + inline v5.5 eliminado + estilos planos v6.0 al final de main.css + app.js rewirereado con guards (side-panel/inp-titulo-header/sel-carrera/sel-nombre/sel-ciclo = 0) + v=6.0 x2 + commit 'refactor: purga completa de CSS antiguo y maquetacion plana v6.0' pusheado."
   },
   "contexto_extra": {
+    "hallazgo_principal": "El panel NO es <aside id='side-panel'> sino <div class='side-panel' id='side-panel'> (pos 22706). El layout position:fixed estÃ¡ SOLO en css/panel.css pos 881-1216 (.side-panel) y 1217-1239 (.side-panel.open) + responsive en css/grid.css (700px: 270px/left -290; 400px: 220px/left -240). main.css: 143 refs '#side-panel' TODAS skin. El inline <style> v5.5 (37785-40025) es skin puro. No existe botÃ³n cerrar en el HTML actual.",
     "posiciones_clave_index_html": {
-      "side_panel_open": 22042,
-      "sp_container_open": 22082,
-      "general_section": 22186,
-      "vista_section": 25114,
-      "plantillas_section": 25997,
-      "horario_section": 26465,
-      "archivos_section": 27787,
-      "config_section_open": 28448,
-      "config_block_fin": 29467,
-      "main_card_container": 29467,
-      "link_css_v58": 21480,
-      "script_js_v58": 60988,
-      "style_inline_inicio": 32693,
-      "style_inline_fin": 39240,
-      "style_inline_v55_comentario": "desde '/* ===== v5.5 — LIMPIEZA TOTAL SIDE-PANEL (alta prioridad) ===== */' hasta antes de </style>"
+      "side_panel_open": 22706,
+      "side_overlay": 22567,
+      "cloud_btn": 22636,
+      "main_card_container_vacio": 30203,
+      "main_card_container_real": 30242,
+      "link_css_v59": 22128,
+      "script_js_v59": 62041,
+      "style_inline_inicio": 33476,
+      "style_inline_v55_inicio": 37785,
+      "style_inline_fin": 40025
     },
     "posiciones_clave_main_css": {
-      "card_section_clara_global": 41132,
-      "side_panel_v53_bg_121826": 52766,
-      "v58_block_inicio": 57400,
-      "v58_block_fin": 59976,
-      "append_v59_desde": 59976
+      "bytes": 62713,
+      "primera_regla_side_panel": 46140,
+      "reglas_clase_side_panel": [19656, 20012, 20334, 49786],
+      "regla_compartida_sp_btn": 29551,
+      "regla_compartida_sp_btn_active": 29641,
+      "regla_fullscreen_sp_sidebar": 31272,
+      "regla_fullscreen_sp_body": 31657,
+      "media_480_1": 32667,
+      "media_480_2": 36930,
+      "card_section_global_libreta": 41132,
+      "section_title_global_libreta": 61150,
+      "bloque_v58_v59_inicio": 59980,
+      "eof": 62712
     },
-    "orden_css_confirmado": "link css/main.css?v=5.8 (21480) < link panel.css < link dashboard.css < <style> inline v5.5 (32693). Inline-important gana a externo-important; por eso sub-tarea 2 neutraliza el inline y v5.9 gana a v5.8 por orden de fuente con el MISMO prefijo '#side-panel .sp-container'.",
-    "refs_js_criticas": [
-      "document.querySelectorAll('.lang-selector-global .lang-btn, .sp-lang-btn') x2 (idioma; document-wide)",
-      "getElementById('font-select') x2 (con fallback 'sel-tipografia'; change → cambiarTipografia)",
-      "getElementById('btn-export-json') x1 (→ exportarHorarioJSON)",
-      "getElementById('btn-export-excel') x1 (→ exportarHorarioExcel)"
+    "posiciones_clave_panel_css": {
+      "bytes": 7543,
+      "cloud_btn_rango": "0-880",
+      "side_panel_layout": 882,
+      "side_panel_open": 1217,
+      "scrollbar": "1240-1370",
+      "sp_header": 1431,
+      "sp_close": 1757,
+      "side_overlay": 2010,
+      "side_overlay_open": 2229,
+      "sp_section": 5187,
+      "sp_body": 6057,
+      "sp_divider": 6336,
+      "sp_hint": 6441,
+      "sp_btn": 6548,
+      "sp_label": 7451
+    },
+    "posiciones_clave_grid_css": {
+      "bytes": 13586,
+      "media_700": 5065,
+      "side_panel_270": 5674,
+      "side_panel_open_700": 5752,
+      "media_400": 7812,
+      "side_panel_220": 8004,
+      "cloud_btn_open_700": 5550,
+      "cloud_btn_open_400": 8050,
+      "global_planner_type_selector_btn": "~5830 (conservar)",
+      "global_view_toggle_btn": "~5910 (conservar)"
+    },
+    "wiring_js_posiciones": {
+      "togglePanel": 69961,
+      "onRolChange": 32771,
+      "onCarreraChange": 35088,
+      "onEspecialidadChange": 35586,
+      "poblarEspecialidad": 33762,
+      "cambioSelect": 28741,
+      "perfilIdActual": 30639,
+      "cargarPerfil": 30159,
+      "aplicarDatos": 51793,
+      "resetear": 52707,
+      "valInfo": 49620,
+      "getDatosCompletos": 49487,
+      "actualizarHeaderPreview": 69603,
+      "cambiarTipografia": 95381,
+      "initPersonalizacion": 96139,
+      "cambiarVista": 70189,
+      "cambiarTipoPlanificador": 52795,
+      "aplicarIdioma": 135428,
+      "init_bindings_final": 136753,
+      "iniciarTourInteractivo": 120157,
+      "conmutarPantallaCompleta": 121729,
+      "exportarHorarioJSON": 49658,
+      "exportarHorarioExcel": 50195
+    },
+    "guards_confirmados": {
+      "aplicarIntervalo": "(getElementById('sel-intervalo')||{value:15})",
+      "cambiarIntervalo": "getElementById('sel-intervalo')&&",
+      "cargarModelo": "try/catch + if(!a)return + querySelectorAll",
+      "guardar": "try/catch solo localStorage",
+      "cargar": "try/catch (riesgo via aplicarDatos -> cubierto)",
+      "resetear": "3 parches necesarios (sub-tarea 7)",
+      "nuevoPlanificador": "querySelectorAll + data-only",
+      "exportarWord": "e?e.outerHTML:''",
+      "dividirCelda": "if(0!==mergeSeleccion.length) data-only",
+      "tour": "doble guard (tbody y .sp-body .toolbar) + n(e+1) salta pasos inexistentes"
+    },
+    "decisiones_clave": [
+      "Conservar clases hook .planner-type-selector y .view-toggle + ids btn-view-table/btn-view-dashboard en el HTML nuevo (active-marking JS sin parches).",
+      "btn-export-json/btn-export-excel SIN onclick inline (binding JS existente); select-tipografia SIN onchange inline (binding _fs patcheado); select-idioma CON onchange inline aplicarIdioma(this.value).",
+      "input-nombre-area = reemplazo de inp-titulo-header (Ã¡rea), NO de inp-nombre; el bloque inp-nombre de onRolChange queda como no-op guarded.",
+      "Scrollbars de panel re-scopeados a #panel-control (mantienen el panel usable con overflow-y:auto).",
+      "No se equilibran las llaves de main.css (roturas pre-existentes ajenas al alcance)."
     ],
-    "clases_eliminadas_html": ["sp-card", "sp-card-title", "sp-field", "sp-label", "sp-btn-stack", "sp-lang-toggle"],
-    "clases_retenidas": ["sp-lang-btn (x2, data-lang es/en)", "sp-select (en #font-select)", "sp-action-btn (x2)"],
-    "clases_nuevas": ["config-row (x3)", "config-label (x3)", "config-control (x2)"],
-    "reglas_inline_a_eliminar": ["#side-panel .sp-card", "#side-panel .sp-card-title", "#side-panel .sp-label", "#side-panel .sp-lang-toggle", "#side-panel .sp-lang-btn", "#side-panel .sp-lang-btn.active", "#side-panel .sp-select", "#side-panel .sp-btn-stack", "#side-panel .sp-action-btn"],
-    "reglas_inline_a_conservar": ["#side-panel *", "#side-panel (bg #0f172a)", "#side-panel .sp-container", "#side-panel .sp-title"],
-    "v58_a_sobrescribir": "card-section #111827/#1f2937/radius 10/box; card-section-title 0.85rem/500/#94a3b8 (mantener tipografía); inputs/selects 38px/6px 12px; botones activos rgba(99,102,241,0.16)/#a5b4fc; sp-btn-primary/sp-action-btn rgba indigo; sp-lang-btn.active rgba indigo",
-    "version_anterior": "5.8",
-    "assets_a_bumpear": ["css/main.css", "js/app.js"],
-    "commit_actual": "7386183 style: redesino minimalista y simplificacion UI del panel de control v5.8",
+    "commit_anterior": "7974611 refactor: reestructuracion profunda y simplificacion de maquetacion del panel v5.9",
     "working_tree": "limpio",
+    "remote": "origin https://github.com/flacelo/planificador-horarios.git",
     "npm_scripts": {
       "check": "node --check js/app.js",
-      "build": "node scripts/build.js"
+      "build": "node scripts/build.js",
+      "dev": "node server.js"
     }
   }
 }

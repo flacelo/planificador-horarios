@@ -1,37 +1,43 @@
 {
-  "task": "TASK-20260801-v6.13",
-  "replaces": "v6.12",
-  "titulo": "Contraste dias Vista Semanal (blanco brillante + 700) + fix boton Empezar vacio + bumps v6.13/v7",
+  "task": "TASK-20260801-v6.14",
+  "replaces": "v6.13",
+  "titulo": "Resguardo inferior para licencia, contraste th y leyenda semanal + bumps v6.14/v8",
   "tipo": "CSS append (retoque visual) + bump versiones + commit/push exacto",
-  "head": "0635c61 (v6.12, interfaz casi terminada)",
+  "head": "13bc378 (v6.13, base verificada: git limpio, balance main.css 649/649)",
   "git_limpio": true,
   "archivos_a_modificar": ["css/main.css", "index.html", "sw.js"],
-  "regla_de_oro": "main.css SOLO append al final (nunca editar reglas existentes). index.html: SOLO las 2 cadenas v=6.12 -> v=6.13. sw.js: SOLO planify-cache-v6 -> planify-cache-v7. NO tocar js/app.js.",
+  "regla_de_oro": "main.css SOLO append al final (nunca editar reglas existentes). index.html: SOLO las 2 cadenas v=6.13 -> v=6.14. sw.js: SOLO planify-cache-v7 -> planify-cache-v8. NO tocar js/app.js.",
   "investigacion_clave": {
-    "A_dias_semanal": {
-      "generacion_js": "Los th de dias NO estan en el HTML estatico: los genera renderizar() en js/app.js (offset 38293): t+='<th style=\"position:relative;\">'+e.substring(0,3)+'<div class=\"resizer\"...'. Array real: let dias=[\"LUNES\",\"MARTES\",\"MIÉRCOLES\",\"JUEVES\",\"VIERNES\",\"SÁBADO\",\"DOMINGO\"] (app.js offset 25395) => textos renderizados: LUN, MAR, MIÉ, JUE, VIE, SÁB, DOM.",
-      "selector_real": "#header-row th (thead id=\"header-row\", th SIN clase propia; unicamente inline style=\"position:relative;\"). El th de HORA lleva inline style=\"width:55px;position:relative;\" y el contenedor padre es #view-semanal (div id=\"view-semanal\" class=\"view-content\").",
-      "regla_que_los_pinta_hoy": "main.css offset ~72480 (append v6.12): '#view-semanal .hora-cell,#view-semanal .hora-cell input,#view-semanal #header-row th,#view-semanal span,#view-semanal label{color:#e2e8f0!important;font-weight:500!important}'. Especificidad para el th: (2,0,1) con !important. Tambien compiten grid.css 'th{color:#334155;font-weight:700}' (0,0,1) y 'th *{color:#334155!important;font-weight:700!important}' (0,0,2) y '.tema-estelar thead th{color:#9effdb!important}' (0,2,1): TODAS pierden contra la v6.12.",
-      "regla_append_ganadora": "'#view-semanal #header-row th{color:#ffffff!important;font-weight:700!important}' => misma especificidad (2,0,1) que la v6.12, ambos con !important => gana por ORDEN (append es la ultima regla del archivo). No hay otra regla con (>=2,0,1) para ese th.",
-      "spans_dentro_del_th": "El th de cada dia contiene <span style='cursor:pointer;color:#ff7675;...'> (eliminar dia, inline) que queda cubierto por '#view-semanal span{color:#e2e8f0!important}' (inline sin !important pierde vs CSS !important). NO se toca: el requerimiento solo pide el TEXTO del dia (texto directo del th), que si cubre la regla nueva."
+    "A_licencia_y_resguardo": {
+      "ubicacion_licencia_html": "index.html offset 35840: <div class=\"lic-msg\">🔓 Licencia personal para Usuario – Gracias por tu compra 💖</div> y offset 35950: <div class=\"footer\"><span class=\"lic-texto\">... mismo texto ...</span>... TUTORIAL. AMBAS estan DENTRO de #view-table (offset 34532) que es hijo de #view-semanal (offset 34467). Estructura: #view-semanal > #view-table > .table-wrap + .leyenda#leyenda + .lic-msg + .footer. La licencia es el ULTIMO contenido visible de la vista semanal.",
+      "bottom_nav": "main.css offset 39404 (layout forzado v6.11): .bottom-nav{position:fixed!important;bottom:10px!important;left:50%!important;transform:translateX(-50%)!important;z-index:9999!important;...}. Esta DENTRO de .main-card-container (index offset 34038) pero es fixed => flota sobre el contenido.",
+      "resguardo_anulado": "v6.11 puso .app{padding-bottom:100px!important} (offset 39403) PERO el append v6.12/6.13 lo ANULO: '#app,.app{height:auto!important;min-height:0!important;padding-bottom:0!important;...}' (offset ~72260). Por eso la licencia queda tapada: NO existe resguardo efectivo hoy.",
+      "contenedor_real": ".main-content NO existe. .main-card-container SI existe (clase, offset 33966/34005) pero es el contenedor de TODAS las vistas. El contenedor REAL y minimo es #view-semanal (padding-bottom:120px!important): la licencia vive dentro de el, crea espacio de scroll al final, y el fondo #0d1117 del area extra lo pinta .main-card-container{background:#0d1117!important} (tema estelar) => NO rompe el fondo. NO hay regla existente que fije padding-bottom de #view-semanal (solo width/height/display/min-height 500px en offsets 251 y ~72240) => sin conflicto.",
+      "decision": "Regla UNICA: '#view-semanal{padding-bottom:120px!important}' (opcion padding del usuario; margin-bottom en .lic-msg NO se usa porque el area extra quedaria sin fondo oscuro). No anadir a #view-diario/#view-mensual (el footer/licencia solo existe en #view-semanal; el usuario pidio solo semanal)."
     },
-    "B_boton_empezar_vacio": {
-      "html_exacto": "index.html offset 34682: <button class=\"btn-empty-secondary\" onclick=\"cerrarEmptyState()\">✏️ <span data-i18n=\"empty_start\">Empezar vacío</span></button>. Ubicacion: #view-semanal > #view-table > div.empty-state#empty-state > .empty-actions. El texto vive en el <span data-i18n=\"empty_start\">.",
-      "estilos_actuales": "main.css offset 15553: 'button.btn-empty-secondary{padding:7px 16px!important;background:rgba(255,255,255,0.7)!important;color:#555!important;border:1px solid rgba(0,0,0,0.08)!important;...}' (0,1,1). Hover offset 15910: 'button.btn-empty-secondary:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08);background:rgba(255,255,255,0.9)!important}' (0,1,1).",
-      "causa_raiz_del_bug": "La regla v6.12 '#view-semanal span{color:#e2e8f0!important}' (1,0,1) pinta el <span data-i18n=\"empty_start\"> con #e2e8f0 (casi blanco) sobre el fondo blanco rgba(255,255,255,0.7) del boton => texto blanco sobre fondo blanco. El color:#555 del button se hereda pero el span lo sobreescribe.",
-      "reglas_append_ganadoras": [
-        "'#view-semanal button.btn-empty-secondary{background:#1e293b!important;color:#ffffff!important;border:1px solid #475569!important}' => (1,0,1) > (0,1,1) de la base. Gana el fondo/borde/color del boton.",
-        "'#view-semanal button.btn-empty-secondary span{color:#ffffff!important}' => (1,1,1) > (1,0,1) de '#view-semanal span'. Gana el TEXTO del span (imprescindible: sin ella el span sigue #e2e8f0)."
-      ],
-      "hover_actual": "button.btn-empty-secondary:hover (0,1,1) con background rgba(255,255,255,0.9)!important PIERDE contra la regla base nueva '#view-semanal button.btn-empty-secondary' (1,0,1) => en hover el fondo se mantiene #1e293b (NO se vuelve blanco). transform:translateY(-2px) y box-shadow del hover no entran en conflicto y se conservan. DECISION: aceptar el hover sin anadir regla (mantener 3 reglas totales como pide el requerimiento); si se quisiera feedback visual extra, regla opcional '#view-semanal button.btn-empty-secondary:hover{background:#334155!important}' (no incluida por defecto)."
+    "B_encabezados_th": {
+      "clases_pedidas": ".col-header, .dia-header, .hora-col como CLASE en elementos: NO existen (grep en index.html/app.js/main.css: 0 refs; 'hora-col' y 'celda-header' solo aparecen como selectores en una regla muerta main.css offset ~72450 '.celda-header,.hora-col{color:#94a3b8!important;font-weight:600}' sin elementos que la matcheen). Selector REAL: #view-semanal #header-row th (los th de dias y el th HORA los genera renderizar() app.js offset 38293: '<th style=\"width:55px;position:relative;\">HORA<div class=\"resizer\"...' y '<th style=\"position:relative;\">LUN...').",
+      "regla_v613_vigente": "main.css offset ~73700: '#view-semanal #header-row th{color:#ffffff!important;font-weight:700!important}' YA EXISTE y sigue vigente (es la penultima regla del archivo). La regla nueva '#view-semanal th' es REDUNDANTE pero inofensiva y la pide el usuario (anade opacity:1 y font-size:0.95rem).",
+      "causa_raiz_OSCURO_hallazgo": "CRITICO: forzarEstiloCabeceras() en js/app.js (def offset 128407, llamadas @40111 en renderizar y @94314 en cambiarTab) hace: var e=document.body.classList.contains('dark')?'#e8eeff':'#334155'; document.querySelectorAll('th, th *').forEach(a=>{a.style.setProperty('color',e,'important');...}). El body es class=\"tema-estelar\" (NO dark) => los th reciben INLINE color:#334155!important (gris oscuro) que VENCE a todo CSS !important (inline !important > hoja !important). ESTE es el bug (b) real. La regla CSS append NO puede vencer el inline JS. Efecto real de la regla nueva: cubre el caso dark activo (localStorage horario_dark_mode=1 -> inline #e8eeff) y futuros refactors, pero con body.tema-estelar sin dark el th seguira #334155 hasta tocar app.js (FUERA del alcance 'solo CSS' de v6.14; se documenta para decision del usuario).",
+      "opacity": "No existe ninguna regla con opacity<1 aplicada a th (#view-semanal tiene opacity:1!important en offset 40456; las opacity<1 del proyecto son .del-fila 0.3, .done-check 0.35, .celda.done 0.85, .estrella 0.3/0.9, .reminder-bell 0.5, .merge-indicator 0.5, hover de botones 0.9). opacity:1!important es defensiva/inofensiva.",
+      "decision_columna_hora": "El th HORA (primera columna) es un <th> dentro de #header-row => cubierto por '#view-semanal th'. Los td .hora-cell y su input (filas, NO encabezados) ya tienen #e2e8f0!important via v6.13 '#view-semanal .hora-cell,#view-semanal .hora-cell input' y en tema estelar #9effdb por '.tema-estelar .hora-cell input' (offset 26455) => contraste OK. DECISION: NO anadir regla para .hora-cell (son celdas de cuerpo, no th; el usuario pidio blanco para th y ya estan legibles)."
     },
-    "C_estado_base_verificado": {
-      "git": "limpio (git status vacio), HEAD 0635c61 (commit v6.12)",
-      "main_css_balance": "646 abres / 646 cierras (verificado con node) => tras append de 3 reglas pasara a 649/649",
-      "main_css_tail": "termina en '...body #view-diario .aesthetic-btn{background:#334155!important}' SIN newline final (append debe empezar con \\n)",
-      "v_6_12": "index.html x2: css/main.css?v=6.12 (offset 25939) y js/app.js?v=6.12 (offset 65137)",
-      "sw_js": "planify-cache-v6 (1 sola referencia, sw.js linea 1, minificado 1 linea)",
-      "main_css_bytes": 73622, "index_html_bytes": 65780, "app_js_bytes": 135904
+    "C_leyenda_pildoras": {
+      "estructura_real": "HTML offset 35788: <div class=\"leyenda\" id=\"leyenda\"></div> DENTRO de #view-table > #view-semanal => '#'view-semanal .leyenda span' SI existe como ruta. El JS renderizarLeyenda() (app.js offset 40056/40350) crea por categoria: <span>[<span class=\"dot\" style=\"background:{color}\">] {label}</span> => cada pildora es un span con un hijo span.dot (background pastel INLINE) y el TEXTO como text node del span padre.",
+      "colores_pastel": "CATS (app.js offset 14802): clase #74b9ff, ensenanza #a29bfe, estudio #dfe6e9, comida #ffeaa7, desconexion #ff7675, flexible #fab1a0, rutina #55efc4, libre #f5f6fa. El fondo pastel viene del INLINE style del span.dot (no de clase .c-*): renderizarLeyenda usa e.color de CATS. Las clases .c-* se usan solo en las celdas de la tabla, no en la leyenda.",
+      "causa_raiz_ILEGIBLE": "CSS base .leyenda span{background:var(--surface-hover);...} (main.css offset 7639) => en tema claro/estelar (body SIN dark) --surface-hover:#f8f9fa (fondo claro). La regla v6.13 '#view-semanal span{color:#e2e8f0!important;font-weight:500!important}' (offset 72479, especificidad 1,0,1) pinta el texto de la pildora casi blanco sobre fondo claro => ILEGIBLE. ESTE es el bug (c).",
+      "selectores_pedidos_inexistentes": ".leyenda-item, .badge-categoria, .tag-categoria, .leyenda-tag: NO existen (grep: 0 refs en todos los archivos). Selector real: '#view-semanal .leyenda span'.",
+      "regla_ganadora": "'#view-semanal .leyenda span{color:#0f172a!important;font-weight:600!important}' => especificidad (1,1,1) > (1,0,1) de la v6.13 => gana. NO rompe el fondo pastel (solo color de texto; el span.dot mantiene su background inline). El dot no tiene texto => inofensivo.",
+      "variante_dark": "'body.dark #view-semanal .leyenda span{color:#e8eeff!important}' => (1,2,2) > (1,1,1) de la regla anterior y > (0,2,1) de 'body.dark .leyenda span' (fondo surface-card oscuro). Evita regresion si el usuario activa dark mode (localStorage horario_dark_mode=1). Incluida como 4ta regla del bloque."
+    },
+    "D_boton_empezar_vacio": {
+      "estado": "YA APLICADO en v6.13 y VIGENTE: main.css offset 73722 '#view-semanal button.btn-empty-secondary{background:#1e293b!important;color:#ffffff!important;border:1px solid #475569!important}' + offset 73851 '#view-semanal button.btn-empty-secondary span{color:#ffffff!important}'. Son las DOS ULTIMAS reglas del archivo => ganan por orden y especificidad (1,0,1)/(1,1,1).",
+      "decision": "NO duplicar, NO re-aplicar. Verificar en ST-03 que siguen intactas (grep) y reportar 'ya aplicada v6.13, sin cambios'. El commit v6.13 (13bc378) las introdujo y ningun cambio posterior las toco."
+    },
+    "E_bumps": {
+      "index_html": "v=6.13 x2: offset 26282 'css/main.css?v=6.13' y offset 65480 'js/app.js?v=6.13'. No hay mas ocurrencias.",
+      "sw_js": "planify-cache-v7 @ offset 13 (1 sola referencia, sw.js 1 linea minificada, 964 bytes).",
+      "estado_base": "git limpio HEAD 13bc378; main.css balance 649 abres/649 cierras (verificado con node); main.css termina en '...btn-empty-secondary span{color:#ffffff!important}' SIN newline final (append debe empezar con \\n); main.css bytes 73900; index 66969; app.js 135904."
     }
   },
   "sub_tareas": [
@@ -39,41 +45,44 @@
       "id": "ST-00",
       "nombre": "Pre-checks de estado base (fail-fast)",
       "pasos": [
-        "git status --short (debe estar vacio) y git rev-parse HEAD (0635c61)",
-        "node: balance llaves main.css == 646/646 (contar '{' y '}' con match)",
-        "node: contar 'v=6.12' en index.html == 2; 'planify-cache-v6' en sw.js == 1; 'planify-cache-v7' ausente"
+        "git status --short (debe estar vacio) y git rev-parse HEAD (13bc378)",
+        "node: balance llaves main.css == 649/649 (contar '{' y '}' con match)",
+        "node: contar 'v=6.13' en index.html == 2; 'planify-cache-v7' en sw.js == 1; 'planify-cache-v8' ausente",
+        "node: confirmar que las 2 reglas v6.13 de btn-empty-secondary siguen en main.css (offsets ~73722 y ~73851)"
       ],
       "criterio": "Si algun check falla, ABORTAR y reportar (no aplicar cambios sobre base sucia)"
     },
     {
       "id": "ST-01",
-      "nombre": "main.css: append bloque v6.13 al final (regla de oro, 3 reglas)",
-      "bloque_css_exacto": "/* v6.13: contraste de dias y boton vacio en vista semanal */\n#view-semanal #header-row th{color:#ffffff!important;font-weight:700!important}\n#view-semanal button.btn-empty-secondary{background:#1e293b!important;color:#ffffff!important;border:1px solid #475569!important}\n#view-semanal button.btn-empty-secondary span{color:#ffffff!important}\n",
+      "nombre": "main.css: append bloque v6.14 al final (regla de oro, 4 reglas)",
+      "bloque_css_exacto": "/* v6.14: resguardo licencia, contraste th y leyenda semanal */\n#view-semanal{padding-bottom:120px!important}\n#view-semanal th{color:#ffffff!important;opacity:1!important;font-weight:700!important;font-size:0.95rem!important}\n#view-semanal .leyenda span{color:#0f172a!important;font-weight:600!important}\nbody.dark #view-semanal .leyenda span{color:#e8eeff!important}\n",
       "notas_selectores_reales": [
-        "Regla 1 (dias): '#view-semanal #header-row th' (2,0,1) empata en especificidad con la v6.12 pero gana por orden (append final) => LUN/MAR/MIE... pasan de #e2e8f0/500 a #ffffff/700.",
-        "Regla 2 (boton): '#view-semanal button.btn-empty-secondary' (1,0,1) vence a 'button.btn-empty-secondary' (0,1,1) y a 'button.btn-empty-secondary:hover' (0,1,1) => fondo #1e293b estable incluso en hover (hover blanco 0.9 pierde; transform/shadow se conservan).",
-        "Regla 3 (texto): '#view-semanal button.btn-empty-secondary span' (1,1,1) vence a '#view-semanal span' (1,0,1) => el <span data-i18n='empty_start'> pasa de #e2e8f0 a #ffffff. OBLIGATORIA: sin ella el texto seguiria casi-blanco sobre fondo oscuro (contraste roto al reves).",
-        "3 reglas nuevas => balance main.css pasa de 646/646 a 649/649."
+        "Regla 1 (resguardo): '#view-semanal{padding-bottom:120px!important}' (1,0,0). Crea scroll al final de la vista semanal para que .lic-msg/.footer (dentro de #view-table dentro de #view-semanal) queden visibles por encima del .bottom-nav fixed bottom:10px z-index:9999. Fondo del area extra: .main-card-container #0d1117 (tema estelar) => sin romper fondo.",
+        "Regla 2 (th): '#view-semanal th{color:#ffffff!important;opacity:1!important;font-weight:700!important;font-size:0.95rem!important}' (1,0,1). Cubre th HORA + th de dias (todos en #header-row). Redundante con v6.13 (#view-semanal #header-row th ya #ffffff/700) pero inofensiva; anade opacity:1 defensivo y font-size 0.95rem. NOTA: con body.tema-estelar SIN dark, el inline #334155!important de forzarEstiloCabeceras (app.js) sigue venciendo al CSS; efecto pleno solo en dark o si se ajusta app.js (fuera de alcance, documentado).",
+        "Regla 3 (leyenda): '#view-semanal .leyenda span{color:#0f172a!important;font-weight:600!important}' (1,1,1) > v6.13 (1,0,1) => texto oscuro legible sobre fondo claro #f8f9fa, manteniendo el dot pastel inline intacto.",
+        "Regla 4 (leyenda dark): 'body.dark #view-semanal .leyenda span{color:#e8eeff!important}' (1,2,2) => protege dark mode (fondo surface-card oscuro) sin romper el modo claro.",
+        "4 reglas nuevas => balance main.css pasa de 649/649 a 653/653."
       ],
       "criterio": [
-        "Balance llaves main.css == 649 abres / 649 cierras",
-        "main.css termina EXACTAMENTE con '...span{color:#ffffff!important}' (ultima regla del append)",
-        "Cada selector nuevo aparece exactamente 1 vez al final del archivo: '#view-semanal #header-row th{' , '#view-semanal button.btn-empty-secondary{' y '#view-semanal button.btn-empty-secondary span{'",
+        "Balance llaves main.css == 653 abres / 653 cierras",
+        "main.css termina EXACTAMENTE con '...body.dark #view-semanal .leyenda span{color:#e8eeff!important}' (ultima regla del append)",
+        "Cada selector nuevo aparece exactamente 1 vez al final del archivo: '#view-semanal{padding-bottom:120px', '#view-semanal th{', '#view-semanal .leyenda span{' y 'body.dark #view-semanal .leyenda span{'",
         "git diff --stat de main.css: solo adiciones (0 lineas con '-')",
-        "NO se edito ninguna regla existente (diff puro append)"
+        "NO se edito ninguna regla existente (diff puro append)",
+        "Las reglas v6.13 de btn-empty-secondary siguen intactas (grep 'btn-empty-secondary' == 5 en main.css, igual que antes)"
       ]
     },
     {
       "id": "ST-02",
-      "nombre": "Bump de versiones: v=6.13 x2 en index.html + cache v7 en sw.js",
+      "nombre": "Bump de versiones: v=6.14 x2 en index.html + cache v8 en sw.js",
       "cambios": [
-        {"archivo": "index.html", "viejo": "css/main.css?v=6.12", "nuevo": "css/main.css?v=6.13", "offset": 25939, "ocurrencias": 1},
-        {"archivo": "index.html", "viejo": "js/app.js?v=6.12", "nuevo": "js/app.js?v=6.13", "offset": 65137, "ocurrencias": 1},
-        {"archivo": "sw.js", "viejo": "planify-cache-v6", "nuevo": "planify-cache-v7", "ocurrencias": 1}
+        {"archivo": "index.html", "viejo": "css/main.css?v=6.13", "nuevo": "css/main.css?v=6.14", "offset": 26282, "ocurrencias": 1},
+        {"archivo": "index.html", "viejo": "js/app.js?v=6.13", "nuevo": "js/app.js?v=6.14", "offset": 65480, "ocurrencias": 1},
+        {"archivo": "sw.js", "viejo": "planify-cache-v7", "nuevo": "planify-cache-v8", "offset": 13, "ocurrencias": 1}
       ],
       "criterio": [
-        "index.html: 'v=6.13' == 2 ocurrencias; 'v=6.12' == 0",
-        "sw.js: contiene 'planify-cache-v7'; no contiene 'planify-cache-v6'"
+        "index.html: 'v=6.14' == 2 ocurrencias; 'v=6.13' == 0",
+        "sw.js: contiene 'planify-cache-v8'; no contiene 'planify-cache-v7'"
       ]
     },
     {
@@ -81,8 +90,9 @@
       "nombre": "Verificacion integral (fail-fast)",
       "comandos_verificacion": [
         "node --check sw.js",
-        "node: balance main.css == 649/649",
-        "node (script temporal en C:\\Users\\Personal\\AppData\\Local\\Temp\\opencode, readFileSync utf8): (a) main.css contiene los 3 selectores nuevos exactamente 1 vez y termina con 'span{color:#ffffff!important}'; (b) index.html: 'v=6.13' == 2 y 'v=6.12' == 0; (c) sw.js: planify-cache-v7 presente y planify-cache-v6 ausente",
+        "node: balance main.css == 653/653",
+        "node (readFileSync utf8): (a) main.css contiene los 4 selectores nuevos exactamente 1 vez y termina con 'body.dark #view-semanal .leyenda span{color:#e8eeff!important}'; (b) index.html: 'v=6.14' == 2 y 'v=6.13' == 0; (c) sw.js: planify-cache-v8 presente y planify-cache-v7 ausente",
+        "node: 'btn-empty-secondary' en main.css sigue == 5 (reglas v6.13 intactas, sin duplicar)",
         "git diff --name-only (debe ser exactamente: css/main.css, index.html, sw.js => 3 archivos)",
         "git diff --stat (main.css solo adiciones; index.html/sw.js cambios de 1 linea cada uno)"
       ],
@@ -91,25 +101,27 @@
     {
       "id": "ST-04",
       "nombre": "Commit + push (mensaje EXACTO)",
-      "mensaje_commit": "fix: contraste de dias y boton vacio en vista semanal v6.13",
+      "mensaje_commit": "fix: ajuste de resguardo para licencia, contraste en dias y leyenda semanal v6.14",
       "pasos": [
         "git add css/main.css index.html sw.js (SOLO estos 3)",
-        "git commit -m 'fix: contraste de dias y boton vacio en vista semanal v6.13'",
+        "git commit -m 'fix: ajuste de resguardo para licencia, contraste en dias y leyenda semanal v6.14'",
         "git push origin HEAD"
       ],
-      "criterio": "git log -1 muestra exactamente el mensaje 'fix: contraste de dias y boton vacio en vista semanal v6.13' con los 3 archivos; git status limpio post-push"
+      "criterio": "git log -1 muestra exactamente el mensaje 'fix: ajuste de resguardo para licencia, contraste en dias y leyenda semanal v6.14' con los 3 archivos; git status limpio post-push"
     }
   ],
   "selectores_reales_finales": [
-    "Dias semanal (texto directo del th, generado por JS en #header-row): #view-semanal #header-row th{color:#ffffff!important;font-weight:700!important}",
-    "Boton Empezar vacio (.btn-empty-secondary dentro de #view-semanal > #view-table > .empty-state#empty-state > .empty-actions): #view-semanal button.btn-empty-secondary{background:#1e293b!important;color:#ffffff!important;border:1px solid #475569!important}",
-    "Texto del boton (span data-i18n=empty_start, vence a '#view-semanal span'): #view-semanal button.btn-empty-secondary span{color:#ffffff!important}"
+    "Resguardo licencia (la licencia .lic-msg/.footer vive en #view-table dentro de #view-semanal; bottom-nav fixed bottom:10px z-index:9999): #view-semanal{padding-bottom:120px!important}",
+    "Encabezados dias+HORA (th generados por JS en #header-row; .col-header/.dia-header/.hora-col NO existen): #view-semanal th{color:#ffffff!important;opacity:1!important;font-weight:700!important;font-size:0.95rem!important}",
+    "Leyenda pildoras (spans creados por renderizarLeyenda; dot pastel inline; .leyenda-item/.badge-categoria/.tag-categoria/.leyenda-tag NO existen): #view-semanal .leyenda span{color:#0f172a!important;font-weight:600!important}",
+    "Leyenda dark (proteccion): body.dark #view-semanal .leyenda span{color:#e8eeff!important}",
+    "Boton Empezar vacio: YA APLICADO v6.13 (#view-semanal button.btn-empty-secondary + span), verificar vigencia sin duplicar"
   ],
   "resumen_cambios_finales": {
-    "css/main.css": "append 3 reglas (balance 646 -> 649)",
-    "index.html": "v=6.12 -> v=6.13 (x2: css/main.css y js/app.js)",
-    "sw.js": "planify-cache-v6 -> planify-cache-v7",
-    "commit": "fix: contraste de dias y boton vacio en vista semanal v6.13",
+    "css/main.css": "append 4 reglas (balance 649 -> 653)",
+    "index.html": "v=6.13 -> v=6.14 (x2: css/main.css y js/app.js)",
+    "sw.js": "planify-cache-v7 -> planify-cache-v8",
+    "commit": "fix: ajuste de resguardo para licencia, contraste en dias y leyenda semanal v6.14",
     "total_archivos": 3
   }
 }

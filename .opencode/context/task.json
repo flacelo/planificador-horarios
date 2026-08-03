@@ -1,123 +1,103 @@
 {
-  "task": "TASK-20260801-v6.19",
-  "replaces": "v6.18",
-  "titulo": "Fase 43 (v6.19): Desbloqueo de eventos pointer-events y handler inline para Tutorial",
-  "tipo": "index.html: 1 reemplazo (boton tutorial con onclick inline + style blindado z-index 99999) + 2 bumps v=6.18->6.19 ; js/app.js: 2 ediciones (1 reemplazo elimina bloque v6.18 muerto dentro de renderTutorialProgress + 1 insercion top-level de window.abrirModalTutorial/window.cerrarModalTutorial + delegacion unica click/keydown) ; sw.js: 1 reemplazo planify-cache-v12->v13 ; CSS: SIN cambios (balance 717/717 se mantiene) ; commit/push exacto",
-  "head": "64d98d6 (v6.18, base verificada: git limpio en main, main.css 717/717, v=6.18 x2 en index.html @27999 y @69032, planify-cache-v12 en sw.js @13, app.js 137047 bytes 1 linea, index.html 69673 bytes 1 linea)",
+  "task": "TASK-20260801-v6.20",
+  "replaces": "v6.19",
+  "titulo": "Fase 44 (v6.20): Correccion visual de reglas CSS y z-index prioritario para #tutorial-modal",
+  "tipo": "css/main.css: 1 APPEND al final (3 reglas !important: hidden/active/`.modal-card`) ; index.html: 2 bumps v=6.19->6.20 ; sw.js: 1 reemplazo planify-cache-v13->v14 ; SIN cambios en js/app.js (el JS v6.19 ya abre bien: console.log '[PLANIFY v6.19] Tutorial abierto') ; commit/push",
+  "head": "0d1f637 (v6.19, base verificada: git limpio en main, main.css 717/717 1 linea, v=6.19 x2 en index.html, planify-cache-v13 x1 en sw.js, index.html 1 linea, app.js 1 linea)",
   "git_limpio": true,
   "archivos_a_modificar": [
+    "css/main.css",
     "index.html",
-    "js/app.js",
     "sw.js"
   ],
   "veredicto_A_causa_raiz": {
-    "causa_primaria": "LA DELEGACION V6.18 NUNCA SE REGISTRA. El bloque click+keydown de v6.18 vive DENTRO de renderTutorialProgress() (@112141), funcion que SOLO se invoca desde mostrarTutorial()/pasoTutorial(); mostrarTutorial() tiene 0 call-sites en app.js e index.html (unica aparicion = definicion @110741). Por tanto renderTutorialProgress() JAMAS se ejecuta -> los 2 listeners document de v6.18 no existen en runtime -> clic muerto con consola limpia (no hay handler que falle: no hay handler). El boton v6.18 no tiene onclick inline -> nada lo abre.",
+    "causa_primaria": "EL JS V6.19 FUNCIONA (window.abrirModalTutorial quita 'hidden' y anade 'active', console.log '[PLANIFY v6.19] Tutorial abierto' confirmado en runtime) PERO EL CSS NO PINTa EL MODAL de forma robusta: no existe NINGUNA regla .hidden en todo main.css (0 matches de '.hidden'), la visibilidad depende de la cascada .modal-overlay{display:none} (z-index:1000, 1er bloque) vs .modal-overlay.active{display:flex} / #tutorial-modal.modal-overlay.active{...z-index:99999...} (v6.18 @final). El requerimiento v6.20 anade al FINAL del stylesheet un bloque !important con: #tutorial-modal.hidden/.modal-overlay.hidden (ocultar seguro), #tutorial-modal.active/.modal-overlay.active (mostrar con z-index:999999, fixed, backdrop blur 8px, fondo rgba(15,23,42,.88), flex centrado) y #tutorial-modal .modal-card (estilo de tarjeta robusto). Al estar al final del archivo y con !important, gana sobre TODO bloque previo (incl. el v6.18 z-index:99999 y el v6.19 que no anadio CSS).",
     "hipotesis_stacking": {
-      "app_stacking_context": "NO. .app{position:relative} @14099 SIN z-index -> positioned + z-index:auto = NO crea stacking context (CSS2.1). backdrop-filter:blur(10px) @2034 queda anulado por .app{...backdrop-filter:none!important} @71897 (y @37378 tema-estelar).",
-      "header_vs_views_mismo_contexto": "SI, teoricamente: .header-actions{position:absolute;top:14px;right:16px;z-index:10} y las vistas #view-semanal,#view-mensual,#view-diario,#cal-grid,.cal-grid{position:relative!important;z-index:10!important} @70743 compiten en el contexto RAIZ (.main-card-container es static, su z-index:1!important @71299 es INERTE porque z-index no aplica a elementos no posicionados) -> mismo z-index 10, DOM posterior (.main-card-container tras .app) -> las vistas pintarian encima.",
-      "pero_sin_solapamiento_geometrico": ".main-card-container es hermano normal-flow POSTERIOR a .app: su borde superior queda bajo el h1 y bajo .app. El boton esta en top:14px right:16px DENTRO de .app (zona de padding superior, junto al h1 centrado). NINGUN elemento cubre esa zona en reposo: .side-overlay display:none (z1000), .side-panel left:-330px (z1001), .cloud-btn left:0 top:50% (z500), .bottom-nav fixed bottom (z9999), .screenshot-warning display:none (z9999), .tour-overlay display:none, .tutorial-overlay display:none!important @71223. h1#main-title es static sin background/z-index -> no intercepta. .main-content y .view-section NO existen en el DOM (CSS muerto). .tab-content NO tiene z-index:10 ni margin:20px auto (solo display:none/block; la unica regla con z es .tab-content#view-mensual{z-index:1000!important} @37891, dentro de .main-card-container, sin solapamiento).",
-      "conclusion_operativa": "El inline position:relative + z-index:99999 en el boton SI basta y es la proteccion correcta: crea stacking context propio en el contexto raiz (ni .app ni .header-actions aislan) -> pinta por encima de TODO: vistas 10, side-overlay 1000, side-panel 1001, modales 1000, tutorial-modal 9999, bottom-nav 9999, screenshot-warning 9999. NO hace falta subir .header-actions (su hijo con z99999 participa en el contexto raiz). NO hace falta CSS extra."
-    },
-    "quien_recibe_el_clic_hoy": "Nadie especifico para abrir: el clic cae en el boton (nada lo tapa) pero no hay listener -> no pasa nada. Consola limpia porque no hay error."
+      "regla_v618_actual": "#tutorial-modal.modal-overlay.active{display:flex!important;position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;background:rgba(15,23,42,.85)!important;backdrop-filter:blur(6px)!important;-webkit-backdrop-filter:blur(6px)!important;z-index:99999!important;justify-content:center!important;align-items:center!important}",
+      "contexto": "El bloque v6.18 (z-index:99999) ya existe y es correcto en contenido, pero el bug reportado indica que en pantalla el modal NO se ve (posible conflicto de cascada/orden con otras reglas .active o repintado). La solucion acordada NO elimina nada: se APPENDE el bloque nuevo al final -> el orden gana (misma especificidad o mayor, todas !important, ultima posicion).",
+      "conclusion_operativa": "Append-only. El nuevo bloque (3 reglas) al final de css/main.css resuelve por orden + !important: display:flex!important + opacity:1!important + z-index:999999!important + fixed 100vw/100vh con backdrop. No hace falta tocar JS ni eliminar bloques v6.18/v6.19."
+    }
   },
   "decisiones": {
-    "tutoria_visto_en_cerrar": "SI setear localStorage TUTORIAL_VISTO en window.cerrarModalTutorial (1 linea): la v6.18 lo setea en TODOS sus caminos de cierre (close-btn, outside, Escape); no hacerlo crearia inconsistencia (cerrar por Entendido no marcaria visto) y contradice el objetivo de no re-molestar. Escritura idempotente.",
-    "duplicacion_delegacion": "OPCION A adaptada SIN listeners duplicados: (ST-02A) se ELIMINA el bloque v6.18 (muerto, reemplazo por e.innerHTML=a) y (ST-02B) se INSERTA en top-level (tras el anchor setTimeout(iniciarTourInteractivo,...) @63588, 1 match) un UNICO bloque con: window.abrirModalTutorial + window.cerrarModalTutorial (fuente unica de verdad) + delegacion unica click (open por closest #tutorial-btn,[data-action],.btn-tutorial; close por closest #close-tutorial-btn,#tutorial-got-it-btn; outside e.target===a) + keydown Escape. El onclick inline del boton es el respaldo adicional directo (stopPropagation impide doble open; la rama open de la delegacion actua solo si faltara el onclick).",
-    "conflictos_cadenas_globales": "Cadena click @63367 (closest .modal-overlay,.tutorial-overlay + ternario por id): #tutorial-modal NO tiene caso en el ternario ('modal','modal-compra','modal-activar','modal-admin','tutorial') -> cae MUDA, no hay doble cierre. Cadena keydown @62960 (Escape): no incluye tutorial-modal -> inerte; la nueva keydown no choca. La clase hidden no existe en CSS (irrelevante; display lo controla .modal-overlay.active{display:flex} y #tutorial-modal.modal-overlay.active{display:flex!important} @78488; se conserva el patron v6.18 add/remove hidden+active).",
-    "notas_riesgo": "Con el side-panel abierto, el boton (z99999) queda por encima del side-overlay (z1000) -> clicable sobre el overlay oscuro: aceptable (panel a la izquierda, sin solapamiento geografico; clic re-abre tutorial idempotente). Con tutorial-modal abierto (z9999), el boton flota encima del overlay del modal: clic -> re-apertura idempotente, sin dano. #tutorial-modal NO tiene aria-hidden en HTML; se gestiona dinamicamente con setAttribute(false/true) segun spec."
+    "mantener_bloques_previos": "SI, MANTENER (append-only, no eliminar): la regla v6.18 #tutorial-modal.modal-overlay.active{...z-index:99999...} y las reglas v6.19 siguen existiendo; el bloque nuevo al final gana por orden. Minimiza el diff y el riesgo de tocar mas de lo necesario.",
+    "formato_del_append": "Anexar el bloque en forma MINIFICADA 1 linea (misma invariante del archivo). El build (scripts/build.js -> minifyCSS) tambien lo minifica: quita comentarios y colapsa espacios; el bloque sobrevive intacto al build (sin comentarios, sin media queries).",
+    "impacto_otros_modales": "La regla generica .modal-overlay.active afecta a LOS 9 overlays (8 modales con class=\"modal-overlay\" + tutorial con \"modal-overlay hidden\"). Todos se abren con classList.add('active') (verificado: modal-compra, modal-activar, modal-admin, modal-categoria, etc.). Efecto: TODOS pasan a z-index:999999, fondo rgba(15,23,42,.88) y blur(8px) (antes rgba(0,0,0,.5)+blur(4px)), padding:16px, box-sizing:border-box. EVALUADO: aceptable (nada por encima de 999999 en el proyecto; apariencia mas consistente y oscura; ningun z-index del repo supera 99999 salvo el boton tutorial inline 99999). Indicarlo al usuario.",
+    "solo_tutorial_card": "#tutorial-modal .modal-card (prefijo ID) solo afecta al modal tutorial; en index.html SOLO el tutorial usa class=\"modal-card modal-lg\" (1 unico div, verificado). Los otros 8 modales no usan .modal-card en HTML -> sin impacto en su tarjeta.",
+    "console_log_sigue_v619": "NO se toca js/app.js: el console.log sigue diciendo '[PLANIFY v6.19] Tutorial abierto'. Aceptable (no se pide cambio JS); NO bump de strings de version en JS.",
+    "notas_riesgo": "Si algun dia otro elemento del proyecto usara z-index > 999999, el modal quedaria por debajo; hoy no existe ninguno (maximo previo: 99999 v6.18, 99999 boton inline, 1000/1001 paneles, 9999 bottom-nav). El estilo inline del boton tutorial (z-index:99999) queda POR DEBAJO del overlay (999999) -> correcto: el boton desaparece bajo el backdrop al abrir el tutorial (cambio sutil de comportamiento vs v6.19 donde el boton flotaba encima; es el comportamiento deseado)."
   },
-  "regla_de_oro": "SOLO los cambios listados. index.html: 1 reemplazo de boton (ancla 1 match @28375, 132 chars) + 2 bumps v. js/app.js: 1 reemplazo (ancla BLOQUE_V618 1 match @112141, 733 chars, incluye ,e.innerHTML=a -> reemplazo e.innerHTML=a) + 1 insercion top-level (ancla ANCHOR_TOPLEVEL 1 match @63588 -> ancla+';'+JS_FINAL; el bloque termina en ';' para separar de 'var dragSource'). sw.js: SOLO planify-cache-v12 -> planify-cache-v13 @13. NO tocar: css/*.css (balance 717/717), cadenas globales keydown @62960 y click @63367, mostrarTutorial/cerrarTutorial/pasoTutorial/renderTutorialProgress (codigo dormido), iniciarTourInteractivo (clave horario_tour_visto), toggleTheme, optimize-a11y.js, server.js, HTML de #tutorial-modal.",
+  "regla_de_oro": "SOLO los cambios listados. css/main.css: 1 append al final (BLOQUE_V620 minificado, 3 reglas, 3 '{' + 3 '}'). index.html: replaceAll '?v=6.19' -> '?v=6.20' (2 matches). sw.js: 'planify-cache-v13' -> 'planify-cache-v14' (1 match). NO tocar: js/app.js, panel.css, dashboard.css, grid.css, index.html estructura del modal, cadenas globales, optimize-a11y.js, server.js.",
   "bloques_finales": {
-    "html_boton_ancla_1match": "<button id=\"tutorial-btn\" class=\"icon-btn\" title=\"Ver Tutorial / Guía\" data-action=\"open-tutorial\">📖 <span>Tutorial</span></button>",
-    "html_boton_nuevo": "<button id=\"tutorial-btn\" class=\"icon-btn\" title=\"Ver Tutorial\" onclick=\"window.abrirModalTutorial && window.abrirModalTutorial(event)\" style=\"position: relative; z-index: 99999; pointer-events: auto !important; cursor: pointer !important;\">📖 <span>Tutorial</span></button>",
-    "js_ancla_bloque_v618_1match": "document.addEventListener(\"click\",function(e){var a=document.getElementById(\"tutorial-modal\");e.target.closest('#tutorial-btn,[data-action=\"open-tutorial\"],.btn-tutorial')?(e.preventDefault(),a&&(a.classList.remove(\"hidden\"),a.classList.add(\"active\"))):(a&&e.target.closest(\"#close-tutorial-btn,#tutorial-got-it-btn\")||a&&e.target===a)&&(a.classList.add(\"hidden\"),a.classList.remove(\"active\"),localStorage.setItem(CONFIG.STORAGE.TUTORIAL_VISTO,\"1\"))}),document.addEventListener(\"keydown\",function(e){if(\"Escape\"===e.key){var a=document.getElementById(\"tutorial-modal\");a&&a.classList.contains(\"active\")&&(a.classList.add(\"hidden\"),a.classList.remove(\"active\"),localStorage.setItem(CONFIG.STORAGE.TUTORIAL_VISTO,\"1\"))}}),e.innerHTML=a",
-    "js_reemplazo_st02a": "e.innerHTML=a",
-    "js_ancla_insercion_1match": "setTimeout(iniciarTourInteractivo,CONFIG.TIME.TUTORIAL_INICIO||1e3);",
-    "js_final_st02b": "window.abrirModalTutorial=function(e){if(e){e.preventDefault();e.stopPropagation()}var a=document.getElementById(\"tutorial-modal\");if(a){a.classList.remove(\"hidden\");a.classList.add(\"active\");a.setAttribute(\"aria-hidden\",\"false\");console.log(\"[PLANIFY v6.19] ✅ Tutorial abierto\")}else console.error(\"[PLANIFY v6.19] ❌ #tutorial-modal no encontrado\")};window.cerrarModalTutorial=function(e){if(e){e.preventDefault();e.stopPropagation()}var a=document.getElementById(\"tutorial-modal\");if(a&&a.classList.contains(\"active\")){a.classList.add(\"hidden\");a.classList.remove(\"active\");a.setAttribute(\"aria-hidden\",\"true\");localStorage.setItem(CONFIG.STORAGE.TUTORIAL_VISTO,\"1\");console.log(\"[PLANIFY v6.19] ✅ Tutorial cerrado y marcado como visto\")}};document.addEventListener(\"click\",function(e){if(e.target.closest('#tutorial-btn,[data-action=\"open-tutorial\"],.btn-tutorial'))window.abrirModalTutorial(e);else{var a=document.getElementById(\"tutorial-modal\");(e.target.closest(\"#close-tutorial-btn,#tutorial-got-it-btn\")||e.target===a)&&window.cerrarModalTutorial(e)}});document.addEventListener(\"keydown\",function(e){if(\"Escape\"===e.key){var a=document.getElementById(\"tutorial-modal\");a&&a.classList.contains(\"active\")&&window.cerrarModalTutorial(e)}});",
-    "css": "SIN CAMBIOS. Justificacion: el style inline tiene maxima prioridad (style attr > stylesheet; ninguna regla existente usa !important sobre z-index/pointer-events del boton); position:relative mantiene el flex item en .header-actions (display:flex intacto); una regla extra .header-actions #tutorial-btn{z-index:99999!important} seria redundante y romperia la invariante 717/717.",
-    "mensaje_commit": "fix: desbloqueo de intercepcion de clics y handler inline para boton tutorial v6.19"
+    "css_ancla_estado_actual": "main.css es 1 linea minificada, balance 717 '{' / 717 '}'. Ultimo bloque actual (confirmar antes de append que el archivo termina en '}'): balance final esperado 720/720.",
+    "css_bloque_v618_existente_no_eliminar": "#tutorial-modal.modal-overlay.active{display:flex!important;position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;background:rgba(15,23,42,.85)!important;backdrop-filter:blur(6px)!important;-webkit-backdrop-filter:blur(6px)!important;z-index:99999!important;justify-content:center!important;align-items:center!important}",
+    "css_bloque_v620_append_minificado": "#tutorial-modal.hidden,.modal-overlay.hidden{display:none!important;opacity:0!important;pointer-events:none!important}#tutorial-modal.active,.modal-overlay.active{display:flex!important;opacity:1!important;pointer-events:auto!important;position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;background-color:rgba(15,23,42,.88)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;z-index:999999!important;align-items:center!important;justify-content:center!important;padding:16px!important;box-sizing:border-box!important}#tutorial-modal .modal-card{background-color:#1e293b!important;border:1px solid #334155!important;color:#f8fafc!important;border-radius:12px!important;max-width:680px!important;width:100%!important;max-height:85vh!important;overflow-y:auto!important;box-shadow:0 25px 50px -12px rgba(0,0,0,.7)!important;position:relative!important;z-index:1000000!important}",
+    "html_bumps": "index.html: 'css/main.css?v=6.19' -> '?v=6.19' NO: '?v=6.19' -> '?v=6.20' x2 (las 2 apariciones: css/main.css y js/app.js)",
+    "html_estructura_modal": "<div class=\"modal-overlay hidden\" id=\"tutorial-modal\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Tutorial guiado\"><div class=\"modal-card modal-lg\"> (contenedor: class 'modal-overlay hidden'; tarjeta: 'modal-card modal-lg')",
+    "sw_bump": "sw.js: 'planify-cache-v13' -> 'planify-cache-v14' (1 match @const CACHE)",
+    "mensaje_commit": "fix: overlay tutorial visible con z-index prioritario y reglas .active robustas v6.20"
   },
   "sub_tareas": [
     {
       "id": "ST-01",
-      "desc": "index.html: reemplazo del boton tutorial (1 match @28375)",
-      "accion": "Sustituir BOTON_VIEJO por BOTON_NUEVO (onclick inline window.abrirModalTutorial && window.abrirModalTutorial(event) + style position:relative;z-index:99999;pointer-events:auto!important;cursor:pointer!important; title 'Ver Tutorial' SIN data-action)",
+      "desc": "css/main.css: APPEND del bloque v6.20 al final (append-only, no eliminar nada)",
+      "accion": "Al final del archivo (despues del ultimo '}' existente) anexar BLOQUE_V620_APPEND_MINIFICADO (3 reglas, 3 '{' + 3 '}', 1 linea). NO eliminar el bloque v6.18 ni las reglas v6.19: el nuevo gana por orden (ultima posicion + !important).",
       "criterios": [
-        "grep 'tutorial-btn.*onclick=\"window.abrirModalTutorial' en index.html = 1 match",
-        "grep 'data-action=\"open-tutorial\"' en index.html = 0 matches (el selector de la delegacion sigue matcheando por id #tutorial-btn)",
+        "main.css sigue siendo 1 linea",
+        "balance '{'=720 '}'=720 (717+3)",
+        "grep '#tutorial-modal.hidden,.modal-overlay.hidden{display:none!important' = 1 match",
+        "grep 'z-index:999999!important' = 1 match (solo el nuevo; el v6.18 sigue con 99999)",
+        "grep 'z-index:1000000!important' = 1 match"
+      ]
+    },
+    {
+      "id": "ST-02",
+      "desc": "index.html: bump ?v=6.19 -> ?v=6.20 (2 ocurrencias)",
+      "accion": "replaceAll '?v=6.19' por '?v=6.20' en index.html (2 matches: css/main.css y js/app.js).",
+      "criterios": [
+        "grep '?v=6.20' en index.html = 2 matches",
+        "grep '?v=6.19' en index.html = 0 matches",
         "index.html sigue siendo 1 linea valida"
       ]
     },
     {
-      "id": "ST-02A",
-      "desc": "js/app.js: eliminar el bloque v6.18 muerto dentro de renderTutorialProgress (1 match @112141)",
-      "accion": "Sustituir BLOQUE_V618 (733 chars, incluye ',e.innerHTML=a') por 'e.innerHTML=a' -> renderTutorialProgress queda limpio (el registro de listeners v6.18 jamas se ejecutaba porque mostrarTutorial no tiene call-sites)",
-      "criterios": [
-        "grep del string 'document.addEventListener(\"click\",function(e){var a=document.getElementById(\"tutorial-modal\")' en app.js = 0 matches",
-        "node --check js/app.js = 0 errores"
-      ]
-    },
-    {
-      "id": "ST-02B",
-      "desc": "js/app.js: insertar bloque nuevo top-level (window functions + delegacion unica + keydown Escape)",
-      "accion": "Sustituir ANCHOR_TOPLEVEL (1 match @63588) por ANCHOR_TOPLEVEL + JS_FINAL (JS_FINAL termina en ';' para separar del 'var dragSource' siguiente). JS_FINAL contiene: window.abrirModalTutorial (preventDefault+stopPropagation, quita hidden, add active, aria-hidden=false, console.log '[PLANIFY v6.19] ✅ Tutorial abierto' si modal existe / console.error si no), window.cerrarModalTutorial (preventDefault+stopPropagation, add hidden, remove active, aria-hidden=true, setItem TUTORIAL_VISTO=1, console.log de cierre; guard a.classList.contains('active') para no cerrar en falso ni marcar visto sin necesidad), delegacion unica click (open: closest '#tutorial-btn,[data-action=\"open-tutorial\"],.btn-tutorial' -> abrirModalTutorial; close: closest '#close-tutorial-btn,#tutorial-got-it-btn' || e.target===a -> cerrarModalTutorial) y keydown Escape (solo si modal activo).",
-      "criterios": [
-        "grep 'window.abrirModalTutorial=function' en app.js = 1 match",
-        "grep 'window.cerrarModalTutorial=function' en app.js = 1 match",
-        "grep 'setTimeout(iniciarTourInteractivo,CONFIG.TIME.TUTORIAL_INICIO||1e3);window.abrirModalTutorial' contiguos = 1 match",
-        "grep 'var dragSource=null' inmediatamente tras el ';' final del bloque = OK",
-        "node --check js/app.js = 0 errores",
-        "SOLO 1 document.addEventListener(\"click\") nuevo para tutorial (la cadena global @63367 intacta)",
-        "keydown Escape nuevo no toca la cadena @62960"
-      ]
-    },
-    {
       "id": "ST-03",
-      "desc": "CSS: SIN cambios",
-      "accion": "No tocar css/*.css. El inline style del boton (z-index:99999 + pointer-events:auto!important) ya blinda; no se anade regla .header-actions #tutorial-btn{z-index:99999!important} (redundante, romperia la invariante de balance).",
+      "desc": "sw.js: bump planify-cache-v13 -> planify-cache-v14",
+      "accion": "Reemplazo unico de 'planify-cache-v13' por 'planify-cache-v14' en la linea const CACHE.",
       "criterios": [
-        "git diff --stat NO incluye css/",
-        "balance main.css sigue 717/717"
+        "grep 'planify-cache-v14' en sw.js = 1 match",
+        "grep 'planify-cache-v13' en sw.js = 0 matches"
       ]
     },
     {
       "id": "ST-04",
-      "desc": "Bump de versiones",
-      "accion": "index.html @27999: 'css/main.css?v=6.18' -> '?v=6.19'. index.html @69032: 'js/app.js?v=6.18' -> '?v=6.19'. sw.js @13: 'planify-cache-v12' -> 'planify-cache-v13'.",
+      "desc": "Verificacion integral + npm run build",
+      "accion": "1) node --check js/app.js (via npm run check o build) = 0 errores. 2) npm run build (scripts/build.js: terser JS + minifyCSS + minifyHTML) -> confirmar que el bloque v6.20 sobrevive minificado. 3) Re-verificar balance main.css = 720/720 POST-build (build elimina comentarios/espacios pero no llaves). 4) greps de ST-01..ST-03 POST-build. 5) git diff --stat = SOLO 3 archivos: css/main.css, index.html, sw.js (+ .opencode/context/task.json trackeado). 6) Prueba manual opcional en navegador: abrir tutorial -> modal visible centrado con backdrop oscuro blur, consola '[PLANIFY v6.19] Tutorial abierto'; cerrar con X/fuera/Escape.",
       "criterios": [
-        "grep 'v=6.19' en index.html = 2 matches",
-        "grep 'v=6.18' en index.html = 0 matches",
-        "grep 'planify-cache-v13' en sw.js = 1 match",
-        "grep 'planify-cache-v12' en sw.js = 0 matches"
+        "npm run build exit 0",
+        "main.css '{'=720 '}'=720 tras build",
+        "git diff --stat = 3 archivos",
+        "ningun otro archivo modificado",
+        "modal visible en pantalla (prueba manual)"
       ]
     },
     {
       "id": "ST-05",
-      "desc": "Verificacion integral",
-      "accion": "Ejecutar: node --check js/app.js ; node --check scripts/check-env.js (si aplica) ; greps de ST-01..ST-04 ; balance main.css 717/717 ; git diff --stat (debe listar SOLO index.html, js/app.js, sw.js) ; git status --short (solo los 3 archivos) ; prueba de apertura manual opcional en navegador (consola: '[PLANIFY v6.19] ✅ Tutorial abierto').",
-      "criterios": [
-        "node --check js/app.js exit 0",
-        "main.css {=717 }=717",
-        "git diff --stat = 3 archivos",
-        "ningun otro archivo modificado"
-      ]
-    },
-    {
-      "id": "ST-06",
       "desc": "Commit + push",
-      "accion": "git add index.html js/app.js sw.js ; git commit -m 'fix: desbloqueo de intercepcion de clics y handler inline para boton tutorial v6.19' ; git push origin main. .opencode/context/task.json queda trackeado (git lo muestra como modificado) y se incluye en el commit junto al plan.",
+      "accion": "git add css/main.css index.html sw.js .opencode/context/task.json ; git commit -m 'fix: overlay tutorial visible con z-index prioritario y reglas .active robustas v6.20' ; git push origin main (convencion del repo: los pushes previos v6.17/v6.18/v6.19 se hicieron).",
       "criterios": [
         "git log --oneline -1 muestra el mensaje exacto",
         "git status limpio tras commit",
-        "HEAD movido sobre 64d98d6"
+        "HEAD movido sobre 0d1f637"
       ]
     }
   ],
   "investigacion_clave": {
-    "A_stacking": "Evidencia completa en veredicto_A_causa_raiz: .app z-auto sin stacking context; vistas z10 vs header-actions z10 en contexto raiz (orden DOM gana pero sin solapamiento geometrico); ningun elemento cubre top:14px right:16px; click muerto por falta de listener (mostrarTutorial 0 call-sites).",
-    "B_boton": "Ancla exacta 1 match @28375 index.html (132 chars). Inline position:relative convive con .header-actions #tutorial-btn{display:flex;align-items:center;gap:6px;height:40px;...} @80547 (sigue siendo flex item; relative no altera display) y con .header-actions{display:flex;gap:12px} @80322. Ninguna regla CSS fija z-index/pointer-events del boton -> inline manda.",
-    "C_delegacion": "Bloque v6.18 exacto 1 match @112141 (733 chars incluye ',e.innerHTML=a'). Cadena click global @63367 cae muda para #tutorial-modal (ternario por id sin caso 'tutorial-modal') -> sin doble cierre. Cadena keydown @62960 sin caso tutorial-modal -> inerte. La delegacion nueva se registra 1 sola vez en top-level (no dentro de renderTutorialProgress, que no corre).",
-    "D_pointer_events": "pointer-events:none SOLO en: .estrella-titilar (z-index:-1 decorativo), .tour-overlay (fixed z9998 click-through por diseno), .tour-tooltip (auto), .sp-body/.sp-section (panel, none->auto al abrir), .celda .reminder-bell, y el pseudo-elemento del side-panel (panel.css @862). NINGUNO en .app, h1#main-title, .header-actions ni #tutorial-btn -> el inline pointer-events:auto!important es blindaje preventivo (no corrige un none actual).",
-    "E_estado_base": "HEAD 64d98d6, git limpio (main), main.css 717/717, v=6.18 x2 en index.html @27999/@69032, planify-cache-v12 @13 sw.js, app.js 137047 bytes 1 linea, index.html 69673 bytes 1 linea. #tutorial-modal en HTML @66902 con class \"modal-overlay hidden\" (sin aria-hidden), z-index CSS real 9999 (NO 99999) via #tutorial-modal.modal-overlay{z-index:9999} @78445."
+    "A_css_actual": "main.css 717/717, 1 linea. 17 bloques #tutorial-modal. Existen: #tutorial-modal.modal-overlay{z-index:9999}, #tutorial-modal.modal-overlay.active{display:flex!important}, #tutorial-modal .modal-card{...width:560px...} + .modal-lg{width:640px}, y el bloque v6.18 completo (z-index:99999, texto exacto en bloques_finales). NO existe NINGUNA regla .hidden en todo el archivo (0 matches) -> las reglas hidden del bloque v6.20 son nuevas. 5 bloques .modal-overlay genericos: base{display:none;...z-index:1000...}, .modal-overlay.active{display:flex}, .modal-overlay{z-index:9999}, .modal-overlay.active{display:flex!important}, y el bloque v6.18 generico .modal-overlay.active{...z-index:99999...}.",
+    "B_html": "index.html 1 linea. '?v=6.19' x2. 9 divs class=\"modal-overlay\": 8 sin hidden + 1 tutorial con 'modal-overlay hidden'. Tutorial: <div class=\"modal-overlay hidden\" id=\"tutorial-modal\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Tutorial guiado\"><div class=\"modal-card modal-lg\"> (unico .modal-card en HTML).",
+    "C_js": "window.abrirModalTutorial (v6.19): a.classList.remove('hidden'), a.classList.add('active'), aria-hidden=false, console.log '[PLANIFY v6.19] Tutorial abierto'. window.cerrarModalTutorial: add hidden, remove active, aria-hidden=true, setItem TUTORIAL_VISTO=1. Los 8 modales restantes se abren con classList.add('active') sobre .modal-overlay (verificado modal-compra/modal-activar/modal-admin/modal-categoria).",
+    "D_sw": "sw.js 1 linea: const CACHE=\"planify-cache-v13\" (1 match). ASSETS incluye ./css/main.css -> el bump v14 fuerza recarga de cache con el CSS nuevo.",
+    "E_build": "package.json scripts: check=node --check js/app.js, build=node scripts/build.js (Terser js/app.js+sw.js, minifyCSS sobre los 4 css, minifyHTML sobre index.html). minifyCSS: quita comentarios, colapsa \\s{2,} (regex whitespace), quita espacio alrededor de {}:;,>,~,+,! y ';}'->'}', ', '->','. El bloque v6.20 sin comentarios ni media queries sobrevive intacto.",
+    "F_desviacion_balance": "El plan del usuario estimaba 6+6 llaves -> 723/723. RECONTEO REAL del bloque exacto: 3 reglas = 3 '{' + 3 '}' -> balance final 720/720 (717+3). DESVIACION registrada: usar 720/720 como criterio.",
+    "G_z_index_maximos": "Maximos z-index en el proyecto: 99999 (bloque v6.18 y boton tutorial inline), 1000/1001 (side-panel/overlay), 9999 (bottom-nav, screenshot-warning, tutorial z9999 viejo). NADA supera 999999 -> el nuevo z-index del modal es globalmente superior. El boton tutorial (99999 inline) queda bajo el overlay (999999) al abrir: el boton deja de flotar encima del backdrop (comportamiento corregido)."
   }
 }

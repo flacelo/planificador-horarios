@@ -1,103 +1,116 @@
 {
-  "task": "TASK-20260801-v6.20",
-  "replaces": "v6.19",
-  "titulo": "Fase 44 (v6.20): Correccion visual de reglas CSS y z-index prioritario para #tutorial-modal",
-  "tipo": "css/main.css: 1 APPEND al final (3 reglas !important: hidden/active/`.modal-card`) ; index.html: 2 bumps v=6.19->6.20 ; sw.js: 1 reemplazo planify-cache-v13->v14 ; SIN cambios en js/app.js (el JS v6.19 ya abre bien: console.log '[PLANIFY v6.19] Tutorial abierto') ; commit/push",
-  "head": "0d1f637 (v6.19, base verificada: git limpio en main, main.css 717/717 1 linea, v=6.19 x2 en index.html, planify-cache-v13 x1 en sw.js, index.html 1 linea, app.js 1 linea)",
-  "git_limpio": true,
-  "archivos_a_modificar": [
-    "css/main.css",
-    "index.html",
-    "sw.js"
+  "id": "TASK-20260801-v6.21",
+  "fase": "Fase 45 (v6.21): Sobreescritura forzada de estilos CSS para el modal de tutorial",
+  "titulo": "fix: renderizado forzado del modal tutorial con maxima especificidad y creacion dinamica v6.21",
+  "requerimiento": "La consola ejecuta el tutorial con exito (console.log v6.19 OK) pero la interfaz NO dibuja #tutorial-modal. Correccion: sobreescritura forzada CSS de maxima especificidad (3 reglas append en css/main.css) + fallback JS que crea el modal dinamicamente si no existe (createElement div). Bumps: ?v=6.20 -> ?v=6.21 (x2 en index.html), planify-cache-v14 -> v15 (sw.js).",
+  "estado": "planificado",
+  "creado": "2026-08-03",
+  "head_actual": "ac27ad4",
+  "rama": "main (arbol limpio: git status --short vacio)",
+  "verificacion_pre": [
+    "git status --short -> limpio (sin salida)",
+    "git log --oneline -3 -> HEAD ac27ad4 'fix: overlay tutorial visible con z-index prioritario y reglas .active robustas v6.20'",
+    "js/app.js: longitud 137563; 1 unica ocurrencia de 'window.abrirModalTutorial=function' (start=63656); definicion exacta de 342 chars (start 63656, end 63998) terminada en '...no encontrado\")}' seguida EXACTAMENTE de ',window.cerrarModalTutorial' (SIN punto y coma)",
+    "js/app.js: call-sites de abrirModalTutorial = 2: (1) la definicion @63656, (2) delegacion @64521 'document.addEventListener(\"click\",function(e){if(e.target.closest('#tutorial-btn,[data-action=\"open-tutorial\"],.btn-tutorial'))window.abrirModalTutorial(e);...' -> NO se toca",
+    "index.html: onclick inline en #tutorial-btn @29141 'onclick=\"window.abrirModalTutorial && window.abrirModalTutorial(event)\"' -> NO se toca",
+    "index.html: el modal YA existe en el DOM '<div class=\"modal-overlay hidden\" id=\"tutorial-modal\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Tutorial guiado\">' con modal-card modal-lg, header (modal-title '📖 Tutorial rápido' + close-btn #close-tutorial-btn), 4 div.tutorial-paso y footer con #tutorial-got-it-btn (1 unica aparicion de 'tutorial-modal' en index.html)",
+    "css/main.css: longitud 82752; balance llaves 720/720; termina EXACTAMENTE en '...box-shadow:0 25px 50px -12px rgba(0,0,0,.7)!important;position:relative!important;z-index:1000000!important}' (bloque v6.20)",
+    "css/main.css: NO contiene 'div#tutorial-modal' ni '2147483647'; maximo z-index actual en el archivo = 1000000 (NOTA: el usuario afirmo 999999 pero existe z-index:1000000 del bloque v6.20)",
+    "index.html: '?v=6.20' x2 en posiciones 28682 (css/main.css?v=6.20) y 69857 (js/app.js?v=6.20)",
+    "sw.js: 'planify-cache-v14' x1 en 'const CACHE=\"planify-cache-v14\"'",
+    "Typo CSS 'justify-space-between': NO existe en el repo (verificado en index.html, js/app.js, css/main.css, css/panel.css, css/dashboard.css, css/grid.css -> todos -1). El typo solo aparece en el snippet de fallback propuesto por el usuario. DECISION: corregirlo a 'justify-content:space-between' en el innerHTML del fallback (es fallback solo si el modal no existe en HTML)."
   ],
-  "veredicto_A_causa_raiz": {
-    "causa_primaria": "EL JS V6.19 FUNCIONA (window.abrirModalTutorial quita 'hidden' y anade 'active', console.log '[PLANIFY v6.19] Tutorial abierto' confirmado en runtime) PERO EL CSS NO PINTa EL MODAL de forma robusta: no existe NINGUNA regla .hidden en todo main.css (0 matches de '.hidden'), la visibilidad depende de la cascada .modal-overlay{display:none} (z-index:1000, 1er bloque) vs .modal-overlay.active{display:flex} / #tutorial-modal.modal-overlay.active{...z-index:99999...} (v6.18 @final). El requerimiento v6.20 anade al FINAL del stylesheet un bloque !important con: #tutorial-modal.hidden/.modal-overlay.hidden (ocultar seguro), #tutorial-modal.active/.modal-overlay.active (mostrar con z-index:999999, fixed, backdrop blur 8px, fondo rgba(15,23,42,.88), flex centrado) y #tutorial-modal .modal-card (estilo de tarjeta robusto). Al estar al final del archivo y con !important, gana sobre TODO bloque previo (incl. el v6.18 z-index:99999 y el v6.19 que no anadio CSS).",
-    "hipotesis_stacking": {
-      "regla_v618_actual": "#tutorial-modal.modal-overlay.active{display:flex!important;position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;background:rgba(15,23,42,.85)!important;backdrop-filter:blur(6px)!important;-webkit-backdrop-filter:blur(6px)!important;z-index:99999!important;justify-content:center!important;align-items:center!important}",
-      "contexto": "El bloque v6.18 (z-index:99999) ya existe y es correcto en contenido, pero el bug reportado indica que en pantalla el modal NO se ve (posible conflicto de cascada/orden con otras reglas .active o repintado). La solucion acordada NO elimina nada: se APPENDE el bloque nuevo al final -> el orden gana (misma especificidad o mayor, todas !important, ultima posicion).",
-      "conclusion_operativa": "Append-only. El nuevo bloque (3 reglas) al final de css/main.css resuelve por orden + !important: display:flex!important + opacity:1!important + z-index:999999!important + fixed 100vw/100vh con backdrop. No hace falta tocar JS ni eliminar bloques v6.18/v6.19."
-    }
+  "anclas": {
+    "def_abrirModalTutorial_actual_LITERAL": "window.abrirModalTutorial=function(e){e&&(e.preventDefault(),e.stopPropagation());var a=document.getElementById(\"tutorial-modal\");a?(a.classList.remove(\"hidden\"),a.classList.add(\"active\"),a.setAttribute(\"aria-hidden\",\"false\"),console.log(\"[PLANIFY v6.19] ✅ Tutorial abierto\")):console.error(\"[PLANIFY v6.19] ❌ #tutorial-modal no encontrado\")}",
+    "def_abrirModalTutorial_notas": "IMPORTANTE: la definicion real usa forma TERNARIA (a?(...):console.error(...)) y NO la forma if/else descrita por el usuario. El reemplazo debe buscar este texto EXACTO de 342 chars (1 sola ocurrencia verificada). Despues de la def sigue ',window.cerrarModalTutorial' SIN punto y coma: no incluir ';' en la busqueda.",
+    "css_final_actual": "z-index:1000000!important}",
+    "contexto_pre_def": "setTimeout(iniciarTourInteractivo,CONFIG.TIME.TUTORIAL_INICIO||1e3),",
+    "contexto_post_def": ",window.cerrarModalTutorial=function(e){e&&(e.preventDefault()"
   },
-  "decisiones": {
-    "mantener_bloques_previos": "SI, MANTENER (append-only, no eliminar): la regla v6.18 #tutorial-modal.modal-overlay.active{...z-index:99999...} y las reglas v6.19 siguen existiendo; el bloque nuevo al final gana por orden. Minimiza el diff y el riesgo de tocar mas de lo necesario.",
-    "formato_del_append": "Anexar el bloque en forma MINIFICADA 1 linea (misma invariante del archivo). El build (scripts/build.js -> minifyCSS) tambien lo minifica: quita comentarios y colapsa espacios; el bloque sobrevive intacto al build (sin comentarios, sin media queries).",
-    "impacto_otros_modales": "La regla generica .modal-overlay.active afecta a LOS 9 overlays (8 modales con class=\"modal-overlay\" + tutorial con \"modal-overlay hidden\"). Todos se abren con classList.add('active') (verificado: modal-compra, modal-activar, modal-admin, modal-categoria, etc.). Efecto: TODOS pasan a z-index:999999, fondo rgba(15,23,42,.88) y blur(8px) (antes rgba(0,0,0,.5)+blur(4px)), padding:16px, box-sizing:border-box. EVALUADO: aceptable (nada por encima de 999999 en el proyecto; apariencia mas consistente y oscura; ningun z-index del repo supera 99999 salvo el boton tutorial inline 99999). Indicarlo al usuario.",
-    "solo_tutorial_card": "#tutorial-modal .modal-card (prefijo ID) solo afecta al modal tutorial; en index.html SOLO el tutorial usa class=\"modal-card modal-lg\" (1 unico div, verificado). Los otros 8 modales no usan .modal-card en HTML -> sin impacto en su tarjeta.",
-    "console_log_sigue_v619": "NO se toca js/app.js: el console.log sigue diciendo '[PLANIFY v6.19] Tutorial abierto'. Aceptable (no se pide cambio JS); NO bump de strings de version en JS.",
-    "notas_riesgo": "Si algun dia otro elemento del proyecto usara z-index > 999999, el modal quedaria por debajo; hoy no existe ninguno (maximo previo: 99999 v6.18, 99999 boton inline, 1000/1001 paneles, 9999 bottom-nav). El estilo inline del boton tutorial (z-index:99999) queda POR DEBAJO del overlay (999999) -> correcto: el boton desaparece bajo el backdrop al abrir el tutorial (cambio sutil de comportamiento vs v6.19 donde el boton flotaba encima; es el comportamiento deseado)."
-  },
-  "regla_de_oro": "SOLO los cambios listados. css/main.css: 1 append al final (BLOQUE_V620 minificado, 3 reglas, 3 '{' + 3 '}'). index.html: replaceAll '?v=6.19' -> '?v=6.20' (2 matches). sw.js: 'planify-cache-v13' -> 'planify-cache-v14' (1 match). NO tocar: js/app.js, panel.css, dashboard.css, grid.css, index.html estructura del modal, cadenas globales, optimize-a11y.js, server.js.",
-  "bloques_finales": {
-    "css_ancla_estado_actual": "main.css es 1 linea minificada, balance 717 '{' / 717 '}'. Ultimo bloque actual (confirmar antes de append que el archivo termina en '}'): balance final esperado 720/720.",
-    "css_bloque_v618_existente_no_eliminar": "#tutorial-modal.modal-overlay.active{display:flex!important;position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;background:rgba(15,23,42,.85)!important;backdrop-filter:blur(6px)!important;-webkit-backdrop-filter:blur(6px)!important;z-index:99999!important;justify-content:center!important;align-items:center!important}",
-    "css_bloque_v620_append_minificado": "#tutorial-modal.hidden,.modal-overlay.hidden{display:none!important;opacity:0!important;pointer-events:none!important}#tutorial-modal.active,.modal-overlay.active{display:flex!important;opacity:1!important;pointer-events:auto!important;position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;background-color:rgba(15,23,42,.88)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;z-index:999999!important;align-items:center!important;justify-content:center!important;padding:16px!important;box-sizing:border-box!important}#tutorial-modal .modal-card{background-color:#1e293b!important;border:1px solid #334155!important;color:#f8fafc!important;border-radius:12px!important;max-width:680px!important;width:100%!important;max-height:85vh!important;overflow-y:auto!important;box-shadow:0 25px 50px -12px rgba(0,0,0,.7)!important;position:relative!important;z-index:1000000!important}",
-    "html_bumps": "index.html: 'css/main.css?v=6.19' -> '?v=6.19' NO: '?v=6.19' -> '?v=6.20' x2 (las 2 apariciones: css/main.css y js/app.js)",
-    "html_estructura_modal": "<div class=\"modal-overlay hidden\" id=\"tutorial-modal\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Tutorial guiado\"><div class=\"modal-card modal-lg\"> (contenedor: class 'modal-overlay hidden'; tarjeta: 'modal-card modal-lg')",
-    "sw_bump": "sw.js: 'planify-cache-v13' -> 'planify-cache-v14' (1 match @const CACHE)",
-    "mensaje_commit": "fix: overlay tutorial visible con z-index prioritario y reglas .active robustas v6.20"
-  },
-  "sub_tareas": [
+  "pasos": [
     {
       "id": "ST-01",
-      "desc": "css/main.css: APPEND del bloque v6.20 al final (append-only, no eliminar nada)",
-      "accion": "Al final del archivo (despues del ultimo '}' existente) anexar BLOQUE_V620_APPEND_MINIFICADO (3 reglas, 3 '{' + 3 '}', 1 linea). NO eliminar el bloque v6.18 ni las reglas v6.19: el nuevo gana por orden (ultima posicion + !important).",
-      "criterios": [
-        "main.css sigue siendo 1 linea",
-        "balance '{'=720 '}'=720 (717+3)",
-        "grep '#tutorial-modal.hidden,.modal-overlay.hidden{display:none!important' = 1 match",
-        "grep 'z-index:999999!important' = 1 match (solo el nuevo; el v6.18 sigue con 99999)",
-        "grep 'z-index:1000000!important' = 1 match"
+      "descripcion": "Verificacion pre-cambio (fail-fast)",
+      "comandos": [
+        "git status --short (esperado: vacio)",
+        "git log --oneline -3 (esperado HEAD ac27ad4)",
+        "node -e contar ocurrencias de 'window.abrirModalTutorial=function' (esperado: 1, start 63656) y verificar sufijo ',window.cerrarModalTutorial' (sin ';')",
+        "node -e balance llaves css/main.css (esperado 720/720) y final 'z-index:1000000!important}'",
+        "grep '?v=6.20' index.html (esperado x2) y 'planify-cache-v14' sw.js (esperado x1)"
       ]
     },
     {
       "id": "ST-02",
-      "desc": "index.html: bump ?v=6.19 -> ?v=6.20 (2 ocurrencias)",
-      "accion": "replaceAll '?v=6.19' por '?v=6.20' en index.html (2 matches: css/main.css y js/app.js).",
-      "criterios": [
-        "grep '?v=6.20' en index.html = 2 matches",
-        "grep '?v=6.19' en index.html = 0 matches",
-        "index.html sigue siendo 1 linea valida"
-      ]
+      "descripcion": "CSS css/main.css - APPEND al final de 3 reglas minificadas (balance 720+3=723/723). Archivo sin newline final significativo: usar lectura+append (codificacion UTF-8 sin BOM).",
+      "append_exacto": "div#tutorial-modal.hidden,div#tutorial-modal:not(.active){display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}div#tutorial-modal.active{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;background-color:rgba(15,23,42,.92)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;z-index:2147483647!important;align-items:center!important;justify-content:center!important;padding:20px!important;box-sizing:border-box!important}div#tutorial-modal .modal-card{background-color:#1e293b!important;border:1px solid #334155!important;color:#f8fafc!important;border-radius:12px!important;max-width:680px!important;width:100%!important;max-height:85vh!important;overflow-y:auto!important;box-shadow:0 25px 50px -12px rgba(0,0,0,.8)!important;margin:auto!important}",
+      "verificacion": "node -e balance (esperado 723/723); grep 'div#tutorial-modal' (esperado presente, 3 selectores); grep '2147483647' (esperado presente)"
     },
     {
       "id": "ST-03",
-      "desc": "sw.js: bump planify-cache-v13 -> planify-cache-v14",
-      "accion": "Reemplazo unico de 'planify-cache-v13' por 'planify-cache-v14' en la linea const CACHE.",
-      "criterios": [
-        "grep 'planify-cache-v14' en sw.js = 1 match",
-        "grep 'planify-cache-v13' en sw.js = 0 matches"
+      "descripcion": "JS js/app.js - REEMPLAZAR la definicion EXACTA de 342 chars (ver anclas.def_abrirModalTutorial_actual_LITERAL) por la nueva version v6.21. El archivo es 1 linea minificada: usar script node -e con String.replace y verificar conteo ===1 antes y despues (fallar si no es 1).",
+      "nueva_definicion": "window.abrirModalTutorial=function(e){e&&(e.preventDefault(),e.stopPropagation());var a=document.getElementById(\"tutorial-modal\");if(a){a.classList.remove(\"hidden\");a.classList.add(\"active\");a.setAttribute(\"aria-hidden\",\"false\")}else{var m=document.createElement(\"div\");m.id=\"tutorial-modal\";m.className=\"modal-overlay active\";m.setAttribute(\"role\",\"dialog\");m.setAttribute(\"aria-modal\",\"true\");m.setAttribute(\"aria-label\",\"Tutorial guiado\");m.style.cssText=\"position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background-color:rgba(15,23,42,.92);padding:20px;box-sizing:border-box\";m.innerHTML='<div class=\"modal-card modal-lg\"><div class=\"modal-header\" style=\"display:flex;justify-content:space-between;align-items:center\"><h3 class=\"modal-title\">🚀 Bienvenido a PLANIFY — Guía de Uso</h3><button type=\"button\" class=\"close-btn\" id=\"close-tutorial-btn\" aria-label=\"Cerrar tutorial\" onclick=\"window.cerrarModalTutorial(event)\">&times;</button></div><div class=\"modal-body\"><div class=\"tutorial-paso\"><div class=\"paso-icon\">📅</div><div><p class=\"paso-titulo\">1. Vista Diario/Notas</p><p class=\"paso-texto\">Haz clic en una celda para registrar tu actividad del día y añade notas personales.</p></div></div><div class=\"tutorial-paso\"><div class=\"paso-icon\">🗓️</div><div><p class=\"paso-titulo\">2. Vista Semanal</p><p class=\"paso-texto\">Organiza tu semana completa, arrastra bloques y marca tus metas diarias.</p></div></div><div class=\"tutorial-paso\"><div class=\"paso-icon\">📆</div><div><p class=\"paso-titulo\">3. Vista Mensual</p><p class=\"paso-texto\">Visualiza el mes entero para planificar a largo plazo y detectar huecos libres.</p></div></div><div class=\"tutorial-paso\"><div class=\"paso-icon\">🌓</div><div><p class=\"paso-titulo\">4. Modo Claro/Oscuro</p><p class=\"paso-texto\">Alterna entre tema claro y oscuro con el botón ☀️/🌙 para tu comodidad.</p></div></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn-primary\" id=\"tutorial-got-it-btn\" onclick=\"window.cerrarModalTutorial(event)\">¡Entendido, comenzar!</button></div></div>';document.body.appendChild(m)}console.log(\"[PLANIFY v6.21] ✅ Modal visibilizado correctamente.\")}",
+      "notas_implementacion": [
+        "innerHTML del fallback delimitado con COMILLAS SIMPLES (las atributos internos usan comillas dobles) - mismo patron que el existente '#tutorial-btn,[data-action=\"open-tutorial\"],.btn-tutorial' en el archivo",
+        "El typo del usuario 'justify-space-between' en el header inline del fallback SE CORRIGE a 'justify-content:space-between' (decision registrada)",
+        "Emoji 🚀 y caracteres UTF-8 (—, í) directos en el string: seguros, el archivo ya contiene emojis (✅ ❌ 📖). Alternativa valida: \\u{1F680}",
+        "Los selectores #close-tutorial-btn y #tutorial-got-it-btn del innerHTML dinamico enganchan con la delegacion existente (e.target.closest('#close-tutorial-btn,#tutorial-got-it-btn')) y con e.target===a (overlay) -> cerrarModalTutorial funciona sin cambios",
+        "cerrarModalTutorial NO se modifica (sigue console.log v6.19 - aceptado)",
+        "Las clases tutorial-paso/paso-icon/paso-titulo/paso-texto ya existen en CSS (heredan estilos del modal HTML actual)"
+      ],
+      "verificacion": [
+        "node -e: conteo 'window.abrirModalTutorial=function' == 1; la nueva def contiene 'createElement' y 'v6.21' y 'justify-content:space-between'",
+        "grep 'v6.19' en la zona de abrirModalTutorial (debe quedar solo en cerrarModalTutorial)"
       ]
     },
     {
       "id": "ST-04",
-      "desc": "Verificacion integral + npm run build",
-      "accion": "1) node --check js/app.js (via npm run check o build) = 0 errores. 2) npm run build (scripts/build.js: terser JS + minifyCSS + minifyHTML) -> confirmar que el bloque v6.20 sobrevive minificado. 3) Re-verificar balance main.css = 720/720 POST-build (build elimina comentarios/espacios pero no llaves). 4) greps de ST-01..ST-03 POST-build. 5) git diff --stat = SOLO 3 archivos: css/main.css, index.html, sw.js (+ .opencode/context/task.json trackeado). 6) Prueba manual opcional en navegador: abrir tutorial -> modal visible centrado con backdrop oscuro blur, consola '[PLANIFY v6.19] Tutorial abierto'; cerrar con X/fuera/Escape.",
-      "criterios": [
-        "npm run build exit 0",
-        "main.css '{'=720 '}'=720 tras build",
-        "git diff --stat = 3 archivos",
-        "ningun otro archivo modificado",
-        "modal visible en pantalla (prueba manual)"
-      ]
+      "descripcion": "Bumps de version",
+      "cambios": [
+        "index.html pos 28682: 'css/main.css?v=6.20' -> 'css/main.css?v=6.21'",
+        "index.html pos 69857: 'js/app.js?v=6.20' -> 'js/app.js?v=6.21'",
+        "sw.js: 'const CACHE=\"planify-cache-v14\"' -> 'const CACHE=\"planify-cache-v15\"'"
+      ],
+      "verificacion": "grep '?v=6.21' index.html == x2 y '?v=6.20' == x0; grep 'planify-cache-v15' sw.js == x1 y 'planify-cache-v14' == x0"
     },
     {
       "id": "ST-05",
-      "desc": "Commit + push",
-      "accion": "git add css/main.css index.html sw.js .opencode/context/task.json ; git commit -m 'fix: overlay tutorial visible con z-index prioritario y reglas .active robustas v6.20' ; git push origin main (convencion del repo: los pushes previos v6.17/v6.18/v6.19 se hicieron).",
-      "criterios": [
-        "git log --oneline -1 muestra el mensaje exacto",
-        "git status limpio tras commit",
-        "HEAD movido sobre 0d1f637"
+      "descripcion": "Verificacion post-cambio completa",
+      "comandos": [
+        "node --check js/app.js (script 'check' del package.json: 'node --check js/app.js')",
+        "npm run build (scripts/build.js) - debe terminar sin errores",
+        "RE-VERIFY post-build: balance css/main.css 723/723; grep 'div#tutorial-modal' presente; grep '2147483647' presente (x1 en CSS y x2 en app.js fallback); grep '?v=6.21' x2; grep 'planify-cache-v15' x1",
+        "git status --short (solo index.html, js/app.js, css/main.css, sw.js modificados; sin archivos sorpresa)",
+        "git diff --stat para confirmar alcance",
+        "NO ejecutar git commit salvo orden explicita del usuario"
       ]
+    },
+    {
+      "id": "ST-06",
+      "descripcion": "Commit propuesto (solo proposicion, no ejecutar sin orden)",
+      "mensaje": "fix: renderizado forzado del modal tutorial con maxima especificidad y creacion dinamica v6.21"
     }
   ],
-  "investigacion_clave": {
-    "A_css_actual": "main.css 717/717, 1 linea. 17 bloques #tutorial-modal. Existen: #tutorial-modal.modal-overlay{z-index:9999}, #tutorial-modal.modal-overlay.active{display:flex!important}, #tutorial-modal .modal-card{...width:560px...} + .modal-lg{width:640px}, y el bloque v6.18 completo (z-index:99999, texto exacto en bloques_finales). NO existe NINGUNA regla .hidden en todo el archivo (0 matches) -> las reglas hidden del bloque v6.20 son nuevas. 5 bloques .modal-overlay genericos: base{display:none;...z-index:1000...}, .modal-overlay.active{display:flex}, .modal-overlay{z-index:9999}, .modal-overlay.active{display:flex!important}, y el bloque v6.18 generico .modal-overlay.active{...z-index:99999...}.",
-    "B_html": "index.html 1 linea. '?v=6.19' x2. 9 divs class=\"modal-overlay\": 8 sin hidden + 1 tutorial con 'modal-overlay hidden'. Tutorial: <div class=\"modal-overlay hidden\" id=\"tutorial-modal\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Tutorial guiado\"><div class=\"modal-card modal-lg\"> (unico .modal-card en HTML).",
-    "C_js": "window.abrirModalTutorial (v6.19): a.classList.remove('hidden'), a.classList.add('active'), aria-hidden=false, console.log '[PLANIFY v6.19] Tutorial abierto'. window.cerrarModalTutorial: add hidden, remove active, aria-hidden=true, setItem TUTORIAL_VISTO=1. Los 8 modales restantes se abren con classList.add('active') sobre .modal-overlay (verificado modal-compra/modal-activar/modal-admin/modal-categoria).",
-    "D_sw": "sw.js 1 linea: const CACHE=\"planify-cache-v13\" (1 match). ASSETS incluye ./css/main.css -> el bump v14 fuerza recarga de cache con el CSS nuevo.",
-    "E_build": "package.json scripts: check=node --check js/app.js, build=node scripts/build.js (Terser js/app.js+sw.js, minifyCSS sobre los 4 css, minifyHTML sobre index.html). minifyCSS: quita comentarios, colapsa \\s{2,} (regex whitespace), quita espacio alrededor de {}:;,>,~,+,! y ';}'->'}', ', '->','. El bloque v6.20 sin comentarios ni media queries sobrevive intacto.",
-    "F_desviacion_balance": "El plan del usuario estimaba 6+6 llaves -> 723/723. RECONTEO REAL del bloque exacto: 3 reglas = 3 '{' + 3 '}' -> balance final 720/720 (717+3). DESVIACION registrada: usar 720/720 como criterio.",
-    "G_z_index_maximos": "Maximos z-index en el proyecto: 99999 (bloque v6.18 y boton tutorial inline), 1000/1001 (side-panel/overlay), 9999 (bottom-nav, screenshot-warning, tutorial z9999 viejo). NADA supera 999999 -> el nuevo z-index del modal es globalmente superior. El boton tutorial (99999 inline) queda bajo el overlay (999999) al abrir: el boton deja de flotar encima del backdrop (comportamiento corregido)."
-  }
+  "riesgos_implementador": [
+    "(a) innerHTML dinamico con atributos en comillas dobles -> el string JS debe usar comillas simples como delimitador (patron ya usado en el archivo)",
+    "(b) Emoji 🚀 y unicode en script Node: usar string directo UTF-8 (el archivo ya contiene ✅❌📖) o \\u{1F680}; evitar escapes corruptos por consola Windows",
+    "(c) La regla nueva 'div#tutorial-modal:not(.active)' es mas especifica que '.modal-overlay.hidden' v6.20 y queda al final del archivo -> gana en cascada",
+    "(d) z-index 2147483647 sobrepasa todo; el maximo actual del repo es 1000000 (main.css v6.20) - NO existe nada superior hoy",
+    "(e) cerrarModalTutorial NO cambia (console.log v6.19) - aceptado; su delegacion sigue cerrando tanto el modal HTML existente como el dinamico (mismos selectores de cierre)",
+    "(f) El texto real de la definicion es TERNARIO (a?(...):...): el implementor NO debe buscar la forma if/else que describio el usuario - no habria match. Usar el literal de 342 chars verificado (anclas)",
+    "(g) La definicion termina en '...no encontrado\")}' y es seguida por ',window.cerrarModalTutorial' (SIN ';'): al reemplazar, conservar la coma; no insertar ';'",
+    "(h) app.js es 1 linea de 137563 chars: usar reemplazo por script node con conteo exacto (===1) antes/despues, no edicion manual por lineas",
+    "(i) El modal YA existe en index.html con clase 'hidden' -> el camino normal en v6.21 es remove('hidden')+add('active'); el createElement es SOLO fallback defensivo",
+    "(j) Archivos minificados UTF-8: preservar codificacion sin BOM en escrituras (PowerShell Set-Content -Encoding utf8 en PS5.1 escribe BOM: usar node fs.writeFileSync utf8 para CSS/JS/sw.js)",
+    "(k) La regla hidden agrega visibility:hidden!important y pointer-events:none!important: no rompe el resto del overlay base (.modal-overlay) porque se limita al id #tutorial-modal"
+  ],
+  "verificacion_post": [
+    "node --check js/app.js OK",
+    "npm run build OK (sin errores)",
+    "css/main.css balance 723/723 y termina en '...margin:auto!important}'",
+    "index.html: '?v=6.21' x2; '?v=6.20' x0",
+    "sw.js: 'planify-cache-v15' x1; 'planify-cache-v14' x0",
+    "js/app.js: 'v6.21' presente en abrirModalTutorial; 'window.abrirModalTutorial=function' x1",
+    "git status --short limitado a 4 archivos: index.html, js/app.js, css/main.css, sw.js"
+  ],
+  "commit_propuesto": "fix: renderizado forzado del modal tutorial con maxima especificidad y creacion dinamica v6.21"
 }

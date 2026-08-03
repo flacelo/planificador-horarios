@@ -1,54 +1,37 @@
 {
-  "task": "TASK-20260801-v6.12",
-  "replaces": "v6.11",
-  "titulo": "Reorden pestañas bottom-nav + tema oscuro Diario + contraste semanal + tipografía nav",
-  "tipo": "REORDENAMIENTO HTML + CSS append + bump versiones",
-  "head": "05bbff4 (v6.11, lienzo visible)",
+  "task": "TASK-20260801-v6.13",
+  "replaces": "v6.12",
+  "titulo": "Contraste dias Vista Semanal (blanco brillante + 700) + fix boton Empezar vacio + bumps v6.13/v7",
+  "tipo": "CSS append (retoque visual) + bump versiones + commit/push exacto",
+  "head": "0635c61 (v6.12, interfaz casi terminada)",
   "git_limpio": true,
-  "archivos_a_modificar": ["index.html", "css/main.css", "sw.js"],
-  "regla_de_oro": "main.css SOLO append al final (nunca editar reglas existentes). index.html: solo las cadenas listadas en ST-01/ST-03.",
-  "decision_activo_inicial": {
-    "decision": "Diario/Notas queda ACTIVO al cargar (Opcion B).",
-    "justificacion": "El requerimiento dice literalmente 'el estado activo inicial debe corresponder al nuevo orden deseado' y Diario queda primero. cambiarTab(e) NO depende del orden de hijos (usa getElementById('view-'+e) y barre .tab-btn globalmente), por lo que el reorden es seguro. Ademas la v6.12 incluye el tema oscuro de Diario en la misma entrega: cargar en Diario muestra el trabajo terminado.",
-    "costo": "4 reemplazos atómicos en index.html (nav, #view-semanal, #view-table, #view-diario) + swap de clase .active. NO hay persistencia de pestaña en localStorage (verificado: 0 refs horario_tab/tab_actual/ultimaTab) y cambiarTab( aparece 1 sola vez (definición) en app.js, asi que el HTML inicial es la unica fuente de verdad.",
-    "riesgos": [
-      "REGLA CLAVE: main.css contiene '#view-semanal:has(#view-table.active){display:block!important...}' (offset ~68960). Si #view-table conservara .active, Semanal se mostraria SIEMPRE por la pseudoclase :has aunque no tenga .active. Por eso ST-01 elimina .active de #view-table (obligatorio).",
-      "Con #view-semanal sin .active aplican: base .view-content{display:none} + '#view-semanal:not(.active){display:none!important}' + inline style=display:none (triple blindaje). Al hacer click en Semanal, cambiarTab pone display:block important + .active y la regla '#view-semanal #view-table{display:block!important}' (2 ids, gana a '#view-semanal .view-content:not(.active)' 1id) muestra la tabla.",
-      "Riesgo residual bajo: si algo fallara, revertir = devolver las 4 cadenas originales (offsets documentados)."
-    ]
-  },
+  "archivos_a_modificar": ["css/main.css", "index.html", "sw.js"],
+  "regla_de_oro": "main.css SOLO append al final (nunca editar reglas existentes). index.html: SOLO las 2 cadenas v=6.12 -> v=6.13. sw.js: SOLO planify-cache-v6 -> planify-cache-v7. NO tocar js/app.js.",
   "investigacion_clave": {
-    "bottom_nav_actual": {
-      "offset_node_utf8": "33340..33772 (432 chars)",
-      "orden_actual": "1) Semanal (tab-btn ACTIVE), 2) Mensual, 3) Diario/Notas",
-      "ids": "data-tab= semanal/mensual/diario; onclick= cambiarTab('...') x3; span data-i18n= tab_semanal/tab_mensual/tab_diario",
-      "emojis": "3 emojis UTF-8 distintos (NO escribir literales en scripts; extraer bloques del archivo). Base64 OLD: PG5hdiBjbGFzcz0iYm90dG9tLW5hdiI+PGJ1dHRvbiBjbGFzcz0idGFiLWJ0biBhY3RpdmUiIGRhdGEtdGFiPSJzZW1hbmFsIiBvbmNsaWNrPSJjYW1iaWFyVGFiKCdzZW1hbmFsJykiPvCfk4UgPHNwYW4gZGF0YS1pMThuPSJ0YWJfc2VtYW5hbCI+U2VtYW5hbDwvc3Bhbj48L2J1dHRvbj48YnV0dG9uIGNsYXNzPSJ0YWItYnRuIiBkYXRhLXRhYj0ibWVuc3VhbCIgb25jbGljaz0iY2FtYmlhclRhYignbWVuc3VhbCcpIj7wn5OGIDxzcGFuIGRhdGEtaTE4bj0idGFiX21lbnN1YWwiPk1lbnN1YWw8L3NwYW4+PC9idXR0b24+PGJ1dHRvbiBjbGFzcz0idGFiLWJ0biIgZGF0YS10YWI9ImRpYXJpbyIgb25jbGljaz0iY2FtYmlhclRhYignZGlhcmlvJykiPvCfk50gPHNwYW4gZGF0YS1pMThuPSJ0YWJfZGlhcmlvIj5EaWFyaW8vTm90YXM8L3NwYW4+PC9idXR0b24+PC9uYXY+",
-      "dependencias_js": "NINGUNA: app.js no referencia view-semanal/view-diario/view-mensual/#view-table (0 refs). cambiarTab usa getElementById('view-'+e) + querySelectorAll('.main-card-container>.view-content') y '.tab-btn:not(#side-panel .tab-btn), .nav-tab, [onclick*=cambiarTab]'. No hay lógica por indice de hijos."
+    "A_dias_semanal": {
+      "generacion_js": "Los th de dias NO estan en el HTML estatico: los genera renderizar() en js/app.js (offset 38293): t+='<th style=\"position:relative;\">'+e.substring(0,3)+'<div class=\"resizer\"...'. Array real: let dias=[\"LUNES\",\"MARTES\",\"MIÉRCOLES\",\"JUEVES\",\"VIERNES\",\"SÁBADO\",\"DOMINGO\"] (app.js offset 25395) => textos renderizados: LUN, MAR, MIÉ, JUE, VIE, SÁB, DOM.",
+      "selector_real": "#header-row th (thead id=\"header-row\", th SIN clase propia; unicamente inline style=\"position:relative;\"). El th de HORA lleva inline style=\"width:55px;position:relative;\" y el contenedor padre es #view-semanal (div id=\"view-semanal\" class=\"view-content\").",
+      "regla_que_los_pinta_hoy": "main.css offset ~72480 (append v6.12): '#view-semanal .hora-cell,#view-semanal .hora-cell input,#view-semanal #header-row th,#view-semanal span,#view-semanal label{color:#e2e8f0!important;font-weight:500!important}'. Especificidad para el th: (2,0,1) con !important. Tambien compiten grid.css 'th{color:#334155;font-weight:700}' (0,0,1) y 'th *{color:#334155!important;font-weight:700!important}' (0,0,2) y '.tema-estelar thead th{color:#9effdb!important}' (0,2,1): TODAS pierden contra la v6.12.",
+      "regla_append_ganadora": "'#view-semanal #header-row th{color:#ffffff!important;font-weight:700!important}' => misma especificidad (2,0,1) que la v6.12, ambos con !important => gana por ORDEN (append es la ultima regla del archivo). No hay otra regla con (>=2,0,1) para ese th.",
+      "spans_dentro_del_th": "El th de cada dia contiene <span style='cursor:pointer;color:#ff7675;...'> (eliminar dia, inline) que queda cubierto por '#view-semanal span{color:#e2e8f0!important}' (inline sin !important pierde vs CSS !important). NO se toca: el requerimiento solo pide el TEXTO del dia (texto directo del th), que si cubre la regla nueva."
     },
-    "vista_inicial_hoy": "#view-semanal tiene class='view-content active' (visible); #view-mensual y #view-diario tienen style='display:none'. #view-table (hija de #view-semanal) tambien tiene class='view-content active'. #view-dashboard esta ANIDADA dentro de #view-semanal (offset 35474). Hijos directos de .main-card-container: solo view-semanal, view-mensual, view-diario.",
-    "selectores_semanal_reales": {
-      ".hora-col": "NO existe en HTML. Solo regla muerta en main.css (.celda-header,.hora-col{color:#94a3b8!important}). Real = .hora-cell (td generado por JS, app.js offset 38883: <td class='hora-cell'><span class='del-fila'>✕</span><input type='text' ...>)",
-      ".dia-header": "NO existe en ningun archivo. Real = #header-row th (thead id='header-row'; JS regenera en renderizar(): <th>HORA + <th>DIA<substring> + <span style='cursor:pointer;color:#ff7675...'> eliminar dia).",
-      ".celda-header": "NO existe en HTML. Solo regla muerta en main.css (.celda-header,.hora-col{...}). Cubierto por #header-row th.",
-      "spans_dentro_de_view-semanal": "5 spans estaticos: span[data-i18n=empty_load] 'Cargar modelo', span[data-i18n=empty_start] 'Empezar vacio', span#merge-badge (color propio #fff sobre gradiente, pierde a #e2e8f0 sin romperse), span.lic-texto, span[style=margin-left:12px] que envuelve <a style='color:#667eea'> Tutorial (el color inline del <a> sobrevive: inline > CSS). Runtime: span.del-fila (coral #e74c3c grid.css) y span con color:#ff7675 inline en th (eliminar dia) y .merge-indicator (#667eea). TODOS quedan #e2e8f0 con la regla span generica: efecto aceptado y pedido por el usuario (el ✕/X pierde el tinte rojo; .merge-indicator queda #e2e8f0 a opacity .5).",
-      "reglas_que_ganan_hoy": "grid.css: th{color:#334155;font-weight:700}, th *{color:#334155!important;font-weight:700!important}, .hora-cell{color:#2c3e50;font-weight:700}, .hora-cell input{color:#1a2530!important;font-weight:700!important}. tema-estelar (main.css ~25979): thead th{color:#9effdb!important}, .hora-cell input{color:#9effdb;font-weight:700}. La regla nueva con #view-semanal (1 id) o #view-semanal #header-row th (2 ids) gana por especificidad."
+    "B_boton_empezar_vacio": {
+      "html_exacto": "index.html offset 34682: <button class=\"btn-empty-secondary\" onclick=\"cerrarEmptyState()\">✏️ <span data-i18n=\"empty_start\">Empezar vacío</span></button>. Ubicacion: #view-semanal > #view-table > div.empty-state#empty-state > .empty-actions. El texto vive en el <span data-i18n=\"empty_start\">.",
+      "estilos_actuales": "main.css offset 15553: 'button.btn-empty-secondary{padding:7px 16px!important;background:rgba(255,255,255,0.7)!important;color:#555!important;border:1px solid rgba(0,0,0,0.08)!important;...}' (0,1,1). Hover offset 15910: 'button.btn-empty-secondary:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08);background:rgba(255,255,255,0.9)!important}' (0,1,1).",
+      "causa_raiz_del_bug": "La regla v6.12 '#view-semanal span{color:#e2e8f0!important}' (1,0,1) pinta el <span data-i18n=\"empty_start\"> con #e2e8f0 (casi blanco) sobre el fondo blanco rgba(255,255,255,0.7) del boton => texto blanco sobre fondo blanco. El color:#555 del button se hereda pero el span lo sobreescribe.",
+      "reglas_append_ganadoras": [
+        "'#view-semanal button.btn-empty-secondary{background:#1e293b!important;color:#ffffff!important;border:1px solid #475569!important}' => (1,0,1) > (0,1,1) de la base. Gana el fondo/borde/color del boton.",
+        "'#view-semanal button.btn-empty-secondary span{color:#ffffff!important}' => (1,1,1) > (1,0,1) de '#view-semanal span'. Gana el TEXTO del span (imprescindible: sin ella el span sigue #e2e8f0)."
+      ],
+      "hover_actual": "button.btn-empty-secondary:hover (0,1,1) con background rgba(255,255,255,0.9)!important PIERDE contra la regla base nueva '#view-semanal button.btn-empty-secondary' (1,0,1) => en hover el fondo se mantiene #1e293b (NO se vuelve blanco). transform:translateY(-2px) y box-shadow del hover no entran en conflicto y se conservan. DECISION: aceptar el hover sin anadir regla (mantener 3 reglas totales como pide el requerimiento); si se quisiera feedback visual extra, regla opcional '#view-semanal button.btn-empty-secondary:hover{background:#334155!important}' (no incluida por defecto)."
     },
-    "estructura_view_diario": {
-      "offsets": "tag <div id='view-diario' class='view-content' style='display:none'> = 43061..43125 (64 chars). Markup: .planner-notebook > (.notebook-header > h2 + .header-controls > .date-picker-container > label + input#planner-date.aesthetic-input) + .notebook-grid > 2x .notebook-col > .card-section (mood-section, todo-section [ul#todo-list + .todo-input-group > input#new-todo-input.aesthetic-input + button#add-todo-btn.aesthetic-btn], goals-section.sticky-note > textarea#goals-input.aesthetic-textarea, productivity-section > .star-rating > span.star x5, morning-section > .routine-checkboxes > label > input[type=checkbox] + span, grateful-section > textarea#grateful-input.aesthetic-textarea, sleep-section > .sleep-clouds > button.cloud-btn x3, affirmations-section > textarea#affirmations-input.aesthetic-textarea).",
-      "estilos_actuales": "Los estilos de #view-diario son un <style> INLINE en index.html (offset 37072..43621, 6549 chars, DESPUES de los <link> del head en orden de documento => gana en cascada a igual especificidad con !important). Colores actuales: #view-diario bg #fdfbf7 color #333333; .planner-notebook bg #faf7f2 (regla global en main.css offset ~40468); .card-section bg #ffffff border #f0ece1; .section-title #4a4a4a; .aesthetic-input/.aesthetic-textarea bg rgba(255,255,255,.9) color #333333; .goals/.grateful/.affirmations/.morning bg pastel; .routine-checkboxes #444444; .mood-btn/.cloud-btn bg #f0ebf7 color #333333; .aesthetic-btn bg #c3aed6 color #fff.",
-      "estrategia_override": "OBLIGATORIO prefijo 'body ' en cada selector (especificidad +1 tipo) porque los estilos inline del <style> (con !important) ganan a igual especificidad por orden de documento. body #view-diario .X (0,1,2) > #view-diario .X (0,1,1); body #view-diario .notebook-header h2 (0,1,3) > #view-diario .notebook-header h2 (0,1,2). Todo con !important."
-    },
-    "tipografia_bottom_nav": {
-      "font_family_actual": "NINGUNO en .bottom-nav ni .tab-btn (verificado 0 coincidencias). body{font-family:'Segoe UI',Arial,sans-serif} y body.tema-estelar define --fuente-principal:'Courier New',monospace que se aplica via 'body,input,select,textarea,button,td,th{font-family:var(--fuente-principal),'Segoe UI',Arial,sans-serif}' (SIN !important) => LOS BOTONES .tab-btn heredan MONOSPACE (Courier New). El append '.bottom-nav{font-family:...!important}' gana: especificidad (0,1,0) > (0,0,2) y con !important, por lo que es determinista. Los hijos .tab-btn heredan del nav (no tienen font-family propio).",
-      "position_zindex": ".bottom-nav tiene position:fixed!important;bottom:10px!important;z-index:9999!important (main.css offset ~39404) y body.tema-estelar .bottom-nav{background:rgba(13,17,23,0.95)!important} (~39692). El append solo toca font-family: no afecta layout."
-    },
-    "estado_base_verificado": {
-      "git": "limpio, HEAD 05bbff4",
-      "main_css_balance": "633 abres / 633 cierras OK (verificado con node)",
-      "grid_css_balance": "199 / 199 OK",
-      "v6.11": "index.html x2: css/main.css?v=6.11 (offset 25583) y js/app.js?v=6.11 (offset 64791). sw.js NO tiene parametro de version, usa cache planify-cache-v5",
-      "sw.js": "1 sola referencia planify-cache (v5), 963 chars",
-      "main.css tail": "termina en '...@media (min-width:768px){#view-table .celda{min-height:70px!important;padding:8px!important;border-radius:8px!important}}' (sin newline final)"
+    "C_estado_base_verificado": {
+      "git": "limpio (git status vacio), HEAD 0635c61 (commit v6.12)",
+      "main_css_balance": "646 abres / 646 cierras (verificado con node) => tras append de 3 reglas pasara a 649/649",
+      "main_css_tail": "termina en '...body #view-diario .aesthetic-btn{background:#334155!important}' SIN newline final (append debe empezar con \\n)",
+      "v_6_12": "index.html x2: css/main.css?v=6.12 (offset 25939) y js/app.js?v=6.12 (offset 65137)",
+      "sw_js": "planify-cache-v6 (1 sola referencia, sw.js linea 1, minificado 1 linea)",
+      "main_css_bytes": 73622, "index_html_bytes": 65780, "app_js_bytes": 135904
     }
   },
   "sub_tareas": [
@@ -56,105 +39,77 @@
       "id": "ST-00",
       "nombre": "Pre-checks de estado base (fail-fast)",
       "pasos": [
-        "git status --short (debe estar vacio) y git rev-parse HEAD (05bbff4313bef57ce69aa9aa04aa12a2602a95edb)",
-        "node: balance llaves main.css == 633/633 y grid.css == 199/199",
-        "node: contar v=6.11 en index.html == 2; planify-cache-v5 en sw.js == 1"
+        "git status --short (debe estar vacio) y git rev-parse HEAD (0635c61)",
+        "node: balance llaves main.css == 646/646 (contar '{' y '}' con match)",
+        "node: contar 'v=6.12' en index.html == 2; 'planify-cache-v6' en sw.js == 1; 'planify-cache-v7' ausente"
       ],
       "criterio": "Si algun check falla, ABORTAR y reportar (no aplicar cambios sobre base sucia)"
     },
     {
       "id": "ST-01",
-      "nombre": "index.html: reorden .bottom-nav + estado activo inicial Diario",
-      "cambios": [
-        {
-          "ordinal": "1.1",
-          "descripcion": "Reemplazar bloque nav (offset 33340..33772, 432 chars) por nav reordenado. NO escribir emojis literalmente: extraer los 3 botones del archivo con regex /<button class=\"tab-btn[^>]*data-tab=\"[a-z]+\"[^>]*>[\\s\\S]*?<\\/button>/g, mover .active del boton semanal al boton diario (reemplazo de subcadena 'class=\"tab-btn active\"' -> 'class=\"tab-btn\"' en semanal y 'class=\"tab-btn\"' -> 'class=\"tab-btn active\"' en diario), y concatenar: '<nav class=\"bottom-nav\">' + btnDiario(active) + btnSemanal + btnMensual + '</nav>'.",
-          "resultado_esperado": "Orden: 1) Diario/Notas (ACTIVE), 2) Semanal, 3) Mensual. Longitud total 432 chars (igual que el viejo). Base64 del nav nuevo (byte-exacto, para verificacion): PG5hdiBjbGFzcz0iYm90dG9tLW5hdiI+PGJ1dHRvbiBjbGFzcz0idGFiLWJ0biBhY3RpdmUiIGRhdGEtdGFiPSJkaWFyaW8iIG9uY2xpY2s9ImNhbWJpYXJUYWIoJ2RpYXJpbycpIj7wn5OdIDxzcGFuIGRhdGEtaTE4bj0idGFiX2RpYXJpbyI+RGlhcmlvL05vdGFzPC9zcGFuPjwvYnV0dG9uPjxidXR0b24gY2xhc3M9InRhYi1idG4iIGRhdGEtdGFiPSJzZW1hbmFsIiBvbmNsaWNrPSJjYW1iaWFyVGFiKCdzZW1hbmFsJykiPvCfk4UgPHNwYW4gZGF0YS1pMThuPSJ0YWJfc2VtYW5hbCI+U2VtYW5hbDwvc3Bhbj48L2J1dHRvbj48YnV0dG9uIGNsYXNzPSJ0YWItYnRuIiBkYXRhLXRhYj0ibWVuc3VhbCIgb25jbGljaz0iY2FtYmlhclRhYignbWVuc3VhbCcpIj7wn5OGIDxzcGFuIGRhdGEtaTE4bj0idGFiX21lbnN1YWwiPk1lbnN1YWw8L3NwYW4+PC9idXR0b24+PC9uYXY+"
-        },
-        {
-          "ordinal": "1.2",
-          "descripcion": "Ocultar Semanal: '<div id=\"view-semanal\" class=\"view-content active\">' (offset 33772, unico) -> '<div id=\"view-semanal\" class=\"view-content\" style=\"display:none\">'"
-        },
-        {
-          "ordinal": "1.3",
-          "descripcion": "OBLIGATORIO: quitar .active de #view-table: '<div id=\"view-table\" class=\"view-content active\">' (offset 33823, unico) -> '<div id=\"view-table\" class=\"view-content\">'. SIN ESTE CAMBIO, la regla '#view-semanal:has(#view-table.active){display:block!important}' de main.css mantiene Semanal visible aunque no tenga .active."
-        },
-        {
-          "ordinal": "1.4",
-          "descripcion": "Activar Diario: '<div id=\"view-diario\" class=\"view-content\" style=\"display:none\">' (offset 43061, unico) -> '<div id=\"view-diario\" class=\"view-content active\">'"
-        }
+      "nombre": "main.css: append bloque v6.13 al final (regla de oro, 3 reglas)",
+      "bloque_css_exacto": "/* v6.13: contraste de dias y boton vacio en vista semanal */\n#view-semanal #header-row th{color:#ffffff!important;font-weight:700!important}\n#view-semanal button.btn-empty-secondary{background:#1e293b!important;color:#ffffff!important;border:1px solid #475569!important}\n#view-semanal button.btn-empty-secondary span{color:#ffffff!important}\n",
+      "notas_selectores_reales": [
+        "Regla 1 (dias): '#view-semanal #header-row th' (2,0,1) empata en especificidad con la v6.12 pero gana por orden (append final) => LUN/MAR/MIE... pasan de #e2e8f0/500 a #ffffff/700.",
+        "Regla 2 (boton): '#view-semanal button.btn-empty-secondary' (1,0,1) vence a 'button.btn-empty-secondary' (0,1,1) y a 'button.btn-empty-secondary:hover' (0,1,1) => fondo #1e293b estable incluso en hover (hover blanco 0.9 pierde; transform/shadow se conservan).",
+        "Regla 3 (texto): '#view-semanal button.btn-empty-secondary span' (1,1,1) vence a '#view-semanal span' (1,0,1) => el <span data-i18n='empty_start'> pasa de #e2e8f0 a #ffffff. OBLIGATORIA: sin ella el texto seguiria casi-blanco sobre fondo oscuro (contraste roto al reves).",
+        "3 reglas nuevas => balance main.css pasa de 646/646 a 649/649."
       ],
       "criterio": [
-        "En index.html: exactamente 1 ocurrencia de 'class=\"view-content active\"' (debe ser la de #view-diario)",
-        "indexOf('data-tab=\"diario\"') < indexOf('data-tab=\"semanal\"') < indexOf('data-tab=\"mensual\"')",
-        "Presente: 'tab-btn active\" data-tab=\"diario\"'; Ausente: 'tab-btn active\" data-tab=\"semanal\"'",
-        "Presentes: '<div id=\"view-semanal\" class=\"view-content\" style=\"display:none\">', '<div id=\"view-table\" class=\"view-content\">', '<div id=\"view-diario\" class=\"view-content active\">'",
-        "Nav completo == base64 del resultado_esperado",
-        "No tocar #view-mensual (sigue con style='display:none' y class='view-content') ni #view-dashboard"
+        "Balance llaves main.css == 649 abres / 649 cierras",
+        "main.css termina EXACTAMENTE con '...span{color:#ffffff!important}' (ultima regla del append)",
+        "Cada selector nuevo aparece exactamente 1 vez al final del archivo: '#view-semanal #header-row th{' , '#view-semanal button.btn-empty-secondary{' y '#view-semanal button.btn-empty-secondary span{'",
+        "git diff --stat de main.css: solo adiciones (0 lineas con '-')",
+        "NO se edito ninguna regla existente (diff puro append)"
       ]
     },
     {
       "id": "ST-02",
-      "nombre": "main.css: append bloque v6.12 al final (regla de oro)",
-      "bloque_css_exacto": "/* v6.12: reorden pestañas, contraste semanal, tema oscuro diario */\n.bottom-nav{font-family:\"Segoe UI\",Inter,system-ui,-apple-system,sans-serif!important}\n#view-semanal .hora-cell,#view-semanal .hora-cell input,#view-semanal #header-row th,#view-semanal span,#view-semanal label{color:#e2e8f0!important;font-weight:500!important}\nbody #view-diario{background:#0f172a!important;border-color:#334155!important;color:#f8fafc!important}\nbody #view-diario .planner-notebook{background:#0f172a!important;color:#f8fafc!important}\nbody #view-diario .notebook-header{border-color:#334155!important}\nbody #view-diario .notebook-header h2{color:#f8fafc!important}\nbody #view-diario .card-section{background:#1e293b!important;border-color:#334155!important}\nbody #view-diario .section-title{color:#f8fafc!important}\nbody #view-diario .aesthetic-input,body #view-diario .aesthetic-textarea{background:#0f172a!important;border-color:#334155!important;color:#e2e8f0!important}\nbody #view-diario .routine-checkboxes{color:#e2e8f0!important}\nbody #view-diario .routine-checkboxes input[type=\"checkbox\"]{accent-color:#8b5cf6!important;color-scheme:dark!important;background:#0f172a!important}\nbody #view-diario .mood-btn,body #view-diario .cloud-btn{background:#0f172a!important;border-color:#334155!important;color:#e2e8f0!important}\nbody #view-diario .aesthetic-btn{background:#334155!important}\n",
-      "notas_selectores_reales": [
-        "Se reemplazaron los selectores muertos del usuario: .hora-col -> .hora-cell + .hora-cell input; .dia-header y .celda-header -> #header-row th (no existen en el HTML). Se mantienen span/label genericos (auditados: 5 spans estaticos + runtime del-fila/merge-indicator/span-de-th; el <a> Tutorial conserva su color inline #667eea).",
-        "Prefijo 'body ' es obligatorio: el <style> inline de #view-diario (index.html offset 37072, posterior a los <link> del head) gana a igual especificidad con !important por orden de documento. body #view-diario .X (0,1,2) supera a #view-diario .X (0,1,1); body #view-diario .notebook-header h2 (0,1,3) supera a su inline (0,1,2).",
-        "body #view-diario .card-section (0,1,2) tambien vence a los fondos pastel inline de .goals-section/.grateful-section/.affirmations-section/.morning-section (0,1,1).",
-        ".planner-notebook tiene regla global en main.css (bg #faf7f2!important, 0,1,0): hay que sobreescribirla (de ahi la regla body #view-diario .planner-notebook).",
-        "Cascada semanal: #view-semanal .hora-cell input (1,1,1) vence a .hora-cell input (0,1,1) y a .tema-estelar .hora-cell input (0,2,1); #view-semanal #header-row th (2,0,1) vence a th (0,0,1), th * (0,0,2) y .tema-estelar thead th (0,2,1); #view-semanal span (1,1,0) vence a .merge-badge (0,1,0), .del-fila (0,1,0), th * y estilos inline NO-important de los spans runtime (inline sin !important pierde contra CSS !important).",
-        "13 reglas nuevas => balance main.css pasa de 633/633 a 646/646."
+      "nombre": "Bump de versiones: v=6.13 x2 en index.html + cache v7 en sw.js",
+      "cambios": [
+        {"archivo": "index.html", "viejo": "css/main.css?v=6.12", "nuevo": "css/main.css?v=6.13", "offset": 25939, "ocurrencias": 1},
+        {"archivo": "index.html", "viejo": "js/app.js?v=6.12", "nuevo": "js/app.js?v=6.13", "offset": 65137, "ocurrencias": 1},
+        {"archivo": "sw.js", "viejo": "planify-cache-v6", "nuevo": "planify-cache-v7", "ocurrencias": 1}
       ],
       "criterio": [
-        "Balance llaves main.css == 646 abres / 646 cierras",
-        "main.css termina con '.aesthetic-btn{background:#334155!important}'",
-        "Cada selector nuevo aparece exactamente 1 vez al final del archivo (grep por 'body #view-diario{' y '#view-semanal .hora-cell')",
-        "git diff --stat de main.css: solo adiciones (sin lineas -)",
-        "NO se edito ninguna regla existente (el diff es puro append)"
+        "index.html: 'v=6.13' == 2 ocurrencias; 'v=6.12' == 0",
+        "sw.js: contiene 'planify-cache-v7'; no contiene 'planify-cache-v6'"
       ]
     },
     {
       "id": "ST-03",
-      "nombre": "Bump de versiones: v=6.12 x2 en index.html + cache v6 en sw.js",
-      "cambios": [
-        {"archivo": "index.html", "viejo": "css/main.css?v=6.11", "nuevo": "css/main.css?v=6.12", "offset": 25583, "ocurrencias": 1},
-        {"archivo": "index.html", "viejo": "js/app.js?v=6.11", "nuevo": "js/app.js?v=6.12", "offset": 64791, "ocurrencias": 1},
-        {"archivo": "sw.js", "viejo": "planify-cache-v5", "nuevo": "planify-cache-v6", "ocurrencias": 1}
-      ],
-      "criterio": [
-        "index.html: 'v=6.12' == 2 ocurrencias; 'v=6.11' == 0",
-        "sw.js: contiene planify-cache-v6; no contiene planify-cache-v5"
-      ]
-    },
-    {
-      "id": "ST-04",
       "nombre": "Verificacion integral (fail-fast)",
       "comandos_verificacion": [
         "node --check sw.js",
-        "node: balance main.css == 646/646",
-        "node (script temporal en C:\\Users\\Personal\\AppData\\Local\\Temp\\opencode, leer con readFileSync utf8): (a) nav: longitud 432 y base64 == base64 ST-01; (b) orden data-tab diario<semanal<mensual; (c) 'class=\"tab-btn active\" data-tab=\"diario\"' presente y 'data-tab=\"semanal\"' sin active; (d) 'class=\"view-content active\"' == 1 (view-diario); (e) strings de ST-01.2/1.3/1.4 presentes; (f) 'v=6.12' == 2 y 'v=6.11' == 0; (g) main.css termina con '.aesthetic-btn{background:#334155!important}'; (h) sw.js: planify-cache-v6 presente, v5 ausente",
-        "git diff --name-only (debe ser exactamente: index.html, css/main.css, sw.js => 3 archivos)",
-        "git diff --stat (solo adiciones en main.css; cambios acotados en index.html/sw.js)",
-        "grep visual: Select-String index.html 'view-content active' para confirmar unica vista activa"
+        "node: balance main.css == 649/649",
+        "node (script temporal en C:\\Users\\Personal\\AppData\\Local\\Temp\\opencode, readFileSync utf8): (a) main.css contiene los 3 selectores nuevos exactamente 1 vez y termina con 'span{color:#ffffff!important}'; (b) index.html: 'v=6.13' == 2 y 'v=6.12' == 0; (c) sw.js: planify-cache-v7 presente y planify-cache-v6 ausente",
+        "git diff --name-only (debe ser exactamente: css/main.css, index.html, sw.js => 3 archivos)",
+        "git diff --stat (main.css solo adiciones; index.html/sw.js cambios de 1 linea cada uno)"
       ],
       "criterio": "TODOS los checks deben pasar; si alguno falla, corregir solo lo indicado y repetir"
     },
     {
-      "id": "ST-05",
-      "nombre": "Commit + push",
-      "mensaje_commit": "fix: reorden de pestañas, tema oscuro en diario y contraste semanal v6.12",
+      "id": "ST-04",
+      "nombre": "Commit + push (mensaje EXACTO)",
+      "mensaje_commit": "fix: contraste de dias y boton vacio en vista semanal v6.13",
       "pasos": [
-        "git add index.html css/main.css sw.js (SOLO estos 3)",
-        "git commit -m 'fix: reorden de pestañas, tema oscuro en diario y contraste semanal v6.12'",
+        "git add css/main.css index.html sw.js (SOLO estos 3)",
+        "git commit -m 'fix: contraste de dias y boton vacio en vista semanal v6.13'",
         "git push origin HEAD"
       ],
-      "criterio": "git log -1 muestra el commit con los 3 archivos; git status limpio post-push"
+      "criterio": "git log -1 muestra exactamente el mensaje 'fix: contraste de dias y boton vacio en vista semanal v6.13' con los 3 archivos; git status limpio post-push"
     }
   ],
+  "selectores_reales_finales": [
+    "Dias semanal (texto directo del th, generado por JS en #header-row): #view-semanal #header-row th{color:#ffffff!important;font-weight:700!important}",
+    "Boton Empezar vacio (.btn-empty-secondary dentro de #view-semanal > #view-table > .empty-state#empty-state > .empty-actions): #view-semanal button.btn-empty-secondary{background:#1e293b!important;color:#ffffff!important;border:1px solid #475569!important}",
+    "Texto del boton (span data-i18n=empty_start, vence a '#view-semanal span'): #view-semanal button.btn-empty-secondary span{color:#ffffff!important}"
+  ],
   "resumen_cambios_finales": {
-    "index.html": "6 ediciones: nav reordenado (432 chars, active en Diario), #view-semanal -> inactive+display:none, #view-table -> sin .active, #view-diario -> active, v=6.11 -> v=6.12 (x2: main.css y app.js)",
-    "css/main.css": "append 13 reglas (balance 633 -> 646)",
-    "sw.js": "planify-cache-v5 -> planify-cache-v6",
+    "css/main.css": "append 3 reglas (balance 646 -> 649)",
+    "index.html": "v=6.12 -> v=6.13 (x2: css/main.css y js/app.js)",
+    "sw.js": "planify-cache-v6 -> planify-cache-v7",
+    "commit": "fix: contraste de dias y boton vacio en vista semanal v6.13",
     "total_archivos": 3
   }
 }

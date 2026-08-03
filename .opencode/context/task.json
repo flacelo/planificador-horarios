@@ -1,31 +1,37 @@
 {
-  "id": "TASK-20260801-v6.21",
-  "fase": "Fase 45 (v6.21): Sobreescritura forzada de estilos CSS para el modal de tutorial",
-  "titulo": "fix: renderizado forzado del modal tutorial con maxima especificidad y creacion dinamica v6.21",
-  "requerimiento": "La consola ejecuta el tutorial con exito (console.log v6.19 OK) pero la interfaz NO dibuja #tutorial-modal. Correccion: sobreescritura forzada CSS de maxima especificidad (3 reglas append en css/main.css) + fallback JS que crea el modal dinamicamente si no existe (createElement div). Bumps: ?v=6.20 -> ?v=6.21 (x2 en index.html), planify-cache-v14 -> v15 (sw.js).",
+  "id": "TASK-20260801-v6.22",
+  "fase": "Fase 46 (v6.22): Reubicación física del modal tutorial a document.body para evitar contenedores ocultos",
+  "titulo": "feat: teleport del modal tutorial a document.body y estructura interna renovada v6.22",
+  "requerimiento": "El modal #tutorial-modal esta dentro de un contenedor hijo que puede ocultarse (display:none), impidiendo el render. Fix: TELEPORT - mover fisicamente el modal a document.body (appendChild) al abrirlo, con estructura interna nueva. Cambios: (1) JS js/app.js: REEMPLAZAR ambas definiciones window.abrirModalTutorial (v6.21 con createElement) y window.cerrarModalTutorial (v6.19 con TUTORIAL_VISTO) por las versiones del usuario; (2) NO tocar CSS (verificar clases, no anadir); (3) Bumps: index.html ?v=6.21 -> ?v=6.22 (x2), sw.js planify-cache-v15 -> v16.",
   "estado": "planificado",
   "creado": "2026-08-03",
-  "head_actual": "ac27ad4",
+  "head_actual": "dbe3ea6",
   "rama": "main (arbol limpio: git status --short vacio)",
   "verificacion_pre": [
     "git status --short -> limpio (sin salida)",
-    "git log --oneline -3 -> HEAD ac27ad4 'fix: overlay tutorial visible con z-index prioritario y reglas .active robustas v6.20'",
-    "js/app.js: longitud 137563; 1 unica ocurrencia de 'window.abrirModalTutorial=function' (start=63656); definicion exacta de 342 chars (start 63656, end 63998) terminada en '...no encontrado\")}' seguida EXACTAMENTE de ',window.cerrarModalTutorial' (SIN punto y coma)",
-    "js/app.js: call-sites de abrirModalTutorial = 2: (1) la definicion @63656, (2) delegacion @64521 'document.addEventListener(\"click\",function(e){if(e.target.closest('#tutorial-btn,[data-action=\"open-tutorial\"],.btn-tutorial'))window.abrirModalTutorial(e);...' -> NO se toca",
-    "index.html: onclick inline en #tutorial-btn @29141 'onclick=\"window.abrirModalTutorial && window.abrirModalTutorial(event)\"' -> NO se toca",
-    "index.html: el modal YA existe en el DOM '<div class=\"modal-overlay hidden\" id=\"tutorial-modal\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Tutorial guiado\">' con modal-card modal-lg, header (modal-title '📖 Tutorial rápido' + close-btn #close-tutorial-btn), 4 div.tutorial-paso y footer con #tutorial-got-it-btn (1 unica aparicion de 'tutorial-modal' en index.html)",
-    "css/main.css: longitud 82752; balance llaves 720/720; termina EXACTAMENTE en '...box-shadow:0 25px 50px -12px rgba(0,0,0,.7)!important;position:relative!important;z-index:1000000!important}' (bloque v6.20)",
-    "css/main.css: NO contiene 'div#tutorial-modal' ni '2147483647'; maximo z-index actual en el archivo = 1000000 (NOTA: el usuario afirmo 999999 pero existe z-index:1000000 del bloque v6.20)",
-    "index.html: '?v=6.20' x2 en posiciones 28682 (css/main.css?v=6.20) y 69857 (js/app.js?v=6.20)",
-    "sw.js: 'planify-cache-v14' x1 en 'const CACHE=\"planify-cache-v14\"'",
-    "Typo CSS 'justify-space-between': NO existe en el repo (verificado en index.html, js/app.js, css/main.css, css/panel.css, css/dashboard.css, css/grid.css -> todos -1). El typo solo aparece en el snippet de fallback propuesto por el usuario. DECISION: corregirlo a 'justify-content:space-between' en el innerHTML del fallback (es fallback solo si el modal no existe en HTML)."
+    "git log --oneline -3 -> HEAD dbe3ea6 'fix: renderizado forzado del modal tutorial con maxima especificidad y creacion dinamica v6.21' (padres: ac27ad4 v6.20, 0d1f637 v6.19)",
+    "js/app.js (1 linea minificada): 1 unica ocurrencia de 'window.abrirModalTutorial=function' (start=63656, def 1548 chars, end=65203, balance llaves depth 0 confirmado: el innerHTML NO contiene '{' ni '}' -> el unico cierre es el final de la funcion) seguida EXACTAMENTE de ',window.cerrarModalTutorial' (SIN punto y coma)",
+    "js/app.js: 1 unica ocurrencia de 'window.cerrarModalTutorial=function' (start=65205, def 387 chars, end=65591) seguida de ',document.addEventListener(\"click\",function(e){...' -> la delegacion global click NO se toca",
+    "js/app.js: call-sites de abrirModalTutorial = 2: (1) la definicion @63656, (2) delegacion @65785 'if(e.target.closest('#tutorial-btn,[data-action=\"open-tutorial\"],.btn-tutorial'))window.abrirModalTutorial(e);else{var a=document.getElementById(\"tutorial-modal\");(e.target.closest(\"#close-tutorial-btn,#tutorial-got-it-btn\")||e.target===a)&&window.cerrarModalTutorial(e)}' -> NO se toca. REQUISITO: el nuevo innerHTML DEBE contener los ids #close-tutorial-btn y #tutorial-got-it-btn para que la delegacion siga cerrando",
+    "js/app.js: keydown Escape @66013 'if(\"Escape\"===e.key){var a=document.getElementById(\"tutorial-modal\");a&&a.classList.contains(\"active\")...' -> NO se toca",
+    "TUTORIAL_VISTO en js/app.js = 3 ocurrencias TOTALES: (1) @606 constante CONFIG.STORAGE.TUTORIAL_VISTO:\"horario_tutorial_visto\"; (2) @65500 setItem dentro de cerrarModalTutorial v6.19; (3) @113704 setItem dentro de cerrarTutorial() LEGACY de la vista #tutorial (tour antiguo, distinto de #tutorial-modal). CONFIRMADO: NO existe NINGUN localStorage.getItem(CONFIG.STORAGE.TUTORIAL_VISTO) en app.js, index.html (0) ni sw.js (0) -> el auto-open fue eliminado en v6.17 y TUTORIAL_VISTO solo se ESCRIBE, nunca se LEE. DECISION REGISTRADA: omitir el setItem en la nueva cerrarModalTutorial es INOCUO; seguir la spec del usuario literal (sin setItem). El setItem de cerrarTutorial() legacy NO se toca (otro componente).",
+    "index.html: onclick inline en #tutorial-btn @29484-29513 'onclick=\"window.abrirModalTutorial && window.abrirModalTutorial(event)\"' (2 matches = el mismo onclick partido por '&&'; 1 solo call-site) -> NO se toca",
+    "index.html: el modal HTML viejo '@68073' '<div class=\"modal-overlay hidden\" id=\"tutorial-modal\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Tutorial guiado\"><div class=\"modal-card modal-lg\">...' con #close-tutorial-btn y #tutorial-got-it-btn -> queda como fallback; el nuevo innerHTML lo sobreescribe en cada apertura (aceptado)",
+    "css/main.css: balance llaves 723/723 (sin cambios desde v6.21). Existencia de clases del NUEVO innerHTML: EXISTEN .modal-header (1), .close-btn (2), .modal-footer (1), .btn-primary (12), .modal-card (4), .modal-lg (1). FALTAN (0 matches): .modal-title-group, .modal-icon, .tutorial-body, .tutorial-steps, .tutorial-step, .step-badge, .highlight-step -> estas 7 quedaran SIN ESTILO (reportar en riesgos; NO anadir CSS, decision del usuario)",
+    "index.html: '?v=6.21' x2 (css/main.css?v=6.21 y js/app.js?v=6.21); sw.js: 'planify-cache-v15' x1 en 'const CACHE=\"planify-cache-v15\"'",
+    "package.json: scripts disponibles 'check' (node --check js/app.js) y 'build' (node scripts/build.js) para verificacion post"
   ],
   "anclas": {
-    "def_abrirModalTutorial_actual_LITERAL": "window.abrirModalTutorial=function(e){e&&(e.preventDefault(),e.stopPropagation());var a=document.getElementById(\"tutorial-modal\");a?(a.classList.remove(\"hidden\"),a.classList.add(\"active\"),a.setAttribute(\"aria-hidden\",\"false\"),console.log(\"[PLANIFY v6.19] ✅ Tutorial abierto\")):console.error(\"[PLANIFY v6.19] ❌ #tutorial-modal no encontrado\")}",
-    "def_abrirModalTutorial_notas": "IMPORTANTE: la definicion real usa forma TERNARIA (a?(...):console.error(...)) y NO la forma if/else descrita por el usuario. El reemplazo debe buscar este texto EXACTO de 342 chars (1 sola ocurrencia verificada). Despues de la def sigue ',window.cerrarModalTutorial' SIN punto y coma: no incluir ';' en la busqueda.",
-    "css_final_actual": "z-index:1000000!important}",
-    "contexto_pre_def": "setTimeout(iniciarTourInteractivo,CONFIG.TIME.TUTORIAL_INICIO||1e3),",
-    "contexto_post_def": ",window.cerrarModalTutorial=function(e){e&&(e.preventDefault()"
+    "def_abrirModalTutorial_actual_LITERAL": "window.abrirModalTutorial=function(e){e&&(e.preventDefault(),e.stopPropagation());var a=document.getElementById(\"tutorial-modal\");a?(a.classList.remove(\"hidden\"),a.classList.add(\"active\")):((a=document.createElement(\"div\")).id=\"tutorial-modal\",a.className=\"modal-overlay active\",a.innerHTML='<div class=\"modal-card modal-lg\"><header class=\"modal-header\" style=\"display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid #334155;\"><h3 style=\"margin:0;color:#fff;\">🚀 Bienvenido a PLANIFY — Guía de Uso</h3><button onclick=\"window.cerrarModalTutorial(event)\" style=\"background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;\">&times;</button></header><div class=\"modal-body\" style=\"padding:24px;color:#e2e8f0;\"><p><strong>1. Vista Diario/Notas:</strong> Configura tus hábitos, rutina y tareas diarias.</p><p><strong>2. Vista Semanal:</strong> Toca celdas para agregar horarios y compromisos por hora.</p><p><strong>3. Vista Mensual:</strong> Revisa la panorámica de eventos de todo el mes.</p><p><strong>4. Modo Claro/Oscuro:</strong> Usa el botón ☀️/🌙 del header para cambiar de tema.</p></div><footer style=\"padding:16px 24px;text-align:right;border-top:1px solid #334155;\"><button onclick=\"window.cerrarModalTutorial(event)\" style=\"background:#0284c7;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-weight:600;cursor:pointer;\">¡Entendido, comenzar!</button></footer></div>',document.body.appendChild(a)),console.log(\"[PLANIFY v6.21] ✅ Modal visibilizado correctamente.\")}",
+    "def_abrirModalTutorial_notas": "TEXTO REAL extraido con node del archivo (post-build ya minificado, forma TERNARIA a?(...):(...)). Contiene '&times;' y '—' (em dash U+2014) literales. La def completa (1548 chars) termina en 'visibilizado correctamente.\")}' seguida de ',window.cerrarModalTutorial' SIN punto y coma. El innerHTML NO contiene '{' ni '}' (balance llaves = 1 solo nivel). El reemplazo debe buscar este texto EXACTO (1 unica ocurrencia verificada @63656) y NO la forma if/else.",
+    "def_cerrarModalTutorial_actual_LITERAL": "window.cerrarModalTutorial=function(e){e&&(e.preventDefault(),e.stopPropagation());var a=document.getElementById(\"tutorial-modal\");a&&a.classList.contains(\"active\")&&(a.classList.add(\"hidden\"),a.classList.remove(\"active\"),a.setAttribute(\"aria-hidden\",\"true\"),localStorage.setItem(CONFIG.STORAGE.TUTORIAL_VISTO,\"1\"),console.log(\"[PLANIFY v6.19] ✅ Tutorial cerrado y marcado como visto\"))}",
+    "def_cerrarModalTutorial_notas": "TEXTO REAL extraido con node (387 chars, v6.19). Termina en 'marcado como visto\"))}' seguida de ',document.addEventListener(\"click\",function(e){...'. Contiene stopPropagation y localStorage.setItem(CONFIG.STORAGE.TUTORIAL_VISTO,\"1\") que la version nueva del usuario ELIMINA (inocuo: 0 getItem en todo el repo).",
+    "nueva_abrirModalTutorial_1linea": "window.abrirModalTutorial=function(e){e&&(e.preventDefault(),e.stopPropagation());var modal=document.getElementById(\"tutorial-modal\");if(!modal){modal=document.createElement(\"div\");modal.id=\"tutorial-modal\";document.body.appendChild(modal)}else if(modal.parentElement!==document.body){document.body.appendChild(modal)}modal.className=\"modal-overlay active\";modal.setAttribute(\"aria-hidden\",\"false\");modal.innerHTML='<INNERHTML_NUEVO>';console.log(\"[PLANIFY v6.22] ✅ Modal reubicado en <body> y visibilizado.\")}",
+    "nueva_cerrarModalTutorial_1linea": "window.cerrarModalTutorial=function(e){if(e)e.preventDefault();var modal=document.getElementById(\"tutorial-modal\");if(modal){modal.classList.add(\"hidden\");modal.classList.remove(\"active\");modal.setAttribute(\"aria-hidden\",\"true\")}}",
+    "template_innerHTML_nuevo": "'<div class=\"modal-card modal-lg\"><header class=\"modal-header\"><div class=\"modal-title-group\"><span class=\"modal-icon\">🚀</span><h3 class=\"modal-title\">Bienvenido a PLANIFY — Guía de Uso</h3></div><button type=\"button\" class=\"close-btn\" id=\"close-tutorial-btn\" aria-label=\"Cerrar tutorial\" onclick=\"window.cerrarModalTutorial(event)\">✕</button></header><div class=\"modal-body tutorial-body\"><div class=\"tutorial-step\"><span class=\"step-badge\">1</span><p><strong>📝 Vista Diario/Notas:</strong> Registra tu Salud y Ánimo, Prioridades y Gratitud.</p></div><div class=\"tutorial-step\"><span class=\"step-badge\">2</span><p><strong>📅 Vista Semanal:</strong> Celdas interactivas y etiquetas pastel por categoría.</p></div><div class=\"tutorial-step\"><span class=\"step-badge\">3</span><p><strong>🗓️ Vista Mensual:</strong> Panorámica del mes y navegación entre meses.</p></div><div class=\"tutorial-step highlight-step\"><span class=\"step-badge\">4</span><p><strong>⚙️ Personalización y Modo Offline:</strong> Tema Claro/Oscuro ☀️/🌙 y PWA offline.</p></div></div><footer class=\"modal-footer\"><button type=\"button\" class=\"btn-primary\" id=\"tutorial-got-it-btn\" onclick=\"window.cerrarModalTutorial(event)\">¡Entendido, comenzar a organizar!</button></footer></div>'",
+    "template_innerHTML_notas": "REFERENCIA de implementacion que cumple la spec del usuario: header .modal-header con .modal-title-group/.modal-icon 🚀/.close-btn ✕ (onclick cerrarModalTutorial); .modal-body.tutorial-body con 4 .tutorial-step (1 📝 Vista Diario/Notas - Salud y Animo/Prioridades/Gratitud; 2 📅 Vista Semanal - Celdas Interactivas/Etiquetas Pastel; 3 🗓️ Vista Mensual - panoramica y navegacion entre meses; 4 .highlight-step ⚙️ Personalizacion y Modo Offline - Tema Claro/Oscuro ☀️/🌙 y PWA offline); footer .modal-footer con .btn-primary '¡Entendido, comenzar a organizar!'. OBLIGATORIO: conservar id=\"close-tutorial-btn\" en el ✕ y id=\"tutorial-got-it-btn\" en el boton footer (enganchan la delegacion global click @65785 que NO se toca). Delimitador del string: COMILLAS SIMPLES (los atributos usan comillas dobles).",
+    "contexto_post_abrir": ",window.cerrarModalTutorial=function(e){e&&(e.preventDefault()",
+    "contexto_post_cerrar": ",document.addEventListener(\"click\",function(e){if(e.target.closest('#tutorial-btn,[data-action=\"open-tutorial\"],.btn-tutorial'))window.abrirModalTutorial(e);else{var a=document.getElementById(\"tutorial-modal\");(e.target.closest(\"#close-tutorial-btn,#tutorial-got-it-btn\")||e.target===a)&&window.cerrarModalTutorial(e)}}),"
   },
   "pasos": [
     {
@@ -33,53 +39,47 @@
       "descripcion": "Verificacion pre-cambio (fail-fast)",
       "comandos": [
         "git status --short (esperado: vacio)",
-        "git log --oneline -3 (esperado HEAD ac27ad4)",
-        "node -e contar ocurrencias de 'window.abrirModalTutorial=function' (esperado: 1, start 63656) y verificar sufijo ',window.cerrarModalTutorial' (sin ';')",
-        "node -e balance llaves css/main.css (esperado 720/720) y final 'z-index:1000000!important}'",
-        "grep '?v=6.20' index.html (esperado x2) y 'planify-cache-v14' sw.js (esperado x1)"
+        "git log --oneline -3 (esperado HEAD dbe3ea6 v6.21)",
+        "node -e contar 'window.abrirModalTutorial=function' (esperado: 1, start 63656) y 'window.cerrarModalTutorial=function' (esperado: 1, start 65205)",
+        "node -e balance llaves css/main.css (esperado 723/723, SIN cambios este fix: solo JS + bumps)",
+        "node -e '?v=6.21' index.html (esperado x2) y 'planify-cache-v15' sw.js (esperado x1)"
       ]
     },
     {
       "id": "ST-02",
-      "descripcion": "CSS css/main.css - APPEND al final de 3 reglas minificadas (balance 720+3=723/723). Archivo sin newline final significativo: usar lectura+append (codificacion UTF-8 sin BOM).",
-      "append_exacto": "div#tutorial-modal.hidden,div#tutorial-modal:not(.active){display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}div#tutorial-modal.active{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;background-color:rgba(15,23,42,.92)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;z-index:2147483647!important;align-items:center!important;justify-content:center!important;padding:20px!important;box-sizing:border-box!important}div#tutorial-modal .modal-card{background-color:#1e293b!important;border:1px solid #334155!important;color:#f8fafc!important;border-radius:12px!important;max-width:680px!important;width:100%!important;max-height:85vh!important;overflow-y:auto!important;box-shadow:0 25px 50px -12px rgba(0,0,0,.8)!important;margin:auto!important}",
-      "verificacion": "node -e balance (esperado 723/723); grep 'div#tutorial-modal' (esperado presente, 3 selectores); grep '2147483647' (esperado presente)"
+      "descripcion": "JS js/app.js - REEMPLAZAR la definicion EXACTA de window.abrirModalTutorial (v6.21, 1548 chars, ver anclas.def_abrirModalTutorial_actual_LITERAL) por la version v6.22 con teleport (ver anclas.nueva_abrirModalTutorial_1linea sustituyendo <INNERHTML_NUEVO> por el template del ancla.template_innerHTML_nuevo, en 1 linea, delimitador comillas simples). Archivo 1 linea minificada: usar script node -e con String.replace (indexOf + slice) y verificar conteo ===1 antes y despues (fallar si no es 1).",
+      "verificacion": [
+        "node -e: conteo 'window.abrirModalTutorial=function' == 1; la nueva def contiene 'parentElement!==document.body', 'v6.22', 'tutorial-body', 'highlight-step' y NO contiene 'v6.21' ni 'visibilizado correctamente'",
+        "node --check js/app.js (o npm run check)"
+      ]
     },
     {
       "id": "ST-03",
-      "descripcion": "JS js/app.js - REEMPLAZAR la definicion EXACTA de 342 chars (ver anclas.def_abrirModalTutorial_actual_LITERAL) por la nueva version v6.21. El archivo es 1 linea minificada: usar script node -e con String.replace y verificar conteo ===1 antes y despues (fallar si no es 1).",
-      "nueva_definicion": "window.abrirModalTutorial=function(e){e&&(e.preventDefault(),e.stopPropagation());var a=document.getElementById(\"tutorial-modal\");if(a){a.classList.remove(\"hidden\");a.classList.add(\"active\");a.setAttribute(\"aria-hidden\",\"false\")}else{var m=document.createElement(\"div\");m.id=\"tutorial-modal\";m.className=\"modal-overlay active\";m.setAttribute(\"role\",\"dialog\");m.setAttribute(\"aria-modal\",\"true\");m.setAttribute(\"aria-label\",\"Tutorial guiado\");m.style.cssText=\"position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background-color:rgba(15,23,42,.92);padding:20px;box-sizing:border-box\";m.innerHTML='<div class=\"modal-card modal-lg\"><div class=\"modal-header\" style=\"display:flex;justify-content:space-between;align-items:center\"><h3 class=\"modal-title\">🚀 Bienvenido a PLANIFY — Guía de Uso</h3><button type=\"button\" class=\"close-btn\" id=\"close-tutorial-btn\" aria-label=\"Cerrar tutorial\" onclick=\"window.cerrarModalTutorial(event)\">&times;</button></div><div class=\"modal-body\"><div class=\"tutorial-paso\"><div class=\"paso-icon\">📅</div><div><p class=\"paso-titulo\">1. Vista Diario/Notas</p><p class=\"paso-texto\">Haz clic en una celda para registrar tu actividad del día y añade notas personales.</p></div></div><div class=\"tutorial-paso\"><div class=\"paso-icon\">🗓️</div><div><p class=\"paso-titulo\">2. Vista Semanal</p><p class=\"paso-texto\">Organiza tu semana completa, arrastra bloques y marca tus metas diarias.</p></div></div><div class=\"tutorial-paso\"><div class=\"paso-icon\">📆</div><div><p class=\"paso-titulo\">3. Vista Mensual</p><p class=\"paso-texto\">Visualiza el mes entero para planificar a largo plazo y detectar huecos libres.</p></div></div><div class=\"tutorial-paso\"><div class=\"paso-icon\">🌓</div><div><p class=\"paso-titulo\">4. Modo Claro/Oscuro</p><p class=\"paso-texto\">Alterna entre tema claro y oscuro con el botón ☀️/🌙 para tu comodidad.</p></div></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn-primary\" id=\"tutorial-got-it-btn\" onclick=\"window.cerrarModalTutorial(event)\">¡Entendido, comenzar!</button></div></div>';document.body.appendChild(m)}console.log(\"[PLANIFY v6.21] ✅ Modal visibilizado correctamente.\")}",
-      "notas_implementacion": [
-        "innerHTML del fallback delimitado con COMILLAS SIMPLES (las atributos internos usan comillas dobles) - mismo patron que el existente '#tutorial-btn,[data-action=\"open-tutorial\"],.btn-tutorial' en el archivo",
-        "El typo del usuario 'justify-space-between' en el header inline del fallback SE CORRIGE a 'justify-content:space-between' (decision registrada)",
-        "Emoji 🚀 y caracteres UTF-8 (—, í) directos en el string: seguros, el archivo ya contiene emojis (✅ ❌ 📖). Alternativa valida: \\u{1F680}",
-        "Los selectores #close-tutorial-btn y #tutorial-got-it-btn del innerHTML dinamico enganchan con la delegacion existente (e.target.closest('#close-tutorial-btn,#tutorial-got-it-btn')) y con e.target===a (overlay) -> cerrarModalTutorial funciona sin cambios",
-        "cerrarModalTutorial NO se modifica (sigue console.log v6.19 - aceptado)",
-        "Las clases tutorial-paso/paso-icon/paso-titulo/paso-texto ya existen en CSS (heredan estilos del modal HTML actual)"
-      ],
+      "descripcion": "JS js/app.js - REEMPLAZAR la definicion EXACTA de window.cerrarModalTutorial (v6.19, 387 chars, ver anclas.def_cerrarModalTutorial_actual_LITERAL) por la version v6.22 del usuario (ver anclas.nueva_cerrarModalTutorial_1linea: if(e)e.preventDefault(); sin stopPropagation, sin setItem TUTORIAL_VISTO, sin console.log). Mismo metodo node con conteo ===1.",
       "verificacion": [
-        "node -e: conteo 'window.abrirModalTutorial=function' == 1; la nueva def contiene 'createElement' y 'v6.21' y 'justify-content:space-between'",
-        "grep 'v6.19' en la zona de abrirModalTutorial (debe quedar solo en cerrarModalTutorial)"
+        "node -e: conteo 'window.cerrarModalTutorial=function' == 1; la nueva def contiene 'classList.add(\"hidden\")' y NO contiene 'TUTORIAL_VISTO' ni 'v6.19'",
+        "node -e: CONFIG.STORAGE.TUTORIAL_VISTO queda con 2 ocurrencias totales (constante @606 + setItem en cerrarTutorial() legacy @113704) - el setItem legacy NO se toca",
+        "node --check js/app.js (o npm run check)"
       ]
     },
     {
       "id": "ST-04",
-      "descripcion": "Bumps de version",
+      "descripcion": "Bumps de version (sin otros cambios)",
       "cambios": [
-        "index.html pos 28682: 'css/main.css?v=6.20' -> 'css/main.css?v=6.21'",
-        "index.html pos 69857: 'js/app.js?v=6.20' -> 'js/app.js?v=6.21'",
-        "sw.js: 'const CACHE=\"planify-cache-v14\"' -> 'const CACHE=\"planify-cache-v15\"'"
+        "index.html: 'css/main.css?v=6.21' -> 'css/main.css?v=6.22' (1er bump)",
+        "index.html: 'js/app.js?v=6.21' -> 'js/app.js?v=6.22' (2do bump)",
+        "sw.js: 'const CACHE=\"planify-cache-v15\"' -> 'const CACHE=\"planify-cache-v16\"'"
       ],
-      "verificacion": "grep '?v=6.21' index.html == x2 y '?v=6.20' == x0; grep 'planify-cache-v15' sw.js == x1 y 'planify-cache-v14' == x0"
+      "verificacion": "node -e '?v=6.22' index.html == x2 y '?v=6.21' == x0; 'planify-cache-v16' sw.js == x1 y 'planify-cache-v15' == x0"
     },
     {
       "id": "ST-05",
       "descripcion": "Verificacion post-cambio completa",
       "comandos": [
-        "node --check js/app.js (script 'check' del package.json: 'node --check js/app.js')",
+        "node --check js/app.js (script 'check' del package.json)",
         "npm run build (scripts/build.js) - debe terminar sin errores",
-        "RE-VERIFY post-build: balance css/main.css 723/723; grep 'div#tutorial-modal' presente; grep '2147483647' presente (x1 en CSS y x2 en app.js fallback); grep '?v=6.21' x2; grep 'planify-cache-v15' x1",
-        "git status --short (solo index.html, js/app.js, css/main.css, sw.js modificados; sin archivos sorpresa)",
+        "RE-VERIFY post-build: balance css/main.css 723/723 (SIN cambios vs v6.21); '?v=6.22' x2; 'planify-cache-v16' x1; 'parentElement!==document.body' presente x1; 'TUTORIAL_VISTO' en app.js == 2 ocurrencias (constante + legacy cerrarTutorial); 'v6.22' presente",
+        "git status --short (solo index.html, js/app.js, sw.js modificados; css/main.css NO debe aparecer; sin archivos sorpresa)",
         "git diff --stat para confirmar alcance",
         "NO ejecutar git commit salvo orden explicita del usuario"
       ]
@@ -87,30 +87,30 @@
     {
       "id": "ST-06",
       "descripcion": "Commit propuesto (solo proposicion, no ejecutar sin orden)",
-      "mensaje": "fix: renderizado forzado del modal tutorial con maxima especificidad y creacion dinamica v6.21"
+      "mensaje": "feat: teleport del modal tutorial a document.body y estructura interna renovada v6.22"
     }
   ],
   "riesgos_implementador": [
-    "(a) innerHTML dinamico con atributos en comillas dobles -> el string JS debe usar comillas simples como delimitador (patron ya usado en el archivo)",
-    "(b) Emoji 🚀 y unicode en script Node: usar string directo UTF-8 (el archivo ya contiene ✅❌📖) o \\u{1F680}; evitar escapes corruptos por consola Windows",
-    "(c) La regla nueva 'div#tutorial-modal:not(.active)' es mas especifica que '.modal-overlay.hidden' v6.20 y queda al final del archivo -> gana en cascada",
-    "(d) z-index 2147483647 sobrepasa todo; el maximo actual del repo es 1000000 (main.css v6.20) - NO existe nada superior hoy",
-    "(e) cerrarModalTutorial NO cambia (console.log v6.19) - aceptado; su delegacion sigue cerrando tanto el modal HTML existente como el dinamico (mismos selectores de cierre)",
-    "(f) El texto real de la definicion es TERNARIO (a?(...):...): el implementor NO debe buscar la forma if/else que describio el usuario - no habria match. Usar el literal de 342 chars verificado (anclas)",
-    "(g) La definicion termina en '...no encontrado\")}' y es seguida por ',window.cerrarModalTutorial' (SIN ';'): al reemplazar, conservar la coma; no insertar ';'",
-    "(h) app.js es 1 linea de 137563 chars: usar reemplazo por script node con conteo exacto (===1) antes/despues, no edicion manual por lineas",
-    "(i) El modal YA existe en index.html con clase 'hidden' -> el camino normal en v6.21 es remove('hidden')+add('active'); el createElement es SOLO fallback defensivo",
-    "(j) Archivos minificados UTF-8: preservar codificacion sin BOM en escrituras (PowerShell Set-Content -Encoding utf8 en PS5.1 escribe BOM: usar node fs.writeFileSync utf8 para CSS/JS/sw.js)",
-    "(k) La regla hidden agrega visibility:hidden!important y pointer-events:none!important: no rompe el resto del overlay base (.modal-overlay) porque se limita al id #tutorial-modal"
+    "(a) innerHTML con atributos en comillas dobles -> el string JS debe usar comillas simples como delimitador (patron ya usado en el archivo v6.21). CUIDADO: el template contiene '—' (em dash) y emojis UTF-8 -> mantener literal UTF-8 o \\u{...} valido",
+    "(b) El ancla A es el TEXTO REAL post-build (forma TERNARIA a?(...):(...), con &times; y —): el implementador NO debe buscar la forma if/else descrita por el usuario originalmente; usar el literal verificado de 1548 chars (1 sola ocurrencia @63656)",
+    "(c) La nueva cerrarModalTutorial NO setea TUTORIAL_VISTO (la v6.19 si): INOCUO, verificado - 0 getItem en todo el repo (auto-open eliminado en v6.17). La unica lectura teorica futura seria el legacy cerrarTutorial() @113704 que sigue escribiendo la constante (NO se toca)",
+    "(d) El modal HTML original en index.html (modal-card modal-lg con contenido viejo) queda como fallback estatico; el innerHTML nuevo lo sobreescribe en CADA apertura (aceptado). El teleport mueve el nodo existente a body; className=\"modal-overlay active\" limpia la clase hidden",
+    "(e) z-index: los bloques CSS v6.20/v6.21 (max z-index 2147483647/1000000) ya cubren display flex/active/hidden -> el teleport NO requiere CSS nuevo. NO anadir CSS (decision del usuario)",
+    "(f) 7 clases del nuevo innerHTML NO existen en main.css: .modal-title-group, .modal-icon, .tutorial-body, .tutorial-steps, .tutorial-step, .step-badge, .highlight-step -> quedaran SIN estilo (el modal usara los estilos base .modal-card/.modal-header/.modal-body/.close-btn/.btn-primary/.modal-footer existentes + inline del CSS v6.20/6.21). Reportar al usuario; NO anadir CSS salvo orden explicita",
+    "(g) La nueva cerrarModalTutorial ELIMINA stopPropagation (la v6.19 lo tenia): al hacer click en ✕ o en el boton footer, el evento seguira propagando a la delegacion global click @65785, que llamara cerrarModalTutorial una 2da vez via e.target.closest('#close-tutorial-btn,#tutorial-got-it-btn'). La doble llamada es IDEMPOTENTE (add hidden + remove active + aria-hidden true) -> inofensiva; NO requiere cambios en la delegacion",
+    "(h) Balance llaves JS: verificar con node --check tras ambos reemplazos (el innerHTML nuevo NO contiene '{' ni '}' - usar solo texto plano en el HTML)",
+    "(i) app.js es 1 linea de ~137KB: usar reemplazo por script node con conteo exacto (===1) antes/despues, no edicion manual por lineas; preservar UTF-8 sin BOM (node fs.writeFileSync utf8, NO Set-Content de PowerShell PS5.1 que anade BOM)",
+    "(j) Los ids #close-tutorial-btn y #tutorial-got-it-btn del nuevo innerHTML son OBLIGATORIOS: la delegacion global @65785 (NO se toca) cierra el modal SOLO si el click cae en esos selectores o en el overlay (e.target===a). Si el implementador omite los ids, el cierre por delegacion se rompe (el onclick inline seguiria funcionando, pero perderiamos robustez y el cierre por click en overlay)",
+    "(k) sw.js bump v15->v16 fuerza re-cache PWA del app.js nuevo (sin el bump, el SW servira la version vieja cacheada con el modal roto)"
   ],
   "verificacion_post": [
     "node --check js/app.js OK",
     "npm run build OK (sin errores)",
-    "css/main.css balance 723/723 y termina en '...margin:auto!important}'",
-    "index.html: '?v=6.21' x2; '?v=6.20' x0",
-    "sw.js: 'planify-cache-v15' x1; 'planify-cache-v14' x0",
-    "js/app.js: 'v6.21' presente en abrirModalTutorial; 'window.abrirModalTutorial=function' x1",
-    "git status --short limitado a 4 archivos: index.html, js/app.js, css/main.css, sw.js"
+    "css/main.css balance 723/723 (SIN cambios - git status NO debe listarlo)",
+    "index.html: '?v=6.22' x2; '?v=6.21' x0",
+    "sw.js: 'planify-cache-v16' x1; 'planify-cache-v15' x0",
+    "js/app.js: 'window.abrirModalTutorial=function' x1 con 'parentElement!==document.body' y 'v6.22'; 'window.cerrarModalTutorial=function' x1 SIN 'TUTORIAL_VISTO'; 'TUTORIAL_VISTO' total == 2 (constante CONFIG @606 + legacy cerrarTutorial @113704)",
+    "git status --short limitado a 3 archivos: index.html, js/app.js, sw.js"
   ],
-  "commit_propuesto": "fix: renderizado forzado del modal tutorial con maxima especificidad y creacion dinamica v6.21"
+  "commit_propuesto": "feat: teleport del modal tutorial a document.body y estructura interna renovada v6.22"
 }

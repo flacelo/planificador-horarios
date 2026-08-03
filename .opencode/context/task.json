@@ -1,225 +1,156 @@
 {
-  "task": "TASK-20260801-v6.16",
-  "replaces": "v6.15",
-  "titulo": "Conmutador de tema Claro/Oscuro en header (boton circular top-right, persistencia planify_theme, paleta clara en main.css, sync con panel) + bumps v6.16/v10",
-  "tipo": "edicion quirurgica index.html (2 inserciones) + js/app.js (3 funciones: toggleDarkMode delegada, toggleTheme nueva, initDarkMode restore, forzarEstiloCabeceras theme-aware) + main.css append 37 reglas claras + bumps + commit/push exacto",
-  "head": "65bfec5 (v6.15, base verificada: git limpio, main.css 653/653, v=6.15 x2 en index.html, planify-cache-v9 en sw.js)",
+  "task": "TASK-20260801-v6.17",
+  "replaces": "v6.16",
+  "titulo": "Fase 41 (v6.17): Reparacion del trigger del boton Tutorial + nuevo modal de tutorial guiado paso a paso (4 pasos)",
+  "tipo": "index.html: 2 ediciones (id en boton real + insercion modal nuevo) ; js/app.js: 2 ediciones (remocion auto-open muerto + bloque JS nuevo abrirTutorialGuiado/initTutorialEvents) ; css/main.css: append 16 reglas scoped a #tutorial-modal ; bumps v=6.17 x2 + cache v11 ; commit/push exacto",
+  "head": "89c7ae6 (v6.16, base verificada: git limpio, main.css 691/691, v=6.16 x2 en index.html, planify-cache-v10 en sw.js)",
   "git_limpio": true,
   "archivos_a_modificar": ["index.html", "js/app.js", "css/main.css", "sw.js"],
-  "regla_de_oro": "SOLO los cambios listados. index.html: 2 inserciones + 2 bumps v. app.js: 3 reemplazos de funcion (cada texto viejo = 1 match unico). main.css: SOLO append al final (1 linea minificada, 37 reglas). sw.js: SOLO planify-cache-v9 -> planify-cache-v10. NO tocar nada mas (ni panel.css, ni optimize-a11y.js, ni server.js).",
+  "regla_de_oro": "SOLO los cambios listados. index.html: 2 ediciones (ancla boton + ancla fin modal-evento) + 2 bumps v. app.js: 2 reemplazos (cada texto viejo = 1 match unico). main.css: SOLO append al final (1 linea minificada, 16 reglas, TODO scoped a #tutorial-modal). sw.js: SOLO planify-cache-v10 -> planify-cache-v11. NO tocar: .tutorial-overlay viejo (HTML ni CSS ni JS mostrarTutorial/cerrarTutorial/pasoTutorial/renderTutorialProgress), cadenas Escape (offset 62960) y click-outside (offset 63367), iniciarTourInteractivo (offset 119240, clave horario_tour_visto), optimize-a11y.js, panel.css, dashboard.css, grid.css, server.js.",
   "investigacion_clave": {
-    "A_header": {
-      "estructura": "<body class=\"tema-estelar\"><div class=\"app licenciado\" id=\"app\"><h1 id=\"main-title\" title=\"Haz clic 5 veces para modo admin\">PLANIFY</h1><div class=\"side-overlay\"...>",
-      "offsets_index_html": {
-        "<body class=\"tema-estelar\">": 27586,
-        "h1#main-title inicio": 27253,
-        "</h1>": 27313,
-        "ancla_insercion": "</h1><div class=\"side-overlay\" id=\"side-overlay\" onclick=\"togglePanel()\" aria-hidden=\"true\"></div> (1 match, offset 27313)"
-      },
-      "estilos": [
-        ".app{position:relative} (main.css, SIN !important) => posicionamiento absolute del boton OK.",
-        ".app base: max-width:1100px;margin:0 auto;padding:28px 26px;bg rgba(255,255,255,0.95); v6.11 #app,.app{overflow:visible!important} => NO hay overflow hidden que corte el boton.",
-        "h1#main-title: text-align:center!important;font-size:1.8em!important;color:#1e293b!important (base) y body.tema-estelar h1#main-title{color:#64ffda!important} (scoped).",
-        ".cloud-btn es la pestaña vertical FIJA del borde IZQUIERDO (panel.css position:fixed;left:0;top:50%) => esquina superior derecha de #app esta LIBRE (sin ocupantes)."
-      ],
-      "decision_insercion": "Insertar <button id=\"btn-tema\"> como hijo directo de #app, INMEDIATAMENTE despues de </h1> y antes de <div class=\"side-overlay\">. Posicion: absolute top:14px right:16px z-index:10 (dentro del padding del .app; por encima de .main-card-container z-index:1, por debajo de .side-overlay z-index:1000 y #side-panel z-index:99999)."
+    "A_boton_tutorial": {
+      "offset_index_html": 37417,
+      "texto_exacto": "<span style=\"margin-left:12px;\">📖 <a style=\"cursor:pointer;color:#667eea;font-weight:500;\" onclick=\"mostrarTutorial()\">📖 Tutorial</a></span>",
+      "contexto": "Header, junto al texto de licencia ('licencia personal para Usuario - Gracias por tu compra'). SIN id, SIN data-action, SIN data-i18n. El <a> con color inline #667eea confirma el hallazgo v6.14.",
+      "que_llama_hoy": "onclick=\"mostrarTutorial()\" (1 match en index.html). mostrarTutorial (app.js offset 110857) hace classList.add('active') al elemento id='tutorial' (HTML offset 48284-~50900, .tutorial-overlay viejo de 7 pasos).",
+      "por_que_no_se_ve": "Regla v6.10 en main.css offset 71223: '.tutorial-overlay,.tour-overlay{display:none!important}' => el overlay viejo NUNCA se muestra => el clic no hace nada visible. CONFIRMADO.",
+      "auto_open_800ms": "Offset 76789 (dentro de generarPieSvg, efecto colateral mal ubicado): localStorage.getItem(CONFIG.STORAGE.TUTORIAL_VISTO)||setTimeout(mostrarTutorial,CONFIG.TIME.TUTORIAL_INICIO); con CONFIG.TIME.TUTORIAL_INICIO=800 (offset 824) y CONFIG.STORAGE.TUTORIAL_VISTO='horario_tutorial_visto' (offset 606). Hoy es codigo MUERTO (abre el overlay oculto).",
+      "tour_interactivo_vivo": "OJO: setTimeout(iniciarTourInteractivo,CONFIG.TIME.TUTORIAL_INICIO||1e3) en offset 63550 con clave propia 'horario_tour_visto' (offset 119240): SI esta vivo y muestra tooltips sobre la toolbar en la primera visita.",
+      "decision": "(1) Anadir id=\"tutorial-btn\" al <a> real (offset 37417). (2) MANTENER onclick=\"mostrarTutorial()\" inline: initTutorialEvents() asigna a.onclick (propiedad IDL) que SOBREESCRIBE el atributo inline => handler nuevo gana; si initTutorialEvents fallara, el fallback abre el overlay muerto (sin efecto visible). (3) AUTO-OPEN: ELIMINAR la expresion muerta (1 reemplazo). Justificacion (opcion de menor riesgo): el tour interactivo (iniciarTourInteractivo, clave horario_tour_visto) YA guia en la primera visita; mantener un auto-open del modal nuevo apileria DOS guias a los 800ms; ademas se evita coordinar claves nuevas. El boton del header queda como punto de entrada explicito del tutorial guiado."
     },
-    "B_toggleDarkMode_estado_actual": {
-      "offset_definicion": "js/app.js offset 93915, longitud 423 chars (archivo minificado 1 linea, UTF-8)",
-      "texto_actual_exacto": "function toggleDarkMode(){document.body.classList.toggle(\"dark\");const e=document.getElementById(\"btn-dark-mode\"),a=document.body.classList.contains(\"dark\");e&&(e.textContent=a?\"☀️ Claro\":\"🌙 Oscuro\"),localStorage.setItem(CONFIG.STORAGE.DARK_MODE,a?\"1\":\"\"),(document.getElementById(\"view-dashboard\").classList.contains(\"active\")||document.querySelector(\"#view-dashboard.active\"))&&renderDashboard(),forzarEstiloCabeceras()}",
-      "que_hace": "Alterna clase 'dark' en body; actualiza textContent del btn-dark-mode (☀️ Claro / 🌙 Oscuro); persiste CONFIG.STORAGE.DARK_MODE (clave real = 'horario_dark_mode', valores '1'/''); re-renderiza dashboard si activo; llama forzarEstiloCabeceras().",
-      "initDarkMode_offset": "js/app.js offset 95206: function initDarkMode(){if(\"1\"===localStorage.getItem(CONFIG.STORAGE.DARK_MODE)){document.body.classList.add(\"dark\");const e=document.getElementById(\"btn-dark-mode\");e&&(e.textContent=\"☀️ Claro\")}}",
-      "btn_panel": "btn-dark-mode NO existe en index.html (fue removido en la reestructuracion v5.4). Solo sobrevive en: (a) app.js getElementById x2, (b) scripts/optimize-a11y.js par from/to: from '<button class=\"sp-btn\" id=\"btn-dark-mode\" onclick=\"toggleDarkMode()\">🌙 Oscuro</button>' -> to con aria-label => el from no matchea => WARN A11Y en build ('[WARN] No se encontro patron ARIA').",
-      "arranque": "function iniciar(){...initDarkMode()...} (offset 54409) se ejecuta al cargar app.js (antes de DOMContentLoaded y antes de renderizar()) => el restore de tema corre ANTES de que forzarEstiloCabeceras pintee th.",
-      "decision": "toggleTheme() es el CONTROLADOR MAESTRO (clase 'tema-claro' + persistencia 'planify_theme' + iconos + sync). toggleDarkMode() queda como DELEGADO: function toggleDarkMode(){toggleTheme()} (compatibilidad total con onclick del panel). initDarkMode() se reescribe para restaurar desde planify_theme (con fallback legacy horario_dark_mode). La clase 'dark' deja de usarse (las reglas body.dark quedan dormidas como hoy; el .leyenda span ya tiene #0f172a fijo por v6.14)."
+    "B_estructura_modales": {
+      "modales_existentes": "8 .modal-overlay (modal, modal-compra, modal-activar, modal-login, modal-recover, modal-admin, modal-report, modal-evento) con estructura .modal-overlay > .modal (interior clase 'modal', NO .modal-card). Se abren/cierran con classList.add/remove('active').",
+      "css_modal_existente": "main.css offset 5485: .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;backdrop-filter:blur(4px)} y .modal-overlay.active{display:flex} => z-index 1000, SIN !important.",
+      "clases_nuevas_sin_colision": "modal-card, modal-lg, modal-header, modal-body, modal-footer, close-btn, modal-title, tutorial-paso, paso-icon, paso-titulo, paso-texto => 0 matches en main.css/panel.css/dashboard.css/grid.css. NOMBRES LIBRES.",
+      "clase_hidden": "NO existe regla .hidden{...} en ningun CSS (0 matches) => el HTML del usuario con class='modal-overlay hidden' depende del .modal-overlay{display:none} base. La clase .hidden queda inerte (solo semantica); el JS la mantiene por consistencia con la spec del usuario.",
+      "btn_primary_global": "EXISTE global en main.css offset 21451: .btn-primary{background:var(--primary-gradient);color:#fff;box-shadow:var(--shadow-button)} + .toolbar .btn-primary scoped (offset 3900). USOS REALES en index.html (4): #btn-export-json (panel), #btn-pagar-tarjeta (modal-compra), generarLicenciaAdmin (modal-admin), cargarPanelAdmin (modal-admin). UNA regla .btn-primary global del usuario en append (0,1,0) VENCERIA a los 4 por orden de aparicion => CONFLICTO REAL.",
+      "decision": "SCOPER TODO el bloque del usuario a #tutorial-modal: #tutorial-modal.modal-overlay.active (display:flex!important; z-index 9999 SOLO para el nuevo modal; los 8 modales existentes conservan z-index 1000) y #tutorial-modal .btn-primary (los 4 botones .btn-primary del index.html quedan intactos). Nada global."
     },
-    "C_forzarEstiloCabeceras_y_colores_inline": {
-      "offset_definicion": "js/app.js offset 129906",
-      "texto_actual_exacto": "function forzarEstiloCabeceras(){document.querySelectorAll(\"th, th *\").forEach(function(e){e.style.setProperty(\"color\",\"#ffffff\",\"important\"),e.style.setProperty(\"opacity\",\"1\",\"important\"),e.style.setProperty(\"font-weight\",\"700\",\"important\"),e.style.setProperty(\"font-family\",\"'Montserrat', sans-serif\",\"important\")})}",
-      "problema": "v6.15 fuerza #ffffff!important INLINE SIEMPRE (inline !important vence a toda hoja !important). En modo claro (body.tema-claro) th tendria texto blanco sobre fondo claro => ilegible.",
-      "otras_inyecciones_inline": [
-        "setProperty @70121/@70395: display block/none para cambiarVista (no color).",
-        "setProperty @94596: --fuente-principal (cambiarTipografia).",
-        "setProperty @94827/@94851: variables de paleta (--primary-1 etc.) de aplicarPaleta.",
-        "Ninguna otra funcion inyecta colores oscuros/claros inline en el lienzo. Solo forzarEstiloCabeceras pinta colores inline.",
-        "La plantilla de reporte por correo (enviarReporteSemanal) tiene #94a3b8/#cbd5e1 hardcodeados pero NO es UI."
-      ],
-      "decision": "Color condicional por tema: var c=document.body.classList.contains(\"tema-claro\")?\"#0f172a\":\"#ffffff\" (se mantienen opacity/font-weight/font-family y el selector 'th, th *')."
+    "C_punto_insercion_html": {
+      "ancla": "</div></div></div><script>(function(){document.querySelectorAll('input[name=\"cal-evento-color\"]'",
+      "offset": 66153,
+      "detalle": "Fin del ultimo modal (modal-evento): cierre de .btns + .modal + .modal-overlay, seguido del <script> inline de los radios de color. Insertar el modal nuevo ENTRE el cierre y el <script>. 1 match unico.",
+      "parseo": "El HTML nuevo se inserta en la misma linea (archivo minificado, 1 sola linea). Usa &times; (entidad valida), emojis UTF-8 reales como el resto del archivo. La indentacion no aplica (minificado)."
     },
-    "D_reglas_oscuras_a_contrarrestar": {
-      "inventario_no_scoped_con_important": [
-        ".cal-dia{background-color:#1e293b!important;border:1px solid #334155!important;min-height:60px!important;color:#ffffff!important} (v6.8, spec 0,1,0)",
-        ".cal-dia{background:rgba(255,255,255,0.08)!important;color:#ffffff!important;border:1px solid rgba(0,240,255,0.3)!important;min-height:50px!important;display:flex!important} (anterior, spec 0,1,0; shorthand background pisado por la de v6.8 pero conviene cubrirla)",
-        ".cal-dia:hover{background:rgba(0,240,255,0.15)!important;border-color:#00f0ff!important} (0,2,0)",
-        ".cal-dia.hoy{border:2px solid #00f0ff!important;background:rgba(0,240,255,0.25)!important} (0,2,0)",
-        ".cal-dia-nombre{color:var(--text-light)!important;...} base + body.tema-estelar .cal-dia-nombre{background:rgba(100,255,218,.08)!important;color:#64ffda!important} (0,1,1 scoped a vencer por orden)",
-        "#cal-titulo{color:#00f0ff!important;...} (1,0,0)",
-        ".cal-nav{background:rgba(0,240,255,0.15)!important;color:#00f0ff!important;border:1px solid #00f0ff!important;...} (0,1,0)",
-        ".celda,.grid-cell,#view-table .celda{color:#f8fafc!important;background-color:#1e293b!important;border:1px solid #334155!important} (v6.10; .celda 0,1,0; #view-table .celda 0,1,1)",
-        ".celda-header,.hora-col{color:#94a3b8!important;font-weight:600} (0,1,0)",
-        "#view-semanal .hora-cell,#view-semanal .hora-cell input,#view-semanal #header-row th,#view-semanal span,#view-semanal label{color:#e2e8f0!important;font-weight:500!important} (v6.12, 1,1,1)",
-        "body #view-diario{background:#0f172a!important;border-color:#334155!important;color:#f8fafc!important} (v6.12, 1,0,1)",
-        "body #view-diario .planner-notebook{background:#0f172a!important;color:#f8fafc!important} (1,1,2)",
-        "body #view-diario .notebook-header{border-color:#334155!important} (1,1,2); body #view-diario .notebook-header h2{color:#f8fafc!important} (1,1,3)",
-        "body #view-diario .card-section{background:#1e293b!important;border-color:#334155!important} (1,1,2); .section-title{color:#f8fafc!important} (1,1,2)",
-        "body #view-diario .aesthetic-input,body #view-diario .aesthetic-textarea{background:#0f172a!important;border-color:#334155!important;color:#e2e8f0!important} (1,1,2)",
-        "body #view-diario .routine-checkboxes{color:#e2e8f0!important} (1,1,2); input[type=checkbox]{accent-color:#8b5cf6!important;color-scheme:dark!important;background:#0f172a!important} (1,2,2)",
-        "body #view-diario .mood-btn,body #view-diario .cloud-btn{background:#0f172a!important;border-color:#334155!important;color:#e2e8f0!important} (1,1,2); .aesthetic-btn{background:#334155!important} (1,1,2)",
-        "#view-semanal #header-row th{color:#ffffff!important;font-weight:700!important} (v6.13, 2,0,1)",
-        "#view-semanal button.btn-empty-secondary{background:#1e293b!important;color:#ffffff!important;border:1px solid #475569!important} (v6.13, 1,1,1); su span{color:#ffffff!important} (1,1,2)",
-        "#view-semanal th{color:#ffffff!important;opacity:1!important;font-weight:700!important;font-size:0.95rem!important} (v6.14, 1,0,1)"
-      ],
-      "no_requieren_override": [
-        "#view-semanal .leyenda span{color:#0f172a!important} (v6.14): texto oscuro sobre chips claros var(--surface-hover)=#f8f9fa => CORRECTO en ambos modos. No tocar.",
-        ".bottom-nav base: background:rgba(255,255,255,0.95) (claro); body.tema-estelar .bottom-nav lo oscurece (scoped). En claro queda claro => NO se necesita override.",
-        "div.empty-state#empty-state: gradiente claro #f0f4ff->#fce4f8 (correcto en ambos modos).",
-        ".tour-tooltip background #2d3436 oscuro (tooltip flotante, correcto en ambos).",
-        ".lic-msg color #27ae60 (correcto en ambos).",
-        "#side-panel y todo su arbol: siempre oscuro por diseno (html body #side-panel ... background #0f172a). No tocar.",
-        "body.dark #view-semanal .leyenda span{color:#e8eeff!important}: la clase 'dark' deja de aplicarse en v6.16 => regla dormida, sin efecto."
-      ],
-      "scoped_estelar_a_vencer_por_append": [
-        "body.tema-estelar{background:#000} (0,1,0)",
-        ".tema-estelar .celda{border-color:rgba(0,255,200,.2)} (0,1,1)",
-        ".tema-estelar thead th{background:rgba(100,255,218,.08);color:#9effdb;...} (0,1,2)",
-        "body.tema-estelar .app{background:#0d1117!important;backdrop-filter:none!important} y body.tema-estelar .app{background:transparent!important} (0,1,1)",
-        "body.tema-estelar h1#main-title{color:#64ffda!important} (0,1,1)",
-        "body.tema-estelar .main-card-container{background:#0d1117!important;border-radius:14px!important} y {background:#0d1117!important;border:1px solid rgba(100,255,218,.15)!important} (0,1,1)",
-        "body.tema-estelar #view-table,body.tema-estelar #view-dashboard{background:#0d1117!important;border-radius:12px!important} (1,1,1)",
-        "body.tema-estelar .table-wrap{background:#0d1117!important} (0,1,1)",
-        "body.tema-estelar #view-mensual{background:#0d1117!important} (1,1,1)",
-        "body.tema-estelar .cal-container,body.tema-estelar #cal-container{background:rgba(255,255,255,.03)!important} (0,1,1)",
-        "body.tema-estelar .cal-grid{background:rgba(255,255,255,.02)!important} y {background:#0f172a!important;border:1px solid rgba(100,255,218,.25)!important} (0,1,1)",
-        "body.tema-estelar .cal-dia{background:rgba(255,255,255,.05)!important} y {background:#1e293b!important;border:1px solid rgba(100,255,218,.35)!important;color:#9effdb!important} y {color:#ffffff!important} (0,1,1)"
-      ]
+    "D_js": {
+      "nombres_libres": "initTutorialEvents: 0 matches en app.js. ids tutorial-btn/tutorial-modal/close-tutorial-btn/tutorial-got-it-btn: 0 en index.html. planify_tutorial_visto: 0. SIN colisiones.",
+      "carga_app_js": "index.html offset 66769: <script src=\"js/app.js?v=6.16\"></script> => script normal al final del body (SIN defer/async) => cuando corre, document.readyState es 'interactive' (nunca 'loading') => el guard del usuario (readyState==='loading' ? DOMContentLoaded : directo) ejecuta la rama directa. OK.",
+      "punto_insercion_js": "Ancla: 'e.innerHTML=a}var loginUsuario=null;' (fin de renderTutorialProgress + declaracion var loginUsuario), 1 match unico en app.js. Insertar el bloque JS nuevo entre 'e.innerHTML=a}' y 'var loginUsuario=null;'.",
+      "onclick_doble": "El boton real tiene onclick inline; initTutorialEvents asigna a.onclick (propiedad) => REEMPLAZA el inline (sin doble listener). No hay addEventListener duplicado: el modal y sus botones no tienen handlers previos.",
+      "cadenas_no_tocar": "Escape chain offset 62960 y click-outside chain offset 63367 referencian #tutorial viejo (harmless, quedan). El nuevo modal se cierra con listeners propios dentro de initTutorialEvents (click en overlay, Escape, close-btn, got-it-btn). La cadena existente de click-outside NO matchea 'tutorial-modal' => no interfiere.",
+      "funciones_similares": "init*Events existentes: initScreenshotProtection (101236), initDarkMode (95206), initPersonalizacion (95600), initTema (96998), initModelos (102131). Ninguna colisiona con initTutorialEvents."
     },
-    "E_boton_header": {
-      "html_exacto": "<button id=\"btn-tema\" class=\"theme-toggle\" onclick=\"toggleTheme()\" aria-label=\"Cambiar a modo claro\" title=\"Cambiar modo claro/oscuro\">☀️</button> (☀️ = U+2600 U+FE0F)",
-      "css": ".theme-toggle: absolute top:14px right:16px z-index:10; 40x40px; border-radius:50%; flex center; font-size:18px; cursor:pointer; dark: bg #1e293b border #334155 color #f8fafc shadow 0 2px 8px rgba(0,0,0,0.3); hover scale(1.08); light: bg #ffffff border #e2e8f0 color #0f172a.",
-      "iconos": "modo OSCURO (default): muestra ☀️ (para pasar a claro); modo CLARO: muestra 🌙 (U+1F319). aria-label y title se actualizan por JS.",
-      "z_index_razon": "10 > .main-card-container z-index:1 (v6.9) => boton sobre el lienzo; 10 < .side-overlay 1000 y #side-panel 99999 => no tapa el panel/overlay."
+    "E_velo_viejo": {
+      "overlay_HTML": "Offset 48284-~50900 (.tutorial-overlay id='tutorial', 7 pasos, botones t-skip/t-prev/t-next). NO se toca.",
+      "css_kill": "main.css offset 71223: .tutorial-overlay,.tour-overlay{display:none!important} (v6.10). NO se toca.",
+      "js_viejo": "mostrarTutorial (110857), cerrarTutorial (111227), pasoTutorial (111261), renderTutorialProgress (111889) quedan como CODIGO MUERTO (cerrarTutorial sigue referenciado por las cadenas Escape/click-outside => eliminarlo obligaria a tocar esas cadenas; dejarlo = 0 riesgo).",
+      "clave_localStorage": "Se REUTILIZA CONFIG.STORAGE.TUTORIAL_VISTO ('horario_tutorial_visto'): el nuevo modal la setea a '1' al cerrar (close-btn, got-it-btn u overlay click). CerrarTutorial viejo tambien la setea (coherente). No se crea 'planify_tutorial_visto'. Al eliminar el auto-open, localStorage.getItem(CONFIG.STORAGE.TUTORIAL_VISTO) queda en 0 refs en app.js (sin efecto).",
+      "clase_nueva_vs_vieja": "El modal nuevo usa clase modal-overlay (id tutorial-modal), NO tutorial-overlay => la regla display:none!important de v6.10 NO lo afecta."
     },
-    "F_persistencia": {
-      "clave": "planify_theme (localStorage), valores 'light' | 'dark'.",
-      "restore": "En initDarkMode() (llamado dentro de iniciar() offset 54409, ANTES de renderizar()) => el classList queda listo antes de que renderizar/forzarEstiloCabeceras pinten. Fallback legacy: si no hay planify_theme y horario_dark_mode === '' => 'light'; en cualquier otro caso 'dark' (default oscuro).",
-      "sin_planify_theme_hoy": "grep app.js: planify_theme 0 refs, tema-claro 0 refs => no hay colision con codigo existente.",
-      "orden_arranque": "app.js se carga al final de body; el bloque de bootstrap llama iniciar() inmediatamente (offset ~63399). initDarkMode corre primero en la cadena; renderizar() despues."
-    },
-    "G_estado_base": {
-      "git": "limpio, HEAD 65bfec5",
-      "main_css": "653 reglas / 74200 bytes (balance 653/653)",
-      "index_html": "v=6.15 x2: 'css/main.css?v=6.15' @26968 y 'js/app.js?v=6.15' @66166",
-      "sw_js": "planify-cache-v9 @13 (sw.js 1 linea)",
-      "app_js": "1 linea minificada, 135892 chars, UTF-8 con emojis reales (☀️ U+2600+U+FE0F, 🌙 U+1F319, 📊 U+1F4CA)"
+    "F_estado_base": {
+      "git": "limpio, HEAD 89c7ae6 (v6.16)",
+      "main_css": "691 reglas/691 llaves (balance verificado), 1 linea, 78445 bytes, cola: 'body.tema-claro .bottom-nav{background:#ffffff!important;border:1px solid #e2e8f0!important}'",
+      "index_html": "1 linea, 68286 bytes. v=6.16 x2: 'css/main.css?v=6.16' @27311 y 'js/app.js?v=6.16' @66776. 'v=6.17' == 0.",
+      "sw_js": "1 linea, 965 bytes: const CACHE=\"planify-cache-v10\" @13.",
+      "app_js": "1 linea minificada, 137964 bytes, UTF-8 con emojis reales. mostrarTutorial == 2 (def + auto-open). cerrarTutorial == 4. getElementById(\"tutorial\") == 3. iniciar() @53825."
     }
   },
   "textos_exactos": {
-    "ST01a_viejo": "</h1><div class=\"side-overlay\" id=\"side-overlay\" onclick=\"togglePanel()\" aria-hidden=\"true\"></div>",
-    "ST01a_nuevo": "</h1><button id=\"btn-tema\" class=\"theme-toggle\" onclick=\"toggleTheme()\" aria-label=\"Cambiar a modo claro\" title=\"Cambiar modo claro/oscuro\">☀️</button><div class=\"side-overlay\" id=\"side-overlay\" onclick=\"togglePanel()\" aria-hidden=\"true\"></div>",
-    "ST01b_viejo": "id=\"btn-view-dashboard\" aria-label=\"Vista dashboard\">📊 Dashboard</button></div></div>",
-    "ST01b_nuevo": "id=\"btn-view-dashboard\" aria-label=\"Vista dashboard\">📊 Dashboard</button></div><button class=\"sp-btn\" id=\"btn-dark-mode\" onclick=\"toggleDarkMode()\">🌙 Oscuro</button></div>",
-    "ST02_viejo_toggleDarkMode": "function toggleDarkMode(){document.body.classList.toggle(\"dark\");const e=document.getElementById(\"btn-dark-mode\"),a=document.body.classList.contains(\"dark\");e&&(e.textContent=a?\"☀️ Claro\":\"🌙 Oscuro\"),localStorage.setItem(CONFIG.STORAGE.DARK_MODE,a?\"1\":\"\"),(document.getElementById(\"view-dashboard\").classList.contains(\"active\")||document.querySelector(\"#view-dashboard.active\"))&&renderDashboard(),forzarEstiloCabeceras()}",
-    "ST02_nuevo_toggleDarkMode": "function toggleDarkMode(){toggleTheme()}function toggleTheme(){const e=document.body.classList.toggle(\"tema-claro\");localStorage.setItem(\"planify_theme\",e?\"light\":\"dark\");const a=document.getElementById(\"btn-tema\"),t=document.getElementById(\"btn-dark-mode\");a&&(a.textContent=e?\"🌙\":\"☀️\",a.setAttribute(\"aria-label\",e?\"Cambiar a modo oscuro\":\"Cambiar a modo claro\"),a.setAttribute(\"title\",e?\"Cambiar a modo oscuro\":\"Cambiar a modo claro\")),t&&(t.textContent=e?\"☀️ Claro\":\"🌙 Oscuro\"),forzarEstiloCabeceras(),(document.getElementById(\"view-dashboard\").classList.contains(\"active\")||document.querySelector(\"#view-dashboard.active\"))&&renderDashboard()}",
-    "ST02_viejo_initDarkMode": "function initDarkMode(){if(\"1\"===localStorage.getItem(CONFIG.STORAGE.DARK_MODE)){document.body.classList.add(\"dark\");const e=document.getElementById(\"btn-dark-mode\");e&&(e.textContent=\"☀️ Claro\")}}",
-    "ST02_nuevo_initDarkMode": "function initDarkMode(){let e=localStorage.getItem(\"planify_theme\");if(!e){const t=localStorage.getItem(CONFIG.STORAGE.DARK_MODE);e=\"\"===t?\"light\":\"dark\"}if(\"light\"===e){document.body.classList.add(\"tema-claro\");const t=document.getElementById(\"btn-tema\");t&&(t.textContent=\"🌙\",t.setAttribute(\"aria-label\",\"Cambiar a modo oscuro\"),t.setAttribute(\"title\",\"Cambiar a modo oscuro\"));const a=document.getElementById(\"btn-dark-mode\");a&&(a.textContent=\"☀️ Claro\")}}",
-    "ST02_viejo_forzar": "function forzarEstiloCabeceras(){document.querySelectorAll(\"th, th *\").forEach(function(e){e.style.setProperty(\"color\",\"#ffffff\",\"important\"),e.style.setProperty(\"opacity\",\"1\",\"important\"),e.style.setProperty(\"font-weight\",\"700\",\"important\"),e.style.setProperty(\"font-family\",\"'Montserrat', sans-serif\",\"important\")})}",
-    "ST02_nuevo_forzar": "function forzarEstiloCabeceras(){var c=document.body.classList.contains(\"tema-claro\")?\"#0f172a\":\"#ffffff\";document.querySelectorAll(\"th, th *\").forEach(function(e){e.style.setProperty(\"color\",c,\"important\"),e.style.setProperty(\"opacity\",\"1\",\"important\"),e.style.setProperty(\"font-weight\",\"700\",\"important\"),e.style.setProperty(\"font-family\",\"'Montserrat', sans-serif\",\"important\")})}"
+    "ST01_viejo_boton": "<span style=\"margin-left:12px;\">· <a style=\"cursor:pointer;color:#667eea;font-weight:500;\" onclick=\"mostrarTutorial()\">📖 Tutorial</a></span>",
+    "ST01_nuevo_boton": "<span style=\"margin-left:12px;\">· <a id=\"tutorial-btn\" style=\"cursor:pointer;color:#667eea;font-weight:500;\" onclick=\"mostrarTutorial()\">📖 Tutorial</a></span>",
+    "ST01_ancla_insert": "</div></div></div><script>(function(){document.querySelectorAll('input[name=\"cal-evento-color\"]'",
+    "ST02_viejo_autoopen": "}localStorage.getItem(CONFIG.STORAGE.TUTORIAL_VISTO)||setTimeout(mostrarTutorial,CONFIG.TIME.TUTORIAL_INICIO);var _chartCategoria=null,_chartDiario=null;",
+    "ST02_nuevo_autoopen": "}var _chartCategoria=null,_chartDiario=null;",
+    "ST02_ancla_js": "e.innerHTML=a}var loginUsuario=null;",
+    "ST04_viejo_vcss": "css/main.css?v=6.16",
+    "ST04_nuevo_vcss": "css/main.css?v=6.17",
+    "ST04_viejo_vjs": "js/app.js?v=6.16",
+    "ST04_nuevo_vjs": "js/app.js?v=6.17",
+    "ST04_viejo_sw": "planify-cache-v10",
+    "ST04_nuevo_sw": "planify-cache-v11"
   },
-  "bloque_css_claro_exacto": "body.tema-claro,html body.tema-claro{background:#f8fafc!important}body.tema-claro .app{background:#ffffff!important;box-shadow:0 4px 24px rgba(15,23,42,0.08)!important}body.tema-claro h1#main-title{color:#0f172a!important}.theme-toggle{position:absolute;top:14px;right:16px;z-index:10;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid #334155;background:#1e293b;color:#f8fafc;font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:transform .2s ease,background .2s ease,border-color .2s ease}.theme-toggle:hover{transform:scale(1.08)}body.tema-claro .theme-toggle{background:#ffffff!important;border-color:#e2e8f0!important;color:#0f172a!important;box-shadow:0 2px 8px rgba(15,23,42,0.12)!important}body.tema-claro thead th{background:#f1f5f9!important;color:#0f172a!important}body.tema-claro .main-card-container{background:#ffffff!important;border:1px solid #e2e8f0!important;border-radius:14px!important}body.tema-claro #view-table,body.tema-claro #view-dashboard{background:#ffffff!important;border-radius:12px!important}body.tema-claro .table-wrap{background:#ffffff!important}body.tema-claro #view-mensual{background:#ffffff!important;border-radius:14px!important}body.tema-claro .celda,body.tema-claro .grid-cell,body.tema-claro #view-table .celda{color:#0f172a!important;background-color:#ffffff!important;border:1px solid #e2e8f0!important}body.tema-claro .celda-header,body.tema-claro .hora-col{color:#475569!important}body.tema-claro #view-semanal .hora-cell,body.tema-claro #view-semanal .hora-cell input,body.tema-claro #view-semanal #header-row th,body.tema-claro #view-semanal span,body.tema-claro #view-semanal label{color:#334155!important;font-weight:500!important}body.tema-claro #view-semanal th{color:#0f172a!important;opacity:1!important;font-weight:700!important}body.tema-claro #view-semanal #header-row th{color:#0f172a!important}body.tema-claro #view-semanal button.btn-empty-secondary{background:#ffffff!important;color:#0f172a!important;border:1px solid #cbd5e1!important}body.tema-claro #view-semanal button.btn-empty-secondary span{color:#0f172a!important}body.tema-claro .cal-container,body.tema-claro #cal-container{background:#f1f5f9!important}body.tema-claro .cal-grid{background:#ffffff!important;border:1px solid #e2e8f0!important}body.tema-claro .cal-dia{background:#ffffff!important;border:1px solid #e2e8f0!important;color:#0f172a!important}body.tema-claro .cal-dia:hover{background:#f1f5f9!important;border-color:#94a3b8!important}body.tema-claro .cal-dia.hoy{border:2px solid #38bdf8!important;background:rgba(56,189,248,0.12)!important;color:#0f172a!important}body.tema-claro .cal-dia-nombre{background:transparent!important;color:#475569!important}body.tema-claro #cal-titulo{color:#0f172a!important}body.tema-claro .cal-nav{background:#e2e8f0!important;color:#0f172a!important;border:1px solid #cbd5e1!important}body.tema-claro #view-diario{background:#fdfbf7!important;border-color:#e8e1d5!important;color:#1e293b!important}body.tema-claro #view-diario .planner-notebook{background:#ffffff!important;color:#1e293b!important}body.tema-claro #view-diario .notebook-header{border-color:#e0d5c1!important}body.tema-claro #view-diario .notebook-header h2{color:#2b2b2b!important}body.tema-claro #view-diario .card-section{background:#ffffff!important;border-color:#f0ece1!important}body.tema-claro #view-diario .section-title{color:#4a4a4a!important}body.tema-claro #view-diario .aesthetic-input,body.tema-claro #view-diario .aesthetic-textarea{background:#ffffff!important;border-color:#dcd6cd!important;color:#1e293b!important}body.tema-claro #view-diario .routine-checkboxes{color:#444!important}body.tema-claro #view-diario .routine-checkboxes input[type=\"checkbox\"]{color-scheme:light!important;background:#ffffff!important;accent-color:#8b5cf6!important}body.tema-claro #view-diario .mood-btn,body.tema-claro #view-diario .cloud-btn{background:#f0ebf7!important;border-color:#dcd0ed!important;color:#333!important}body.tema-claro #view-diario .aesthetic-btn{background:#e2e8f0!important;color:#0f172a!important}body.tema-claro .bottom-nav{background:#ffffff!important;border:1px solid #e2e8f0!important}",
-  "verificacion_parejas_especificidad": [
-    ".cal-dia (0,1,0) vs body.tema-claro .cal-dia (0,1,1) => gana claro",
-    ".cal-dia:hover (0,2,0) vs body.tema-claro .cal-dia:hover (0,2,1) => gana claro",
-    ".cal-dia.hoy (0,2,0) vs body.tema-claro .cal-dia.hoy (0,2,1) => gana claro",
-    ".cal-dia-nombre scoped (0,1,1) vs body.tema-claro .cal-dia-nombre (0,1,1) => igual spec, gana por append (bloque al final)",
-    "#cal-titulo (1,0,0) vs body.tema-claro #cal-titulo (1,1,1) => gana claro",
-    ".cal-nav (0,1,0) vs body.tema-claro .cal-nav (0,1,1) => gana claro",
-    ".celda (0,1,0) vs body.tema-claro .celda (0,1,1); #view-table .celda (0,1,1) vs body.tema-claro #view-table .celda (1,1,2) => gana claro",
-    ".celda-header/.hora-col (0,1,0) vs (0,1,1) => gana claro",
-    "#view-semanal .hora-cell/span/label (1,1,1) vs body.tema-claro #view-semanal .hora-cell (1,2,2) => gana claro",
-    "#view-semanal th (1,0,1) vs body.tema-claro #view-semanal th (1,1,2) => gana claro",
-    "#view-semanal #header-row th (2,0,1) vs body.tema-claro #view-semanal #header-row th (2,1,2) => gana claro",
-    "#view-semanal button.btn-empty-secondary (1,1,1) vs (1,1,2) y span (1,1,2) vs (1,2,3) => gana claro",
-    "body #view-diario (1,0,1) vs body.tema-claro #view-diario (1,1,1) => gana claro",
-    "body #view-diario .X (1,1,2) vs body.tema-claro #view-diario .X (1,2,2) => gana claro",
-    "body #view-diario .notebook-header h2 (1,1,3) vs (1,2,3) => gana claro",
-    "body #view-diario input[type=checkbox] (1,2,2) vs (1,3,2) => gana claro",
-    ".tema-estelar thead th (0,1,2) vs body.tema-claro thead th (0,1,3) => gana claro",
-    "scoped (0,1,1)/(1,1,1) vs body.tema-claro (0,1,1)/(1,1,1): igual spec => gana claro POR ORDEN (append al final de main.css, despues de la ultima regla body.dark #view-semanal .leyenda span)",
-    "body.tema-estelar (0,1,0) vs body.tema-claro,html body.tema-claro (0,1,0)/(0,1,2) => gana claro (html body.tema-claro incluso vence a .tema-cyberpunk body 0,1,1 en caso de combo)",
-    "body.tema-estelar .bottom-nav{background:rgba(13,17,23,0.95)!important;border:1px solid rgba(100,255,218,0.15)!important} (0,1,1): como el body conserva tema-estelar + tema-claro, el scoped oscuro SI matchea y vence a la base clara (0,1,0) => SE CONTRARRESTA con body.tema-claro .bottom-nav{background:#ffffff!important;border:1px solid #e2e8f0!important} (0,1,1, igual spec, gana por append)."
+  "html_modal_exacto": "<div class=\"modal-overlay hidden\" id=\"tutorial-modal\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Tutorial guiado\"><div class=\"modal-card modal-lg\"><div class=\"modal-header\"><h3 class=\"modal-title\">📖 Tutorial rápido</h3><button type=\"button\" class=\"close-btn\" id=\"close-tutorial-btn\" aria-label=\"Cerrar tutorial\">&times;</button></div><div class=\"modal-body\"><div class=\"tutorial-paso\"><div class=\"paso-icon\">📋</div><div><p class=\"paso-titulo\">1. Panel de Control</p><p class=\"paso-texto\">Revisa tu progreso, balance de vida y estadísticas semanales de un vistazo en la pestaña Dashboard.</p></div></div><div class=\"tutorial-paso\"><div class=\"paso-icon\">🗓️</div><div><p class=\"paso-titulo\">2. Tabla de Horarios</p><p class=\"paso-texto\">Haz clic en una celda para editarla, arrastra bloques para reordenarlos y marca tus metas diarias.</p></div></div><div class=\"tutorial-paso\"><div class=\"paso-icon\">🎨</div><div><p class=\"paso-titulo\">3. Personaliza tu espacio</p><p class=\"paso-texto\">Cambia entre las vistas semanal, diaria y mensual; activa el modo claro con el botón ☀️ y ajusta intervalos y tipografía desde el panel.</p></div></div><div class=\"tutorial-paso\"><div class=\"paso-icon\">💾</div><div><p class=\"paso-titulo\">4. Tus datos seguros</p><p class=\"paso-texto\">Todo se guarda automáticamente en tu navegador. Exporta o importa tu información desde Gestión de Datos.</p></div></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn-primary\" id=\"tutorial-got-it-btn\">Entendido, ¡empezar! 🚀</button></div></div></div>",
+  "js_bloque_exacto": "function abrirTutorialGuiado(){var e=document.getElementById(\"tutorial-modal\");e&&(e.classList.remove(\"hidden\"),e.classList.add(\"active\"))}function initTutorialEvents(){var a=document.getElementById(\"tutorial-btn\"),b=document.getElementById(\"tutorial-modal\"),c=document.getElementById(\"close-tutorial-btn\"),d=document.getElementById(\"tutorial-got-it-btn\");function cerrar(){b&&(b.classList.add(\"hidden\"),b.classList.remove(\"active\")),localStorage.setItem(CONFIG.STORAGE.TUTORIAL_VISTO,\"1\")}a&&(a.onclick=function(e){e&&e.preventDefault(),abrirTutorialGuiado()}),c&&(c.onclick=cerrar),d&&(d.onclick=cerrar),b&&b.addEventListener(\"click\",function(e){e.target===b&&cerrar()}),document.addEventListener(\"keydown\",function(e){\"Escape\"===e.key&&b&&b.classList.contains(\"active\")&&cerrar()})}\"loading\"===document.readyState?document.addEventListener(\"DOMContentLoaded\",initTutorialEvents):initTutorialEvents();",
+  "bloque_css_exacto": "#tutorial-modal.modal-overlay{z-index:9999}#tutorial-modal.modal-overlay.active{display:flex!important}#tutorial-modal .modal-card{background:var(--surface-modal);border-radius:14px;width:560px;max-width:92vw;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(0,0,0,0.35)}#tutorial-modal .modal-card.modal-lg{width:640px}#tutorial-modal .modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border-color,#e2e8f0)}#tutorial-modal .modal-title{margin:0;font-size:1.05em;font-weight:700;color:var(--text-primary)}#tutorial-modal .close-btn{background:none;border:none;font-size:1.5em;line-height:1;cursor:pointer;color:var(--text-muted,#64748b);padding:2px 8px;border-radius:8px}#tutorial-modal .close-btn:hover{color:#e74c3c;background:rgba(0,0,0,0.06)}#tutorial-modal .modal-body{padding:18px 22px;overflow-y:auto}#tutorial-modal .tutorial-paso{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}#tutorial-modal .paso-icon{min-width:38px;width:38px;height:38px;border-radius:10px;background:rgba(102,126,234,0.14);display:flex;align-items:center;justify-content:center;font-size:1.3em}#tutorial-modal .paso-titulo{margin:2px 0;font-size:.92em;font-weight:700;color:var(--text-primary)}#tutorial-modal .paso-texto{margin:0;font-size:.8em;line-height:1.45;color:var(--text-secondary,#475569)}#tutorial-modal .modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--border-color,#e2e8f0);background:var(--surface-hover,#f8f9fa)}#tutorial-modal .btn-primary{background:var(--primary-gradient);color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:.85em;font-weight:600;cursor:pointer;box-shadow:var(--shadow-button)}#tutorial-modal .btn-primary:hover{opacity:.92;transform:translateY(-1px)}",
+  "notas_css": [
+    "16 reglas, TODAS scoped a #tutorial-modal. Nada global (las reglas del usuario .modal-overlay.active{display:flex!important;z-index:9999} y .btn-primary GLOBALES se descartan y se adaptan scoped: los 8 modales existentes conservan z-index 1000 y los 4 botones .btn-primary del index.html conservan el global (0,1,0) intacto).",
+    "#tutorial-modal.modal-overlay{z-index:9999} (1,1,0) vence al .modal-overlay base z-index:1000 (0,1,0) SOLO en el modal nuevo. El display base display:none sigue viniendo de .modal-overlay (offset 5485); .active{display:flex!important} scoped garantiza la apertura.",
+    "Los 8 modales existentes usan la clase interior '.modal' (no .modal-card) => las reglas #tutorial-modal .modal-card/.modal-header/.modal-body/.modal-footer NO les aplican (scoped + clase distinta).",
+    "Todas las variables usadas existen en main.css: --surface-modal (2), --border-color (10), --surface-hover (10), --text-primary (9), --text-secondary (10), --text-muted (12), --primary-gradient (5), --shadow-button (4). Fallbacks incluidos por si la paleta no define alguna.",
+    "La clase .hidden del HTML es inerte (no existe regla .hidden en el proyecto); el JS la mantiene por consistencia con la spec del usuario. La ocultacion por defecto la da .modal-overlay{display:none} base.",
+    "Conteo post-append: '#tutorial-modal' == 16 (1 por regla). Balance: 691 + 16 = 707/707."
   ],
   "sub_tareas": [
     {
       "id": "ST-00",
       "nombre": "Pre-checks de estado base (fail-fast)",
       "pasos": [
-        "git status --short (vacio) y git rev-parse --short HEAD (65bfec5)",
-        "node: balance llaves main.css == 653/653",
+        "git status --short (vacio) y git rev-parse --short HEAD (89c7ae6)",
+        "node: balance llaves main.css == 691/691",
         "node --check js/app.js (SYNTAX OK pre-cambio)",
-        "node: 'v=6.15' en index.html == 2; 'planify-cache-v9' en sw.js == 1; 'planify_theme' en app.js == 0; 'tema-claro' en app.js == 0 y en main.css == 0; 'btn-tema' en index.html == 0",
-        "node: cada texto_viejo de ST-01/ST-02 tiene EXACTAMENTE 1 match en su archivo"
+        "node: 'v=6.16' en index.html == 2; 'v=6.17' == 0; 'planify-cache-v10' en sw.js == 1; 'initTutorialEvents' en app.js == 0; 'tutorial-btn'/'tutorial-modal'/'close-tutorial-btn'/'tutorial-got-it-btn' en index.html == 0",
+        "node: cada texto viejo de ST-01/ST-02/ST-04 tiene EXACTAMENTE 1 match en su archivo"
       ],
       "criterio": "Si algun check falla, ABORTAR y reportar (no aplicar cambios sobre base sucia)"
     },
     {
       "id": "ST-01",
-      "nombre": "index.html: insercion del boton header (ST-01a) y del btn-dark-mode en el panel (ST-01b)",
+      "nombre": "index.html: id tutorial-btn en el <a> real (ST-01a) + insercion del modal nuevo (ST-01b)",
       "cambios": [
-        {"parte": "ST-01a", "offset_ancla": 27313, "viejo": "TEXTOS_EXACTOS.ST01a_viejo", "nuevo": "TEXTOS_EXACTOS.ST01a_nuevo", "nota": "Boton circular del header: hijo directo de #app, despues de </h1>. icono inicial ☀️ (modo oscuro default)."},
-        {"parte": "ST-01b", "offset_ancla": 31802, "viejo": "TEXTOS_EXACTOS.ST01b_viejo", "nuevo": "TEXTOS_EXACTOS.ST01b_nuevo", "nota": "Re-anade btn-dark-mode dentro de la card 'Vista' del panel (tab-personalizar), tras el view-toggle. El HTML resultante coincide EXACTO con el patron from de optimize-a11y.js => desaparece el WARN A11Y de btn-dark-mode en el proximo build."}
+        {"parte": "ST-01a", "offset_ancla": 37417, "viejo": "TEXTOS_EXACTOS.ST01_viejo_boton", "nuevo": "TEXTOS_EXACTOS.ST01_nuevo_boton", "nota": "Anade id=\"tutorial-btn\" al <a> real del header. Se MANTIENE onclick=\"mostrarTutorial()\" como fallback: la asignacion a.onclick de initTutorialEvents (propiedad IDL) sobrescribe el atributo inline => gana el handler nuevo; si initTutorialEvents fallara, mostrarTutorial abre el overlay muerto (sin efecto visible)."},
+        {"parte": "ST-01b", "offset_ancla": 66153, "viejo": "TEXTOS_EXACTOS.ST01_ancla_insert", "nuevo": "'</div></div></div>' + HTML_MODAL_EXACTO + '<script>(function(){document.querySelectorAll(\\'input[name=\"cal-evento-color\"]\\''", "nota": "Modal nuevo insertado tras el cierre del ultimo modal (modal-evento), antes del <script> inline de los radios de color. Estructura del usuario: #tutorial-modal.modal-overlay.hidden + .modal-card.modal-lg + .modal-header/.modal-body/.modal-footer + close-btn &times; + btn-primary #tutorial-got-it-btn + 4 .tutorial-paso."}
       ],
       "criterio": [
-        "index.html: 'btn-tema' == 1 y 'theme-toggle' == 1 (solo el nuevo); 'btn-dark-mode' == 1; 'toggleTheme()' == 1; 'toggleDarkMode()' == 1",
-        "La cadena vieja ST01b (con 📊 Dashboard) sigue intacta salvo la insercion",
-        "El orden del DOM: <h1>...PLANIFY</h1><button id=\"btn-tema\"...></button><div class=\"side-overlay\"..."
+        "index.html: 'id=\"tutorial-btn\"' == 1; 'tutorial-modal' == 1; 'close-tutorial-btn' == 1; 'tutorial-got-it-btn' == 1; '&times;' == 1",
+        "La cadena 'onclick=\"mostrarTutorial()\"' sigue == 1 (fallback conservado)",
+        "El orden del DOM: ...modal-evento cierre...</div></div></div><div class=\"modal-overlay hidden\" id=\"tutorial-modal\"...><script>(function(){document.querySelectorAll('input[name=\"cal-evento-color\"]'",
+        "El resto del index.html intacto (sin cambios de lineas: sigue 1 sola linea)"
       ]
     },
     {
       "id": "ST-02",
-      "nombre": "js/app.js: 3 reemplazos de funcion (1 match cada uno) + node --check",
+      "nombre": "js/app.js: remocion del auto-open muerto (ST-02a) + insercion del bloque JS nuevo (ST-02b)",
       "cambios": [
-        {"funcion": "toggleDarkMode (offset 93915)", "viejo": "TEXTOS_EXACTOS.ST02_viejo_toggleDarkMode", "nuevo": "TEXTOS_EXACTOS.ST02_nuevo_toggleDarkMode", "nota": "toggleDarkMode queda como delegado: toggleTheme() es el controlador maestro (clase tema-claro, persistencia planify_theme light/dark, iconos btn-tema ☀️/🌙, sync btn-dark-mode ☀️ Claro/🌙 Oscuro, forzarEstiloCabeceras + renderDashboard condicional igual que antes)."},
-        {"funcion": "initDarkMode (offset 95206)", "viejo": "TEXTOS_EXACTOS.ST02_viejo_initDarkMode", "nuevo": "TEXTOS_EXACTOS.ST02_nuevo_initDarkMode", "nota": "Restaura desde planify_theme; fallback legacy horario_dark_mode ('' -> light, resto -> dark). En light: classList.add('tema-claro') + sync iconos. Se ejecuta dentro de iniciar() ANTES de renderizar => forzarEstiloCabeceras pinta con el tema correcto."},
-        {"funcion": "forzarEstiloCabeceras (offset 129906)", "viejo": "TEXTOS_EXACTOS.ST02_viejo_forzar", "nuevo": "TEXTOS_EXACTOS.ST02_nuevo_forzar", "nota": "Color condicional: tema-claro -> #0f172a (legible en claro), si no -> #ffffff (v6.15 intacto en oscuro). Se mantienen opacity/font-weight/font-family y selector 'th, th *'."}
+        {"parte": "ST-02a", "offset_ancla": 76789, "viejo": "TEXTOS_EXACTOS.ST02_viejo_autoopen", "nuevo": "TEXTOS_EXACTOS.ST02_nuevo_autoopen", "nota": "Elimina el setTimeout(mostrarTutorial,800) muerto dentro de generarPieSvg. DECISION (menor riesgo): NO se reemplaza por el modal nuevo porque iniciarTourInteractivo (clave horario_tour_visto) YA guia en la primera visita; apilar dos guias a los 800ms seria mala UX. El boton del header queda como unico punto de entrada del tutorial guiado."},
+        {"parte": "ST-02b", "offset_ancla": 112104, "viejo": "TEXTOS_EXACTOS.ST02_ancla_js", "nuevo": "'e.innerHTML=a}' + JS_BLOQUE_EXACTO + 'var loginUsuario=null;'", "nota": "Inserta abrirTutorialGuiado + initTutorialEvents + invocacion con guard readyState justo despues de renderTutorialProgress (agrupado con el codigo tutorial viejo). app.js se carga sin defer al final del body => readyState 'interactive' => ejecuta la rama directa. initTutorialEvents: bindea tutorial-btn (a.onclick sobrescribe el inline), close-tutorial-btn, tutorial-got-it-btn (cierra + setea CONFIG.STORAGE.TUTORIAL_VISTO='1'), click en overlay y tecla Escape (listener propio, sin tocar la cadena Escape existente del offset 62960)."}
       ],
       "criterio": [
         "Cada texto viejo: 1 match unico antes del edit; 0 matches despues",
         "node --check js/app.js: SYNTAX OK",
-        "js/app.js: 'function toggleTheme' == 1; 'planify_theme' == 2 (1 setItem en toggleTheme + 1 getItem en initDarkMode); 'tema-claro' == 3 (toggle en toggleTheme, add en initDarkMode, contains en forzarEstiloCabeceras); 'classList.toggle(\"dark\")' == 0",
-        "Totales post-edit: 'forzarEstiloCabeceras' == 5 (def + 4 call sites: 40111, 94314, 128416, 129344, 129382), 'toggleDarkMode' == 1 (solo definicion; el onclick vive en index.html), 'initDarkMode' == 2 (def + call en iniciar()), 'toggleTheme' == 1",
-        "git diff --name-only == solo js/app.js en este paso (si ST-01 ya aplico, js/app.js + index.html)"
+        "js/app.js: 'function abrirTutorialGuiado' == 1; 'abrirTutorialGuiado' == 2 (def + uso en a.onclick); 'function initTutorialEvents' == 1; 'initTutorialEvents' == 3 (def + 2 refs en el guard readyState); 'setTimeout(mostrarTutorial' == 0; 'localStorage.getItem(CONFIG.STORAGE.TUTORIAL_VISTO)' == 0; 'mostrarTutorial' == 1 (solo definicion, codigo dormido)",
+        "git diff --name-only == solo js/app.js en este paso (si ST-01 ya aplico: js/app.js + index.html)"
       ]
     },
     {
       "id": "ST-03",
-      "nombre": "css/main.css: APPEND del bloque claro (1 linea minificada, 38 reglas) al final del archivo",
+      "nombre": "css/main.css: APPEND del bloque scoped (1 linea minificada, 16 reglas) al final del archivo",
       "cambios": [
-        {"archivo": "css/main.css", "tipo": "append al final (offset actual 74200, despues de 'body.dark #view-semanal .leyenda span{color:#e8eeff!important}')", "contenido": "BLOQUE_CSS_CLARO_EXACTO (38 reglas, incluye body.tema-claro .bottom-nav)"}
+        {"archivo": "css/main.css", "tipo": "append al final (offset actual 78445, despues de 'body.tema-claro .bottom-nav{background:#ffffff!important;border:1px solid #e2e8f0!important}')", "contenido": "BLOQUE_CSS_EXACTO (16 reglas, TODAS con prefijo #tutorial-modal)"}
       ],
       "notas": [
-        "Las 38 reglas cierran con } y el archivo queda terminando en '}' sin salto de linea extra (consistente con minificacion actual).",
-        "Especificidad minima de cada regla clara: 0,1,1 (body.tema-claro .X) con prefijo id (1,1,1+ o 2,1,1+) donde la oscura tenia id => verificadas por pareja (ver 'verificacion_parejas_especificidad').",
-        "Igual spec => gana claro por estar APPEND al final (todas !important).",
-        "No se tocan: .leyenda span (ya #0f172a correcto), .empty-state, .tour-tooltip, .lic-msg, #side-panel (siempre oscuro por diseno)."
+        "Las 16 reglas cierran con } y el archivo queda terminando en '}' sin salto de linea extra (consistente con minificacion actual).",
+        "SCOPE TOTAL a #tutorial-modal: las reglas globales del usuario (.modal-overlay.active{display:flex!important;...z-index:9999} y .btn-primary) se descartan; el z-index 9999 queda SOLO para el modal nuevo y los 4 botones .btn-primary reales (panel + modales de licencia/admin) conservan el global existente.",
+        "Especificidad: #tutorial-modal.modal-overlay (1,1,0) vence a .modal-overlay (0,1,0); #tutorial-modal .X (1,1,0) no pisa nada porque modal-card/modal-header/modal-body/modal-footer/close-btn no existian.",
+        "Las clases interiores usan vars existentes del tema (ver NOTAS_CSS). Funciona en tema-estelar (oscuro) y con body.tema-claro."
       ],
       "criterio": [
-        "main.css termina con 'body.tema-claro .bottom-nav{background:#ffffff!important;border:1px solid #e2e8f0!important}'",
-        "Balance llaves main.css == 653 + 38 == 691/691",
-        "node: conteo /body\\.tema-claro/g en main.css == 39 (38 selectores con prefijo body.tema-claro; 'body.tema-claro,html body.tema-claro' cuenta 2 en la primera regla) => aceptar 39 +/- diferencias si alguna regla usa selector doble; reportar conteo real",
+        "main.css termina con '#tutorial-modal .btn-primary:hover{opacity:.92;transform:translateY(-1px)}'",
+        "Balance llaves main.css == 691 + 16 == 707/707",
+        "node: conteo '#tutorial-modal' en main.css == 16",
         "main.css sigue siendo 1 sola linea (sin saltos) y sin caracteres no ASCII"
       ]
     },
     {
       "id": "ST-04",
-      "nombre": "Bump de versiones: v=6.16 x2 en index.html + cache v10 en sw.js",
+      "nombre": "Bump de versiones: v=6.17 x2 en index.html + cache v11 en sw.js",
       "cambios": [
-        {"archivo": "index.html", "viejo": "css/main.css?v=6.15", "nuevo": "css/main.css?v=6.16", "offset": 26968, "ocurrencias": 1},
-        {"archivo": "index.html", "viejo": "js/app.js?v=6.15", "nuevo": "js/app.js?v=6.16", "offset": 66166, "ocurrencias": 1},
-        {"archivo": "sw.js", "viejo": "planify-cache-v9", "nuevo": "planify-cache-v10", "offset": 13, "ocurrencias": 1}
+        {"archivo": "index.html", "viejo": "css/main.css?v=6.16", "nuevo": "css/main.css?v=6.17", "offset": 27311, "ocurrencias": 1},
+        {"archivo": "index.html", "viejo": "js/app.js?v=6.16", "nuevo": "js/app.js?v=6.17", "offset": 66776, "ocurrencias": 1},
+        {"archivo": "sw.js", "viejo": "planify-cache-v10", "nuevo": "planify-cache-v11", "offset": 13, "ocurrencias": 1}
       ],
       "criterio": [
-        "index.html: 'v=6.16' == 2 ocurrencias; 'v=6.15' == 0",
-        "sw.js: contiene 'planify-cache-v10'; NO contiene 'planify-cache-v9'"
+        "index.html: 'v=6.17' == 2 ocurrencias; 'v=6.16' == 0",
+        "sw.js: contiene 'planify-cache-v11'; NO contiene 'planify-cache-v10'"
       ]
     },
     {
@@ -227,34 +158,34 @@
       "nombre": "Verificacion integral (fail-fast)",
       "comandos_verificacion": [
         "node --check js/app.js (SYNTAX OK)",
-        "node: js/app.js contiene 'function toggleTheme' 1 vez, 'planify_theme' 2 veces, 'tema-claro' 3 veces, 'classList.toggle(\"dark\")' 0, 'document.body.classList.add(\"dark\")' 0, 'forzarEstiloCabeceras' 5, 'toggleDarkMode' 1",
-        "node: index.html contiene btn-tema 1, theme-toggle 1, btn-dark-mode 1, toggleTheme() 1, toggleDarkMode() 1, v=6.16 2, v=6.15 0",
-        "node: sw.js contiene planify-cache-v10 y NO planify-cache-v9",
-        "node: main.css balance de llaves == 691/691 (653 + 38) y termina con 'body.tema-claro .bottom-nav'; conteo /body\\.tema-claro/g == 39 (o reportar real)",
-        "node: emojis reales en archivos: index.html contiene U+2600 (☀) y U+1F319 (🌙); app.js contiene U+2600 y U+1F319",
+        "node: js/app.js contiene 'function abrirTutorialGuiado' 1, 'abrirTutorialGuiado' 2, 'function initTutorialEvents' 1, 'initTutorialEvents' 3, 'setTimeout(mostrarTutorial' 0, 'mostrarTutorial' 1, 'localStorage.getItem(CONFIG.STORAGE.TUTORIAL_VISTO)' 0, 'cerrarTutorial' 4 (intacto)",
+        "node: index.html contiene 'id=\"tutorial-btn\"' 1, 'tutorial-modal' 1, 'close-tutorial-btn' 1, 'tutorial-got-it-btn' 1, '&times;' 1, 'v=6.17' 2, 'v=6.16' 0, 'onclick=\"mostrarTutorial()\"' 1",
+        "node: sw.js contiene 'planify-cache-v11' y NO 'planify-cache-v10'",
+        "node: main.css balance de llaves == 707/707 (691 + 16), conteo '#tutorial-modal' == 16 y termina con '#tutorial-modal .btn-primary:hover{opacity:.92;transform:translateY(-1px)}'",
+        "node: emojis reales en index.html: contiene U+1F4D6 (📖), U+1F4CB (📋), U+1F5C3 (🗓️), U+1F3A8 (🎨), U+1F4BE (💾), U+1F680 (🚀), U+2600+U+FE0F (☀️)",
         "git diff --name-only == exactamente: index.html, js/app.js, css/main.css, sw.js (4 archivos)",
-        "git diff --stat: index.html 1 linea, app.js 1 linea (o 2 si el editor divide), main.css 1 linea, sw.js 1 linea"
+        "git diff --stat: index.html 1 linea, app.js 1 linea, main.css 1 linea, sw.js 1 linea"
       ],
       "criterio": "TODOS los checks deben pasar; si alguno falla, corregir solo lo indicado y repetir"
     },
     {
       "id": "ST-06",
       "nombre": "Commit + push (mensaje EXACTO)",
-      "mensaje_commit": "feat: conmutador de modo claro y oscuro en header con persistencia v6.16",
+      "mensaje_commit": "fix: reparacion del boton Tutorial con modal guiado paso a paso v6.17",
       "pasos": [
         "git add index.html js/app.js css/main.css sw.js (SOLO estos 4)",
-        "git commit -m 'feat: conmutador de modo claro y oscuro en header con persistencia v6.16'",
+        "git commit -m 'fix: reparacion del boton Tutorial con modal guiado paso a paso v6.17'",
         "git push origin HEAD"
       ],
-      "criterio": "git log -1 muestra exactamente 'feat: conmutador de modo claro y oscuro en header con persistencia v6.16' con los 4 archivos; git status limpio post-push"
+      "criterio": "git log -1 muestra exactamente 'fix: reparacion del boton Tutorial con modal guiado paso a paso v6.17' con los 4 archivos; git status limpio post-push"
     }
   ],
   "resumen_cambios_finales": {
-    "index.html": "insercion boton #btn-tema (header top-right, ☀️ inicial) + re-insercion #btn-dark-mode en panel (card Vista, elimina WARN A11Y) + v=6.15 -> v=6.16 x2",
-    "js/app.js": "toggleDarkMode -> delega en toggleTheme; toggleTheme nuevo (clase tema-claro, planify_theme light/dark, iconos, sync panel); initDarkMode -> restore con fallback legacy; forzarEstiloCabeceras -> color condicional #0f172a (claro) / #ffffff (oscuro)",
-    "css/main.css": "append 38 reglas modo claro (paleta #f8fafc/#ffffff/#e2e8f0/#0f172a; theme-toggle; contrarresto completo de reglas oscuras no-scoped v6.6-v6.15; bottom-nav claro)", 
-    "sw.js": "planify-cache-v9 -> planify-cache-v10",
-    "commit": "feat: conmutador de modo claro y oscuro en header con persistencia v6.16",
+    "index.html": "id=\"tutorial-btn\" en el <a> Tutorial real del header (mantiene onclick fallback) + insercion del modal #tutorial-modal (modal-card modal-lg, header con close-btn &times;, body con 4 pasos, footer con btn-primary #tutorial-got-it-btn) tras el cierre de modal-evento + v=6.16 -> v=6.17 x2",
+    "js/app.js": "eliminado el auto-open muerto (setTimeout(mostrarTutorial,800) dentro de generarPieSvg) + bloque nuevo: abrirTutorialGuiado() (abre #tutorial-modal) y initTutorialEvents() (bindea #tutorial-btn, #close-tutorial-btn, #tutorial-got-it-btn, click en overlay y Escape; cierra seteando CONFIG.STORAGE.TUTORIAL_VISTO='1') + invocacion con guard readyState; mostrarTutorial/cerrarTutorial/pasoTutorial/renderTutorialProgress quedan como codigo dormido intacto",
+    "css/main.css": "append 16 reglas TODAS scoped a #tutorial-modal (z-index 9999 solo para el nuevo modal; .btn-primary scoped para no romper los 4 botones .btn-primary reales; vars del tema con fallbacks); balance 691 -> 707",
+    "sw.js": "planify-cache-v10 -> planify-cache-v11",
+    "commit": "fix: reparacion del boton Tutorial con modal guiado paso a paso v6.17",
     "total_archivos": 4
   }
 }

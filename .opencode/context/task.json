@@ -1,127 +1,260 @@
 {
-  "task": "TASK-20260801-v6.15",
-  "replaces": "v6.14",
-  "titulo": "forzarEstiloCabeceras: color blanco #ffffff + opacity 1 SIEMPRE (eliminar condicion dark/light) + bumps v6.15/v9",
-  "tipo": "edicion quirurgica js/app.js (1 funcion) + bump versiones + commit/push exacto",
-  "head": "0b3dd76 (v6.14, base verificada: git limpio, main.css 653/653, node --check OK)",
+  "task": "TASK-20260801-v6.16",
+  "replaces": "v6.15",
+  "titulo": "Conmutador de tema Claro/Oscuro en header (boton circular top-right, persistencia planify_theme, paleta clara en main.css, sync con panel) + bumps v6.16/v10",
+  "tipo": "edicion quirurgica index.html (2 inserciones) + js/app.js (3 funciones: toggleDarkMode delegada, toggleTheme nueva, initDarkMode restore, forzarEstiloCabeceras theme-aware) + main.css append 37 reglas claras + bumps + commit/push exacto",
+  "head": "65bfec5 (v6.15, base verificada: git limpio, main.css 653/653, v=6.15 x2 en index.html, planify-cache-v9 en sw.js)",
   "git_limpio": true,
-  "archivos_a_modificar": ["js/app.js", "index.html", "sw.js"],
-  "regla_de_oro": "js/app.js: SOLO la funcion forzarEstiloCabeceras (1 match unico). index.html: SOLO las 2 cadenas v=6.14 -> v=6.15. sw.js: SOLO planify-cache-v8 -> planify-cache-v9. NO tocar css/main.css ni nada mas.",
+  "archivos_a_modificar": ["index.html", "js/app.js", "css/main.css", "sw.js"],
+  "regla_de_oro": "SOLO los cambios listados. index.html: 2 inserciones + 2 bumps v. app.js: 3 reemplazos de funcion (cada texto viejo = 1 match unico). main.css: SOLO append al final (1 linea minificada, 37 reglas). sw.js: SOLO planify-cache-v9 -> planify-cache-v10. NO tocar nada mas (ni panel.css, ni optimize-a11y.js, ni server.js).",
   "investigacion_clave": {
-    "A_funcion_actual": {
-      "offset_definicion": "js/app.js offset 128407 a 128737 (longitud 330 chars, texto minificado 1 sola linea)",
-      "texto_actual_exacto": "function forzarEstiloCabeceras(){var e=document.body.classList.contains(\"dark\")?\"#e8eeff\":\"#334155\";document.querySelectorAll(\"th, th *\").forEach(function(a){a.style.setProperty(\"color\",e,\"important\"),a.style.setProperty(\"font-weight\",\"700\",\"important\"),a.style.setProperty(\"font-family\",\"'Montserrat', sans-serif\",\"important\")})}",
-      "que_hace": [
-        "1) Calcula e: si body.classList contiene 'dark' -> '#e8eeff' (claro), sino -> '#334155' (gris oscuro).",
-        "2) document.querySelectorAll('th, th *') => TODOS los th Y TODOS sus descendientes (spans internos de dias/horas).",
-        "3) Por cada elemento: color=e !important, font-weight=700 !important, font-family='Montserrat', sans-serif !important.",
-        "4) NO toca .hora-cell, NO toca inputs, NO toca background/border/opacity. Solo color, peso y fuente de th/th *."
+    "A_header": {
+      "estructura": "<body class=\"tema-estelar\"><div class=\"app licenciado\" id=\"app\"><h1 id=\"main-title\" title=\"Haz clic 5 veces para modo admin\">PLANIFY</h1><div class=\"side-overlay\"...>",
+      "offsets_index_html": {
+        "<body class=\"tema-estelar\">": 27586,
+        "h1#main-title inicio": 27253,
+        "</h1>": 27313,
+        "ancla_insercion": "</h1><div class=\"side-overlay\" id=\"side-overlay\" onclick=\"togglePanel()\" aria-hidden=\"true\"></div> (1 match, offset 27313)"
+      },
+      "estilos": [
+        ".app{position:relative} (main.css, SIN !important) => posicionamiento absolute del boton OK.",
+        ".app base: max-width:1100px;margin:0 auto;padding:28px 26px;bg rgba(255,255,255,0.95); v6.11 #app,.app{overflow:visible!important} => NO hay overflow hidden que corte el boton.",
+        "h1#main-title: text-align:center!important;font-size:1.8em!important;color:#1e293b!important (base) y body.tema-estelar h1#main-title{color:#64ffda!important} (scoped).",
+        ".cloud-btn es la pestaña vertical FIJA del borde IZQUIERDO (panel.css position:fixed;left:0;top:50%) => esquina superior derecha de #app esta LIBRE (sin ocupantes)."
       ],
-      "call_sites": [
-        {"offset": 40111, "contexto": "cadena init de renderizar(): ...actualizarMergeBadge(),forzarEstiloCabeceras()}function renderizarLeyenda()...", "tipo": "llamada directa"},
-        {"offset": 94314, "contexto": "cambiarTab(): (document.getElementById('view-dashboard')...)&&renderDashboard(),forzarEstiloCabeceras()}function initDarkMode()...", "tipo": "llamada directa"},
-        {"offset": 129356, "contexto": "setTimeout(forzarEstiloCabeceras,500)", "tipo": "diferida 500ms"},
-        {"offset": 129394, "contexto": "setTimeout(forzarEstiloCabeceras,1500)", "tipo": "diferida 1500ms"}
-      ],
-      "total_ocurrencias_string": "5 (1 definicion + 4 call sites). NINGUN call site se modifica.",
-      "causa_raiz": "body tiene clase 'tema-estelar' (NO 'dark'), por lo que e='#334155' (gris oscuro) se inyecta INLINE con !important en th/th * => vence a TODO CSS !important (inline !important > hoja !important). El CSS resguardo '#view-semanal th{color:#ffffff!important;opacity:1!important...}' (main.css offset 73945) ya pedia blanco, pero el inline JS lo pisa."
+      "decision_insercion": "Insertar <button id=\"btn-tema\"> como hijo directo de #app, INMEDIATAMENTE despues de </h1> y antes de <div class=\"side-overlay\">. Posicion: absolute top:14px right:16px z-index:10 (dentro del padding del .app; por encima de .main-card-container z-index:1, por debajo de .side-overlay z-index:1000 y #side-panel z-index:99999)."
     },
-    "B_decision_color": {
-      "existe_tema_claro": "NO existe 'tema-claro' en el proyecto (grep app.js/main.css/index.html: 0 refs). Los 4 temas avanzados son: tema-estelar, tema-cyberpunk, tema-ejecutivo, tema-pastel.",
-      "fondo_th_por_tema": [
-        "tema-estelar: thead th background rgba(100,255,218,.08)!important sobre fondo #000 => oscuro.",
-        "tema-cyberpunk: thead th background rgba(255,0,255,.1)!important sobre fondo #0a0014 => oscuro.",
-        "tema-ejecutivo: thead th background #1a237e!important (navy oscuro), CSS ya pide color:#fff!important.",
-        "tema-pastel: thead th background linear-gradient(#f48fb1,#f06292)!important (rosa medio), CSS ya pide color:#fff!important.",
-        "dark mode (body.dark): th sobre superficies oscuras (#0f172a/#1e293b) => blanco correcto.",
-        "modo claro por defecto (sin clase): el bloque resguardo v6.12+ (main.css offsets ~71000-74000) fuerza .celda/#view-table .celda background #1e293b!important y '#view-semanal th{color:#ffffff!important}' de forma INCONDICIONAL (sin tema), ademas body #view-diario{background:#0f172a!important}. => incluso en modo claro las vistas actuales quedan oscuras."
-      ],
-      "decision": "FORZAR SIEMPRE #ffffff + opacity:1 (tal como pide el usuario). La vista actual es tema-estelar; los 4 temas y el dark mode tienen fondo de th oscuro donde el blanco es legible; el CSS resguardo ya fuerza oscuro incluso en modo claro. El unico caso teoricamente riesgoso (modo claro puro sin resguardo) no existe en el estado actual del CSS. Se mantienen font-weight:700 y font-family Montserrat (propiedades OK, no pedidas de cambiar). Se ELIMINA la variable e y la condicion dark/light completa.",
-      "no_tocar": "No tocar .hora-cell ni inputs (v6.12 ya puso .hora-cell #e2e8f0 CSS; tema estelar usa #9effdb en .hora-cell input) => la funcion nunca los toco y no debe empezar a tocarlos."
+    "B_toggleDarkMode_estado_actual": {
+      "offset_definicion": "js/app.js offset 93915, longitud 423 chars (archivo minificado 1 linea, UTF-8)",
+      "texto_actual_exacto": "function toggleDarkMode(){document.body.classList.toggle(\"dark\");const e=document.getElementById(\"btn-dark-mode\"),a=document.body.classList.contains(\"dark\");e&&(e.textContent=a?\"☀️ Claro\":\"🌙 Oscuro\"),localStorage.setItem(CONFIG.STORAGE.DARK_MODE,a?\"1\":\"\"),(document.getElementById(\"view-dashboard\").classList.contains(\"active\")||document.querySelector(\"#view-dashboard.active\"))&&renderDashboard(),forzarEstiloCabeceras()}",
+      "que_hace": "Alterna clase 'dark' en body; actualiza textContent del btn-dark-mode (☀️ Claro / 🌙 Oscuro); persiste CONFIG.STORAGE.DARK_MODE (clave real = 'horario_dark_mode', valores '1'/''); re-renderiza dashboard si activo; llama forzarEstiloCabeceras().",
+      "initDarkMode_offset": "js/app.js offset 95206: function initDarkMode(){if(\"1\"===localStorage.getItem(CONFIG.STORAGE.DARK_MODE)){document.body.classList.add(\"dark\");const e=document.getElementById(\"btn-dark-mode\");e&&(e.textContent=\"☀️ Claro\")}}",
+      "btn_panel": "btn-dark-mode NO existe en index.html (fue removido en la reestructuracion v5.4). Solo sobrevive en: (a) app.js getElementById x2, (b) scripts/optimize-a11y.js par from/to: from '<button class=\"sp-btn\" id=\"btn-dark-mode\" onclick=\"toggleDarkMode()\">🌙 Oscuro</button>' -> to con aria-label => el from no matchea => WARN A11Y en build ('[WARN] No se encontro patron ARIA').",
+      "arranque": "function iniciar(){...initDarkMode()...} (offset 54409) se ejecuta al cargar app.js (antes de DOMContentLoaded y antes de renderizar()) => el restore de tema corre ANTES de que forzarEstiloCabeceras pintee th.",
+      "decision": "toggleTheme() es el CONTROLADOR MAESTRO (clase 'tema-claro' + persistencia 'planify_theme' + iconos + sync). toggleDarkMode() queda como DELEGADO: function toggleDarkMode(){toggleTheme()} (compatibilidad total con onclick del panel). initDarkMode() se reescribe para restaurar desde planify_theme (con fallback legacy horario_dark_mode). La clase 'dark' deja de usarse (las reglas body.dark quedan dormidas como hoy; el .leyenda span ya tiene #0f172a fijo por v6.14)."
     },
-    "C_bumps": {
-      "index_html": "v=6.14 x2: offset 26625 'css/main.css?v=6.14' (1 match) y offset 65823 'js/app.js?v=6.14' (1 match). Total 'v=6.14' == 2.",
-      "sw_js": "planify-cache-v8 @ offset 13 (1 sola referencia, sw.js 1 linea minificada).",
-      "estado_base": "git limpio HEAD 0b3dd76; main.css balance 653/653 (74200 bytes); app.js 137424 bytes; node --check js/app.js: SYNTAX OK pre-cambio; app.js 1 linea minificada."
+    "C_forzarEstiloCabeceras_y_colores_inline": {
+      "offset_definicion": "js/app.js offset 129906",
+      "texto_actual_exacto": "function forzarEstiloCabeceras(){document.querySelectorAll(\"th, th *\").forEach(function(e){e.style.setProperty(\"color\",\"#ffffff\",\"important\"),e.style.setProperty(\"opacity\",\"1\",\"important\"),e.style.setProperty(\"font-weight\",\"700\",\"important\"),e.style.setProperty(\"font-family\",\"'Montserrat', sans-serif\",\"important\")})}",
+      "problema": "v6.15 fuerza #ffffff!important INLINE SIEMPRE (inline !important vence a toda hoja !important). En modo claro (body.tema-claro) th tendria texto blanco sobre fondo claro => ilegible.",
+      "otras_inyecciones_inline": [
+        "setProperty @70121/@70395: display block/none para cambiarVista (no color).",
+        "setProperty @94596: --fuente-principal (cambiarTipografia).",
+        "setProperty @94827/@94851: variables de paleta (--primary-1 etc.) de aplicarPaleta.",
+        "Ninguna otra funcion inyecta colores oscuros/claros inline en el lienzo. Solo forzarEstiloCabeceras pinta colores inline.",
+        "La plantilla de reporte por correo (enviarReporteSemanal) tiene #94a3b8/#cbd5e1 hardcodeados pero NO es UI."
+      ],
+      "decision": "Color condicional por tema: var c=document.body.classList.contains(\"tema-claro\")?\"#0f172a\":\"#ffffff\" (se mantienen opacity/font-weight/font-family y el selector 'th, th *')."
+    },
+    "D_reglas_oscuras_a_contrarrestar": {
+      "inventario_no_scoped_con_important": [
+        ".cal-dia{background-color:#1e293b!important;border:1px solid #334155!important;min-height:60px!important;color:#ffffff!important} (v6.8, spec 0,1,0)",
+        ".cal-dia{background:rgba(255,255,255,0.08)!important;color:#ffffff!important;border:1px solid rgba(0,240,255,0.3)!important;min-height:50px!important;display:flex!important} (anterior, spec 0,1,0; shorthand background pisado por la de v6.8 pero conviene cubrirla)",
+        ".cal-dia:hover{background:rgba(0,240,255,0.15)!important;border-color:#00f0ff!important} (0,2,0)",
+        ".cal-dia.hoy{border:2px solid #00f0ff!important;background:rgba(0,240,255,0.25)!important} (0,2,0)",
+        ".cal-dia-nombre{color:var(--text-light)!important;...} base + body.tema-estelar .cal-dia-nombre{background:rgba(100,255,218,.08)!important;color:#64ffda!important} (0,1,1 scoped a vencer por orden)",
+        "#cal-titulo{color:#00f0ff!important;...} (1,0,0)",
+        ".cal-nav{background:rgba(0,240,255,0.15)!important;color:#00f0ff!important;border:1px solid #00f0ff!important;...} (0,1,0)",
+        ".celda,.grid-cell,#view-table .celda{color:#f8fafc!important;background-color:#1e293b!important;border:1px solid #334155!important} (v6.10; .celda 0,1,0; #view-table .celda 0,1,1)",
+        ".celda-header,.hora-col{color:#94a3b8!important;font-weight:600} (0,1,0)",
+        "#view-semanal .hora-cell,#view-semanal .hora-cell input,#view-semanal #header-row th,#view-semanal span,#view-semanal label{color:#e2e8f0!important;font-weight:500!important} (v6.12, 1,1,1)",
+        "body #view-diario{background:#0f172a!important;border-color:#334155!important;color:#f8fafc!important} (v6.12, 1,0,1)",
+        "body #view-diario .planner-notebook{background:#0f172a!important;color:#f8fafc!important} (1,1,2)",
+        "body #view-diario .notebook-header{border-color:#334155!important} (1,1,2); body #view-diario .notebook-header h2{color:#f8fafc!important} (1,1,3)",
+        "body #view-diario .card-section{background:#1e293b!important;border-color:#334155!important} (1,1,2); .section-title{color:#f8fafc!important} (1,1,2)",
+        "body #view-diario .aesthetic-input,body #view-diario .aesthetic-textarea{background:#0f172a!important;border-color:#334155!important;color:#e2e8f0!important} (1,1,2)",
+        "body #view-diario .routine-checkboxes{color:#e2e8f0!important} (1,1,2); input[type=checkbox]{accent-color:#8b5cf6!important;color-scheme:dark!important;background:#0f172a!important} (1,2,2)",
+        "body #view-diario .mood-btn,body #view-diario .cloud-btn{background:#0f172a!important;border-color:#334155!important;color:#e2e8f0!important} (1,1,2); .aesthetic-btn{background:#334155!important} (1,1,2)",
+        "#view-semanal #header-row th{color:#ffffff!important;font-weight:700!important} (v6.13, 2,0,1)",
+        "#view-semanal button.btn-empty-secondary{background:#1e293b!important;color:#ffffff!important;border:1px solid #475569!important} (v6.13, 1,1,1); su span{color:#ffffff!important} (1,1,2)",
+        "#view-semanal th{color:#ffffff!important;opacity:1!important;font-weight:700!important;font-size:0.95rem!important} (v6.14, 1,0,1)"
+      ],
+      "no_requieren_override": [
+        "#view-semanal .leyenda span{color:#0f172a!important} (v6.14): texto oscuro sobre chips claros var(--surface-hover)=#f8f9fa => CORRECTO en ambos modos. No tocar.",
+        ".bottom-nav base: background:rgba(255,255,255,0.95) (claro); body.tema-estelar .bottom-nav lo oscurece (scoped). En claro queda claro => NO se necesita override.",
+        "div.empty-state#empty-state: gradiente claro #f0f4ff->#fce4f8 (correcto en ambos modos).",
+        ".tour-tooltip background #2d3436 oscuro (tooltip flotante, correcto en ambos).",
+        ".lic-msg color #27ae60 (correcto en ambos).",
+        "#side-panel y todo su arbol: siempre oscuro por diseno (html body #side-panel ... background #0f172a). No tocar.",
+        "body.dark #view-semanal .leyenda span{color:#e8eeff!important}: la clase 'dark' deja de aplicarse en v6.16 => regla dormida, sin efecto."
+      ],
+      "scoped_estelar_a_vencer_por_append": [
+        "body.tema-estelar{background:#000} (0,1,0)",
+        ".tema-estelar .celda{border-color:rgba(0,255,200,.2)} (0,1,1)",
+        ".tema-estelar thead th{background:rgba(100,255,218,.08);color:#9effdb;...} (0,1,2)",
+        "body.tema-estelar .app{background:#0d1117!important;backdrop-filter:none!important} y body.tema-estelar .app{background:transparent!important} (0,1,1)",
+        "body.tema-estelar h1#main-title{color:#64ffda!important} (0,1,1)",
+        "body.tema-estelar .main-card-container{background:#0d1117!important;border-radius:14px!important} y {background:#0d1117!important;border:1px solid rgba(100,255,218,.15)!important} (0,1,1)",
+        "body.tema-estelar #view-table,body.tema-estelar #view-dashboard{background:#0d1117!important;border-radius:12px!important} (1,1,1)",
+        "body.tema-estelar .table-wrap{background:#0d1117!important} (0,1,1)",
+        "body.tema-estelar #view-mensual{background:#0d1117!important} (1,1,1)",
+        "body.tema-estelar .cal-container,body.tema-estelar #cal-container{background:rgba(255,255,255,.03)!important} (0,1,1)",
+        "body.tema-estelar .cal-grid{background:rgba(255,255,255,.02)!important} y {background:#0f172a!important;border:1px solid rgba(100,255,218,.25)!important} (0,1,1)",
+        "body.tema-estelar .cal-dia{background:rgba(255,255,255,.05)!important} y {background:#1e293b!important;border:1px solid rgba(100,255,218,.35)!important;color:#9effdb!important} y {color:#ffffff!important} (0,1,1)"
+      ]
+    },
+    "E_boton_header": {
+      "html_exacto": "<button id=\"btn-tema\" class=\"theme-toggle\" onclick=\"toggleTheme()\" aria-label=\"Cambiar a modo claro\" title=\"Cambiar modo claro/oscuro\">☀️</button> (☀️ = U+2600 U+FE0F)",
+      "css": ".theme-toggle: absolute top:14px right:16px z-index:10; 40x40px; border-radius:50%; flex center; font-size:18px; cursor:pointer; dark: bg #1e293b border #334155 color #f8fafc shadow 0 2px 8px rgba(0,0,0,0.3); hover scale(1.08); light: bg #ffffff border #e2e8f0 color #0f172a.",
+      "iconos": "modo OSCURO (default): muestra ☀️ (para pasar a claro); modo CLARO: muestra 🌙 (U+1F319). aria-label y title se actualizan por JS.",
+      "z_index_razon": "10 > .main-card-container z-index:1 (v6.9) => boton sobre el lienzo; 10 < .side-overlay 1000 y #side-panel 99999 => no tapa el panel/overlay."
+    },
+    "F_persistencia": {
+      "clave": "planify_theme (localStorage), valores 'light' | 'dark'.",
+      "restore": "En initDarkMode() (llamado dentro de iniciar() offset 54409, ANTES de renderizar()) => el classList queda listo antes de que renderizar/forzarEstiloCabeceras pinten. Fallback legacy: si no hay planify_theme y horario_dark_mode === '' => 'light'; en cualquier otro caso 'dark' (default oscuro).",
+      "sin_planify_theme_hoy": "grep app.js: planify_theme 0 refs, tema-claro 0 refs => no hay colision con codigo existente.",
+      "orden_arranque": "app.js se carga al final de body; el bloque de bootstrap llama iniciar() inmediatamente (offset ~63399). initDarkMode corre primero en la cadena; renderizar() despues."
+    },
+    "G_estado_base": {
+      "git": "limpio, HEAD 65bfec5",
+      "main_css": "653 reglas / 74200 bytes (balance 653/653)",
+      "index_html": "v=6.15 x2: 'css/main.css?v=6.15' @26968 y 'js/app.js?v=6.15' @66166",
+      "sw_js": "planify-cache-v9 @13 (sw.js 1 linea)",
+      "app_js": "1 linea minificada, 135892 chars, UTF-8 con emojis reales (☀️ U+2600+U+FE0F, 🌙 U+1F319, 📊 U+1F4CA)"
     }
   },
+  "textos_exactos": {
+    "ST01a_viejo": "</h1><div class=\"side-overlay\" id=\"side-overlay\" onclick=\"togglePanel()\" aria-hidden=\"true\"></div>",
+    "ST01a_nuevo": "</h1><button id=\"btn-tema\" class=\"theme-toggle\" onclick=\"toggleTheme()\" aria-label=\"Cambiar a modo claro\" title=\"Cambiar modo claro/oscuro\">☀️</button><div class=\"side-overlay\" id=\"side-overlay\" onclick=\"togglePanel()\" aria-hidden=\"true\"></div>",
+    "ST01b_viejo": "id=\"btn-view-dashboard\" aria-label=\"Vista dashboard\">📊 Dashboard</button></div></div>",
+    "ST01b_nuevo": "id=\"btn-view-dashboard\" aria-label=\"Vista dashboard\">📊 Dashboard</button></div><button class=\"sp-btn\" id=\"btn-dark-mode\" onclick=\"toggleDarkMode()\">🌙 Oscuro</button></div>",
+    "ST02_viejo_toggleDarkMode": "function toggleDarkMode(){document.body.classList.toggle(\"dark\");const e=document.getElementById(\"btn-dark-mode\"),a=document.body.classList.contains(\"dark\");e&&(e.textContent=a?\"☀️ Claro\":\"🌙 Oscuro\"),localStorage.setItem(CONFIG.STORAGE.DARK_MODE,a?\"1\":\"\"),(document.getElementById(\"view-dashboard\").classList.contains(\"active\")||document.querySelector(\"#view-dashboard.active\"))&&renderDashboard(),forzarEstiloCabeceras()}",
+    "ST02_nuevo_toggleDarkMode": "function toggleDarkMode(){toggleTheme()}function toggleTheme(){const e=document.body.classList.toggle(\"tema-claro\");localStorage.setItem(\"planify_theme\",e?\"light\":\"dark\");const a=document.getElementById(\"btn-tema\"),t=document.getElementById(\"btn-dark-mode\");a&&(a.textContent=e?\"🌙\":\"☀️\",a.setAttribute(\"aria-label\",e?\"Cambiar a modo oscuro\":\"Cambiar a modo claro\"),a.setAttribute(\"title\",e?\"Cambiar a modo oscuro\":\"Cambiar a modo claro\")),t&&(t.textContent=e?\"☀️ Claro\":\"🌙 Oscuro\"),forzarEstiloCabeceras(),(document.getElementById(\"view-dashboard\").classList.contains(\"active\")||document.querySelector(\"#view-dashboard.active\"))&&renderDashboard()}",
+    "ST02_viejo_initDarkMode": "function initDarkMode(){if(\"1\"===localStorage.getItem(CONFIG.STORAGE.DARK_MODE)){document.body.classList.add(\"dark\");const e=document.getElementById(\"btn-dark-mode\");e&&(e.textContent=\"☀️ Claro\")}}",
+    "ST02_nuevo_initDarkMode": "function initDarkMode(){let e=localStorage.getItem(\"planify_theme\");if(!e){const t=localStorage.getItem(CONFIG.STORAGE.DARK_MODE);e=\"\"===t?\"light\":\"dark\"}if(\"light\"===e){document.body.classList.add(\"tema-claro\");const t=document.getElementById(\"btn-tema\");t&&(t.textContent=\"🌙\",t.setAttribute(\"aria-label\",\"Cambiar a modo oscuro\"),t.setAttribute(\"title\",\"Cambiar a modo oscuro\"));const a=document.getElementById(\"btn-dark-mode\");a&&(a.textContent=\"☀️ Claro\")}}",
+    "ST02_viejo_forzar": "function forzarEstiloCabeceras(){document.querySelectorAll(\"th, th *\").forEach(function(e){e.style.setProperty(\"color\",\"#ffffff\",\"important\"),e.style.setProperty(\"opacity\",\"1\",\"important\"),e.style.setProperty(\"font-weight\",\"700\",\"important\"),e.style.setProperty(\"font-family\",\"'Montserrat', sans-serif\",\"important\")})}",
+    "ST02_nuevo_forzar": "function forzarEstiloCabeceras(){var c=document.body.classList.contains(\"tema-claro\")?\"#0f172a\":\"#ffffff\";document.querySelectorAll(\"th, th *\").forEach(function(e){e.style.setProperty(\"color\",c,\"important\"),e.style.setProperty(\"opacity\",\"1\",\"important\"),e.style.setProperty(\"font-weight\",\"700\",\"important\"),e.style.setProperty(\"font-family\",\"'Montserrat', sans-serif\",\"important\")})}"
+  },
+  "bloque_css_claro_exacto": "body.tema-claro,html body.tema-claro{background:#f8fafc!important}body.tema-claro .app{background:#ffffff!important;box-shadow:0 4px 24px rgba(15,23,42,0.08)!important}body.tema-claro h1#main-title{color:#0f172a!important}.theme-toggle{position:absolute;top:14px;right:16px;z-index:10;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid #334155;background:#1e293b;color:#f8fafc;font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:transform .2s ease,background .2s ease,border-color .2s ease}.theme-toggle:hover{transform:scale(1.08)}body.tema-claro .theme-toggle{background:#ffffff!important;border-color:#e2e8f0!important;color:#0f172a!important;box-shadow:0 2px 8px rgba(15,23,42,0.12)!important}body.tema-claro thead th{background:#f1f5f9!important;color:#0f172a!important}body.tema-claro .main-card-container{background:#ffffff!important;border:1px solid #e2e8f0!important;border-radius:14px!important}body.tema-claro #view-table,body.tema-claro #view-dashboard{background:#ffffff!important;border-radius:12px!important}body.tema-claro .table-wrap{background:#ffffff!important}body.tema-claro #view-mensual{background:#ffffff!important;border-radius:14px!important}body.tema-claro .celda,body.tema-claro .grid-cell,body.tema-claro #view-table .celda{color:#0f172a!important;background-color:#ffffff!important;border:1px solid #e2e8f0!important}body.tema-claro .celda-header,body.tema-claro .hora-col{color:#475569!important}body.tema-claro #view-semanal .hora-cell,body.tema-claro #view-semanal .hora-cell input,body.tema-claro #view-semanal #header-row th,body.tema-claro #view-semanal span,body.tema-claro #view-semanal label{color:#334155!important;font-weight:500!important}body.tema-claro #view-semanal th{color:#0f172a!important;opacity:1!important;font-weight:700!important}body.tema-claro #view-semanal #header-row th{color:#0f172a!important}body.tema-claro #view-semanal button.btn-empty-secondary{background:#ffffff!important;color:#0f172a!important;border:1px solid #cbd5e1!important}body.tema-claro #view-semanal button.btn-empty-secondary span{color:#0f172a!important}body.tema-claro .cal-container,body.tema-claro #cal-container{background:#f1f5f9!important}body.tema-claro .cal-grid{background:#ffffff!important;border:1px solid #e2e8f0!important}body.tema-claro .cal-dia{background:#ffffff!important;border:1px solid #e2e8f0!important;color:#0f172a!important}body.tema-claro .cal-dia:hover{background:#f1f5f9!important;border-color:#94a3b8!important}body.tema-claro .cal-dia.hoy{border:2px solid #38bdf8!important;background:rgba(56,189,248,0.12)!important;color:#0f172a!important}body.tema-claro .cal-dia-nombre{background:transparent!important;color:#475569!important}body.tema-claro #cal-titulo{color:#0f172a!important}body.tema-claro .cal-nav{background:#e2e8f0!important;color:#0f172a!important;border:1px solid #cbd5e1!important}body.tema-claro #view-diario{background:#fdfbf7!important;border-color:#e8e1d5!important;color:#1e293b!important}body.tema-claro #view-diario .planner-notebook{background:#ffffff!important;color:#1e293b!important}body.tema-claro #view-diario .notebook-header{border-color:#e0d5c1!important}body.tema-claro #view-diario .notebook-header h2{color:#2b2b2b!important}body.tema-claro #view-diario .card-section{background:#ffffff!important;border-color:#f0ece1!important}body.tema-claro #view-diario .section-title{color:#4a4a4a!important}body.tema-claro #view-diario .aesthetic-input,body.tema-claro #view-diario .aesthetic-textarea{background:#ffffff!important;border-color:#dcd6cd!important;color:#1e293b!important}body.tema-claro #view-diario .routine-checkboxes{color:#444!important}body.tema-claro #view-diario .routine-checkboxes input[type=\"checkbox\"]{color-scheme:light!important;background:#ffffff!important;accent-color:#8b5cf6!important}body.tema-claro #view-diario .mood-btn,body.tema-claro #view-diario .cloud-btn{background:#f0ebf7!important;border-color:#dcd0ed!important;color:#333!important}body.tema-claro #view-diario .aesthetic-btn{background:#e2e8f0!important;color:#0f172a!important}body.tema-claro .bottom-nav{background:#ffffff!important;border:1px solid #e2e8f0!important}",
+  "verificacion_parejas_especificidad": [
+    ".cal-dia (0,1,0) vs body.tema-claro .cal-dia (0,1,1) => gana claro",
+    ".cal-dia:hover (0,2,0) vs body.tema-claro .cal-dia:hover (0,2,1) => gana claro",
+    ".cal-dia.hoy (0,2,0) vs body.tema-claro .cal-dia.hoy (0,2,1) => gana claro",
+    ".cal-dia-nombre scoped (0,1,1) vs body.tema-claro .cal-dia-nombre (0,1,1) => igual spec, gana por append (bloque al final)",
+    "#cal-titulo (1,0,0) vs body.tema-claro #cal-titulo (1,1,1) => gana claro",
+    ".cal-nav (0,1,0) vs body.tema-claro .cal-nav (0,1,1) => gana claro",
+    ".celda (0,1,0) vs body.tema-claro .celda (0,1,1); #view-table .celda (0,1,1) vs body.tema-claro #view-table .celda (1,1,2) => gana claro",
+    ".celda-header/.hora-col (0,1,0) vs (0,1,1) => gana claro",
+    "#view-semanal .hora-cell/span/label (1,1,1) vs body.tema-claro #view-semanal .hora-cell (1,2,2) => gana claro",
+    "#view-semanal th (1,0,1) vs body.tema-claro #view-semanal th (1,1,2) => gana claro",
+    "#view-semanal #header-row th (2,0,1) vs body.tema-claro #view-semanal #header-row th (2,1,2) => gana claro",
+    "#view-semanal button.btn-empty-secondary (1,1,1) vs (1,1,2) y span (1,1,2) vs (1,2,3) => gana claro",
+    "body #view-diario (1,0,1) vs body.tema-claro #view-diario (1,1,1) => gana claro",
+    "body #view-diario .X (1,1,2) vs body.tema-claro #view-diario .X (1,2,2) => gana claro",
+    "body #view-diario .notebook-header h2 (1,1,3) vs (1,2,3) => gana claro",
+    "body #view-diario input[type=checkbox] (1,2,2) vs (1,3,2) => gana claro",
+    ".tema-estelar thead th (0,1,2) vs body.tema-claro thead th (0,1,3) => gana claro",
+    "scoped (0,1,1)/(1,1,1) vs body.tema-claro (0,1,1)/(1,1,1): igual spec => gana claro POR ORDEN (append al final de main.css, despues de la ultima regla body.dark #view-semanal .leyenda span)",
+    "body.tema-estelar (0,1,0) vs body.tema-claro,html body.tema-claro (0,1,0)/(0,1,2) => gana claro (html body.tema-claro incluso vence a .tema-cyberpunk body 0,1,1 en caso de combo)",
+    "body.tema-estelar .bottom-nav{background:rgba(13,17,23,0.95)!important;border:1px solid rgba(100,255,218,0.15)!important} (0,1,1): como el body conserva tema-estelar + tema-claro, el scoped oscuro SI matchea y vence a la base clara (0,1,0) => SE CONTRARRESTA con body.tema-claro .bottom-nav{background:#ffffff!important;border:1px solid #e2e8f0!important} (0,1,1, igual spec, gana por append)."
+  ],
   "sub_tareas": [
     {
       "id": "ST-00",
       "nombre": "Pre-checks de estado base (fail-fast)",
       "pasos": [
-        "git status --short (debe estar vacio) y git rev-parse --short HEAD (debe ser 0b3dd76)",
+        "git status --short (vacio) y git rev-parse --short HEAD (65bfec5)",
         "node: balance llaves main.css == 653/653",
-        "node --check js/app.js (debe pasar: SYNTAX OK)",
-        "node: contar 'forzarEstiloCabeceras' en js/app.js == 5; 'v=6.14' en index.html == 2; 'planify-cache-v8' en sw.js == 1",
-        "node: confirmar que el texto viejo de la funcion (prefijo 'function forzarEstiloCabeceras(){var e=document.body.classList.contains(\"dark\")?\"#e8eeff\":\"#334155\"') tiene EXACTAMENTE 1 match"
+        "node --check js/app.js (SYNTAX OK pre-cambio)",
+        "node: 'v=6.15' en index.html == 2; 'planify-cache-v9' en sw.js == 1; 'planify_theme' en app.js == 0; 'tema-claro' en app.js == 0 y en main.css == 0; 'btn-tema' en index.html == 0",
+        "node: cada texto_viejo de ST-01/ST-02 tiene EXACTAMENTE 1 match en su archivo"
       ],
       "criterio": "Si algun check falla, ABORTAR y reportar (no aplicar cambios sobre base sucia)"
     },
     {
       "id": "ST-01",
-      "nombre": "js/app.js: reemplazo exacto de la funcion forzarEstiloCabeceras (1 match unico)",
-      "texto_viejo_exacto": "function forzarEstiloCabeceras(){var e=document.body.classList.contains(\"dark\")?\"#e8eeff\":\"#334155\";document.querySelectorAll(\"th, th *\").forEach(function(a){a.style.setProperty(\"color\",e,\"important\"),a.style.setProperty(\"font-weight\",\"700\",\"important\"),a.style.setProperty(\"font-family\",\"'Montserrat', sans-serif\",\"important\")})}",
-      "texto_nuevo_exacto": "function forzarEstiloCabeceras(){document.querySelectorAll(\"th, th *\").forEach(function(a){a.style.setProperty(\"color\",\"#ffffff\",\"important\"),a.style.setProperty(\"opacity\",\"1\",\"important\"),a.style.setProperty(\"font-weight\",\"700\",\"important\"),a.style.setProperty(\"font-family\",\"'Montserrat', sans-serif\",\"important\")})}",
-      "notas": [
-        "Se elimina la variable 'e' y la condicion completa (document.body.classList.contains(\"dark\")?\"#e8eeff\":\"#334155\") => SIEMPRE color #ffffff.",
-        "Se anade opacity:1 !important (pedido por el usuario; refuerza legibilidad ante cualquier regla con opacity < 1).",
-        "Se conservan font-weight:700 y font-family Montserrat (no pedidos de cambiar; si se quitaran, podria perder el estilo de encabezados).",
-        "El selector 'th, th *' NO se toca: cubre th + spans internos (nombres de dias, HORA).",
-        "La funcion NO toca .hora-cell ni inputs: se mantiene ese comportamiento (v6.12 ya los cubre con CSS #e2e8f0)."
+      "nombre": "index.html: insercion del boton header (ST-01a) y del btn-dark-mode en el panel (ST-01b)",
+      "cambios": [
+        {"parte": "ST-01a", "offset_ancla": 27313, "viejo": "TEXTOS_EXACTOS.ST01a_viejo", "nuevo": "TEXTOS_EXACTOS.ST01a_nuevo", "nota": "Boton circular del header: hijo directo de #app, despues de </h1>. icono inicial ☀️ (modo oscuro default)."},
+        {"parte": "ST-01b", "offset_ancla": 31802, "viejo": "TEXTOS_EXACTOS.ST01b_viejo", "nuevo": "TEXTOS_EXACTOS.ST01b_nuevo", "nota": "Re-anade btn-dark-mode dentro de la card 'Vista' del panel (tab-personalizar), tras el view-toggle. El HTML resultante coincide EXACTO con el patron from de optimize-a11y.js => desaparece el WARN A11Y de btn-dark-mode en el proximo build."}
       ],
       "criterio": [
-        "El texto viejo aparece EXACTAMENTE 1 vez en js/app.js (verificado: prefijo con 1 match, funcion completa 1 match)",
-        "El texto nuevo queda 1 sola vez; 'var e=document.body.classList.contains' desaparece de js/app.js (0 matches)",
-        "node --check js/app.js pasa (SYNTAX OK)",
-        "Los 4 call sites (40111, 94314, 129356, 129394) permanecen intactos: total 'forzarEstiloCabeceras' == 5 (igual que antes)",
-        "git diff --name-only == solo js/app.js en este paso"
+        "index.html: 'btn-tema' == 1 y 'theme-toggle' == 1 (solo el nuevo); 'btn-dark-mode' == 1; 'toggleTheme()' == 1; 'toggleDarkMode()' == 1",
+        "La cadena vieja ST01b (con 📊 Dashboard) sigue intacta salvo la insercion",
+        "El orden del DOM: <h1>...PLANIFY</h1><button id=\"btn-tema\"...></button><div class=\"side-overlay\"..."
       ]
     },
     {
       "id": "ST-02",
-      "nombre": "Bump de versiones: v=6.15 x2 en index.html + cache v9 en sw.js",
+      "nombre": "js/app.js: 3 reemplazos de funcion (1 match cada uno) + node --check",
       "cambios": [
-        {"archivo": "index.html", "viejo": "css/main.css?v=6.14", "nuevo": "css/main.css?v=6.15", "offset": 26625, "ocurrencias": 1},
-        {"archivo": "index.html", "viejo": "js/app.js?v=6.14", "nuevo": "js/app.js?v=6.15", "offset": 65823, "ocurrencias": 1},
-        {"archivo": "sw.js", "viejo": "planify-cache-v8", "nuevo": "planify-cache-v9", "offset": 13, "ocurrencias": 1}
+        {"funcion": "toggleDarkMode (offset 93915)", "viejo": "TEXTOS_EXACTOS.ST02_viejo_toggleDarkMode", "nuevo": "TEXTOS_EXACTOS.ST02_nuevo_toggleDarkMode", "nota": "toggleDarkMode queda como delegado: toggleTheme() es el controlador maestro (clase tema-claro, persistencia planify_theme light/dark, iconos btn-tema ☀️/🌙, sync btn-dark-mode ☀️ Claro/🌙 Oscuro, forzarEstiloCabeceras + renderDashboard condicional igual que antes)."},
+        {"funcion": "initDarkMode (offset 95206)", "viejo": "TEXTOS_EXACTOS.ST02_viejo_initDarkMode", "nuevo": "TEXTOS_EXACTOS.ST02_nuevo_initDarkMode", "nota": "Restaura desde planify_theme; fallback legacy horario_dark_mode ('' -> light, resto -> dark). En light: classList.add('tema-claro') + sync iconos. Se ejecuta dentro de iniciar() ANTES de renderizar => forzarEstiloCabeceras pinta con el tema correcto."},
+        {"funcion": "forzarEstiloCabeceras (offset 129906)", "viejo": "TEXTOS_EXACTOS.ST02_viejo_forzar", "nuevo": "TEXTOS_EXACTOS.ST02_nuevo_forzar", "nota": "Color condicional: tema-claro -> #0f172a (legible en claro), si no -> #ffffff (v6.15 intacto en oscuro). Se mantienen opacity/font-weight/font-family y selector 'th, th *'."}
       ],
       "criterio": [
-        "index.html: 'v=6.15' == 2 ocurrencias; 'v=6.14' == 0",
-        "sw.js: contiene 'planify-cache-v9'; NO contiene 'planify-cache-v8'"
+        "Cada texto viejo: 1 match unico antes del edit; 0 matches despues",
+        "node --check js/app.js: SYNTAX OK",
+        "js/app.js: 'function toggleTheme' == 1; 'planify_theme' == 2 (1 setItem en toggleTheme + 1 getItem en initDarkMode); 'tema-claro' == 3 (toggle en toggleTheme, add en initDarkMode, contains en forzarEstiloCabeceras); 'classList.toggle(\"dark\")' == 0",
+        "Totales post-edit: 'forzarEstiloCabeceras' == 5 (def + 4 call sites: 40111, 94314, 128416, 129344, 129382), 'toggleDarkMode' == 1 (solo definicion; el onclick vive en index.html), 'initDarkMode' == 2 (def + call en iniciar()), 'toggleTheme' == 1",
+        "git diff --name-only == solo js/app.js en este paso (si ST-01 ya aplico, js/app.js + index.html)"
       ]
     },
     {
       "id": "ST-03",
+      "nombre": "css/main.css: APPEND del bloque claro (1 linea minificada, 38 reglas) al final del archivo",
+      "cambios": [
+        {"archivo": "css/main.css", "tipo": "append al final (offset actual 74200, despues de 'body.dark #view-semanal .leyenda span{color:#e8eeff!important}')", "contenido": "BLOQUE_CSS_CLARO_EXACTO (38 reglas, incluye body.tema-claro .bottom-nav)"}
+      ],
+      "notas": [
+        "Las 38 reglas cierran con } y el archivo queda terminando en '}' sin salto de linea extra (consistente con minificacion actual).",
+        "Especificidad minima de cada regla clara: 0,1,1 (body.tema-claro .X) con prefijo id (1,1,1+ o 2,1,1+) donde la oscura tenia id => verificadas por pareja (ver 'verificacion_parejas_especificidad').",
+        "Igual spec => gana claro por estar APPEND al final (todas !important).",
+        "No se tocan: .leyenda span (ya #0f172a correcto), .empty-state, .tour-tooltip, .lic-msg, #side-panel (siempre oscuro por diseno)."
+      ],
+      "criterio": [
+        "main.css termina con 'body.tema-claro .bottom-nav{background:#ffffff!important;border:1px solid #e2e8f0!important}'",
+        "Balance llaves main.css == 653 + 38 == 691/691",
+        "node: conteo /body\\.tema-claro/g en main.css == 39 (38 selectores con prefijo body.tema-claro; 'body.tema-claro,html body.tema-claro' cuenta 2 en la primera regla) => aceptar 39 +/- diferencias si alguna regla usa selector doble; reportar conteo real",
+        "main.css sigue siendo 1 sola linea (sin saltos) y sin caracteres no ASCII"
+      ]
+    },
+    {
+      "id": "ST-04",
+      "nombre": "Bump de versiones: v=6.16 x2 en index.html + cache v10 en sw.js",
+      "cambios": [
+        {"archivo": "index.html", "viejo": "css/main.css?v=6.15", "nuevo": "css/main.css?v=6.16", "offset": 26968, "ocurrencias": 1},
+        {"archivo": "index.html", "viejo": "js/app.js?v=6.15", "nuevo": "js/app.js?v=6.16", "offset": 66166, "ocurrencias": 1},
+        {"archivo": "sw.js", "viejo": "planify-cache-v9", "nuevo": "planify-cache-v10", "offset": 13, "ocurrencias": 1}
+      ],
+      "criterio": [
+        "index.html: 'v=6.16' == 2 ocurrencias; 'v=6.15' == 0",
+        "sw.js: contiene 'planify-cache-v10'; NO contiene 'planify-cache-v9'"
+      ]
+    },
+    {
+      "id": "ST-05",
       "nombre": "Verificacion integral (fail-fast)",
       "comandos_verificacion": [
         "node --check js/app.js (SYNTAX OK)",
-        "node: js/app.js contiene el texto nuevo 1 vez; NO contiene '#334155' dentro de forzarEstiloCabeceras; total 'forzarEstiloCabeceras' == 5",
-        "node: index.html 'v=6.15' == 2 y 'v=6.14' == 0",
-        "node: sw.js contiene 'planify-cache-v9' y NO 'planify-cache-v8'",
-        "node: main.css sigue 653/653 y sin cambios (git diff no debe listarlo)",
-        "git diff --name-only (debe ser exactamente: js/app.js, index.html, sw.js => 3 archivos)",
-        "git diff --stat (app.js: 1 linea cambiada; index.html/sw.js: 1 linea cada uno)"
+        "node: js/app.js contiene 'function toggleTheme' 1 vez, 'planify_theme' 2 veces, 'tema-claro' 3 veces, 'classList.toggle(\"dark\")' 0, 'document.body.classList.add(\"dark\")' 0, 'forzarEstiloCabeceras' 5, 'toggleDarkMode' 1",
+        "node: index.html contiene btn-tema 1, theme-toggle 1, btn-dark-mode 1, toggleTheme() 1, toggleDarkMode() 1, v=6.16 2, v=6.15 0",
+        "node: sw.js contiene planify-cache-v10 y NO planify-cache-v9",
+        "node: main.css balance de llaves == 691/691 (653 + 38) y termina con 'body.tema-claro .bottom-nav'; conteo /body\\.tema-claro/g == 39 (o reportar real)",
+        "node: emojis reales en archivos: index.html contiene U+2600 (☀) y U+1F319 (🌙); app.js contiene U+2600 y U+1F319",
+        "git diff --name-only == exactamente: index.html, js/app.js, css/main.css, sw.js (4 archivos)",
+        "git diff --stat: index.html 1 linea, app.js 1 linea (o 2 si el editor divide), main.css 1 linea, sw.js 1 linea"
       ],
       "criterio": "TODOS los checks deben pasar; si alguno falla, corregir solo lo indicado y repetir"
     },
     {
-      "id": "ST-04",
+      "id": "ST-06",
       "nombre": "Commit + push (mensaje EXACTO)",
-      "mensaje_commit": "fix: forzar color blanco en forzarEstiloCabeceras en app.js v6.15",
+      "mensaje_commit": "feat: conmutador de modo claro y oscuro en header con persistencia v6.16",
       "pasos": [
-        "git add js/app.js index.html sw.js (SOLO estos 3)",
-        "git commit -m 'fix: forzar color blanco en forzarEstiloCabeceras en app.js v6.15'",
+        "git add index.html js/app.js css/main.css sw.js (SOLO estos 4)",
+        "git commit -m 'feat: conmutador de modo claro y oscuro en header con persistencia v6.16'",
         "git push origin HEAD"
       ],
-      "criterio": "git log -1 muestra exactamente el mensaje 'fix: forzar color blanco en forzarEstiloCabeceras en app.js v6.15' con los 3 archivos; git status limpio post-push"
+      "criterio": "git log -1 muestra exactamente 'feat: conmutador de modo claro y oscuro en header con persistencia v6.16' con los 4 archivos; git status limpio post-push"
     }
   ],
   "resumen_cambios_finales": {
-    "js/app.js": "reemplazo 1:1 de la funcion forzarEstiloCabeceras (elimina condicion dark/light; color #ffffff + opacity 1 SIEMPRE)",
-    "index.html": "v=6.14 -> v=6.15 (x2: css/main.css y js/app.js)",
-    "sw.js": "planify-cache-v8 -> planify-cache-v9",
-    "commit": "fix: forzar color blanco en forzarEstiloCabeceras en app.js v6.15",
-    "total_archivos": 3
+    "index.html": "insercion boton #btn-tema (header top-right, ☀️ inicial) + re-insercion #btn-dark-mode en panel (card Vista, elimina WARN A11Y) + v=6.15 -> v=6.16 x2",
+    "js/app.js": "toggleDarkMode -> delega en toggleTheme; toggleTheme nuevo (clase tema-claro, planify_theme light/dark, iconos, sync panel); initDarkMode -> restore con fallback legacy; forzarEstiloCabeceras -> color condicional #0f172a (claro) / #ffffff (oscuro)",
+    "css/main.css": "append 38 reglas modo claro (paleta #f8fafc/#ffffff/#e2e8f0/#0f172a; theme-toggle; contrarresto completo de reglas oscuras no-scoped v6.6-v6.15; bottom-nav claro)", 
+    "sw.js": "planify-cache-v9 -> planify-cache-v10",
+    "commit": "feat: conmutador de modo claro y oscuro en header con persistencia v6.16",
+    "total_archivos": 4
   }
 }

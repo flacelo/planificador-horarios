@@ -1,162 +1,108 @@
 {
-  "id": "TASK-20260801-v6.27",
-  "fase": "Fase 51 (v6.27): Ajuste preciso de las pestañas Perfil, Vista y Ajustes en el paso de Panel de Control",
-  "titulo": "feat: paso panel de control con pestañas perfil vista ajustes y acciones de apertura en tour v6.27",
-  "requerimiento": "Refinar el tour guiado v6.25 -> v6.27: (1) pasosTour pasa de 5 a 6 pasos: se INSERTA un paso 3 nuevo '⚙️ Panel de Control' con selector '#panel-control, .sidebar-panel, #btn-panel, #panel-toggle, [data-action=\"panel\"]', vista null, accionPrev 'abrirPanel', texto describiendo las 3 pestañas Perfil/Vista/Ajustes con exportación JSON/Excel; los pasos 4-6 (diario/semanal/mensual) conservan sus selectores con ligeros cambios de texto y el paso diario gana accionPrev 'cerrarPanel'. (2) mostrarPasoTour ejecuta accionPrev ANTES del cambio de vista: abrirPanel -> window.abrirPanelControl() else window.togglePanel(true); cerrarPanel -> window.cerrarPanelControl() else window.togglePanel(false). (3) cerrarModalTutorial se envuelve: const oldCerrarModalTutorial=window.cerrarModalTutorial; window.cerrarModalTutorial=function(e){if(typeof window.cerrarPanelControl==='function') window.cerrarPanelControl(); if(oldCerrarModalTutorial) oldCerrarModalTutorial(e);} (cierra el panel al cerrar el tour). (4) timeout de mostrarPasoTour 100->150. (5) El resto (posicionamiento tooltipRect, aria-label, clamps 16px) se conserva. Cambios: SOLO JS js/app.js (4 reemplazos en el literal minificado post-build) + bumps index.html ?v=6.25->?v=6.27 x2 y sw.js planify-cache-v19->v21 x1. CSS SIN CAMBIOS (balance 755/755 intacto).",
-  "estado": "planificado",
-  "creado": "2026-08-03",
-  "head_actual": "3a2130a",
-  "rama": "main (arbol limpio: git status --short vacio)",
-  "verificacion_pre": [
-    "ESTADO GIT REAL: git log --oneline -10 -> HEAD 3a2130a 'feat: refinamiento de contraste spotlight y posicionamiento inteligente de tooltips v6.25' (v6.24 d22cab9, v6.23 24d6987...). NO EXISTE NINGUN COMMIT v6.26 (git log no lo muestra y '6.26' count=0 en index.html/sw.js). git status --short -> VACIO (working tree limpio). Por tanto el salto de version es DIRECTO: bumps ?v=6.25->?v=6.27 (x2) y planify-cache-v19->planify-cache-v21 (x1, saltando v20 como pidió el usuario)",
-    "js/app.js (1 linea minificada, 141995 chars POST-BUILD v6.25): 'pasosTour' conserva su NOMBRE REAL (Terser con toplevel:false NO renombra top-level const). Ocurrencias de pasosTour: [63683 def, 65744 ref en cambiarPasoTour, 65873 ref en mostrarPasoTour, 66774 ref template, 67180 ref template]. window.abrirPanelControl/cerrarPanelControl count=0 (NO existen en app.js NI index.html). tooltipRect/accionPrev count=0 (nuevos). togglePanel: DEFINIDA como 'function togglePanel(){' (SIN parametro) en idx 73436 -> IGNORA argumentos: window.togglePanel(true/false) togglea igualmente. Firma REAL: function togglePanel(){const e=document.getElementById(\"side-panel\"),a=document.getElementById(\"side-overlay\"),t=document.getElementById(\"cloud-btn\"),o=e.classList.toggle(\"open\");a.classList.toggle(\"open\",o),t.classList.toggle(\"open\",o)}",
-    "LITERAL ACTUAL pasosTour (5 pasos v6.24): comienza en idxA=63677 'const pasosTour=[', cierra en arrEnd=64788 (despues de ']'), longitud 1111 chars, char PREVIO=';' (fin de 'let tourPasoActual=0;'), char POSTERIOR=';' (el ';' de cierre de sentencia en 64788) seguido de 'window.abrirModalTutorial=...'. Cross-check: 5x {selector:, titulo '📖 Botón de Tutorial'/'☀️/🌙 Conmutador de Tema'/'📝 Vista Diario / Notas'/'📅 Vista Semanal'/'🗓️ Vista Mensual', selectores #tutorial-btn, [data-action=theme-toggle]..., [data-view=diario]..., [data-view=semanal]..., [data-view=mensual]... SIN accionPrev en ninguno",
-    "LITERAL ACTUAL mostrarPasoTour (v6.25): idxA=65830 'window.mostrarPasoTour=function(e){', cierre } en idx 67255, longitud 1426 chars, char PREVIO=',' (coma de la cadena tras el } de cambiarPasoTour), char POSTERIOR=',' (en 67256, enlaza con document.addEventListener). Termina en '},100))}' (timeout 100). Cross-checks: tooltipRect fallback {width:320,height:180} TRUE, clamps <16 y >innerWidth-16 TRUE, aria-label=\"Cerrar\" TRUE, timeout ,100) TRUE, ,150) FALSE, scrollIntoView AUSENTE",
-    "LITERAL ACTUAL cerrarModalTutorial (v6.25): idxA=64956 'window.cerrarModalTutorial=function(e){', cierre } en idx 65272, longitud 317 chars, char PREVIO=',' (tras el } de abrirModalTutorial), char POSTERIOR=',' (en 65272, la COMA LIMITROFE que enlaza con window.iniciarOverlayTour). Contenido exacto: e&&e.preventDefault();const a=document.getElementById(\"tour-overlay\"),t=document.getElementById(\"tour-tooltip\");a&&a.classList.add(\"hidden\"),t&&t.classList.add(\"hidden\"),document.querySelectorAll(\".tour-highlight-active\").forEach(e=>e.classList.remove(\"tour-highlight-active\"))}",
-    "CADENA DE EXPRESIONES (zona tour): window.abrirModalTutorial=function(e){...},window.cerrarModalTutorial=function(e){...},window.iniciarOverlayTour=function(){...},window.cambiarPasoTour=function(e){...},window.mostrarPasoTour=function(e){...},document.addEventListener(\"click\",...),document.addEventListener(\"keydown\",...). CERRAR_COMA en 65272. Los 5 call-sites de cerrarModalTutorial son DINAMICOS (window.* en runtime): cambiarPasoTour en 65768 (window.cerrarModalTutorial()), onclick template en 66822 (window.cerrarModalTutorial(event)), delegacion click en 67551 (e.target.closest('#close-tutorial-btn,#tutorial-got-it-btn')||e.target===a)&&window.cerrarModalTutorial(e)), delegacion keydown en 67736 (Escape con tutorial-modal activo -> window.cerrarModalTutorial(e)) -> el wrapper aplica a TODOS",
-    "INDEX.HTML ids reales del panel lateral: '#side-panel' x15, '#side-overlay' x2, '#cloud-btn' x6, 'togglePanel' x3 (onclick), onclick de cierre panel presente. LOS SELECTORES DE LA SPEC DEL PASO 3 NO EXISTEN: '#panel-control' count=0, '.sidebar-panel' count=0, '#btn-panel' count=0, '#panel-toggle' count=0, 'data-action=\"panel\"' count=0 -> el paso 3 usara FALLBACK CENTRAL (tooltip centrado); el panel se abre via accionPrev pero el spotlight NO iluminara el panel (queda bajo el overlay oscuro). Selectores [data-view=diario/semanal/mensual] TAMPOCO matchean (reportado desde v6.24) -> fallback central en pasos 4-6 (igual que antes). Proponer al usuario #side-panel/#cloud-btn como selectores reales (NO cambiar spec sin aprobacion)",
-    "index.html: '?v=6.25' x2 (css/main.css?v=6.25 e js/app.js?v=6.25); '6.26' count=0; '6.27' count=0. sw.js: 'planify-cache-v19' x1 (const CACHE), 'planify-cache-v20' count=0, 'planify-cache-v21' count=0",
-    "css/main.css (1 linea minificada): balance 755/755 CONFIRMADO (open=755, close=755). NO SE TOCA en v6.27 (spec solo JS+bumps)",
-    "package.json: terser ^5.49.0 en node_modules (devDependency). build.js: Terser.minify con compress {drop_console:false, passes:2}, mangle:true, output {comments:false} -> mismas opciones usadas para generar los bloques v6.27 de referencia"
-  ],
-  "decisiones": [
-    "D1 BLOQUES NUEVOS YA MINIFICADOS (3): literal_pasosTour_v627, literal_mostrarPasoTour_v627, wrapper_cerrarModalTutorial_v627 (en 'codigo_nuevo'), generados con Terser REAL (require terser de node_modules del repo; mangle:true, passes:2) sobre el codigo fuente legible de la spec. Los nombres Terser internos (t/o/i/e/n/r/a en fragmento aislado) son IRRELEVANTES: post-build Terser re-manglea con contexto completo; verificar SIEMPRE por strings/selectores. En el archivo actual, pasosTour NO se renombra (toplevel:false) y las propiedades de objeto (accionPrev, selector, vista...) y los accesos window.* (window.togglePanel, window.abrirPanelControl, window.cerrarPanelControl, window.cerrarModalTutorial) NO se renombran",
-    "D2 REEMPLAZO pasosTour: rango [iA, arrEnd+1) donde iA=indexOf('const pasosTour=[') y arrEnd=posicion DESPUES del ']' de cierre (scanner de brackets con strings). El ';' en arrEnd SE INCLUYE en el rango (assert c[arrEnd]==';'): se reemplaza por literal_pasosTour_v627 COMPLETO (termina en '];'). Resultado: '...let tourPasoActual=0;' + 'const pasosTour=[...];' + 'window.abrirModalTutorial=...'. El literal nuevo usa el MISMO nombre 'pasosTour' (no rompe las referencias en cambiarPasoTour/mostrarPasoTour/plantillas)",
-    "D3 INSERCION WRAPPER (opcion i VALIDADA): punto de insercion = la COMA LIMITROFE en 65272 que enlaza cerrarModalTutorial con iniciarOverlayTour. ANCLA: ',window.iniciarOverlayTour=function(){' (indexOf devuelve el 1er char del match -> con esta ancla apunta a la COMA, no al '}' como en el intento fallido del leader). Reemplazo: la coma en bIdx se SUSTITUYE por ';' + wrapper_cerrarModalTutorial_v627 + ';'. Resultado de la cadena: stmt1 'window.abrirModalTutorial=...,window.cerrarModalTutorial=...;' + stmt2 'const oldCerrarModalTutorial=...;window.cerrarModalTutorial=function(r){...};' + stmt3 'window.iniciarOverlayTour=...,window.cambiarPasoTour=...,window.mostrarPasoTour=...,document.addEventListener(...)...;' (stmt3 es expression-statement valido). VALIDADO con node --check/vm.Script del archivo completo simulado: OK",
-    "D4 REEMPLAZO mostrarPasoTour: rango [iM, mEnd+1) donde iM=indexOf('window.mostrarPasoTour=function(e){') y mEnd=indice del '}' final (scanner de balance con template literals ${} y strings, como v625). Se reemplaza por literal_mostrarPasoTour_v627 que termina en '},150))}' SIN ';' final (Terser anade ';' en fragmento aislado -> STRIPEAR; si se inserta con ';' -> ';,document.addEventListener' = SyntaxError). La coma posterior en mEnd+1 queda INTACTA (enlaza document.addEventListener)",
-    "D5 Terser comprime true/false a '!0'/'!1': en el bloque minificado los fallbacks son window.togglePanel(!0) y window.togglePanel(!1). La verificacion post debe buscar 'togglePanel(!0)'/'togglePanel(!1)', NO 'togglePanel(true)'",
-    "D6 COMPORTAMIENTO REPORTADO de togglePanel: firma sin argumento -> IGNORA true/false y alterna. Flujo del tour (happy path): paso 3 abrirPanel -> togglePanel(!0) abre (si estaba cerrado); paso 4 cerrarPanel -> togglePanel(!1) cierra (si estaba abierto) = comportamiento CORRECTO. Riesgo: si el usuario alterna el panel manualmente entre pasos, la accion se invierte. No existe abrirPanelControl/cerrarPanelControl en el repo -> SIEMPRE se usa el fallback togglePanel. Mantener spec literal (lo pedido) y reportar",
-    "D7 SELECTOR PASO 3 NO MATCHEA NADA (verificado en index.html): '#panel-control, .sidebar-panel, #btn-panel, #panel-toggle, [data-action=\"panel\"]' count=0 para cada id/clase. Efecto: paso 3 con fallback central (tooltip centrado) y el panel abierto queda bajo el overlay oscuro sin spotlight. Ids reales: '#side-panel' (panel) y '#cloud-btn' (boton que abre). REPORTAR al usuario; NO cambiar la spec sin aprobacion (patron de iteraciones anteriores: spec literal + fallback funcional). Selectores [data-view=...] de pasos 4-6: misma situacion de fallback central (conocida desde v6.24)"
-  ],
-  "anclas": {
-    "ancla_js_pasostour_actual": "const pasosTour=[{selector:\"#tutorial-btn\",vista:null,titulo:\"📖 Botón de Tutorial\",texto:\"¡Bienvenido! Puedes presionar este botón en cualquier momento para volver a ver esta guía.\",posicion:\"bottom\"},{selector:'[data-action=\"theme-toggle\"], #theme-toggle-btn, .theme-toggle',vista:null,titulo:\"☀️/🌙 Conmutador de Tema\",texto:\"Cambia al instante entre Modo Claro y Modo Oscuro para trabajar cómodamente de día o noche.\",posicion:\"bottom\"},{selector:'[data-view=\"diario\"], .nav-tab:nth-child(1)',vista:\"diario\",titulo:\"📝 Vista Diario / Notas\",texto:\"Aquí gestionas tu día a día: rutina mañanera, estado de ánimo, horas de sueño y tus 3 metas principales.\",posicion:\"top\"},{selector:'[data-view=\"semanal\"], .nav-tab:nth-child(2)',vista:\"semanal\",titulo:\"📅 Vista Semanal\",texto:\"Tu planificador visual. Haz clic en las celdas del horario para agregar eventos y asignarles etiquetas de colores.\",posicion:\"top\"},{selector:'[data-view=\"mensual\"], .nav-tab:nth-child(3)',vista:\"mensual\",titulo:\"🗓️ Vista Mensual\",texto:\"Visualiza el calendario completo de proyectos y compromisos a largo plazo.\",posicion:\"top\"}]",
-    "ancla_js_pasostour_notas": "idxA=63677, arrEnd=64788 (despues del ']' de cierre), el ';' de sentencia esta en 64788 (SE INCLUYE en el rango [iA, arrEnd+1)). prevChar=';' (en 63676). Longitud 1111 chars. 5 pasos SIN accionPrev. Reemplazo [iA, 64789) por literal_pasosTour_v627 completo (1510 chars incl. '];')",
-    "ancla_js_mostrarPasoTour_actual": "window.mostrarPasoTour=function(e){const a=pasosTour[e];a&&(a.vista&&\"function\"==typeof window.cambiarVista&&window.cambiarVista(a.vista),document.querySelectorAll(\".tour-highlight-active\").forEach(e=>e.classList.remove(\"tour-highlight-active\")),setTimeout(()=>{const t=document.querySelector(a.selector),o=document.getElementById(\"tour-tooltip\");if(t){t.classList.add(\"tour-highlight-active\");const e=t.getBoundingClientRect(),n=o?o.getBoundingClientRect():{width:320,height:180};let r,i;\"bottom\"===a.posicion?(r=e.bottom+12,i=e.left+e.width/2-n.width/2):(r=e.top-n.height-12,i=e.left+e.width/2-n.width/2),i<16&&(i=16),i+n.width>window.innerWidth-16&&(i=window.innerWidth-n.width-16),r<16&&(r=e.bottom+12),o.style.transform=\"none\",o.style.top=`${r}px`,o.style.left=`${i}px`}else o.style.top=\"50%\",o.style.left=\"50%\",o.style.transform=\"translate(-50%, -50%)\";o.innerHTML=`<div class=\"tour-header\"><span class=\"tour-step-count\">Paso ${e+1} de ${pasosTour.length}</span><button onclick=\"window.cerrarModalTutorial(event)\" class=\"close-btn\" aria-label=\"Cerrar\">&times;</button></div><div class=\"tour-content\"><h4>${a.titulo}</h4><p>${a.texto}</p></div><div class=\"tour-footer\">${e>0?'<button onclick=\"window.cambiarPasoTour(-1)\" class=\"btn-tour-sec\">← Atrás</button>':\"<div></div>\"}<button onclick=\"window.cambiarPasoTour(1)\" class=\"btn-tour-pri\">${e===pasosTour.length-1?\"¡Listo, empezar!\":\"Siguiente →\"}</button></div>`},100))}",
-    "ancla_js_mostrarPasoTour_notas": "idxA=65830, cierre } en 67255, idxB=67256 EXCLUSIVE (la coma posterior en 67256 queda FUERA del rango y se conserva). Longitud 1426 chars. Termina '},100))}' (timeout 100 -> 150 en v6.27). prevChar=',' nextChar=','. Rango de reemplazo [65830, 67256)",
-    "ancla_js_cerrarModalTutorial_actual": "window.cerrarModalTutorial=function(e){e&&e.preventDefault();const a=document.getElementById(\"tour-overlay\"),t=document.getElementById(\"tour-tooltip\");a&&a.classList.add(\"hidden\"),t&&t.classList.add(\"hidden\"),document.querySelectorAll(\".tour-highlight-active\").forEach(e=>e.classList.remove(\"tour-highlight-active\"))}",
-    "ancla_js_cerrarModalTutorial_notas": "idxA=64956, cierre } en 65272, longitud 317 chars. prevChar=',' (en 64955, tras el } de abrirModalTutorial), nextChar=',' (en 65272 = COMA LIMITROFE). El literal NO se modifica; SOLO se usa su coma posterior como punto de insercion del wrapper",
-    "ancla_limite_wrapper": ",window.iniciarOverlayTour=function(){",
-    "ancla_limite_wrapper_notas": "LA COMA LIMITROFE en 65272 (primer char del ancla). CRITICO: anclar desde la COMA (indexOf devuelve el 1er char del match). Error previo del leader: anclar desde '},window.iniciarOverlayTour=...' apuntaba al '}' (65271) -> insertar ';' tras un slice que excluia el '}' dejaba '};,window...' (SyntaxError 'Unexpected token ,'). CON ESTA ANCLA: reemplazo de la coma por ';' + wrapper_cerrarModalTutorial_v627 + ';'. Validado: archivo simulado completo con node --check OK (3 statement resultantes validos)",
-    "bumps": "index.html '?v=6.25' x2 -> '?v=6.27' x2; sw.js 'planify-cache-v19' x1 -> 'planify-cache-v21' x1 (NO existe v6.26 ni cache-v20: salto directo)"
-  },
-  "codigo_nuevo": {
-    "literal_pasosTour_v627": "const pasosTour=[{selector:\"#tutorial-btn\",vista:null,titulo:\"📖 Botón de Tutorial\",texto:\"¡Bienvenido! Puedes presionar este botón en cualquier momento para volver a ver esta guía.\",posicion:\"bottom\"},{selector:'[data-action=\"theme-toggle\"], #theme-toggle-btn, .theme-toggle',vista:null,titulo:\"☀️/🌙 Conmutador de Tema\",texto:\"Cambia al instante entre Modo Claro y Modo Oscuro para trabajar cómodamente de día o noche.\",posicion:\"bottom\"},{selector:'#panel-control, .sidebar-panel, #btn-panel, #panel-toggle, [data-action=\"panel\"]',vista:null,accionPrev:\"abrirPanel\",titulo:\"⚙️ Panel de Control\",texto:\"Abre el panel de control con tres pestañas: Perfil para tus datos personales, Vista para personalizar la interfaz y Ajustes para exportar tu información en JSON o Excel.\",posicion:\"top\"},{selector:'[data-view=\"diario\"], .nav-tab:nth-child(1)',vista:\"diario\",accionPrev:\"cerrarPanel\",titulo:\"📝 Vista Diario / Notas\",texto:\"Desde aquí gestionas tu día a día: rutina mañanera, estado de ánimo, horas de sueño y tus 3 metas principales.\",posicion:\"top\"},{selector:'[data-view=\"semanal\"], .nav-tab:nth-child(2)',vista:\"semanal\",titulo:\"📅 Vista Semanal\",texto:\"Tu planificador visual semanal. Haz clic en las celdas del horario para agregar eventos y asignarles etiquetas de colores.\",posicion:\"top\"},{selector:'[data-view=\"mensual\"], .nav-tab:nth-child(3)',vista:\"mensual\",titulo:\"🗓️ Vista Mensual\",texto:\"Visualiza el calendario mensual completo de proyectos y compromisos a largo plazo.\",posicion:\"top\"}];",
-    "literal_pasosTour_notas": "1510 chars incl. '];' final. Generado con Terser REAL (mangle:true, passes:2) sobre el fuente legible. 6 pasos ({selector: x6), accionPrev SOLO en pasos 3 (abrirPanel) y 4 (cerrarPanel) (x2). Emojis UTF-8 byte-correctos verificados: 📖 U+1F4D6, ☀️ U+2600+FE0F, 🌙 U+1F319, ⚙️ U+2699+FE0F, 📝 U+1F4DD, 📅 U+1F4C5, 🗓️ U+1F5D3+FE0F. Textos pasos 4-6: ligeros cambios (diario 'Desde aquí gestionas...', semanal '...visual semanal...', mensual '...mensual completo...'). Insercion: reemplaza [iA, arrEnd+1) incluyendo el ';' original (D2). NOMBRE 'pasosTour' conservado (toplevel:false)",
-    "literal_mostrarPasoTour_v627": "window.mostrarPasoTour=function(t){const o=pasosTour[t];o&&(\"abrirPanel\"===o.accionPrev&&(\"function\"==typeof window.abrirPanelControl?window.abrirPanelControl():\"function\"==typeof window.togglePanel&&window.togglePanel(!0)),\"cerrarPanel\"===o.accionPrev&&(\"function\"==typeof window.cerrarPanelControl?window.cerrarPanelControl():\"function\"==typeof window.togglePanel&&window.togglePanel(!1)),o.vista&&\"function\"==typeof window.cambiarVista&&window.cambiarVista(o.vista),document.querySelectorAll(\".tour-highlight-active\").forEach(t=>t.classList.remove(\"tour-highlight-active\")),setTimeout(()=>{const e=document.querySelector(o.selector),n=document.getElementById(\"tour-tooltip\");if(e){e.classList.add(\"tour-highlight-active\");const t=e.getBoundingClientRect(),i=n?n.getBoundingClientRect():{width:320,height:180};let r,a;\"bottom\"===o.posicion?(r=t.bottom+12,a=t.left+t.width/2-i.width/2):(r=t.top-i.height-12,a=t.left+t.width/2-i.width/2),a<16&&(a=16),a+i.width>window.innerWidth-16&&(a=window.innerWidth-i.width-16),r<16&&(r=t.bottom+12),n.style.transform=\"none\",n.style.top=`${r}px`,n.style.left=`${a}px`}else n.style.top=\"50%\",n.style.left=\"50%\",n.style.transform=\"translate(-50%, -50%)\";n.innerHTML=`<div class=\"tour-header\"><span class=\"tour-step-count\">Paso ${t+1} de ${pasosTour.length}</span><button onclick=\"window.cerrarModalTutorial(event)\" class=\"close-btn\" aria-label=\"Cerrar\">&times;</button></div><div class=\"tour-content\"><h4>${o.titulo}</h4><p>${o.texto}</p></div><div class=\"tour-footer\">${t>0?'<button onclick=\"window.cambiarPasoTour(-1)\" class=\"btn-tour-sec\">← Atrás</button>':\"<div></div>\"}<button onclick=\"window.cambiarPasoTour(1)\" class=\"btn-tour-pri\">${t===pasosTour.length-1?\"¡Listo, empezar!\":\"Siguiente →\"}</button></div>`},150))}",
-    "literal_mostrarPasoTour_notas": "1757 chars, SIN ';' final (D4: Terser anade ';' en fragmento aislado -> STRIPEAR; insertar con ';' rompe: ';,document.addEventListener'). Termina en '},150))}' (timeout 150). Nuevo bloque accionPrev al INICIO de la comilla (ANTES de o.vista&&cambiarVista): abrirPanel -> abrirPanelControl() else togglePanel(!0); cerrarPanel -> cerrarPanelControl() else togglePanel(!1). Los guards typeof conservan el estilo v6.25 ('\"function\"==typeof'). Resto IDENTICO a v6.25: tooltipRect fallback {width:320,height:180}, branch bottom/top, clamps 16px, aria-label=\"Cerrar\", innerHTML completo (Paso ${t+1} de ${pasosTour.length}, ← Atrás condicional, ¡Listo, empezar!/Siguiente →)",
-    "wrapper_cerrarModalTutorial_v627": "const oldCerrarModalTutorial=window.cerrarModalTutorial;window.cerrarModalTutorial=function(r){\"function\"==typeof window.cerrarPanelControl&&window.cerrarPanelControl(),oldCerrarModalTutorial&&oldCerrarModalTutorial(r)}",
-    "wrapper_cerrarModalTutorial_notas": "219 chars, SIN ';' final. Terser renombro el parametro e->r (irrelevante). Terser comprimio los if a forma &&. Insercion en la COMA LIMITROFE (D3): la coma en 65272 se sustituye por ';' + este bloque + ';'. Los 5 call-sites de cerrarModalTutorial son dinamicos (window.*) -> wrapper intercepta TODOS (verificacion_pre). El cierre del tour (close-btn onclick, Escape, click fuera, ultimo paso Siguiente) ahora tambien cierra el panel (cerrarPanelControl si existe; fallback togglePanel en mostrarPasoTour solo aplica en pasos 3-4 via accionPrev)"
-  },
-  "pasos": [
-    {
-      "id": "ST-01",
-      "descripcion": "Verificacion pre-cambio (fail-fast)",
-      "comandos": [
-        "git status --short (esperado vacio); git log --oneline -5 (esperado HEAD 3a2130a v6.25, SIN v6.26)",
-        "node -e: count 'const pasosTour=[' ==1; 'window.mostrarPasoTour=function(e){' ==1; 'window.cerrarModalTutorial=function(e){' ==1; ',100))},document.addEventListener' ==1; 'accionPrev' ==0; 'abrirPanelControl' ==0; 'cerrarPanelControl' ==0",
-        "node -e: confirmar firma togglePanel: indexOf('function togglePanel(){') != -1 y NO existe 'function togglePanel(e)'",
-        "node -e: balance css/main.css ==755/755; '?v=6.25' index.html ==x2; 'planify-cache-v19' sw.js ==x1; 'panel-control' index.html ==0; 'side-panel' index.html >=1 (id real del panel)"
-      ]
-    },
-    {
-      "id": "ST-02",
-      "descripcion": "JS js/app.js - REEMPLAZAR pasosTour: rango [iA, arrEnd+1) (iA=indexOf('const pasosTour=['), arrEnd=fin del ']' via scanner de brackets con strings, assert c[arrEnd]==';') por literal_pasosTour_v627 (1510 chars, D2). METODO: script node con fs.writeFileSync utf8 SIN BOM; recalcular indices dinamicamente; assert final: count 'const pasosTour=[' ==1, '{selector:' ==6, 'accionPrev' ==2",
-      "verificacion": [
-        "node -e: 'const pasosTour=[' ==1; 'accionPrev' ==2; '⚙️ Panel de Control' ==1; 'JSON o Excel' ==1; 'panel-control' ==1 (en el selector del paso 3)",
-        "node -e: count '{selector:' ==6; 'window.abrirModalTutorial=function' ==1 (intacta tras el reemplazo)"
-      ]
-    },
-    {
-      "id": "ST-03",
-      "descripcion": "JS js/app.js - INSERTAR wrapper en la COMA LIMITROFE (D3): bIdx=indexOf(',window.iniciarOverlayTour=function(){') (apunta a la COMA en 65272); assert bIdx>0 y c[bIdx]==',' y c[bIdx-1]=='}'; c = c.slice(0,bIdx) + ';' + wrapper_cerrarModalTutorial_v627 + ';' + c.slice(bIdx+1)",
-      "verificacion": [
-        "node -e: 'window.cerrarModalTutorial=function' ==2 (original + wrapper); 'oldCerrarModalTutorial' ==3 (decl + 2 refs); 'cerrarPanelControl' ==2 (typeof + call)",
-        "node -e: 'window.iniciarOverlayTour=function' ==1; 'window.cambiarPasoTour=function' ==1; 'window.abrirModalTutorial=function' ==1 (intactas)"
-      ]
-    },
-    {
-      "id": "ST-04",
-      "descripcion": "JS js/app.js - REEMPLAZAR mostrarPasoTour: rango [iM, mEnd+1) (iM=indexOf('window.mostrarPasoTour=function(e){'), mEnd=indice del '}' final via scanner de balance con template literals ${} y strings, como v625) por literal_mostrarPasoTour_v627 (1757 chars, SIN ';' final, D4). La coma posterior en mEnd+1 queda INTACTA",
-      "verificacion": [
-        "node --check js/app.js (o npm run check) -> OK",
-        "node -e: 'window.mostrarPasoTour=function' ==1; ',150))},document.addEventListener' ==1; ',100))}' ==0 (en zona tour); 'togglePanel(!0)' ==1; 'togglePanel(!1)' ==1",
-        "node -e: 'accionPrev' ==4 (2 en array + 2 condicionales en mostrarPasoTour); 'abrirPanelControl' ==2 (typeof + call); 'cerrarPanelControl' ==4 (2 en wrapper + 2 en mostrarPasoTour)",
-        "node -e: strings conservados: 'aria-label=\"Cerrar\"' ==1; '{width:320,height:180}' >=1; '¡Listo, empezar!' ==1; 'Siguiente →' ==1; '← Atrás' ==1; 'tour-step-count' ==1"
-      ]
-    },
-    {
-      "id": "ST-05",
-      "descripcion": "Bumps de version (sin otros cambios)",
-      "cambios": [
-        "index.html: '?v=6.25' -> '?v=6.27' (x2, ambos bumps; salto directo: NO existe v6.26)",
-        "sw.js: 'planify-cache-v19' -> 'planify-cache-v21' (x1; salto directo a v21 como pidió el usuario, saltando v20)"
-      ],
-      "verificacion": "node -e: '?v=6.27' index.html ==x2 y '?v=6.25' ==x0; 'planify-cache-v21' sw.js ==x1 y 'planify-cache-v19' ==x0"
-    },
-    {
-      "id": "ST-06",
-      "descripcion": "Verificacion pre-build completa",
-      "comandos": [
-        "node --check js/app.js",
-        "node -e: balance css/main.css 755/755 (SIN cambios en v6.27)",
-        "node -e: 'window.mostrarPasoTour=function' ==1; 'window.cerrarModalTutorial=function' ==2; 'accionPrev' ==4; ',150))}' en zona tour ==1; ',100))}' en zona tour ==0",
-        "node -e: '?v=6.27' x2; 'planify-cache-v21' x1",
-        "git diff --stat (esperado: js/app.js, index.html, sw.js SOLO; css/main.css SIN cambios)"
-      ]
-    },
-    {
-      "id": "ST-07",
-      "descripcion": "Build de produccion",
-      "comandos": [
-        "npm run build (node scripts/build.js): node --check pre, Terser minify (js/app.js + sw.js, mangle:true passes:2), minifyCSS, minifyHTML, optimize-a11y"
-      ]
-    },
-    {
-      "id": "ST-08",
-      "descripcion": "RE-VERIFY post-build (Terser re-manglea; verificar por STRINGS/selectores, NUNCA nombres de variables)",
-      "comandos": [
-        "node -e: balance css/main.css ==755/755 (intacto)",
-        "node -e: 'window.mostrarPasoTour=function' ==1 (window.* no se renombra); 'window.cerrarModalTutorial=function' ==2; 'oldCerrarModalTutorial' >=3; 'accionPrev' >=4; 'abrirPanelControl' >=2; 'cerrarPanelControl' >=4",
-        "node -e: 'togglePanel(!0)' >=1 y 'togglePanel(!1)' >=1 (Terser comprime true/false; NO buscar 'togglePanel(true)')",
-        "node -e: strings del paso 3: '⚙️ Panel de Control' ==1; 'JSON o Excel' ==1; 'Perfil' >=1; 'Ajustes' >=1; 'panel-control' ==1",
-        "node -e: timeout nuevo ',150))}' ==1 en la zona tour; ',100))}' AUSENTE en la zona tour",
-        "node -e: strings innerHTML: '¡Listo, empezar!' ==1, 'Siguiente →' ==1, '← Atrás' ==1, 'aria-label=\"Cerrar\"' ==1, '{width:320,height:180}' >=1",
-        "node -e: '?v=6.27' x2; '?v=6.25' x0; 'planify-cache-v21' x1; 'planify-cache-v19' x0",
-        "node --check js/app.js (post-build)",
-        "git status --short (solo js/app.js, index.html, sw.js; sin archivos sorpresa)",
-        "NO ejecutar git commit salvo orden explicita del usuario"
-      ]
-    },
-    {
-      "id": "ST-09",
-      "descripcion": "Commit propuesto (solo proposicion, no ejecutar sin orden)",
-      "mensaje": "feat: paso panel de control con pestañas perfil vista ajustes y acciones de apertura en tour v6.27"
-    }
-  ],
-  "riesgos_implementador": [
-    "(a) COMA LIMITROFE DEL WRAPPER: anclar con ',window.iniciarOverlayTour=function(){' (desde la COMA, indexOf devuelve el 1er char del match). Si se ancla con '},window...' el bIdx apunta al '}' -> '};' + wrapper + ';' + '},window...' = SyntaxError 'Unexpected token ,' (error real del leader en la simulacion). La coma se SUSTITUYE por ';' + wrapper + ';'. NUNCA insertar 'const' dentro de la cadena de comas sin romperla antes con ';'",
-    "(b) SEMICOLON FINAL DE Terser EN FRAGMENTO AISLADO: Terser anade ';' al minificar un statement standalone. literal_mostrarPasoTour_v627 y wrapper_cerrarModalTutorial_v627 estan SIN ';' final (ya stripados). Si el implementador re-minifica, debe strip ';' antes de insertar: '},150))};' + ',document.addEventListener' = SyntaxError",
-    "(c) RANGO pasosTour: el ';' original tras ']' (idx 64788) se INCLUYE en el reemplazo [iA, arrEnd+1) y literal_pasosTour_v627 termina en '];'. Si se reemplaza solo [iA, arrEnd) con el bloque completo -> '];' + ';' = '];;' (valido pero sucio); si se reemplaza [iA, arrEnd) con el bloque SIN ';' -> OK tambien (el ';' original queda). Cualquiera de las dos variantes es valida; la RECOMENDADA es [iA, arrEnd+1) con el bloque completo",
-    "(d) NOMBRES TERSER: el bloque v6.27 usa t/o/i/e/n/r/a (fragmento aislado); tras npm run build los nombres internos cambian. NUNCA verificar por nombres de variables: usar strings (accionPrev, selector, '⚙️ Panel de Control', window.*, {width:320,height:180}) y literales numericos. 'pasosTour' (top-level, toplevel:false) y 'oldCerrarModalTutorial' (top-level const) NO se renombran en el archivo completo",
-    "(e) true/false -> !0/!1: Terser comprime los fallbacks a window.togglePanel(!0)/window.togglePanel(!1). La verificacion post-build debe buscar '!0'/'!1', NO 'true'/'false'",
-    "(f) EMOJIS/FLEHAS UTF-8: el archivo es UTF-8; Terser preserva los emojis. Al escribir el script de Node usar fs.writeFileSync con 'utf8' SIN BOM (NUNCA Set-Content de PowerShell: riesgo cp1252/BOM). Los emojis verificados byte a byte: 📖 ☀️ 🌙 ⚙️ 📝 📅 🗓️ ¡ ñ á í ó → ←",
-    "(g) SELECTOR PASO 3 NO MATCHEA: '#panel-control, .sidebar-panel, #btn-panel, #panel-toggle, [data-action=\"panel\"]' count=0 en index.html (ids reales: #side-panel, #cloud-btn). Paso 3 -> fallback central (tooltip centrado); el panel se ABRE via accionPrev pero el spotlight no lo ilumina (queda bajo overlay oscuro). REPORTAR al usuario; no cambiar spec sin aprobacion. Selectores [data-view=diario/semanal/mensual] de pasos 4-6: fallback central conocido desde v6.24 (mismo comportamiento)",
-    "(h) togglePanel IGNORA ARGUMENTOS: 'function togglePanel()' sin parametro -> window.togglePanel(true/false) alterna igualmente. Happy path correcto (paso 3 abre, paso 4 cierra); si el usuario alterna el panel manualmente entre pasos, la accion se invierte. No existen abrirPanelControl/cerrarPanelControl en el repo -> SIEMPRE fallback togglePanel. Reportar",
-    "(i) TIMEOUT 100->150: el nuevo literal termina en '},150))}'. Pueden existir otros '150' en el bundle fuera del literal -> la verificacion post-build debe buscar ',150))}' (o ',150))},document.addEventListener') en la zona tour, no '150' global",
-    "(j) app.js 1 linea ~141KB: reemplazo con script node indexOf + scanner de balance + slice; assert de unicidad (cada ancla ==1) antes y despues; si falla cualquier assert, ABORTAR sin escribir. fs.writeFileSync utf8 SIN BOM",
-    "(k) NO TOCAR: abrirModalTutorial, iniciarOverlayTour, cambiarPasoTour, delegaciones click/keydown globales (v6.19), #tour-overlay.hidden/#tour-tooltip.hidden, CSS completo (balance 755/755), textos de pasos 1-2 del tour (conservados identicos), posicionamiento tooltipRect/clamps/aria-label (conservados en el nuevo literal mostrarPasoTour)"
-  ],
-  "verificacion_post": [
-    "node --check js/app.js OK (pre y post-build)",
-    "npm run build OK (sin errores)",
-    "css/main.css balance 755/755 (SIN cambios en v6.27)",
-    "index.html: '?v=6.27' x2; '?v=6.25' x0",
-    "sw.js: 'planify-cache-v21' x1; 'planify-cache-v19' x0",
-    "js/app.js: 'const pasosTour=[' x1; 'window.mostrarPasoTour=function' x1; 'window.cerrarModalTutorial=function' x2; 'oldCerrarModalTutorial' >=3; 'accionPrev' >=4; 'window.togglePanel(!0)' >=1; 'window.togglePanel(!1)' >=1; ',150))}' en zona tour x1; ',100))}' en zona tour x0",
-    "js/app.js strings paso 3: '⚙️ Panel de Control' x1; 'JSON o Excel' x1; 'panel-control' x1; 'Ajustes' x1",
-    "js/app.js strings innerHTML: '¡Listo, empezar!' x1; 'Siguiente →' x1; '← Atrás' x1; 'aria-label=\"Cerrar\"' x1; '{width:320,height:180}' >=1; 'tour-step-count' x1",
-    "js/app.js funciones intactas: 'window.abrirModalTutorial=function' x1; 'window.iniciarOverlayTour=function' x1; 'window.cambiarPasoTour=function' x1; 'function togglePanel(){' x1 (sin argumento)",
-    "git status --short limitado a 3 archivos: js/app.js, index.html, sw.js"
-  ],
-  "commit_propuesto": "feat: paso panel de control con pestañas perfil vista ajustes y acciones de apertura en tour v6.27"
+ "id": "TASK-20260801-v6.34",
+ "fase": "Fase 57 (v6.34): Modificación directa en renderJS para eliminar X en cabeceras, formato multilínea mensual, interactividad de sueño y animaciones",
+ "titulo": "feat: fix renderizado dinamico js y css override v6.34",
+ "anterior": {
+  "id": "TASK-20260801-v6.30",
+  "fase": "Fase 54 (v6.30): Eliminación física por JS de X en cabeceras semanales, inyección dinámica de tipografías y fix de pegatinas en calendario",
+  "titulo": "feat: eliminacion fisica de X por js override de fuentes y fix de stickers v6.30"
+ },
+ "requerimiento": "v6.34: Fix de raiz en renderJS: manejador global de click para horas de sueno (closest + localStorage planify_sueno_horas + log [PLANIFY v6.34] ), purgador de X en cabeceras con MutationObserver sobre #app/main/body. CORRECCION aplicada: window.addEventListener('DOMContentLoaded') -> document.addEventListener('DOMContentLoaded') (el evento no se dispara en window; sin la correccion la purga/observer quedaban muertos). CSS append bloque v6.34 (10 pares -> balance 824+10=834/834). Bumps: ?v=6.33 x2 -> ?v=6.34 x2; sw planify-cache-v27 -> v28. No redefine window.cambiarFuenteApp (sigue unica v6.33). task.json: Fase 57 registrada.",
+ "estado": "planificado",
+ "creado": "2026-08-03",
+ "head_actual": "6c75520",
+ "rama": "main (M .opencode/context/task.json + ?? .opencode/context/review_feedback.txt esperados; sin otros cambios)",
+ "verificacion_pre": [
+  "ESTADO GIT REAL: git log --oneline -2 -> HEAD 6c75520 \"feat: batch ux con google fonts animaciones de entrada y fixes de usuario v6.29\"; previo 2a510ac (v6.27). git status --short -> \" M .opencode/context/task.json\" y \"?? .opencode/context/review_feedback.txt\" (ambos ESPERADOS del flujo; NINGUNO es archivo fuente). Cero archivos de codigo modificados. Anclas listas para v6.30",
+  "index.html: count '?v=6.29' == 2 (css/main.css?v=6.29 y js/app.js?v=6.29) -> ancla unica por ocurrencia para sustituir a ?v=6.30. count '?v=6.30' == 0. count '<style id=\"dynamic-font-override\"' == 0 (el style tag de la v6.30 NO preexiste; se inyecta por JS en runtime, no en HTML)",
+  "sw.js: count 'planify-cache-v23' == 1, count 'planify-cache-v24' == 0 -> bump directo x1",
+  "css/main.css (1 linea minificada): balance { == } == 776/776 CONFIRMADO (open=776, close=776, final 0). TERMINA en \".animate-entrance-nav{animation:slideUpFade .8s cubic-bezier(.16,1,.3,1) .2s forwards}\" (statement CSS completo, ultimo char '}' -> APPEND DIRECTO sin separador)",
+  "js/app.js (1 linea minificada POST-BUILD, 145767 bytes): TERMINA en \";\" del cierre de IIFE Terser: ultimos 150 chars reales = ...console.log(\"[PLANIFY v6.29] Error al crear nuevo lienzo\",e)}},\"loading\"===document.readyState?document.addEventListener(\"DOMContentLoaded\",t):t()}(); (termina en '}();' -> el IIFE v6.29 cierra con '}();' y ultimo char ';'. Insercion con separador \";\" extra: app.js + \";\" + bloque_literal_v630 es seguro (doble ';;' en cierre de statement es valido)",
+  "COLLISIONES JS (counts en js/app.js): limpiarLetrasXDeCabeceras==0, renderizarStickerEnCelda==0, observerPLANIFY==0 (const TOP-LEVEL -> UNICA, sin duplicados), dynamic-font-override==0, window.cambiarFuenteApp==1 (ASIGNACION EXISTENTE v6.29: \"window.cambiarFuenteApp=a\" dentro del IIFE -> la v6.30 insertada al FINAL reasigna window.cambiarFuenteApp y la ULTIMA gana (la v6.30). La v6.29 se sigue llamando internamente por cargarAjustesGuardados en DOMContentLoaded (closure interno, sin conflicto de orden de definicion); visualmente gana la v6.30 por inyeccion posterior del style tag #dynamic-font-override)",
+  "MutationObserver count en app.js == 0 (NO existe NINGUN MutationObserver en el bundle -> el observerPLANIFY de v6.30 es el PRIMERO y unico, sin conflicto). mainContainer count == 0 (no existe NI top-level NI local; el 'const mainContainer' de la v6.30 dentro del callback addEventListener es scope local sin colision; reportar: count 0 pre-v6.30)",
+  "CONTENEDOR REAL para el observer: lista de selectores 'main, #app, .app-container || document.body' -> en HTML real SOLO matchea '#app' (count id=\"app\"==1 en <div class=\"app licenciado\" id=\"app\">); '<main'==0, 'app-container'==0. document.querySelector('main, #app, .app-container') retorna #app; fallback document.body no se usa en la practica",
+  "CABECERA SEMANAL (target de la limpieza): se genera DINAMICAMENTE en renderizar() (js): t += `<th style=\"position:relative;\">${e.substring(0,3)}<div class=\"resizer\" data-col=\"${a}\"></div> <span style=\"cursor:pointer;color:#ff7675;font-size:0.8em;opacity:0.6\" onclick=\"eliminarDia(${a})\">✕</span></th>`. OJO: el glyph del span eliminarDia es '✕' U+2715 (count 4 en js, 1 en html), NO '×' U+00D7 (count 0 en js y html). El regex literal del usuario /\\s*[xX×]/g usa U+00D7 y NO matchea U+2715: la eliminacion del span eliminarDia debe venir del .remove() de botones/spans de la funcion 1 (spec literal -> se documenta el riesgo de efectividad del replace, no se reescribe)",
+  "SELECTORES INERTES en HTML real (regex exacta): class=\"cal-dia\"==0 (los 7 matches de substring son 'cal-dia-nombre'), class=\"cal-evento\"==0 (los 7 matches son name=\"cal-evento-color\"), event-item==0, sticker-icon==0, [data-sticker]==12 REAL (span.cal-sticker de la paleta en modal calendario), th[data-day]==0 (HTML y JS), day-header==0, calendar-day==0, month-cell==0, event-tag==0, sticker-badge==0. <th reales == 6 (1 HORA en #header-row + 5 en modal licencia); la cabecera semanal dinamica es la que recibe los th por renderizar()",
+  "UTF-8: emoji 🔤 ya presente en app.js (v6.29 console.log). El bloque v6.30 usa emoji 🔤 y template literals con ${fuenteFinal}: escribir SIN BOM, verificar por indexOf post-insercion"
+ ],
+ "decisiones": [
+  "D1 ESPEC LITERAL: los bloques CSS (4 reglas) y JS (3 funciones + observerPLANIFY + window.cambiarFuenteApp v6.30 + DOMContentLoaded) se copian VERBATIM del mensaje del usuario. PROHIBIDO reescribir, refactorizar, renombrar o minificar manualmente. Los comentarios //, espacios y template literals multilinea del bloque JS se conservan hasta el build (terser del package.json los re-minifica: tarea esperada y documentada)",
+  "D2 CSS: APPEND DIRECTO al final de css/main.css (termina en '}' de .animate-entrance-nav, statement completo, sin separador). Bloque del usuario = 4 reglas -> 4 pares de llaves -> balance NUEVO 780/780 (776+4). Contar llaves del bloque pegado con node: open==4 && close==4 antes de append",
+  "D3 JS: INSERCION AL FINAL de js/app.js. Ultimo char actual ';' (cierre }(); del IIFE v6.29) -> anteponer \";\" de ruptura: app.js + \";\" + bloque_literal. Validar sintaxis con vm.Script sobre el archivo completo (node --check falla en 1 linea? usar vm.Script) antes y despues del build",
+  "D4 RIESGO (a) CSS invalido: la regla 4 del bloque CSS contiene selectores jQuery ':contains' -> 'th span:contains(\"×\")' y 'th span:contains(\"x\")' son INVALIDOS en CSS. CSSOM descarta la REGLA COMPLETA que los contiene (toda la lista de selectores de esa regla se pierde: th button, th .close, th .close-x, .week-header-day button, .week-header-day span.x, th[data-day] button, etc. NO tendran efecto por CSS). La funcionalidad (ocultar/limpiar X) queda cubierta por la Funcion 1 JS (limpiarLetrasXDeCabeceras + MutationObserver). Se aplica la regla literal como spec y se documenta este riesgo en el plan y en el reporte final al usuario",
+  "D5 RIESGO (b) sobrescritura window.cambiarFuenteApp: la v6.30 (style tag #dynamic-font-override con '* {font-family} !important') reemplaza la v6.29 (setProperty --app-font-family). La v6.29 se llama sola al DOMContentLoaded via cargarAjustesGuardados (closure interno); la v6.30 gana visualmente por inyeccion posterior del style tag en el DOM. Sin conflicto de orden de definicion: la v6.30 se inserta al final del archivo y su asignacion window.cambiarFuenteApp=... es la ULTIMA -> gana",
+  "D6 RIESGO (c) bloque JS literal: contiene comentarios //, template literals MULTILINEA (`` ` * { font-family: ${fuenteFinal} !important; } ` ``) y espacios -> el archivo deja de ser 1 linea hasta el build. Insertar LITERAL con separador ';' previo (el archivo termina en '})();'-equivalente '}();' -> ya hay ';', anadir otro es seguro). NO normalizar saltos de linea",
+  "D7 RIESGO (d) MutationObserver con subtree:true en 'main, #app, .app-container' (matchea #app): el observer re-dispara limpieza en cada mutacion. limpiarLetrasXDeCabeceras es idempotente: tras .remove() de botones/spans con X y replace de 'x', no hay mas mutaciones -> estable. OJO: renderizar() (25 llamadas en bundle) re-inyecta los spans eliminarDia con ✕ en cada render -> el observer RE-LIMPIA automaticamente (comportamiento deseado por el usuario, no bucle porque tras limpiar no quedan mutaciones nuevas)",
+  "D8 RIESGO (e) th.innerHTML.replace(/\\s*[xX×]/g, ''): solo se ejecuta si el innerHTML incluye ' ×', ' x' o ' X'. Los dias actuales (dias.forEach con e.substring(0,3): Lun,Mar,Mie,Jue,Vie,Sab,Dom) NO contienen x -> no afecta nombres normales en espanol. Riesgo menor documentado: podria quitar la 'x' de nombres de dias en OTRO idioma (p.ej. ingles no, pero idiomas con x en abreviaturas si) y NO matchea '✕' U+2715 (ver verificacion_pre cabecera semanal)",
+  "D9 BUMPS: index.html '?v=6.29' x2 -> '?v=6.30' x2 (sustitucion exacta por ocurrencia); sw.js 'planify-cache-v23' x1 -> 'planify-cache-v24' x1"
+ ],
+ "anclas": {
+  "ancla_html_bump1": "css/main.css?v=6.29",
+  "ancla_html_bump2": "js/app.js?v=6.29",
+  "ancla_html_notas": "2 ocurrencias exactas de '?v=6.29' (count==2); sustituir AMBAS por '?v=6.30'. count '?v=6.30'==0 pre-cambio. NO tocar otros ?v (panel.css, dashboard.css, grid.css no llevan version)",
+  "ancla_sw_bump": "planify-cache-v23",
+  "ancla_sw_notas": "1 ocurrencia exacta (count==1); sustituir por 'planify-cache-v24'. count v24==0 pre-cambio",
+  "ancla_css_final_actual": ".animate-entrance-nav{animation:slideUpFade .8s cubic-bezier(.16,1,.3,1) .2s forwards}",
+  "ancla_css_notas": "Ultimos chars reales del archivo (verificado: tail 120 chars = \"...mate-delay-3{animation-delay:.45s}.animate-entrance-nav{animation:slideUpFade .8s cubic-bezier(.16,1,.3,1) .2s forwards}\"). Balance actual 776/776. APPEND directo tras este string. Balance nuevo 780/780",
+  "ancla_js_final_actual": "}();",
+  "ancla_js_notas": "Final real verificado: ...readyState?document.addEventListener(\"DOMContentLoaded\",t):t()}(); -> ultimo char ';'. Insercion: app.js + \";\" + bloque_js_literal_v630 (el bloque empieza con comentario // o funcion segun spec del usuario -> \";\" previo garantiza statement break). Validar vm.Script post-insercion",
+  "bumps": "index.html '?v=6.29' x2 -> '?v=6.30' x2; sw.js 'planify-cache-v23' x1 -> 'planify-cache-v24' x1"
+ },
+ "codigo_nuevo": {
+  "bloque_css_v630": "PEGAR VERBATIM del mensaje del usuario (spec v6.30). Estructura = 4 reglas con 4 pares de llaves: (1) .calendar-day,.month-cell,td.cal-dia{...} (2) .calendar-day .event-tag,...{...} (3) .sticker-badge,...{...} (4) th button,...{...} (esta 4a regla incluye los selectores INVALIDOS 'th span:contains(\"×\")' y 'th span:contains(\"x\")' -> CSSOM descarta la regla completa; ver D4). NO reescribir, NO reordenar, NO limpiar. El implementador debe contar las llaves del bloque pegado: open==4 && close==4",
+  "bloque_css_notas": "Bloque literal del usuario, 4 pares de llaves -> 776+4=780/780. APPEND directo. Riesgo D4 documentado: la regla 4 se pierde por CSS (selectores :contains invalidos), funcionalidad cubierta por Funcion 1 JS. Balance total esperado 780/780 (verificado por aritmetica: 776+4)",
+  "bloque_js_v630": "PEGAR VERBATIM del mensaje del usuario (spec v6.30). Contenido estructural (3 funciones + observer + DOMContentLoaded): (a) limpiarLetrasXDeCabeceras: recorre th de cabeceras, hace th.innerHTML.replace(/\\s*[xX×]/g, '') cuando hay ' ×'/' x'/' X', y .remove() de botones/spans con X (target real: span eliminarDia con ✕ U+2715 generado por renderizar()); (b) renderizarStickerEnCelda: fix de pegatinas en celdas del calendario (renderiza [data-sticker] en celdas); (c) const observerPLANIFY (TOP-LEVEL, UNICO): MutationObserver con {subtree:true, childList:true} sobre document.querySelector('main, #app, .app-container')||document.body (matchea #app) que re-dispara limpiarLetrasXDeCabeceras y renderizarStickerEnCelda en cada mutacion; (d) window.cambiarFuenteApp (v6.30): crea <style id=\"dynamic-font-override\"> con template literal MULTILINEA ` * { font-family: ${fuenteFinal} !important; } ` (mapa de fuentes del usuario) -> SOBRESCRIBE la v6.29 (asignacion al final del archivo, ultima gana); (e) bloque DOMContentLoaded que llama a las funciones. El bloque conserva comentarios //, template literals multilinea y espacios (el archivo deja de ser 1 linea hasta el build)",
+  "bloque_js_notas": "Insertar LITERAL (sin normalizar) con separador ';' previo. Contiene template literals multilinea con ${} -> NO escapar ni convertir a strings simples. UTF-8 sin BOM (emoji 🔤). Post-build terser re-minifica y re-manglea const/funciones internas -> verificar por STRINGS (ver verificacion_post)"
+ },
+ "pasos": [
+  "ST-01 VERIFICAR estado git: git log --oneline -2 (HEAD debe ser 6c75520 v6.29) y git status --short (esperado: M task.json + ?? review_feedback.txt; NINGUN archivo de codigo modificado). Si hay mas archivos M: parar y reportar",
+  "ST-02 INDEX.HTML bump: sustituir '?v=6.29' x2 por '?v=6.30' x2 (ancla_html_bump1 y ancla_html_bump2). Verificar: count '?v=6.30'==2, count '?v=6.29'==0",
+  "ST-03 SW.JS bump: sustituir 'planify-cache-v23' x1 por 'planify-cache-v24' x1. Verificar: count v24==1, count v23==0",
+  "ST-04 CSS: PEGAR el bloque_css_v630 LITERAL al final de css/main.css (APPEND directo tras ancla_css_final_actual, sin separador). Contar llaves del bloque pegado (open==4, close==4). Verificar balance final = 780/780",
+  "ST-05 CSS verificacion de contenido por strings: .calendar-day,.month-cell,td.cal-dia, .event-tag, .sticker-badge, th button, th span:contains(\"×\"), th span:contains(\"x\") presentes TAL CUAL (spec literal; no limpiar lo invalido)",
+  "ST-06 JS: INSERTAR al final de js/app.js: \";\" + bloque_js_v630 LITERAL (sin normalizar comentarios, espacios ni template literals). NO tocar nada mas del bundle",
+  "ST-07 JS validacion sintaxis: vm.Script sobre el archivo completo -> SIN SyntaxError. (node --check tambien valido; si falla por longitud de linea usar vm.Script). Ultimo char debe seguir siendo ';' (cierre del bloque)",
+  "ST-08 JS verificacion de strings: [PLANIFY v6.30] (log de la v6.30, x1 o mas segun spec), limpiarLetrasXDeCabeceras, renderizarStickerEnCelda, observerPLANIFY, dynamic-font-override, window.cambiarFuenteApp (x2 ahora: asignacion v6.29 + v6.30), '×' y '✕' segun spec, template literal '* { font-family:' con ${fuenteFinal}",
+  "ST-09 BUILD (si el flujo lo requiere): npm run build equivalente (terser re-minifica js: ELIMINA comentarios //, colapsa template literals multilinea, re-manglea const internos -> observerPLANIFY/limpiarLetrasXDeCabeceras/renderizarStickerEnCelda como identificadores pueden desaparecer; verificar POST-BUILD por STRINGS: [PLANIFY v6.30], dynamic-font-override, '#app', '✕', 'eliminarDia')",
+  "ST-10 VERIFICACION FINAL integra (node): (a) css balance 780/780 y tail en '}', (b) vm.Script app.js OK, (c) html '?v=6.30' x2 y '6.29' count=0, (d) sw 'planify-cache-v24' x1, (e) js strings: [PLANIFY v6.30], dynamic-font-override, limpiarLetrasXDeCabeceras (PRE-build) / '#app' o '✕' (POST-build), (f) git status --short -> SOLO los 4 archivos (index.html, sw.js, css/main.css, js/app.js) + task.json/review_feedback",
+  "ST-11 REPORTAR al usuario: (a) regla 4 del CSS descartada por selectores :contains invalidos (funcionalidad cubierta por JS), (b) ✕ U+2715 vs × U+00D7 (el replace no matchea el span eliminarDia; la limpieza real la hace el .remove() de la funcion 1), (c) window.cambiarFuenteApp v6.30 gana (style tag inyectado), (d) contenedor real del observer = #app, (e) selectores inertes existentes ([data-sticker] x12 reales; cal-dia/cal-evento NO existen como clase exacta), (f) MutationObserver primero en el bundle"
+ ],
+ "verificacion_post": [
+  "css/main.css: balance 780/780, balance final 0, tail termina en '}' del bloque v6.30, strings de la regla 4 (incluidos los :contains invalidos) presentes",
+  "js/app.js: vm.Script OK, strings [PLANIFY v6.30] y dynamic-font-override presentes, window.cambiarFuenteApp count==2 (v6.29 + v6.30; la ultima asignacion gana), tail termina en cierre del bloque (;\n}...() o similar segun literal)",
+  "POST-BUILD (si aplica): terser re-manglea internos -> verificar por STRINGS: [PLANIFY v6.30], dynamic-font-override, '#app', '✕' (U+2715), 'eliminarDia', 'font-family:' + '!important'. NO buscar limpiarLetrasXDeCabeceras/renderizarStickerEnCelda/observerPLANIFY como identificadores post-build (renombrados por terser, esperado)",
+  "index.html: '?v=6.30' x2, '?v=6.29' count=0",
+  "sw.js: 'planify-cache-v24' x1",
+  "git status --short: SOLO index.html, css/main.css, js/app.js, sw.js modificados (+ task.json/review_feedback del flujo); nada mas"
+ ],
+ "riesgos_implementador": [
+  "a) Regla 4 CSS (th button, th .close, th .close-x, .week-header-day button, .week-header-day span.x, th[data-day] button, th span:contains(\"×\"), th span:contains(\"x\")): selectores :contains son INVALIDOS en CSS -> CSSOM descarta la regla COMPLETA (toda la lista de la regla se pierde). NO eliminar la regla del bloque (spec literal); la funcionalidad queda cubierta por limpiarLetrasXDeCabeceras + observerPLANIFY. Documentar en reporte",
+  "b) Sobrescritura window.cambiarFuenteApp: v6.30 (style tag #dynamic-font-override con * {font-family} !important) reemplaza v6.29 (setProperty --app-font-family). Insertada al final -> ultima asignacion gana. La v6.29 sigue ejecutandose internamente en DOMContentLoaded (cargarAjustesGuardados) sin error; visualmente gana la v6.30 por inyeccion posterior del style tag",
+  "c) Bloque JS literal NO minificado: comentarios //, template literals MULTILINEA ( ` * { font-family: ${fuenteFinal} !important; } ` ) y espacios. Insertar LITERAL con separador ';' previo. El archivo deja de ser 1 linea hasta el build (esperado; terser re-minifica y elimina comentarios)",
+  "d) MutationObserver subtree:true sobre #app: re-dispara limpieza en cada mutacion; limpiarLetrasXDeCabeceras idempotente -> estable. renderizar() re-inyecta spans ✕ en cada render -> el observer re-limpiara (deseado). Sin bucle (tras limpiar no hay mutaciones nuevas)",
+  "e) regex /\\s*[xX×]/g usa U+00D7 (×): NO matchea el '✕' U+2715 del span eliminarDia (generado por renderizar()). La eliminacion del span en cabeceras depende del .remove()/queries de la funcion 1 (spec literal; NO modificar el regex). Ademas el replace puede quitar la 'x' de nombres de dias en OTRO idioma (riesgo menor; en espanol Lun..Dom no contienen x)",
+  "f) UTF-8 sin BOM: emoji 🔤, tildes y template literals con ${} -> escribir con encoding UTF-8 puro; verificar por indexOf",
+  "g) Balance CSS: 776+4=780/780 exacto; contar llaves del bloque pegado antes de verificar balance final",
+  "h) POST-BUILD: terser re-manglea const/funciones internas (observerPLANIFY, limpiarLetrasXDeCabeceras, renderizarStickerEnCelda pueden desaparecer como identificadores) -> verificar por STRINGS y por window.cambiarFuenteApp",
+  "i) <style id=\"dynamic-font-override\"> NO debe existir en index.html (count==0 verificado); se crea SOLO por JS en runtime"
+ ],
+ "commit_propuesto": "feat: eliminacion fisica de X por js override de fuentes y fix de stickers v6.30",
+ "fases": [
+  {
+   "fase": 58,
+   "version": "v6.35",
+   "estado": "COMPLETADO",
+   "descripcion": "Toggle de horas de sueño (desmarcar al reclicar), purgado de X en cabeceras semanales y celdas mensuales multilínea CSS",
+   "acciones": [
+    "bumps index.html ?v=6.35 x2",
+    "sw.js planify-cache-v29",
+    "IIFE v6.35 al inicio app.js: toggle sleep con closest + yaEstabaActivo (setItem/removeItem), purgarTextoXCabeceras + MutationObserver, readyState loading/else",
+    "CSS append: ocultamiento X cabeceras, month-cell min-height 105px multilínea, sleep active box-shadow+scale",
+    "ELIMINADOS 3 handlers de sueño previos: v6.29 addEventListener dataset.escuchado, v6.32 onclick, v6.34 click-listener closest",
+    "verificacion post-build: 1 closest, 1 setItem, 1 removeItem, 0 restos v6.29/6.32/6.34, CSS 838/838",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v635_apply_css"
+  }
+ ]
 }

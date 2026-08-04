@@ -172,6 +172,24 @@
     "npm run check OK, build OK"
    ],
    "commit": "v639_apply_js"
+  },
+  {
+   "fase": 63,
+   "version": "v6.40",
+   "estado": "COMPLETADO",
+   "descripcion": "Fix definitivo de botones de sueño (toggle), inyección de stickers en celdas mensuales y sincronización de título de rutina diaria",
+   "acciones": [
+    "bumps index.html ?v=6.40 x2",
+    "sw.js planify-cache-v34",
+    "IIFE v6.40 al inicio: toggle global de sueño con containers .horas-sueño/.sueño-opciones/[data-sueño]/.sueño-btn, limpieza completa de estilos inline previos, clave planify_sueño_seleccionado",
+    "actualizarTituloDiario: sincroniza Rutina Diaria - d/m/a desde input fecha, listeners change + DOMContentLoaded",
+    "EDIT sticker renderizarCalendario: estilos individuales sustituidos por style.cssText con !important (fontSize 1.2rem, marginRight 6px, inline-block, verticalAlign middle)",
+    "CSS append: FIX INTERACTIVIDAD v6.40 (cursor/transition en botones sueño + .cal-sticker-visible 1.25rem) 838+2=840/840",
+    "NOTA: segmento post-build usa nombres minificados (y.sticker, h.prepend)",
+    "verificacion post-build: sueño_seleccionado 2 (set+remove), selectores x1, cssText x1, Rutina Diaria x1, CSS 840/840",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v640_apply_js"
   }
  ]
 }

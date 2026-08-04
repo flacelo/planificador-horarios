@@ -139,6 +139,23 @@
     "npm run check OK, build OK"
    ],
    "commit": "v637_apply_js"
+  },
+  {
+   "fase": 61,
+   "version": "v6.38",
+   "estado": "COMPLETADO",
+   "descripcion": "Guard null-check en renderizarCalendario y renderizado completo de celdas mensuales",
+   "acciones": [
+    "bumps index.html ?v=6.38 x2",
+    "sw.js planify-cache-v32",
+    "EDIT renderizarCalendario: cal-titulo con fallback document.querySelector(.cal-titulo) y else que CONTINUA el renderizado (antes return void abortaba todo si faltaba #cal-titulo)",
+    "EDIT renderizarCalendario: n.style.display=grid forzado tras obtener cal-grid",
+    "CSS append: FIX VISTA MENSUAL v6.38 (#cal-grid grid 7 columnas, .cal-dia 95px, .cal-evento/.cal-evento-mini multilínea) 834+3=837/837",
+    "NOTA: segmentos minificados sin var (terser fusiona declaraciones en secuencia), cal-titulo si conserva var r=",
+    "verificacion post-build: guard x1, fallback x1, return fatal 0, grid display x1",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v638_apply_js"
   }
  ]
 }

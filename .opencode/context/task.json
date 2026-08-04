@@ -190,6 +190,26 @@
     "npm run check OK, build OK"
    ],
    "commit": "v640_apply_js"
+  },
+  {
+   "fase": 64,
+   "version": "v6.41",
+   "estado": "COMPLETADO",
+   "descripcion": "Toggle directo de sueño, stickers visibles en celdas y título dinámico en diario",
+   "acciones": [
+    "bumps index.html ?v=6.41 x2",
+    "sw.js planify-cache-v35",
+    "INSPECCION: botones de sueño son button.cloud-btn[data-sleep=4-6|7-9|10-12] en .sleep-clouds (HTML estatico #view-diario)",
+    "IIFE v6.41 al inicio: bindSueño con addEventListener click POR BOTON (.sleep-clouds .cloud-btn[data-sleep]) con dataset.v641 guard, toggle real (desmarca si activo, removeItem) con estilos inline azul cian",
+    "IIFE v6.41: listener click .cal-dia -> dataset.fecha -> setea input fecha + titulo Rutina Diaria - d/m/a",
+    "ELIMINADO toggle v6.36 document-level closest .sleep-hour-btn,[data-sleep] (evita doble toggle)",
+    "ELIMINADO truncado slice(0,12) en renderizarCalendario: h.textContent=y.texto completo, sticker span cal-sticker-visible prepend intacto",
+    "FIX: handler principal de la app (querySelectorAll .cloud-btn en DOMContentLoaded) ahora excluye .sleep-clouds para no pisar el toggle",
+    "FIX: coma antes de const tras eliminar v6.36 (SyntaxError) corregida a punto y coma",
+    "verificacion post-build: selector x1, dataset.v641 x2, set/removeItem 1/1, exclusion x1, slice(0,12) 0, toggle v6.36 0",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v641_apply_js"
   }
  ]
 }

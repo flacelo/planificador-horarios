@@ -210,6 +210,26 @@
     "npm run check OK, build OK"
    ],
    "commit": "v641_apply_js"
+  },
+  {
+   "fase": 65,
+   "version": "v6.42",
+   "estado": "COMPLETADO",
+   "descripcion": "Decodificacion de stickers, ajuste de ancho en cal-evento y sincronizacion de fecha al hacer clic en dia",
+   "acciones": [
+    "bumps index.html ?v=6.42 x2",
+    "sw.js planify-cache-v36",
+    "INSPECCION: listener v6.41 termina en }}}) + , (comilla de secuencia en IIFE), no }}} ,",
+    "IIFE v6.42 al inicio: MAPA_STICKERS (salud gym avion musica cumple comida idea amor trabajo cama colores default) + window.obtenerStickerIcono (ID->emoji, si no es ID devuelve valor)",
+    "listener v6.42: click .cal-dia -> data-fecha -> input date .value + dispatchEvent change (bubbles) -> v6.40 actualiza titulo; ademas setea h1,h2,h3,.title,.card-title que incluyan Rutina Diaria",
+    "ELIMINADO listener cal-dia v6.41 (sustituido por v6.42 con dispatch change, incluye la coma de secuencia en la eliminacion)",
+    "renderizarCalendario: sticker ahora decodifica (window.obtenerStickerIcono(y.sticker||y.emoji)) con span cal-sticker-visible font-size 1.1rem + espacio tras emoji",
+    "CSS append FIX FORMATO DE TEXTO Y STICKERS v6.42: .cal-evento,.cal-evento-mini (white-space normal, word-wrap break-word, word-break keep-all, display block, width 100%, box-sizing, padding 4px 6px) + .cal-sticker-visible (inline-block, visibility visible, opacity 1)",
+    "balance CSS 842/842 pre-build; minifier elimina comentario y espacios (keep-all x1, visibility:visible x15 post-build)",
+    "verificacion post-build: obtenerStickerIcono def x1, decode en render x2 usos, listener viejo 0, dispatchEvent x1, ?v=6.42 x2, cache v36",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v642_apply_js"
   }
  ]
 }

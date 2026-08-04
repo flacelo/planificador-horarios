@@ -121,6 +121,24 @@
     "npm run check OK, build OK"
    ],
    "commit": "v636_apply_js"
+  },
+  {
+   "fase": 60,
+   "version": "v6.37",
+   "estado": "COMPLETADO",
+   "descripcion": "Eliminacion de X concatenada en string de cabeceras y inline styles en renderJS",
+   "acciones": [
+    "bumps index.html ?v=6.37 x2",
+    "sw.js planify-cache-v31",
+    "IIFE v6.37 al inicio: limpiarCabecerasSemanales (th, .week-header-day, .cal-header) con regex /\\s*[xX×]\\s*$/g + window export + DOMContentLoaded/readyState",
+    "EDIT renderizar(): eliminado span onclick=eliminarDia() con ✕ del template de cabeceras (era inmune a purgadores: sin clase ni tag button)",
+    "EDIT renderizar(): hook window.limpiarCabecerasSemanales() al inicio",
+    "inline styles en creacion de cal-evento-mini (calendario mensual): whiteSpace normal, wordBreak, fontSize 0.85rem, lineHeight 1.3, display block",
+    "inline styles en cell-content de renderizarStickerEnCelda",
+    "verificacion post-build: span X en th = 0, del-fila intacto, hooks x1, inline x1/x1",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v637_apply_js"
   }
  ]
 }

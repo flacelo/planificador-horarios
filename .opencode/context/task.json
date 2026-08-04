@@ -230,6 +230,24 @@
     "npm run check OK, build OK"
    ],
    "commit": "v642_apply_js"
+  },
+  {
+   "fase": 66,
+   "version": "v6.43",
+   "estado": "COMPLETADO",
+   "descripcion": "Titulo de diario alimentado por el evento del dia y rendering forzado de icono de sticker",
+   "acciones": [
+    "bumps index.html ?v=6.43 x2",
+    "sw.js planify-cache-v37",
+    "IIFE v6.43 al inicio: EMOJIS_DEFECTO (desechado por terser por no usarse) + obtenerIconoValido (si sticker falsy, >4 chars o incluye color/palette -> pin pin; si no, emoji directo)",
+    "listener v6.43: click .cal-dia -> extrae nombreEvento del primer .cal-evento/.cal-evento-mini/.cell-content (innerText sin saltos), sincroniza input date + dispatch change, titulo = nombreEvento - d/m/a | nombreEvento | Rutina Diaria - d/m/a | Rutina Diaria; dataset.esTituloDiario para reclicar dias",
+    "ELIMINADO listener v6.42 (por indices verificados: segmento len 495, fin en }) } ) + }() del IIFE) para evitar overwrite del titulo",
+    "renderizarCalendario: expresion v6.42 reemplazada por window.inyectarStickerEnEvento&&(y.sticker||y.emoji)&&window.inyectarStickerEnEvento(h,y.sticker||y.emoji) (guarda conserva eventos sin sticker)",
+    "inyectarStickerEnEvento: obtenerIconoValido inline por terser (o.length<=4), span cal-sticker-visible 1.1rem/5px con guard querySelector",
+    "verificacion post-build: def x1, uso en render x1, esTituloDiario x2, innerText.replace x1, template  -  y fallbacks confirmados, 3===t.length 0, ?v=6.43 x2, cache v37",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v643_apply_js"
   }
  ]
 }

@@ -103,6 +103,24 @@
     "npm run check OK, build OK"
    ],
    "commit": "v635_apply_css"
+  },
+  {
+   "fase": 59,
+   "version": "v6.36",
+   "estado": "COMPLETADO",
+   "descripcion": "Sistema de inyección JS de estilos forzados (styleFix en head) e interceptación de DOM por service worker/PWA",
+   "acciones": [
+    "bumps index.html ?v=6.36 x2",
+    "sw.js planify-cache-v30",
+    "IIFE v6.36 al inicio de app.js: style tag planify-force-styles-v36 inyectado en head (ocultar X semanal, celdas mensuales 110px multilínea con [data-event], estado activo sueño)",
+    "toggle de sueño (closest + yaEstabaActivo, setItem/removeItem)",
+    "purgarX + MutationObserver con readyState loading/else",
+    "ELIMINADO IIFE v6.35 completo (corte por frontera de fusión de IIFEs de Terser + prefijo !)",
+    "ELIMINADO bloque CSS v6.35 de main.css (834/834)",
+    "verificacion post-build: 1 closest, 1 setItem, 1 removeItem, styleFix id x1, [data-event] x1, MutationObserver x3",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v636_apply_js"
   }
  ]
 }

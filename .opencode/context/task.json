@@ -156,6 +156,22 @@
     "npm run check OK, build OK"
    ],
    "commit": "v638_apply_js"
+  },
+  {
+   "fase": 62,
+   "version": "v6.39",
+   "estado": "COMPLETADO",
+   "descripcion": "Renderizado explícito de stickers/emojis en celdas del calendario mensual",
+   "acciones": [
+    "bumps index.html ?v=6.39 x2",
+    "sw.js planify-cache-v33",
+    "EDIT renderizarCalendario: sustituido sticker texto plano (h.textContent=b.sticker+space) por span.cal-sticker-visible creado con createElement, textContent=b.sticker, inline styles (fontSize 1.2rem, marginRight 4px, inline-block, verticalAlign middle) y h.prepend() antes del texto del evento",
+    "texto de evento conserva truncado length>12 con slice(0,12)+...",
+    "CSS append: FIX STICKERS v6.39 (.cal-sticker-visible, [data-sticker], .cal-sticker visibles inline-block 1.2rem) 837+1=838/838",
+    "verificacion post-build: clase x1, prepend x1, fontSize 1.2rem x1, texto plano eliminado 0, slice(0,12) x1",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v639_apply_js"
   }
  ]
 }

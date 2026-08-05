@@ -248,6 +248,25 @@
     "npm run check OK, build OK"
    ],
    "commit": "v643_apply_js"
+  },
+  {
+   "fase": 67,
+   "version": "v6.44",
+   "estado": "COMPLETADO",
+   "descripcion": "Titulo de diario exclusivamente con nombre de evento sin fecha concatenada y mapa exacto para pegatina paleta",
+   "acciones": [
+    "bumps index.html ?v=6.44 x2",
+    "sw.js planify-cache-v38",
+    "IIFE v6.44 al inicio: MAPA_STICKERS_EXACTO (colores/paleta/default->paleta, cuadros->cuadro, salud gym avion musica cumple comida idea amor trabajo cama) + window.obtenerEmojiCorrecto (lowercase trim, si ya es emoji <=4 chars sin color/btn lo devuelve, si no paleta)",
+    "listener v6.44: click .cal-dia -> clona .cal-evento para quitar span sticker (sin mutar DOM), nombreEvento limpio, titulo = nombreEvento | Rutina Diaria SIN concatenar fecha; condicion incluye t.textContent===nombreEvento para reclicar",
+    "NOTA: el listener v6.44 omite la sincronizacion del input de fecha (spec del usuario); el dispatch change de v6.42/6.43 desaparece con ellos",
+    "window.inyectarStickerEnEvento v6.44: obtenerEmojiCorrecto, elimina span previo (.remove) y SIEMPRE inyecta (default colores)",
+    "renderizarCalendario: expresion = window.inyectarStickerEnEvento&&window.inyectarStickerEnEvento(h,y.sticker||y.emoji||colores) - sin guard, todo evento recibe emoji",
+    "ELIMINADO bloque v6.43 completo (listener + definicion vieja de inyectarStickerEnEvento): terser habia desenvuelto su IIFE a secuencia top-level; junction con v6.42 quedo como ...prepend(a)}},function(){const e={salud y el ! inicial se perdio -> restaurado prepend ! tras el corte",
+    "verificacion post-build: e.textContent=t||\"Rutina Diaria\" (sin fecha), condicion textContent===t, cloneNode x2, y.emoji||colores x1, ${o} - ${t} 0, esTituloDiario x2, ?v=6.44 x2, cache v38",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v644_apply_js"
   }
  ]
 }

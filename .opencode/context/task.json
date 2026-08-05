@@ -370,6 +370,24 @@
     "npm run build OK"
    ],
    "commit": "v650_apply_css_js"
+  },
+  {
+   "fase": 74,
+   "version": "v6.51",
+   "estado": "COMPLETADO",
+   "descripcion": "Titulo editable con persistencia local para el bloque de Rutina en el Planificador Diario",
+   "acciones": [
+    "bumps index.html ?v=6.51 x2 (css/main.css?v=6.51 y js/app.js?v=6.51)",
+    "sw.js planify-cache-v45",
+    "HTML: <h2 data-i18n=\"title\">Rutina Diaria</h2> -> <h2 data-i18n=\"title\" id=\"titulo-rutina-diaria\" contenteditable=\"true\">Rutina Diaria</h2>",
+    "JS: IIFE v6.51 insertado tras v6.48 (junction con v6.42): carga localStorage planify_titulo_rutina (default \"Rutina diaria\") y guarda en blur con trim + fallback al default; try/catch en ambos accesos",
+    "CSS: #titulo-rutina-diaria con cursor pointer, borde dashed transparente con transicion, hover (borde rgba(255,255,255,.4) + fondo .05) y focus (#38bdf8 + fondo rgba(56,189,248,.1))",
+    "CAVEAT: aplicarIdioma (data-i18n=\"title\") puede sobrescribir el titulo custom al cambiar idioma; el valor guardado se restaura en la proxima carga",
+    "verificacion post-build: HTML id+contenteditable x1, IIFE getElementById x1, planify_titulo_rutina x2, CSS base/hover/focus x1 cada una, ?v=6.51 x2, cache v45",
+    "smoke test del IIFE extraido del build: carga default \"Rutina diaria\" OK y carga de titulo guardado \"Inicio de clases\" OK",
+    "npm run build OK"
+   ],
+   "commit": "v651_apply_js"
   }
  ]
 }

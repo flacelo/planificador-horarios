@@ -405,6 +405,20 @@
     "npm run build OK"
    ],
    "commit": "v652_apply_js"
+  },
+  {
+   "fase": 76,
+   "version": "v6.53",
+   "estado": "COMPLETADO",
+   "descripcion": "Estilización CSS y contraste radiante (cian/blanco) para el icono de selector de fecha nativo en input[type=date]",
+   "acciones": [
+    "bumps index.html ?v=6.53 x2, sw.js planify-cache-v47",
+    "CSS v6.53 anexado al final de css/main.css: input[type=\"date\"]::-webkit-calendar-picker-indicator con filter invert(.8) sepia(1) saturate(5) hue-rotate(170deg) brightness(1.2) -> icono negro nativo convertido a cian brillante, opacity .9, transicion 0.2s, padding 2px, cursor pointer",
+    "hover: opacity 1, filter invert(1) brightness(1.5) + drop-shadow cyan rgba(56,189,248,.8), transform scale(1.15)",
+    "verificacion post-build: ambas reglas presentes verbatim en css compilado (minificador conservo 0.8/0.9/0.2s), ?v=6.53 x2, cache v47",
+    "npm run build OK"
+   ],
+   "commit": "v653_apply_css"
   }
  ]
 }

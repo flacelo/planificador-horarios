@@ -267,6 +267,24 @@
     "npm run check OK, build OK"
    ],
    "commit": "v644_apply_js"
+  },
+  {
+   "fase": 68,
+   "version": "v6.45",
+   "estado": "COMPLETADO",
+   "descripcion": "Declaracion global de cambiarTab y correccion del mapa de sticker a imagenes superpuestas",
+   "acciones": [
+    "bumps index.html ?v=6.45 x2",
+    "sw.js planify-cache-v39",
+    "DIAGNOSTICO: cambiarTab YA existia como function cambiarTab(e) top-level y la cadena window.cambiarTab=cambiarTab (top-level) lo exponía; load test en Node (stub DOM) confirma window.cambiarTab definido tras load -> el error del usuario proviene de SW cacheado o fallo previo en su sesion",
+    "window.cambiarTab global al inicio absoluto (version usuario ADAPTADA: matcher t.id===\"view-\"+tabName porque las vistas reales son #view-diario/#view-semanal/#view-mensual sin data-tab-content; el snippet literal habria ocultado TODAS las vistas) + renderizarCalendario() al elegir mensual (comportamiento del original)",
+    "ELIMINADO window.cambiarTab=cambiarTab de la cadena de exposicion (la version v6.45 queda como definitiva; el function cambiarTab original sigue en scope para llamadas internas)",
+    "IIFE v6.45 insertado TRAS el IIFE v6.44 (no al inicio) para que overwrite obtenerEmojiCorrecto/inyectarStickerEnEvento; union por coma (})(); habria roto la secuencia top-level - 2 intentos fallidos resueltos)",
+    "MAPA_STICKERS_EXACTO v6.45: colores/paleta/cuadros/imagenes/default -> marco con imagen, resto de IDs igual que v6.44",
+    "verificacion post-build: window.cambiarTab=function(e) @0 con matcher view-, def obtenerEmojiCorrecto x2 (v6.44 @768 default paleta de colores, v6.45 @2108 default marco), inyectarStickerEnEvento v6.45, chain 0, ?v=6.45 x2, cache v39, load test LOAD OK con cambiarTab funcion",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v645_apply_js"
   }
  ]
 }

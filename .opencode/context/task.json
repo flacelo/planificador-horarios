@@ -303,6 +303,24 @@
     "npm run check OK, build OK"
    ],
    "commit": "v646_apply_js"
+  },
+  {
+   "fase": 70,
+   "version": "v6.47",
+   "estado": "COMPLETADO",
+   "descripcion": "Cambio a emoji cama con persona 🛌 y mapeo forzado del primer sticker a ambulancia 🚑",
+   "acciones": [
+    "bumps index.html ?v=6.47 x2",
+    "sw.js planify-cache-v41",
+    "IIFE v6.47 insertado TRAS el IIFE v6.46 (junction con v6.42), union por coma -> defs v6.47 pisan a v6.46/v6.45/v6.44",
+    "DICCIONARIO_AJUSTADO v6.47: salud/emergencia/auto-medico/carrito/red/first/0/sticker-0 -> 🚑 (primer boton del modal), cama/dormir/descanso/sueño -> 🛌, hospital/clinica/medico -> 🏥, resto de stickers intactos",
+    "obtenerEmojiCorrecto v6.47: emoji directo con reemplazo forzado 🛏️->🛌, lookup exacto, keywords parciales (ambulan/emergen/salud -> 🚑; cama/dormir/sleep -> 🛌), fallback 📌",
+    "inyectarStickerEnEvento v6.47 identico (span .cal-sticker-visible prepend con cssText)",
+    "verificacion post-build: 4 defs obtenerEmojiCorrecto/inyectarStickerEnEvento, cama:\"🛌\" x1, red:\"🚑\" x1, sticker-0 x1, 0:\"🚑\" x1, keyword sleep, ?v=6.47 x2, cache v41",
+    "test aislado del IIFE v6.47 extraido del build (@4038..5268): 37 claves exactas + 🛏️ directo->🛌 + emoji passthrough + parciales ambulan/emergencias/camas/sleeping + fallbacks, TODOS OK",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v647_apply_js"
   }
  ]
 }

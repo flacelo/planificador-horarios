@@ -433,6 +433,22 @@
     "npm run build OK"
    ],
    "commit": "v654_apply_css"
+  },
+  {
+   "fase": 78,
+   "version": "v6.55",
+   "estado": "COMPLETADO",
+   "descripcion": "Título del diario dinámico en función de la fecha seleccionada en el selector o calendario",
+   "acciones": [
+    "bumps index.html ?v=6.55 x2, sw.js planify-cache-v49",
+    "window.actualizarTituloSegunFecha(fechaISO): busca evento en storage y fija tituloEl.textContent = texto del evento o \"Rutina Diaria\"",
+    "ADAPTACION CLAVE REAL: el snippet usaba EVENTOS_PLANIFY/PLANIFY_DATA/planify_eventos (inexistentes); el app real persiste eventos en localStorage \"horario_eventos_cal\" (objeto por fecha YYYY-MM-DD con {texto,notas,color,sticker}) - usado como fuente de datos real",
+    "ADAPTACION dataset.fecha: en el clic de .cal-dia se usa calDia.dataset.fecha (lo setea renderizarCalendario) en vez del valor del input date, para que el titulo siga al dia clickeado aunque el input no se haya actualizado (evita regresion vs v6.52)",
+    "EXTRA: inicializacion al cargar (DOMContentLoaded) con el valor del input date para eliminar el bug del titulo global persistido al abrir la app",
+    "insercion: antes de la junction ,function(){const e={salud con slice(0,j+1)+iife+\",\\n\"+slice(j+1) (primer intento sin coma -> SyntaxError; restaurado via git checkout y reintentado)",
+    "verificacion: node --check, npm run check, npm run build OK; VM test sobre bloque compilado (wrapper function(){...}() conservado por terser por la declaracion interna function e): 9/9 PASS (carga inicial, fecha con evento, fecha sin evento, change listener date/no-date, click .cal-dia con/sin evento, click fuera, input vacio)"
+   ],
+   "commit": "v655_apply_js"
   }
  ]
 }

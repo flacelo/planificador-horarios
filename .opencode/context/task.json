@@ -1,532 +1,607 @@
 {
- "id": "TASK-20260801-v6.34",
- "fase": "Fase 57 (v6.34): Modificación directa en renderJS para eliminar X en cabeceras, formato multilínea mensual, interactividad de sueño y animaciones",
- "titulo": "feat: fix renderizado dinamico js y css override v6.34",
- "anterior": {
-  "id": "TASK-20260801-v6.30",
-  "fase": "Fase 54 (v6.30): Eliminación física por JS de X en cabeceras semanales, inyección dinámica de tipografías y fix de pegatinas en calendario",
-  "titulo": "feat: eliminacion fisica de X por js override de fuentes y fix de stickers v6.30"
- },
- "requerimiento": "v6.34: Fix de raiz en renderJS: manejador global de click para horas de sueno (closest + localStorage planify_sueno_horas + log [PLANIFY v6.34] ), purgador de X en cabeceras con MutationObserver sobre #app/main/body. CORRECCION aplicada: window.addEventListener('DOMContentLoaded') -> document.addEventListener('DOMContentLoaded') (el evento no se dispara en window; sin la correccion la purga/observer quedaban muertos). CSS append bloque v6.34 (10 pares -> balance 824+10=834/834). Bumps: ?v=6.33 x2 -> ?v=6.34 x2; sw planify-cache-v27 -> v28. No redefine window.cambiarFuenteApp (sigue unica v6.33). task.json: Fase 57 registrada.",
- "estado": "planificado",
- "creado": "2026-08-03",
- "head_actual": "6c75520",
- "rama": "main (M .opencode/context/task.json + ?? .opencode/context/review_feedback.txt esperados; sin otros cambios)",
- "verificacion_pre": [
-  "ESTADO GIT REAL: git log --oneline -2 -> HEAD 6c75520 \"feat: batch ux con google fonts animaciones de entrada y fixes de usuario v6.29\"; previo 2a510ac (v6.27). git status --short -> \" M .opencode/context/task.json\" y \"?? .opencode/context/review_feedback.txt\" (ambos ESPERADOS del flujo; NINGUNO es archivo fuente). Cero archivos de codigo modificados. Anclas listas para v6.30",
-  "index.html: count '?v=6.29' == 2 (css/main.css?v=6.29 y js/app.js?v=6.29) -> ancla unica por ocurrencia para sustituir a ?v=6.30. count '?v=6.30' == 0. count '<style id=\"dynamic-font-override\"' == 0 (el style tag de la v6.30 NO preexiste; se inyecta por JS en runtime, no en HTML)",
-  "sw.js: count 'planify-cache-v23' == 1, count 'planify-cache-v24' == 0 -> bump directo x1",
-  "css/main.css (1 linea minificada): balance { == } == 776/776 CONFIRMADO (open=776, close=776, final 0). TERMINA en \".animate-entrance-nav{animation:slideUpFade .8s cubic-bezier(.16,1,.3,1) .2s forwards}\" (statement CSS completo, ultimo char '}' -> APPEND DIRECTO sin separador)",
-  "js/app.js (1 linea minificada POST-BUILD, 145767 bytes): TERMINA en \";\" del cierre de IIFE Terser: ultimos 150 chars reales = ...console.log(\"[PLANIFY v6.29] Error al crear nuevo lienzo\",e)}},\"loading\"===document.readyState?document.addEventListener(\"DOMContentLoaded\",t):t()}(); (termina en '}();' -> el IIFE v6.29 cierra con '}();' y ultimo char ';'. Insercion con separador \";\" extra: app.js + \";\" + bloque_literal_v630 es seguro (doble ';;' en cierre de statement es valido)",
-  "COLLISIONES JS (counts en js/app.js): limpiarLetrasXDeCabeceras==0, renderizarStickerEnCelda==0, observerPLANIFY==0 (const TOP-LEVEL -> UNICA, sin duplicados), dynamic-font-override==0, window.cambiarFuenteApp==1 (ASIGNACION EXISTENTE v6.29: \"window.cambiarFuenteApp=a\" dentro del IIFE -> la v6.30 insertada al FINAL reasigna window.cambiarFuenteApp y la ULTIMA gana (la v6.30). La v6.29 se sigue llamando internamente por cargarAjustesGuardados en DOMContentLoaded (closure interno, sin conflicto de orden de definicion); visualmente gana la v6.30 por inyeccion posterior del style tag #dynamic-font-override)",
-  "MutationObserver count en app.js == 0 (NO existe NINGUN MutationObserver en el bundle -> el observerPLANIFY de v6.30 es el PRIMERO y unico, sin conflicto). mainContainer count == 0 (no existe NI top-level NI local; el 'const mainContainer' de la v6.30 dentro del callback addEventListener es scope local sin colision; reportar: count 0 pre-v6.30)",
-  "CONTENEDOR REAL para el observer: lista de selectores 'main, #app, .app-container || document.body' -> en HTML real SOLO matchea '#app' (count id=\"app\"==1 en <div class=\"app licenciado\" id=\"app\">); '<main'==0, 'app-container'==0. document.querySelector('main, #app, .app-container') retorna #app; fallback document.body no se usa en la practica",
-  "CABECERA SEMANAL (target de la limpieza): se genera DINAMICAMENTE en renderizar() (js): t += `<th style=\"position:relative;\">${e.substring(0,3)}<div class=\"resizer\" data-col=\"${a}\"></div> <span style=\"cursor:pointer;color:#ff7675;font-size:0.8em;opacity:0.6\" onclick=\"eliminarDia(${a})\">✕</span></th>`. OJO: el glyph del span eliminarDia es '✕' U+2715 (count 4 en js, 1 en html), NO '×' U+00D7 (count 0 en js y html). El regex literal del usuario /\\s*[xX×]/g usa U+00D7 y NO matchea U+2715: la eliminacion del span eliminarDia debe venir del .remove() de botones/spans de la funcion 1 (spec literal -> se documenta el riesgo de efectividad del replace, no se reescribe)",
-  "SELECTORES INERTES en HTML real (regex exacta): class=\"cal-dia\"==0 (los 7 matches de substring son 'cal-dia-nombre'), class=\"cal-evento\"==0 (los 7 matches son name=\"cal-evento-color\"), event-item==0, sticker-icon==0, [data-sticker]==12 REAL (span.cal-sticker de la paleta en modal calendario), th[data-day]==0 (HTML y JS), day-header==0, calendar-day==0, month-cell==0, event-tag==0, sticker-badge==0. <th reales == 6 (1 HORA en #header-row + 5 en modal licencia); la cabecera semanal dinamica es la que recibe los th por renderizar()",
-  "UTF-8: emoji 🔤 ya presente en app.js (v6.29 console.log). El bloque v6.30 usa emoji 🔤 y template literals con ${fuenteFinal}: escribir SIN BOM, verificar por indexOf post-insercion"
- ],
- "decisiones": [
-  "D1 ESPEC LITERAL: los bloques CSS (4 reglas) y JS (3 funciones + observerPLANIFY + window.cambiarFuenteApp v6.30 + DOMContentLoaded) se copian VERBATIM del mensaje del usuario. PROHIBIDO reescribir, refactorizar, renombrar o minificar manualmente. Los comentarios //, espacios y template literals multilinea del bloque JS se conservan hasta el build (terser del package.json los re-minifica: tarea esperada y documentada)",
-  "D2 CSS: APPEND DIRECTO al final de css/main.css (termina en '}' de .animate-entrance-nav, statement completo, sin separador). Bloque del usuario = 4 reglas -> 4 pares de llaves -> balance NUEVO 780/780 (776+4). Contar llaves del bloque pegado con node: open==4 && close==4 antes de append",
-  "D3 JS: INSERCION AL FINAL de js/app.js. Ultimo char actual ';' (cierre }(); del IIFE v6.29) -> anteponer \";\" de ruptura: app.js + \";\" + bloque_literal. Validar sintaxis con vm.Script sobre el archivo completo (node --check falla en 1 linea? usar vm.Script) antes y despues del build",
-  "D4 RIESGO (a) CSS invalido: la regla 4 del bloque CSS contiene selectores jQuery ':contains' -> 'th span:contains(\"×\")' y 'th span:contains(\"x\")' son INVALIDOS en CSS. CSSOM descarta la REGLA COMPLETA que los contiene (toda la lista de selectores de esa regla se pierde: th button, th .close, th .close-x, .week-header-day button, .week-header-day span.x, th[data-day] button, etc. NO tendran efecto por CSS). La funcionalidad (ocultar/limpiar X) queda cubierta por la Funcion 1 JS (limpiarLetrasXDeCabeceras + MutationObserver). Se aplica la regla literal como spec y se documenta este riesgo en el plan y en el reporte final al usuario",
-  "D5 RIESGO (b) sobrescritura window.cambiarFuenteApp: la v6.30 (style tag #dynamic-font-override con '* {font-family} !important') reemplaza la v6.29 (setProperty --app-font-family). La v6.29 se llama sola al DOMContentLoaded via cargarAjustesGuardados (closure interno); la v6.30 gana visualmente por inyeccion posterior del style tag en el DOM. Sin conflicto de orden de definicion: la v6.30 se inserta al final del archivo y su asignacion window.cambiarFuenteApp=... es la ULTIMA -> gana",
-  "D6 RIESGO (c) bloque JS literal: contiene comentarios //, template literals MULTILINEA (`` ` * { font-family: ${fuenteFinal} !important; } ` ``) y espacios -> el archivo deja de ser 1 linea hasta el build. Insertar LITERAL con separador ';' previo (el archivo termina en '})();'-equivalente '}();' -> ya hay ';', anadir otro es seguro). NO normalizar saltos de linea",
-  "D7 RIESGO (d) MutationObserver con subtree:true en 'main, #app, .app-container' (matchea #app): el observer re-dispara limpieza en cada mutacion. limpiarLetrasXDeCabeceras es idempotente: tras .remove() de botones/spans con X y replace de 'x', no hay mas mutaciones -> estable. OJO: renderizar() (25 llamadas en bundle) re-inyecta los spans eliminarDia con ✕ en cada render -> el observer RE-LIMPIA automaticamente (comportamiento deseado por el usuario, no bucle porque tras limpiar no quedan mutaciones nuevas)",
-  "D8 RIESGO (e) th.innerHTML.replace(/\\s*[xX×]/g, ''): solo se ejecuta si el innerHTML incluye ' ×', ' x' o ' X'. Los dias actuales (dias.forEach con e.substring(0,3): Lun,Mar,Mie,Jue,Vie,Sab,Dom) NO contienen x -> no afecta nombres normales en espanol. Riesgo menor documentado: podria quitar la 'x' de nombres de dias en OTRO idioma (p.ej. ingles no, pero idiomas con x en abreviaturas si) y NO matchea '✕' U+2715 (ver verificacion_pre cabecera semanal)",
-  "D9 BUMPS: index.html '?v=6.29' x2 -> '?v=6.30' x2 (sustitucion exacta por ocurrencia); sw.js 'planify-cache-v23' x1 -> 'planify-cache-v24' x1"
- ],
- "anclas": {
-  "ancla_html_bump1": "css/main.css?v=6.29",
-  "ancla_html_bump2": "js/app.js?v=6.29",
-  "ancla_html_notas": "2 ocurrencias exactas de '?v=6.29' (count==2); sustituir AMBAS por '?v=6.30'. count '?v=6.30'==0 pre-cambio. NO tocar otros ?v (panel.css, dashboard.css, grid.css no llevan version)",
-  "ancla_sw_bump": "planify-cache-v23",
-  "ancla_sw_notas": "1 ocurrencia exacta (count==1); sustituir por 'planify-cache-v24'. count v24==0 pre-cambio",
-  "ancla_css_final_actual": ".animate-entrance-nav{animation:slideUpFade .8s cubic-bezier(.16,1,.3,1) .2s forwards}",
-  "ancla_css_notas": "Ultimos chars reales del archivo (verificado: tail 120 chars = \"...mate-delay-3{animation-delay:.45s}.animate-entrance-nav{animation:slideUpFade .8s cubic-bezier(.16,1,.3,1) .2s forwards}\"). Balance actual 776/776. APPEND directo tras este string. Balance nuevo 780/780",
-  "ancla_js_final_actual": "}();",
-  "ancla_js_notas": "Final real verificado: ...readyState?document.addEventListener(\"DOMContentLoaded\",t):t()}(); -> ultimo char ';'. Insercion: app.js + \";\" + bloque_js_literal_v630 (el bloque empieza con comentario // o funcion segun spec del usuario -> \";\" previo garantiza statement break). Validar vm.Script post-insercion",
-  "bumps": "index.html '?v=6.29' x2 -> '?v=6.30' x2; sw.js 'planify-cache-v23' x1 -> 'planify-cache-v24' x1"
- },
- "codigo_nuevo": {
-  "bloque_css_v630": "PEGAR VERBATIM del mensaje del usuario (spec v6.30). Estructura = 4 reglas con 4 pares de llaves: (1) .calendar-day,.month-cell,td.cal-dia{...} (2) .calendar-day .event-tag,...{...} (3) .sticker-badge,...{...} (4) th button,...{...} (esta 4a regla incluye los selectores INVALIDOS 'th span:contains(\"×\")' y 'th span:contains(\"x\")' -> CSSOM descarta la regla completa; ver D4). NO reescribir, NO reordenar, NO limpiar. El implementador debe contar las llaves del bloque pegado: open==4 && close==4",
-  "bloque_css_notas": "Bloque literal del usuario, 4 pares de llaves -> 776+4=780/780. APPEND directo. Riesgo D4 documentado: la regla 4 se pierde por CSS (selectores :contains invalidos), funcionalidad cubierta por Funcion 1 JS. Balance total esperado 780/780 (verificado por aritmetica: 776+4)",
-  "bloque_js_v630": "PEGAR VERBATIM del mensaje del usuario (spec v6.30). Contenido estructural (3 funciones + observer + DOMContentLoaded): (a) limpiarLetrasXDeCabeceras: recorre th de cabeceras, hace th.innerHTML.replace(/\\s*[xX×]/g, '') cuando hay ' ×'/' x'/' X', y .remove() de botones/spans con X (target real: span eliminarDia con ✕ U+2715 generado por renderizar()); (b) renderizarStickerEnCelda: fix de pegatinas en celdas del calendario (renderiza [data-sticker] en celdas); (c) const observerPLANIFY (TOP-LEVEL, UNICO): MutationObserver con {subtree:true, childList:true} sobre document.querySelector('main, #app, .app-container')||document.body (matchea #app) que re-dispara limpiarLetrasXDeCabeceras y renderizarStickerEnCelda en cada mutacion; (d) window.cambiarFuenteApp (v6.30): crea <style id=\"dynamic-font-override\"> con template literal MULTILINEA ` * { font-family: ${fuenteFinal} !important; } ` (mapa de fuentes del usuario) -> SOBRESCRIBE la v6.29 (asignacion al final del archivo, ultima gana); (e) bloque DOMContentLoaded que llama a las funciones. El bloque conserva comentarios //, template literals multilinea y espacios (el archivo deja de ser 1 linea hasta el build)",
-  "bloque_js_notas": "Insertar LITERAL (sin normalizar) con separador ';' previo. Contiene template literals multilinea con ${} -> NO escapar ni convertir a strings simples. UTF-8 sin BOM (emoji 🔤). Post-build terser re-minifica y re-manglea const/funciones internas -> verificar por STRINGS (ver verificacion_post)"
- },
- "pasos": [
-  "ST-01 VERIFICAR estado git: git log --oneline -2 (HEAD debe ser 6c75520 v6.29) y git status --short (esperado: M task.json + ?? review_feedback.txt; NINGUN archivo de codigo modificado). Si hay mas archivos M: parar y reportar",
-  "ST-02 INDEX.HTML bump: sustituir '?v=6.29' x2 por '?v=6.30' x2 (ancla_html_bump1 y ancla_html_bump2). Verificar: count '?v=6.30'==2, count '?v=6.29'==0",
-  "ST-03 SW.JS bump: sustituir 'planify-cache-v23' x1 por 'planify-cache-v24' x1. Verificar: count v24==1, count v23==0",
-  "ST-04 CSS: PEGAR el bloque_css_v630 LITERAL al final de css/main.css (APPEND directo tras ancla_css_final_actual, sin separador). Contar llaves del bloque pegado (open==4, close==4). Verificar balance final = 780/780",
-  "ST-05 CSS verificacion de contenido por strings: .calendar-day,.month-cell,td.cal-dia, .event-tag, .sticker-badge, th button, th span:contains(\"×\"), th span:contains(\"x\") presentes TAL CUAL (spec literal; no limpiar lo invalido)",
-  "ST-06 JS: INSERTAR al final de js/app.js: \";\" + bloque_js_v630 LITERAL (sin normalizar comentarios, espacios ni template literals). NO tocar nada mas del bundle",
-  "ST-07 JS validacion sintaxis: vm.Script sobre el archivo completo -> SIN SyntaxError. (node --check tambien valido; si falla por longitud de linea usar vm.Script). Ultimo char debe seguir siendo ';' (cierre del bloque)",
-  "ST-08 JS verificacion de strings: [PLANIFY v6.30] (log de la v6.30, x1 o mas segun spec), limpiarLetrasXDeCabeceras, renderizarStickerEnCelda, observerPLANIFY, dynamic-font-override, window.cambiarFuenteApp (x2 ahora: asignacion v6.29 + v6.30), '×' y '✕' segun spec, template literal '* { font-family:' con ${fuenteFinal}",
-  "ST-09 BUILD (si el flujo lo requiere): npm run build equivalente (terser re-minifica js: ELIMINA comentarios //, colapsa template literals multilinea, re-manglea const internos -> observerPLANIFY/limpiarLetrasXDeCabeceras/renderizarStickerEnCelda como identificadores pueden desaparecer; verificar POST-BUILD por STRINGS: [PLANIFY v6.30], dynamic-font-override, '#app', '✕', 'eliminarDia')",
-  "ST-10 VERIFICACION FINAL integra (node): (a) css balance 780/780 y tail en '}', (b) vm.Script app.js OK, (c) html '?v=6.30' x2 y '6.29' count=0, (d) sw 'planify-cache-v24' x1, (e) js strings: [PLANIFY v6.30], dynamic-font-override, limpiarLetrasXDeCabeceras (PRE-build) / '#app' o '✕' (POST-build), (f) git status --short -> SOLO los 4 archivos (index.html, sw.js, css/main.css, js/app.js) + task.json/review_feedback",
-  "ST-11 REPORTAR al usuario: (a) regla 4 del CSS descartada por selectores :contains invalidos (funcionalidad cubierta por JS), (b) ✕ U+2715 vs × U+00D7 (el replace no matchea el span eliminarDia; la limpieza real la hace el .remove() de la funcion 1), (c) window.cambiarFuenteApp v6.30 gana (style tag inyectado), (d) contenedor real del observer = #app, (e) selectores inertes existentes ([data-sticker] x12 reales; cal-dia/cal-evento NO existen como clase exacta), (f) MutationObserver primero en el bundle"
- ],
- "verificacion_post": [
-  "css/main.css: balance 780/780, balance final 0, tail termina en '}' del bloque v6.30, strings de la regla 4 (incluidos los :contains invalidos) presentes",
-  "js/app.js: vm.Script OK, strings [PLANIFY v6.30] y dynamic-font-override presentes, window.cambiarFuenteApp count==2 (v6.29 + v6.30; la ultima asignacion gana), tail termina en cierre del bloque (;\n}...() o similar segun literal)",
-  "POST-BUILD (si aplica): terser re-manglea internos -> verificar por STRINGS: [PLANIFY v6.30], dynamic-font-override, '#app', '✕' (U+2715), 'eliminarDia', 'font-family:' + '!important'. NO buscar limpiarLetrasXDeCabeceras/renderizarStickerEnCelda/observerPLANIFY como identificadores post-build (renombrados por terser, esperado)",
-  "index.html: '?v=6.30' x2, '?v=6.29' count=0",
-  "sw.js: 'planify-cache-v24' x1",
-  "git status --short: SOLO index.html, css/main.css, js/app.js, sw.js modificados (+ task.json/review_feedback del flujo); nada mas"
- ],
- "riesgos_implementador": [
-  "a) Regla 4 CSS (th button, th .close, th .close-x, .week-header-day button, .week-header-day span.x, th[data-day] button, th span:contains(\"×\"), th span:contains(\"x\")): selectores :contains son INVALIDOS en CSS -> CSSOM descarta la regla COMPLETA (toda la lista de la regla se pierde). NO eliminar la regla del bloque (spec literal); la funcionalidad queda cubierta por limpiarLetrasXDeCabeceras + observerPLANIFY. Documentar en reporte",
-  "b) Sobrescritura window.cambiarFuenteApp: v6.30 (style tag #dynamic-font-override con * {font-family} !important) reemplaza v6.29 (setProperty --app-font-family). Insertada al final -> ultima asignacion gana. La v6.29 sigue ejecutandose internamente en DOMContentLoaded (cargarAjustesGuardados) sin error; visualmente gana la v6.30 por inyeccion posterior del style tag",
-  "c) Bloque JS literal NO minificado: comentarios //, template literals MULTILINEA ( ` * { font-family: ${fuenteFinal} !important; } ` ) y espacios. Insertar LITERAL con separador ';' previo. El archivo deja de ser 1 linea hasta el build (esperado; terser re-minifica y elimina comentarios)",
-  "d) MutationObserver subtree:true sobre #app: re-dispara limpieza en cada mutacion; limpiarLetrasXDeCabeceras idempotente -> estable. renderizar() re-inyecta spans ✕ en cada render -> el observer re-limpiara (deseado). Sin bucle (tras limpiar no hay mutaciones nuevas)",
-  "e) regex /\\s*[xX×]/g usa U+00D7 (×): NO matchea el '✕' U+2715 del span eliminarDia (generado por renderizar()). La eliminacion del span en cabeceras depende del .remove()/queries de la funcion 1 (spec literal; NO modificar el regex). Ademas el replace puede quitar la 'x' de nombres de dias en OTRO idioma (riesgo menor; en espanol Lun..Dom no contienen x)",
-  "f) UTF-8 sin BOM: emoji 🔤, tildes y template literals con ${} -> escribir con encoding UTF-8 puro; verificar por indexOf",
-  "g) Balance CSS: 776+4=780/780 exacto; contar llaves del bloque pegado antes de verificar balance final",
-  "h) POST-BUILD: terser re-manglea const/funciones internas (observerPLANIFY, limpiarLetrasXDeCabeceras, renderizarStickerEnCelda pueden desaparecer como identificadores) -> verificar por STRINGS y por window.cambiarFuenteApp",
-  "i) <style id=\"dynamic-font-override\"> NO debe existir en index.html (count==0 verificado); se crea SOLO por JS en runtime"
- ],
- "commit_propuesto": "feat: eliminacion fisica de X por js override de fuentes y fix de stickers v6.30",
- "fases": [
-  {
-   "fase": 58,
-   "version": "v6.35",
-   "estado": "COMPLETADO",
-   "descripcion": "Toggle de horas de sueño (desmarcar al reclicar), purgado de X en cabeceras semanales y celdas mensuales multilínea CSS",
-   "acciones": [
-    "bumps index.html ?v=6.35 x2",
-    "sw.js planify-cache-v29",
-    "IIFE v6.35 al inicio app.js: toggle sleep con closest + yaEstabaActivo (setItem/removeItem), purgarTextoXCabeceras + MutationObserver, readyState loading/else",
-    "CSS append: ocultamiento X cabeceras, month-cell min-height 105px multilínea, sleep active box-shadow+scale",
-    "ELIMINADOS 3 handlers de sueño previos: v6.29 addEventListener dataset.escuchado, v6.32 onclick, v6.34 click-listener closest",
-    "verificacion post-build: 1 closest, 1 setItem, 1 removeItem, 0 restos v6.29/6.32/6.34, CSS 838/838",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v635_apply_css"
+  "id": "TASK-20260801-v6.34",
+  "fase": "Fase 57 (v6.34): Modificación directa en renderJS para eliminar X en cabeceras, formato multilínea mensual, interactividad de sueño y animaciones",
+  "titulo": "feat: fix renderizado dinamico js y css override v6.34",
+  "anterior": {
+    "id": "TASK-20260801-v6.30",
+    "fase": "Fase 54 (v6.30): Eliminación física por JS de X en cabeceras semanales, inyección dinámica de tipografías y fix de pegatinas en calendario",
+    "titulo": "feat: eliminacion fisica de X por js override de fuentes y fix de stickers v6.30"
   },
-  {
-   "fase": 59,
-   "version": "v6.36",
-   "estado": "COMPLETADO",
-   "descripcion": "Sistema de inyección JS de estilos forzados (styleFix en head) e interceptación de DOM por service worker/PWA",
-   "acciones": [
-    "bumps index.html ?v=6.36 x2",
-    "sw.js planify-cache-v30",
-    "IIFE v6.36 al inicio de app.js: style tag planify-force-styles-v36 inyectado en head (ocultar X semanal, celdas mensuales 110px multilínea con [data-event], estado activo sueño)",
-    "toggle de sueño (closest + yaEstabaActivo, setItem/removeItem)",
-    "purgarX + MutationObserver con readyState loading/else",
-    "ELIMINADO IIFE v6.35 completo (corte por frontera de fusión de IIFEs de Terser + prefijo !)",
-    "ELIMINADO bloque CSS v6.35 de main.css (834/834)",
-    "verificacion post-build: 1 closest, 1 setItem, 1 removeItem, styleFix id x1, [data-event] x1, MutationObserver x3",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v636_apply_js"
+  "requerimiento": "v6.34: Fix de raiz en renderJS: manejador global de click para horas de sueno (closest + localStorage planify_sueno_horas + log [PLANIFY v6.34] ), purgador de X en cabeceras con MutationObserver sobre #app/main/body. CORRECCION aplicada: window.addEventListener('DOMContentLoaded') -> document.addEventListener('DOMContentLoaded') (el evento no se dispara en window; sin la correccion la purga/observer quedaban muertos). CSS append bloque v6.34 (10 pares -> balance 824+10=834/834). Bumps: ?v=6.33 x2 -> ?v=6.34 x2; sw planify-cache-v27 -> v28. No redefine window.cambiarFuenteApp (sigue unica v6.33). task.json: Fase 57 registrada.",
+  "estado": "planificado",
+  "creado": "2026-08-03",
+  "head_actual": "6c75520",
+  "rama": "main (M .opencode/context/task.json + ?? .opencode/context/review_feedback.txt esperados; sin otros cambios)",
+  "verificacion_pre": [
+    "ESTADO GIT REAL: git log --oneline -2 -> HEAD 6c75520 \"feat: batch ux con google fonts animaciones de entrada y fixes de usuario v6.29\"; previo 2a510ac (v6.27). git status --short -> \" M .opencode/context/task.json\" y \"?? .opencode/context/review_feedback.txt\" (ambos ESPERADOS del flujo; NINGUNO es archivo fuente). Cero archivos de codigo modificados. Anclas listas para v6.30",
+    "index.html: count '?v=6.29' == 2 (css/main.css?v=6.29 y js/app.js?v=6.29) -> ancla unica por ocurrencia para sustituir a ?v=6.30. count '?v=6.30' == 0. count '<style id=\"dynamic-font-override\"' == 0 (el style tag de la v6.30 NO preexiste; se inyecta por JS en runtime, no en HTML)",
+    "sw.js: count 'planify-cache-v23' == 1, count 'planify-cache-v24' == 0 -> bump directo x1",
+    "css/main.css (1 linea minificada): balance { == } == 776/776 CONFIRMADO (open=776, close=776, final 0). TERMINA en \".animate-entrance-nav{animation:slideUpFade .8s cubic-bezier(.16,1,.3,1) .2s forwards}\" (statement CSS completo, ultimo char '}' -> APPEND DIRECTO sin separador)",
+    "js/app.js (1 linea minificada POST-BUILD, 145767 bytes): TERMINA en \";\" del cierre de IIFE Terser: ultimos 150 chars reales = ...console.log(\"[PLANIFY v6.29] Error al crear nuevo lienzo\",e)}},\"loading\"===document.readyState?document.addEventListener(\"DOMContentLoaded\",t):t()}(); (termina en '}();' -> el IIFE v6.29 cierra con '}();' y ultimo char ';'. Insercion con separador \";\" extra: app.js + \";\" + bloque_literal_v630 es seguro (doble ';;' en cierre de statement es valido)",
+    "COLLISIONES JS (counts en js/app.js): limpiarLetrasXDeCabeceras==0, renderizarStickerEnCelda==0, observerPLANIFY==0 (const TOP-LEVEL -> UNICA, sin duplicados), dynamic-font-override==0, window.cambiarFuenteApp==1 (ASIGNACION EXISTENTE v6.29: \"window.cambiarFuenteApp=a\" dentro del IIFE -> la v6.30 insertada al FINAL reasigna window.cambiarFuenteApp y la ULTIMA gana (la v6.30). La v6.29 se sigue llamando internamente por cargarAjustesGuardados en DOMContentLoaded (closure interno, sin conflicto de orden de definicion); visualmente gana la v6.30 por inyeccion posterior del style tag #dynamic-font-override)",
+    "MutationObserver count en app.js == 0 (NO existe NINGUN MutationObserver en el bundle -> el observerPLANIFY de v6.30 es el PRIMERO y unico, sin conflicto). mainContainer count == 0 (no existe NI top-level NI local; el 'const mainContainer' de la v6.30 dentro del callback addEventListener es scope local sin colision; reportar: count 0 pre-v6.30)",
+    "CONTENEDOR REAL para el observer: lista de selectores 'main, #app, .app-container || document.body' -> en HTML real SOLO matchea '#app' (count id=\"app\"==1 en <div class=\"app licenciado\" id=\"app\">); '<main'==0, 'app-container'==0. document.querySelector('main, #app, .app-container') retorna #app; fallback document.body no se usa en la practica",
+    "CABECERA SEMANAL (target de la limpieza): se genera DINAMICAMENTE en renderizar() (js): t += `<th style=\"position:relative;\">${e.substring(0,3)}<div class=\"resizer\" data-col=\"${a}\"></div> <span style=\"cursor:pointer;color:#ff7675;font-size:0.8em;opacity:0.6\" onclick=\"eliminarDia(${a})\">✕</span></th>`. OJO: el glyph del span eliminarDia es '✕' U+2715 (count 4 en js, 1 en html), NO '×' U+00D7 (count 0 en js y html). El regex literal del usuario /\\s*[xX×]/g usa U+00D7 y NO matchea U+2715: la eliminacion del span eliminarDia debe venir del .remove() de botones/spans de la funcion 1 (spec literal -> se documenta el riesgo de efectividad del replace, no se reescribe)",
+    "SELECTORES INERTES en HTML real (regex exacta): class=\"cal-dia\"==0 (los 7 matches de substring son 'cal-dia-nombre'), class=\"cal-evento\"==0 (los 7 matches son name=\"cal-evento-color\"), event-item==0, sticker-icon==0, [data-sticker]==12 REAL (span.cal-sticker de la paleta en modal calendario), th[data-day]==0 (HTML y JS), day-header==0, calendar-day==0, month-cell==0, event-tag==0, sticker-badge==0. <th reales == 6 (1 HORA en #header-row + 5 en modal licencia); la cabecera semanal dinamica es la que recibe los th por renderizar()",
+    "UTF-8: emoji 🔤 ya presente en app.js (v6.29 console.log). El bloque v6.30 usa emoji 🔤 y template literals con ${fuenteFinal}: escribir SIN BOM, verificar por indexOf post-insercion"
+  ],
+  "decisiones": [
+    "D1 ESPEC LITERAL: los bloques CSS (4 reglas) y JS (3 funciones + observerPLANIFY + window.cambiarFuenteApp v6.30 + DOMContentLoaded) se copian VERBATIM del mensaje del usuario. PROHIBIDO reescribir, refactorizar, renombrar o minificar manualmente. Los comentarios //, espacios y template literals multilinea del bloque JS se conservan hasta el build (terser del package.json los re-minifica: tarea esperada y documentada)",
+    "D2 CSS: APPEND DIRECTO al final de css/main.css (termina en '}' de .animate-entrance-nav, statement completo, sin separador). Bloque del usuario = 4 reglas -> 4 pares de llaves -> balance NUEVO 780/780 (776+4). Contar llaves del bloque pegado con node: open==4 && close==4 antes de append",
+    "D3 JS: INSERCION AL FINAL de js/app.js. Ultimo char actual ';' (cierre }(); del IIFE v6.29) -> anteponer \";\" de ruptura: app.js + \";\" + bloque_literal. Validar sintaxis con vm.Script sobre el archivo completo (node --check falla en 1 linea? usar vm.Script) antes y despues del build",
+    "D4 RIESGO (a) CSS invalido: la regla 4 del bloque CSS contiene selectores jQuery ':contains' -> 'th span:contains(\"×\")' y 'th span:contains(\"x\")' son INVALIDOS en CSS. CSSOM descarta la REGLA COMPLETA que los contiene (toda la lista de selectores de esa regla se pierde: th button, th .close, th .close-x, .week-header-day button, .week-header-day span.x, th[data-day] button, etc. NO tendran efecto por CSS). La funcionalidad (ocultar/limpiar X) queda cubierta por la Funcion 1 JS (limpiarLetrasXDeCabeceras + MutationObserver). Se aplica la regla literal como spec y se documenta este riesgo en el plan y en el reporte final al usuario",
+    "D5 RIESGO (b) sobrescritura window.cambiarFuenteApp: la v6.30 (style tag #dynamic-font-override con '* {font-family} !important') reemplaza la v6.29 (setProperty --app-font-family). La v6.29 se llama sola al DOMContentLoaded via cargarAjustesGuardados (closure interno); la v6.30 gana visualmente por inyeccion posterior del style tag en el DOM. Sin conflicto de orden de definicion: la v6.30 se inserta al final del archivo y su asignacion window.cambiarFuenteApp=... es la ULTIMA -> gana",
+    "D6 RIESGO (c) bloque JS literal: contiene comentarios //, template literals MULTILINEA (`` ` * { font-family: ${fuenteFinal} !important; } ` ``) y espacios -> el archivo deja de ser 1 linea hasta el build. Insertar LITERAL con separador ';' previo (el archivo termina en '})();'-equivalente '}();' -> ya hay ';', anadir otro es seguro). NO normalizar saltos de linea",
+    "D7 RIESGO (d) MutationObserver con subtree:true en 'main, #app, .app-container' (matchea #app): el observer re-dispara limpieza en cada mutacion. limpiarLetrasXDeCabeceras es idempotente: tras .remove() de botones/spans con X y replace de 'x', no hay mas mutaciones -> estable. OJO: renderizar() (25 llamadas en bundle) re-inyecta los spans eliminarDia con ✕ en cada render -> el observer RE-LIMPIA automaticamente (comportamiento deseado por el usuario, no bucle porque tras limpiar no quedan mutaciones nuevas)",
+    "D8 RIESGO (e) th.innerHTML.replace(/\\s*[xX×]/g, ''): solo se ejecuta si el innerHTML incluye ' ×', ' x' o ' X'. Los dias actuales (dias.forEach con e.substring(0,3): Lun,Mar,Mie,Jue,Vie,Sab,Dom) NO contienen x -> no afecta nombres normales en espanol. Riesgo menor documentado: podria quitar la 'x' de nombres de dias en OTRO idioma (p.ej. ingles no, pero idiomas con x en abreviaturas si) y NO matchea '✕' U+2715 (ver verificacion_pre cabecera semanal)",
+    "D9 BUMPS: index.html '?v=6.29' x2 -> '?v=6.30' x2 (sustitucion exacta por ocurrencia); sw.js 'planify-cache-v23' x1 -> 'planify-cache-v24' x1"
+  ],
+  "anclas": {
+    "ancla_html_bump1": "css/main.css?v=6.29",
+    "ancla_html_bump2": "js/app.js?v=6.29",
+    "ancla_html_notas": "2 ocurrencias exactas de '?v=6.29' (count==2); sustituir AMBAS por '?v=6.30'. count '?v=6.30'==0 pre-cambio. NO tocar otros ?v (panel.css, dashboard.css, grid.css no llevan version)",
+    "ancla_sw_bump": "planify-cache-v23",
+    "ancla_sw_notas": "1 ocurrencia exacta (count==1); sustituir por 'planify-cache-v24'. count v24==0 pre-cambio",
+    "ancla_css_final_actual": ".animate-entrance-nav{animation:slideUpFade .8s cubic-bezier(.16,1,.3,1) .2s forwards}",
+    "ancla_css_notas": "Ultimos chars reales del archivo (verificado: tail 120 chars = \"...mate-delay-3{animation-delay:.45s}.animate-entrance-nav{animation:slideUpFade .8s cubic-bezier(.16,1,.3,1) .2s forwards}\"). Balance actual 776/776. APPEND directo tras este string. Balance nuevo 780/780",
+    "ancla_js_final_actual": "}();",
+    "ancla_js_notas": "Final real verificado: ...readyState?document.addEventListener(\"DOMContentLoaded\",t):t()}(); -> ultimo char ';'. Insercion: app.js + \";\" + bloque_js_literal_v630 (el bloque empieza con comentario // o funcion segun spec del usuario -> \";\" previo garantiza statement break). Validar vm.Script post-insercion",
+    "bumps": "index.html '?v=6.29' x2 -> '?v=6.30' x2; sw.js 'planify-cache-v23' x1 -> 'planify-cache-v24' x1"
   },
-  {
-   "fase": 60,
-   "version": "v6.37",
-   "estado": "COMPLETADO",
-   "descripcion": "Eliminacion de X concatenada en string de cabeceras y inline styles en renderJS",
-   "acciones": [
-    "bumps index.html ?v=6.37 x2",
-    "sw.js planify-cache-v31",
-    "IIFE v6.37 al inicio: limpiarCabecerasSemanales (th, .week-header-day, .cal-header) con regex /\\s*[xX×]\\s*$/g + window export + DOMContentLoaded/readyState",
-    "EDIT renderizar(): eliminado span onclick=eliminarDia() con ✕ del template de cabeceras (era inmune a purgadores: sin clase ni tag button)",
-    "EDIT renderizar(): hook window.limpiarCabecerasSemanales() al inicio",
-    "inline styles en creacion de cal-evento-mini (calendario mensual): whiteSpace normal, wordBreak, fontSize 0.85rem, lineHeight 1.3, display block",
-    "inline styles en cell-content de renderizarStickerEnCelda",
-    "verificacion post-build: span X en th = 0, del-fila intacto, hooks x1, inline x1/x1",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v637_apply_js"
+  "codigo_nuevo": {
+    "bloque_css_v630": "PEGAR VERBATIM del mensaje del usuario (spec v6.30). Estructura = 4 reglas con 4 pares de llaves: (1) .calendar-day,.month-cell,td.cal-dia{...} (2) .calendar-day .event-tag,...{...} (3) .sticker-badge,...{...} (4) th button,...{...} (esta 4a regla incluye los selectores INVALIDOS 'th span:contains(\"×\")' y 'th span:contains(\"x\")' -> CSSOM descarta la regla completa; ver D4). NO reescribir, NO reordenar, NO limpiar. El implementador debe contar las llaves del bloque pegado: open==4 && close==4",
+    "bloque_css_notas": "Bloque literal del usuario, 4 pares de llaves -> 776+4=780/780. APPEND directo. Riesgo D4 documentado: la regla 4 se pierde por CSS (selectores :contains invalidos), funcionalidad cubierta por Funcion 1 JS. Balance total esperado 780/780 (verificado por aritmetica: 776+4)",
+    "bloque_js_v630": "PEGAR VERBATIM del mensaje del usuario (spec v6.30). Contenido estructural (3 funciones + observer + DOMContentLoaded): (a) limpiarLetrasXDeCabeceras: recorre th de cabeceras, hace th.innerHTML.replace(/\\s*[xX×]/g, '') cuando hay ' ×'/' x'/' X', y .remove() de botones/spans con X (target real: span eliminarDia con ✕ U+2715 generado por renderizar()); (b) renderizarStickerEnCelda: fix de pegatinas en celdas del calendario (renderiza [data-sticker] en celdas); (c) const observerPLANIFY (TOP-LEVEL, UNICO): MutationObserver con {subtree:true, childList:true} sobre document.querySelector('main, #app, .app-container')||document.body (matchea #app) que re-dispara limpiarLetrasXDeCabeceras y renderizarStickerEnCelda en cada mutacion; (d) window.cambiarFuenteApp (v6.30): crea <style id=\"dynamic-font-override\"> con template literal MULTILINEA ` * { font-family: ${fuenteFinal} !important; } ` (mapa de fuentes del usuario) -> SOBRESCRIBE la v6.29 (asignacion al final del archivo, ultima gana); (e) bloque DOMContentLoaded que llama a las funciones. El bloque conserva comentarios //, template literals multilinea y espacios (el archivo deja de ser 1 linea hasta el build)",
+    "bloque_js_notas": "Insertar LITERAL (sin normalizar) con separador ';' previo. Contiene template literals multilinea con ${} -> NO escapar ni convertir a strings simples. UTF-8 sin BOM (emoji 🔤). Post-build terser re-minifica y re-manglea const/funciones internas -> verificar por STRINGS (ver verificacion_post)"
   },
-  {
-   "fase": 61,
-   "version": "v6.38",
-   "estado": "COMPLETADO",
-   "descripcion": "Guard null-check en renderizarCalendario y renderizado completo de celdas mensuales",
-   "acciones": [
-    "bumps index.html ?v=6.38 x2",
-    "sw.js planify-cache-v32",
-    "EDIT renderizarCalendario: cal-titulo con fallback document.querySelector(.cal-titulo) y else que CONTINUA el renderizado (antes return void abortaba todo si faltaba #cal-titulo)",
-    "EDIT renderizarCalendario: n.style.display=grid forzado tras obtener cal-grid",
-    "CSS append: FIX VISTA MENSUAL v6.38 (#cal-grid grid 7 columnas, .cal-dia 95px, .cal-evento/.cal-evento-mini multilínea) 834+3=837/837",
-    "NOTA: segmentos minificados sin var (terser fusiona declaraciones en secuencia), cal-titulo si conserva var r=",
-    "verificacion post-build: guard x1, fallback x1, return fatal 0, grid display x1",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v638_apply_js"
-  },
-  {
-   "fase": 62,
-   "version": "v6.39",
-   "estado": "COMPLETADO",
-   "descripcion": "Renderizado explícito de stickers/emojis en celdas del calendario mensual",
-   "acciones": [
-    "bumps index.html ?v=6.39 x2",
-    "sw.js planify-cache-v33",
-    "EDIT renderizarCalendario: sustituido sticker texto plano (h.textContent=b.sticker+space) por span.cal-sticker-visible creado con createElement, textContent=b.sticker, inline styles (fontSize 1.2rem, marginRight 4px, inline-block, verticalAlign middle) y h.prepend() antes del texto del evento",
-    "texto de evento conserva truncado length>12 con slice(0,12)+...",
-    "CSS append: FIX STICKERS v6.39 (.cal-sticker-visible, [data-sticker], .cal-sticker visibles inline-block 1.2rem) 837+1=838/838",
-    "verificacion post-build: clase x1, prepend x1, fontSize 1.2rem x1, texto plano eliminado 0, slice(0,12) x1",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v639_apply_js"
-  },
-  {
-   "fase": 63,
-   "version": "v6.40",
-   "estado": "COMPLETADO",
-   "descripcion": "Fix definitivo de botones de sueño (toggle), inyección de stickers en celdas mensuales y sincronización de título de rutina diaria",
-   "acciones": [
-    "bumps index.html ?v=6.40 x2",
-    "sw.js planify-cache-v34",
-    "IIFE v6.40 al inicio: toggle global de sueño con containers .horas-sueño/.sueño-opciones/[data-sueño]/.sueño-btn, limpieza completa de estilos inline previos, clave planify_sueño_seleccionado",
-    "actualizarTituloDiario: sincroniza Rutina Diaria - d/m/a desde input fecha, listeners change + DOMContentLoaded",
-    "EDIT sticker renderizarCalendario: estilos individuales sustituidos por style.cssText con !important (fontSize 1.2rem, marginRight 6px, inline-block, verticalAlign middle)",
-    "CSS append: FIX INTERACTIVIDAD v6.40 (cursor/transition en botones sueño + .cal-sticker-visible 1.25rem) 838+2=840/840",
-    "NOTA: segmento post-build usa nombres minificados (y.sticker, h.prepend)",
-    "verificacion post-build: sueño_seleccionado 2 (set+remove), selectores x1, cssText x1, Rutina Diaria x1, CSS 840/840",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v640_apply_js"
-  },
-  {
-   "fase": 64,
-   "version": "v6.41",
-   "estado": "COMPLETADO",
-   "descripcion": "Toggle directo de sueño, stickers visibles en celdas y título dinámico en diario",
-   "acciones": [
-    "bumps index.html ?v=6.41 x2",
-    "sw.js planify-cache-v35",
-    "INSPECCION: botones de sueño son button.cloud-btn[data-sleep=4-6|7-9|10-12] en .sleep-clouds (HTML estatico #view-diario)",
-    "IIFE v6.41 al inicio: bindSueño con addEventListener click POR BOTON (.sleep-clouds .cloud-btn[data-sleep]) con dataset.v641 guard, toggle real (desmarca si activo, removeItem) con estilos inline azul cian",
-    "IIFE v6.41: listener click .cal-dia -> dataset.fecha -> setea input fecha + titulo Rutina Diaria - d/m/a",
-    "ELIMINADO toggle v6.36 document-level closest .sleep-hour-btn,[data-sleep] (evita doble toggle)",
-    "ELIMINADO truncado slice(0,12) en renderizarCalendario: h.textContent=y.texto completo, sticker span cal-sticker-visible prepend intacto",
-    "FIX: handler principal de la app (querySelectorAll .cloud-btn en DOMContentLoaded) ahora excluye .sleep-clouds para no pisar el toggle",
-    "FIX: coma antes de const tras eliminar v6.36 (SyntaxError) corregida a punto y coma",
-    "verificacion post-build: selector x1, dataset.v641 x2, set/removeItem 1/1, exclusion x1, slice(0,12) 0, toggle v6.36 0",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v641_apply_js"
-  },
-  {
-   "fase": 65,
-   "version": "v6.42",
-   "estado": "COMPLETADO",
-   "descripcion": "Decodificacion de stickers, ajuste de ancho en cal-evento y sincronizacion de fecha al hacer clic en dia",
-   "acciones": [
-    "bumps index.html ?v=6.42 x2",
-    "sw.js planify-cache-v36",
-    "INSPECCION: listener v6.41 termina en }}}) + , (comilla de secuencia en IIFE), no }}} ,",
-    "IIFE v6.42 al inicio: MAPA_STICKERS (salud gym avion musica cumple comida idea amor trabajo cama colores default) + window.obtenerStickerIcono (ID->emoji, si no es ID devuelve valor)",
-    "listener v6.42: click .cal-dia -> data-fecha -> input date .value + dispatchEvent change (bubbles) -> v6.40 actualiza titulo; ademas setea h1,h2,h3,.title,.card-title que incluyan Rutina Diaria",
-    "ELIMINADO listener cal-dia v6.41 (sustituido por v6.42 con dispatch change, incluye la coma de secuencia en la eliminacion)",
-    "renderizarCalendario: sticker ahora decodifica (window.obtenerStickerIcono(y.sticker||y.emoji)) con span cal-sticker-visible font-size 1.1rem + espacio tras emoji",
-    "CSS append FIX FORMATO DE TEXTO Y STICKERS v6.42: .cal-evento,.cal-evento-mini (white-space normal, word-wrap break-word, word-break keep-all, display block, width 100%, box-sizing, padding 4px 6px) + .cal-sticker-visible (inline-block, visibility visible, opacity 1)",
-    "balance CSS 842/842 pre-build; minifier elimina comentario y espacios (keep-all x1, visibility:visible x15 post-build)",
-    "verificacion post-build: obtenerStickerIcono def x1, decode en render x2 usos, listener viejo 0, dispatchEvent x1, ?v=6.42 x2, cache v36",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v642_apply_js"
-  },
-  {
-   "fase": 66,
-   "version": "v6.43",
-   "estado": "COMPLETADO",
-   "descripcion": "Titulo de diario alimentado por el evento del dia y rendering forzado de icono de sticker",
-   "acciones": [
-    "bumps index.html ?v=6.43 x2",
-    "sw.js planify-cache-v37",
-    "IIFE v6.43 al inicio: EMOJIS_DEFECTO (desechado por terser por no usarse) + obtenerIconoValido (si sticker falsy, >4 chars o incluye color/palette -> pin pin; si no, emoji directo)",
-    "listener v6.43: click .cal-dia -> extrae nombreEvento del primer .cal-evento/.cal-evento-mini/.cell-content (innerText sin saltos), sincroniza input date + dispatch change, titulo = nombreEvento - d/m/a | nombreEvento | Rutina Diaria - d/m/a | Rutina Diaria; dataset.esTituloDiario para reclicar dias",
-    "ELIMINADO listener v6.42 (por indices verificados: segmento len 495, fin en }) } ) + }() del IIFE) para evitar overwrite del titulo",
-    "renderizarCalendario: expresion v6.42 reemplazada por window.inyectarStickerEnEvento&&(y.sticker||y.emoji)&&window.inyectarStickerEnEvento(h,y.sticker||y.emoji) (guarda conserva eventos sin sticker)",
-    "inyectarStickerEnEvento: obtenerIconoValido inline por terser (o.length<=4), span cal-sticker-visible 1.1rem/5px con guard querySelector",
-    "verificacion post-build: def x1, uso en render x1, esTituloDiario x2, innerText.replace x1, template  -  y fallbacks confirmados, 3===t.length 0, ?v=6.43 x2, cache v37",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v643_apply_js"
-  },
-  {
-   "fase": 67,
-   "version": "v6.44",
-   "estado": "COMPLETADO",
-   "descripcion": "Titulo de diario exclusivamente con nombre de evento sin fecha concatenada y mapa exacto para pegatina paleta",
-   "acciones": [
-    "bumps index.html ?v=6.44 x2",
-    "sw.js planify-cache-v38",
-    "IIFE v6.44 al inicio: MAPA_STICKERS_EXACTO (colores/paleta/default->paleta, cuadros->cuadro, salud gym avion musica cumple comida idea amor trabajo cama) + window.obtenerEmojiCorrecto (lowercase trim, si ya es emoji <=4 chars sin color/btn lo devuelve, si no paleta)",
-    "listener v6.44: click .cal-dia -> clona .cal-evento para quitar span sticker (sin mutar DOM), nombreEvento limpio, titulo = nombreEvento | Rutina Diaria SIN concatenar fecha; condicion incluye t.textContent===nombreEvento para reclicar",
-    "NOTA: el listener v6.44 omite la sincronizacion del input de fecha (spec del usuario); el dispatch change de v6.42/6.43 desaparece con ellos",
-    "window.inyectarStickerEnEvento v6.44: obtenerEmojiCorrecto, elimina span previo (.remove) y SIEMPRE inyecta (default colores)",
-    "renderizarCalendario: expresion = window.inyectarStickerEnEvento&&window.inyectarStickerEnEvento(h,y.sticker||y.emoji||colores) - sin guard, todo evento recibe emoji",
-    "ELIMINADO bloque v6.43 completo (listener + definicion vieja de inyectarStickerEnEvento): terser habia desenvuelto su IIFE a secuencia top-level; junction con v6.42 quedo como ...prepend(a)}},function(){const e={salud y el ! inicial se perdio -> restaurado prepend ! tras el corte",
-    "verificacion post-build: e.textContent=t||\"Rutina Diaria\" (sin fecha), condicion textContent===t, cloneNode x2, y.emoji||colores x1, ${o} - ${t} 0, esTituloDiario x2, ?v=6.44 x2, cache v38",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v644_apply_js"
-  },
-  {
-   "fase": 68,
-   "version": "v6.45",
-   "estado": "COMPLETADO",
-   "descripcion": "Declaracion global de cambiarTab y correccion del mapa de sticker a imagenes superpuestas",
-   "acciones": [
-    "bumps index.html ?v=6.45 x2",
-    "sw.js planify-cache-v39",
-    "DIAGNOSTICO: cambiarTab YA existia como function cambiarTab(e) top-level y la cadena window.cambiarTab=cambiarTab (top-level) lo exponía; load test en Node (stub DOM) confirma window.cambiarTab definido tras load -> el error del usuario proviene de SW cacheado o fallo previo en su sesion",
-    "window.cambiarTab global al inicio absoluto (version usuario ADAPTADA: matcher t.id===\"view-\"+tabName porque las vistas reales son #view-diario/#view-semanal/#view-mensual sin data-tab-content; el snippet literal habria ocultado TODAS las vistas) + renderizarCalendario() al elegir mensual (comportamiento del original)",
-    "ELIMINADO window.cambiarTab=cambiarTab de la cadena de exposicion (la version v6.45 queda como definitiva; el function cambiarTab original sigue en scope para llamadas internas)",
-    "IIFE v6.45 insertado TRAS el IIFE v6.44 (no al inicio) para que overwrite obtenerEmojiCorrecto/inyectarStickerEnEvento; union por coma (})(); habria roto la secuencia top-level - 2 intentos fallidos resueltos)",
-    "MAPA_STICKERS_EXACTO v6.45: colores/paleta/cuadros/imagenes/default -> marco con imagen, resto de IDs igual que v6.44",
-    "verificacion post-build: window.cambiarTab=function(e) @0 con matcher view-, def obtenerEmojiCorrecto x2 (v6.44 @768 default paleta de colores, v6.45 @2108 default marco), inyectarStickerEnEvento v6.45, chain 0, ?v=6.45 x2, cache v39, load test LOAD OK con cambiarTab funcion",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v645_apply_js"
-  },
-  {
-   "fase": 69,
-   "version": "v6.46",
-   "estado": "COMPLETADO",
-   "descripcion": "Mapeo exhaustivo de las 12 pegatinas del modal a sus emojis exactos",
-   "acciones": [
-    "bumps index.html ?v=6.46 x2",
-    "sw.js planify-cache-v40",
-    "IIFE v6.46 con DICCIONARIO_PEGATINAS (56 claves): ambulancia/carrito/emergencia/auto-medico->🚑, hospital/clinica/salud/medico->🏥, cama/dormir/descanso/sueño->🛏️, colores/paleta/cuadros/imagenes/arte->🖼️, comida/pizza/almuerzo/cena->🍕, idea/foco/pensamiento/creatividad->💡, corazon/amor/heart/love->💖, trabajo/maletin/oficina/empleo->💼, gym/ejercicio/deporte/gimnasio->🏋️, avion/viaje/vuelo/aeropuerto->✈️, musica/nota/cancion/sonido->🎵, cumple/cumpleaños/pastel/torta->🎂, libros/libro/estudio/clases/lectura->📚",
-    "obtenerEmojiCorrecto v6.46: emoji directo (len<=4 y sin [a-zA-Z0-9_-]), lookup exacto, coincidencia parcial includes(), fallback neutro 📌 (ya no paisaje)",
-    "inyectarStickerEnEvento v6.46 re-escrito con cssText completo (mismo metodo que v6.45: span .cal-sticker-visible prepend)",
-    "IIFE insertado TRAS el IIFE v6.45 (junction con v6.42), union por coma -> la def v6.46 pisa a v6.45 y v6.44",
-    "verificacion post-build: DICCIONARIO completo presente, 3 defs de obtenerEmojiCorrecto/inyectarStickerEnEvento (v6.44/v6.45/v6.46), fallback 📌 x3, render y.emoji||colores intacto, ?v=6.46 x2, cache v40",
-    "test aislado del IIFE v6.46 extraido del build: 44 claves + emoji directo + PIZZA mayus + undefined/xyz fallback, TODOS OK (load test completo de la app no usable: iniciar() ejecuta render con APIs DOM profundas no relacionadas con el cambio)",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v646_apply_js"
-  },
-  {
-   "fase": 70,
-   "version": "v6.47",
-   "estado": "COMPLETADO",
-   "descripcion": "Cambio a emoji cama con persona 🛌 y mapeo forzado del primer sticker a ambulancia 🚑",
-   "acciones": [
-    "bumps index.html ?v=6.47 x2",
-    "sw.js planify-cache-v41",
-    "IIFE v6.47 insertado TRAS el IIFE v6.46 (junction con v6.42), union por coma -> defs v6.47 pisan a v6.46/v6.45/v6.44",
-    "DICCIONARIO_AJUSTADO v6.47: salud/emergencia/auto-medico/carrito/red/first/0/sticker-0 -> 🚑 (primer boton del modal), cama/dormir/descanso/sueño -> 🛌, hospital/clinica/medico -> 🏥, resto de stickers intactos",
-    "obtenerEmojiCorrecto v6.47: emoji directo con reemplazo forzado 🛏️->🛌, lookup exacto, keywords parciales (ambulan/emergen/salud -> 🚑; cama/dormir/sleep -> 🛌), fallback 📌",
-    "inyectarStickerEnEvento v6.47 identico (span .cal-sticker-visible prepend con cssText)",
-    "verificacion post-build: 4 defs obtenerEmojiCorrecto/inyectarStickerEnEvento, cama:\"🛌\" x1, red:\"🚑\" x1, sticker-0 x1, 0:\"🚑\" x1, keyword sleep, ?v=6.47 x2, cache v41",
-    "test aislado del IIFE v6.47 extraido del build (@4038..5268): 37 claves exactas + 🛏️ directo->🛌 + emoji passthrough + parciales ambulan/emergencias/camas/sleeping + fallbacks, TODOS OK",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v647_apply_js"
-  },
-  {
-   "fase": 71,
-   "version": "v6.48",
-   "estado": "COMPLETADO",
-   "descripcion": "Captura explicita del primer boton de pegatina del modal asignando emoji 🚑",
-   "acciones": [
-    "DIAGNOSTICO: el primer boton del modal tiene data-sticker=\"\" (vacio) -> seleccionarSticker guarda \"\" -> render usa y.emoji||\"colores\" -> obtenerEmojiCorrecto(\"colores\") -> 🖼️ (paisaje). Ese es el bug real, no un valor \"colores\" guardado",
-    "bumps index.html ?v=6.48 x2",
-    "sw.js planify-cache-v42",
-    "PATCH guardarEvento (minificado): modal-evento-sticker\").value || \"ambulancia\" -> si se selecciona el primer boton (valor vacio) se guarda sticker:\"ambulancia\" -> renderiza 🚑; tambien corrige eventos legacy con sticker vacio",
-    "IIFE v6.48 insertado tras v6.47: listener de clic document que marca dataset.stickerExacto=\"🚑\" en el primer boton/[data-sticker] con 🚑 (guard de parentNode anadido)",
-    "obtenerEmojiCorrecto v6.48: caso especial val===\"colores\"&&indexBoton===0 -> 🚑, lookup exacto, emoji directo con 🛏️->🛌, keywords parciales ambulan/emergen/salud->🚑 y cama/dormir/sleep->🛌, fallback 📌",
-    "DEVIACION DOCUMENTADA: el snippet del usuario traia EMOJI_MAP_v648 solo con 11 claves (regresion: los otros 10 stickers del modal habrian renderizado 📌); se completo el mapa con el diccionario v6.47 integro (56 claves) para no regresionar",
-    "verificacion post-build: 5 defs obtenerEmojiCorrecto/inyectarStickerEnEvento, patch guardarEvento x1, patron colores&&indexBoton x1, keyword sleep x2, ?v=6.48 x2, cache v42",
-    "test aislado del IIFE v6.48 (@5269..7109): las 12 claves reales del modal (data-sticker=\"\" rinde 📌 por diseno, cubierto por el patch de guardarEvento) + colores->🖼️, colores+index0->🚑, stickers, 🛏️->🛌, sleeping->🛌, fallbacks, TODOS OK",
-    "npm run check OK, build OK"
-   ],
-   "commit": "v648_apply_js"
-  },
-  {
-   "fase": 72,
-   "version": "v6.49",
-   "estado": "COMPLETADO",
-   "descripcion": "Restructuración CSS de celdas de calendario mensual: número superior izquierdo y contenedor de eventos inferior/centrado",
-   "acciones": [
-    "bumps index.html ?v=6.49 x2 (css/main.css?v=6.49 y js/app.js?v=6.49)",
-    "sw.js planify-cache-v43",
-    "bloque v6.49 anexado al FINAL de css/main.css: .cal-dia flex column (numero arriba, justify flex-start, height 100%), numero .cal-numero/>span:first-child alineado a la izquierda (0.95rem bold, margin-bottom 6px), eventos .cal-evento/.cal-evento-mini/.cell-content con width 100% flex row, padding 4px 6px, border-radius 6px y fondo rgba(255,255,255,.05)",
-    "verificacion post-build (css compilado): 3 reglas presentes tal cual (el minificador conservo 0.95rem/0.9), ?v=6.49 x2, cache v43",
-    "npm run build OK"
-   ],
-   "commit": "v649_apply_css"
-  },
-  {
-   "fase": 73,
-   "version": "v6.50",
-   "estado": "COMPLETADO",
-   "descripcion": "Centrado de tarjetas de eventos en celdas de calendario mensual e inyeccion de notas/detalles secundarios",
-   "acciones": [
-    "bumps index.html ?v=6.50 x2, sw.js planify-cache-v44",
-    "CSS v6.50 anexado al final de css/main.css: .cal-dia (flex column, justify space-between, min-height 85px, padding 6px 8px) PISA al v6.49 (misma especificidad + !important, gana el ultimo); numero .cal-numero/>span:first-child (0.9rem bold, margin-bottom 4px); .cal-evento-contenedor (column centrado, margin auto 0 -> centrado vertical, fondo rgba(255,255,255,.06), radius 6px); .cal-evento-titulo (0.88rem semibold, flex centrado con gap 4px); .cal-evento-detalles (0.75rem, opacity .8, line-height 1.1)",
-    "JS patch 1: el numero del dia ya NO es textContent suelto: se crea span.cal-numero como primer hijo (la regla CSS del numero ahora aplica de verdad)",
-    "JS patch 2: render del evento en renderizarCalendario reemplazado: span.cal-evento-mini -> div.cal-evento-contenedor con borderLeft 3px del color del evento + div.cal-evento-titulo (sticker via inyectarStickerEnEvento + span con texto) + div.cal-evento-detalles solo si hay notas",
-    "DEVIACION DOCUMENTADA del snippet: el esquema real del evento es {texto, notas, color, sticker} (guardarEvento) -> se uso y.texto||\"Sin título\" y y.notas (el snippet usaba titulo/nombre/descripcion/detalles inexistentes); el fallback de sticker en render se cambio de \"colores\" a \"ambulancia\" (coherente con v6.48: sticker vacio no debe pintar el paisaje)",
-    "verificacion post-build: cal-evento-contenedor/titulo/detalles x1 en JS, span.cal-numero x1, borderLeft 3px x1, texto Sin titulo x1, fallback ambulancia x1 (minificador renombro y->h), CSS con min-height:85px, contenedor/titulo/detalles completos, ?v=6.50 x2, cache v44",
-    "npm run build OK"
-   ],
-   "commit": "v650_apply_css_js"
-  },
-  {
-   "fase": 74,
-   "version": "v6.51",
-   "estado": "COMPLETADO",
-   "descripcion": "Titulo editable con persistencia local para el bloque de Rutina en el Planificador Diario",
-   "acciones": [
-    "bumps index.html ?v=6.51 x2 (css/main.css?v=6.51 y js/app.js?v=6.51)",
-    "sw.js planify-cache-v45",
-    "HTML: <h2 data-i18n=\"title\">Rutina Diaria</h2> -> <h2 data-i18n=\"title\" id=\"titulo-rutina-diaria\" contenteditable=\"true\">Rutina Diaria</h2>",
-    "JS: IIFE v6.51 insertado tras v6.48 (junction con v6.42): carga localStorage planify_titulo_rutina (default \"Rutina diaria\") y guarda en blur con trim + fallback al default; try/catch en ambos accesos",
-    "CSS: #titulo-rutina-diaria con cursor pointer, borde dashed transparente con transicion, hover (borde rgba(255,255,255,.4) + fondo .05) y focus (#38bdf8 + fondo rgba(56,189,248,.1))",
-    "CAVEAT: aplicarIdioma (data-i18n=\"title\") puede sobrescribir el titulo custom al cambiar idioma; el valor guardado se restaura en la proxima carga",
-    "verificacion post-build: HTML id+contenteditable x1, IIFE getElementById x1, planify_titulo_rutina x2, CSS base/hover/focus x1 cada una, ?v=6.51 x2, cache v45",
-    "smoke test del IIFE extraido del build: carga default \"Rutina diaria\" OK y carga de titulo guardado \"Inicio de clases\" OK",
-    "npm run build OK"
-   ],
-   "commit": "v651_apply_js"
-  },
-  {
-   "fase": 75,
-   "version": "v6.52",
-   "estado": "COMPLETADO",
-   "descripcion": "Sincronización automática de título diario al hacer clic en evento de calendario mensual",
-   "acciones": [
-    "bumps index.html ?v=6.52 x2, sw.js planify-cache-v46",
-    "IIFE v6.52 insertado tras v6.51 (junction con v6.42): window.actualizarTituloDiarioDesdeEvento(nuevoTitulo) -> textContent en #titulo-rutina-diaria (fallback .rutina-diaria-titulo, h2.rutina) + guarda en planify_titulo_rutina; default \"Rutina Diaria\" si vacio",
-    "listener document click con closest(\".cal-dia\"): si la celda tiene .cal-evento-titulo/.cal-evento/.cell-content -> clona, remueve .cal-sticker-visible (sticker no debe ir al titulo), innerText limpio -> actualizarTituloDiarioDesdeEvento; si la celda no tiene eventos -> reset a \"Rutina Diaria\"",
-    "NOTA BUILD: terser colapso el IIFE (sin scope necesario) -> window.actualizarTituloDiarioDesdeEvento=function(...) queda como secuencia top-level; verificado asi",
-    "verificacion post-build: def global x1, llamadas x2, closest(\".cal-dia\") x2, selector evento x1, cloneNode x3 (con otros usos preexistentes), ?v=6.52 x2, cache v46",
-    "simulacion de clics con el codigo minificado real: dia con evento -> titulo \"INICIO DE CLASES\" SIN sticker (clon + remove) y guardado en storage OK; dia vacio -> reset \"Rutina Diaria\" OK; clic fuera de .cal-dia -> intacto OK",
-    "interaccion con v6.51: el titulo editable sigue funcionando (blur guarda); v6.52 lo sobrescribe al hacer clic en un dia del calendario mensual (comportamiento deseado)",
-    "npm run build OK"
-   ],
-   "commit": "v652_apply_js"
-  },
-  {
-   "fase": 76,
-   "version": "v6.53",
-   "estado": "COMPLETADO",
-   "descripcion": "Estilización CSS y contraste radiante (cian/blanco) para el icono de selector de fecha nativo en input[type=date]",
-   "acciones": [
-    "bumps index.html ?v=6.53 x2, sw.js planify-cache-v47",
-    "CSS v6.53 anexado al final de css/main.css: input[type=\"date\"]::-webkit-calendar-picker-indicator con filter invert(.8) sepia(1) saturate(5) hue-rotate(170deg) brightness(1.2) -> icono negro nativo convertido a cian brillante, opacity .9, transicion 0.2s, padding 2px, cursor pointer",
-    "hover: opacity 1, filter invert(1) brightness(1.5) + drop-shadow cyan rgba(56,189,248,.8), transform scale(1.15)",
-    "verificacion post-build: ambas reglas presentes verbatim en css compilado (minificador conservo 0.8/0.9/0.2s), ?v=6.53 x2, cache v47",
-    "npm run build OK"
-   ],
-   "commit": "v653_apply_css"
-  },
-  {
-   "fase": 77,
-   "version": "v6.54",
-   "estado": "COMPLETADO",
-   "descripcion": "Adaptación CSS condicional por tema (light/dark) para la visibilidad del icono de fecha",
-   "acciones": [
-    "bumps index.html ?v=6.54 x2, sw.js planify-cache-v48",
-    "CSS v6.54 anexado al final de css/main.css (pisa al v6.53 por !important + orden): dark default con invert(0.85) saturate(3) y hover scale(1.12); light con invert(0.3) saturate(5) hue-rotate(190deg) brightness(0.7) y hover mas oscuro con drop-shadow sky",
-    "DEVIACION DOCUMENTADA: la app usa body.tema-claro como modo claro real (verificado: light-mode/light-theme/data-theme = 0 usos en js y css; tema-claro = 53 usos). Se anadieron selectores body.tema-claro al grupo light (y hover) ademas de los del snippet (body.light-mode, [data-theme=\"light\"], .light-theme) para que la regla realmente aplique",
-    "verificacion post-build: dark base x1, light base tema-claro x1, light hover tema-claro x1, selectores .light-theme y data-theme x2, ?v=6.54 x2, cache v48",
-    "npm run build OK"
-   ],
-   "commit": "v654_apply_css"
-  },
-  {
-   "fase": 78,
-   "version": "v6.55",
-   "estado": "COMPLETADO",
-   "descripcion": "Título del diario dinámico en función de la fecha seleccionada en el selector o calendario",
-   "acciones": [
-    "bumps index.html ?v=6.55 x2, sw.js planify-cache-v49",
-    "window.actualizarTituloSegunFecha(fechaISO): busca evento en storage y fija tituloEl.textContent = texto del evento o \"Rutina Diaria\"",
-    "ADAPTACION CLAVE REAL: el snippet usaba EVENTOS_PLANIFY/PLANIFY_DATA/planify_eventos (inexistentes); el app real persiste eventos en localStorage \"horario_eventos_cal\" (objeto por fecha YYYY-MM-DD con {texto,notas,color,sticker}) - usado como fuente de datos real",
-    "ADAPTACION dataset.fecha: en el clic de .cal-dia se usa calDia.dataset.fecha (lo setea renderizarCalendario) en vez del valor del input date, para que el titulo siga al dia clickeado aunque el input no se haya actualizado (evita regresion vs v6.52)",
-    "EXTRA: inicializacion al cargar (DOMContentLoaded) con el valor del input date para eliminar el bug del titulo global persistido al abrir la app",
-    "insercion: antes de la junction ,function(){const e={salud con slice(0,j+1)+iife+\",\\n\"+slice(j+1) (primer intento sin coma -> SyntaxError; restaurado via git checkout y reintentado)",
-    "verificacion: node --check, npm run check, npm run build OK; VM test sobre bloque compilado (wrapper function(){...}() conservado por terser por la declaracion interna function e): 9/9 PASS (carga inicial, fecha con evento, fecha sin evento, change listener date/no-date, click .cal-dia con/sin evento, click fuera, input vacio)"
-   ],
-   "commit": "v655_apply_js"
-  },
-  {
-   "fase": 79,
-   "version": "v6.56",
-   "estado": "COMPLETADO",
-   "descripcion": "Activación funcional del botón + en lista de tareas con menú desplegable autocompletable de sugerencias rápidas",
-   "acciones": [
-    "bumps index.html ?v=6.56 x2, sw.js planify-cache-v50",
-    "ADAPTACION SELECTORES: estructura real = input#new-todo-input (placeholder \"Nueva tarea...\"), button#add-todo-btn, ul#todo-list.notebook-todo-list dentro de .todo-input-group (los selectores del snippet .Lista_de_Tareas/.lista-tareas-items/.tareas-container no existen en el HTML)",
-    "CONFLICTO RESUELTO: existia listener previo en add-todo-btn (agrega li plano sin checkbox/eliminar). El modulo clona el boton (cloneNode+replaceChild) para eliminar listeners previos y evita doble alta; idempotente via dataset.v656 (el 2do init en setTimeout 500 se salta)",
-    "Clase .contenedor-input-tareas agregada al .todo-input-group por JS para que el CSS posicional (relative/flex) aplique al contenedor real",
-    "Items como li (no div) para respetar ul#todo-list: checkbox + span + boton eliminar X; checkbox tacha/opacidad; Enter agrega; clic sugerencia agrega+limpia+cierra; click fuera cierra; focus/input filtran en vivo",
-    "CSS v6.56 anexado al final de main.css: .contenedor-input-tareas, .desplegable-sugerencias-tareas (absolute top 105%, z-index 100, max-height 180px), .activo, .opcion-sugerencia-tarea (+hover), variantes body.tema-claro",
-    "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro SUGERENCIAS_BASE->e, inicializarModuloTareas->t): 23/23 PASS (menu, clon boton, 7 sugerencias, seleccion, filtro, boton con texto, Enter, eliminar, checkbox, click fuera, focus)",
-    "stubs del test: fakeEl con innerHTML setter que limpia children (realismo DOM), replaceChild con registro, sin bucles en contains"
-   ],
-   "commit": "v656_apply_js"
-  },
-  {
-   "fase": 80,
-   "version": "v6.57",
-   "estado": "COMPLETADO",
-   "descripcion": "Neutralización inclusiva de género en la tarjeta de agradecimientos y placeholder",
-   "acciones": [
-    "bumps index.html ?v=6.57 x2, sw.js planify-cache-v51",
-    "ADAPTACION markup real (.grateful-section): span.section-title data-i18n=grateful \"Agradecida por\" -> \"Agradecimientos\"; textarea#grateful-input placeholder \"¿De qué estás agradecida hoy?...\" -> \"¿Qué agradeces el día de hoy?...\" (se conservan ids/classes existentes; el snippet sugeria .tarjeta-agradecimiento/#input-agradecimiento que no existen en el HTML)",
-    "js/app.js TRADUCCIONES es: grateful:\"Agradecimientos\", gratefulPh:\"¿Qué agradeces el día de hoy?...\" (claves i18n intactas)",
-    "en: ya era neutral (\"I am Grateful for\"/\"What are you grateful for today?...\") - sin cambios",
-    "verificacion post-build: html titulo x1, html placeholder x1, js es x1 c/u, 0 residuales femeninos (agradecida=0 en html y js), ?v=6.57 x2, cache v51, build OK"
-   ],
-   "commit": "v657_apply_text"
-  },
-  {
-   "fase": 81,
-   "version": "v6.58",
-   "estado": "COMPLETADO",
-   "descripcion": "Integración de botones con desplegable de sugerencias contextuales e ideas inspiradoras en Metas, Agradecimientos y Afirmaciones",
-   "acciones": [
-    "bumps index.html ?v=6.58 x2, sw.js planify-cache-v52",
-    "ADAPTACION SELECTORES REALES: .goals-section, .grateful-section, .affirmations-section (cada una con span.section-title + textarea#goals-input/#grateful-input/#affirmations-input). Los selectores del snippet ([class*=\"Metas\"], #metas-section, etc.) no existian en el HTML",
-    "FIX DEL SNIPPET: el titulo se busca con .section-title, h3, h2, label, .titulo-seccion (el snippet omitia .section-title que es el elemento real); el textarea se busca scopeado dentro del contenedor (contenedor.querySelector(\"textarea, input\")) porque document.querySelector(\"textarea, input\") del snippet devolveria el PRIMER campo del documento",
-    "Botón ✨ Ideas + en wrapper .encabezado-con-sugerencias (flex space-between); menu .menu-ideas-flotante (absolute top 100% right 0, z-index 120, max-height 200px) con 5 opciones por seccion; clic opcion: inserta (concatena con \\n si hay texto), dispara Event input para autoguardado, cierra",
-    "Cierre: al abrir un menu se cierran los demas; toggle en el mismo boton; click en documento cierra todos",
-    "CSS v6.58 anexado al final de main.css + variantes body.tema-claro",
-    "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro BANCO_IDEAS->e): 17/17 PASS (3 botones, 5 opciones c/u, apertura, insercion, concat, evento input, cierre entre menus, toggle, click fuera, idempotencia doble init)",
-    "stub test: querySelector con selectores compuestos (coma) para emular el DOM real"
-   ],
-   "commit": "v658_apply_js"
-  },
-  {
-   "fase": 82,
-   "version": "v6.59",
-   "estado": "COMPLETADO",
-   "descripcion": "Depuración de UI: eliminación del botón duplicado de Tema Oscuro en la pestaña Vista del panel de control",
-   "acciones": [
-    "bumps index.html ?v=6.59 x2, sw.js planify-cache-v53",
-    "index.html: removido <button class=\"sp-btn\" id=\"btn-dark-mode\" onclick=\"toggleDarkMode()\" aria-label=\"Alternar modo oscuro\">🌙 Oscuro</button> (ubicado tras .view-toggle en la pestaña Vista); reemplazado por comentario de limpieza (el minificador lo elimina en build)",
-    "Seguridad verificada: js/app.js referencia btn-dark-mode SOLO con guarda a&&(a.textContent=...) dentro de toggleTheme, y toggleDarkMode()->toggleTheme(); el selector principal #btn-tema (☀️/🌙) de la barra superior queda intacto",
-    "LIMPIEZA EXTRA: eliminada la regla ARIA muerta del boton en scripts/optimize-a11y.js (linea 47) que generaba WARN permanente en cada build por el boton inexistente",
-    "verificacion: 0 ocurrencias de btn-dark-mode/Oscuro en index.html y css; build OK sin warning de btn-dark-mode (los demas WARN ARIA son preexistentes por normalizacion de comillas del minificador)"
-   ],
-   "commit": "v659_apply_html"
-  },
-  {
-   "fase": 83,
-   "version": "v6.60",
-   "estado": "COMPLETADO",
-   "descripcion": "Reestructuración de arquitectura de navegación, sincronización bi-direccional entre panel lateral y barra inferior, y fix de vista Anual",
-   "acciones": [
-    "bumps index.html ?v=6.60 x2, sw.js planify-cache-v54",
-    "ARQUITECTURA REAL: barra flotante = .tab-btn[data-tab] con onclick cambiarTab (diario/semanal/mensual) -> #view-diario/#view-semanal/#view-mensual; panel Vista = .planner-type-selector button[data-type] (tipos del GRID: diario/semanal/mensual/anual/personalizado) + .view-toggle (table/dashboard). #view-table esta ANIDADA dentro de #view-semanal. cambiarVista y cambiarTipoPlanificador son funciones globales (NO window); cambiarTab SI es window.cambiarTab",
-    "window.cambiarVistaPlanify(vista): dispatcher unico - diario/semanal/mensual -> window.cambiarTab(vista); anual -> reparar datos + cambiarTab(semanal) + cambiarVista(table) + cambiarTipoPlanificador(anual) + tabs flotantes inactivos; dashboard/table -> cambiarVista; sincroniza .planner-type-selector + view-toggle en ambos casos; persiste localStorage.planify_vista_activa",
-    "FIX ANUAL: PLANNER_TYPES ya tenia anual (12 meses + getDefaultAnual); el bug LUN-DOM venia de datos corruptos en localStorage horario_data_anual. repararDatosAnuales() valida dias (12, ENERGO..DICIEMBRE) y si no, removeItem para regenerar defaults - la vista anual muestra el grid de 12 meses",
-    "INTERCEPTOR DE CLICKS (delegacion document, SIN preventDefault para no romper onclick inline): botones [data-type] (excepto personalizado), .tab-btn[data-tab] diario/semanal/mensual (tab-perfil del panel lateral IGNORADO), #btn-view-table/#btn-view-dashboard",
-    "Init unico: guard inicioAplicado evita doble listener (DOMContentLoaded + setTimeout 300); aplica vista guardada al cargar",
-    "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro: inicioAplicado->e, VincularEventosNavegacion->a): 27/27 PASS (init, guard, semanal, anual corrupto/valido, diario/notas, mensual, dashboard, default, clicks tipos/tabs/toggle, personalizado y tab-perfil ignorados, click fuera)"
-   ],
-   "commit": "v660_apply_js"
-  }
- ]
+  "pasos": [
+    "ST-01 VERIFICAR estado git: git log --oneline -2 (HEAD debe ser 6c75520 v6.29) y git status --short (esperado: M task.json + ?? review_feedback.txt; NINGUN archivo de codigo modificado). Si hay mas archivos M: parar y reportar",
+    "ST-02 INDEX.HTML bump: sustituir '?v=6.29' x2 por '?v=6.30' x2 (ancla_html_bump1 y ancla_html_bump2). Verificar: count '?v=6.30'==2, count '?v=6.29'==0",
+    "ST-03 SW.JS bump: sustituir 'planify-cache-v23' x1 por 'planify-cache-v24' x1. Verificar: count v24==1, count v23==0",
+    "ST-04 CSS: PEGAR el bloque_css_v630 LITERAL al final de css/main.css (APPEND directo tras ancla_css_final_actual, sin separador). Contar llaves del bloque pegado (open==4, close==4). Verificar balance final = 780/780",
+    "ST-05 CSS verificacion de contenido por strings: .calendar-day,.month-cell,td.cal-dia, .event-tag, .sticker-badge, th button, th span:contains(\"×\"), th span:contains(\"x\") presentes TAL CUAL (spec literal; no limpiar lo invalido)",
+    "ST-06 JS: INSERTAR al final de js/app.js: \";\" + bloque_js_v630 LITERAL (sin normalizar comentarios, espacios ni template literals). NO tocar nada mas del bundle",
+    "ST-07 JS validacion sintaxis: vm.Script sobre el archivo completo -> SIN SyntaxError. (node --check tambien valido; si falla por longitud de linea usar vm.Script). Ultimo char debe seguir siendo ';' (cierre del bloque)",
+    "ST-08 JS verificacion de strings: [PLANIFY v6.30] (log de la v6.30, x1 o mas segun spec), limpiarLetrasXDeCabeceras, renderizarStickerEnCelda, observerPLANIFY, dynamic-font-override, window.cambiarFuenteApp (x2 ahora: asignacion v6.29 + v6.30), '×' y '✕' segun spec, template literal '* { font-family:' con ${fuenteFinal}",
+    "ST-09 BUILD (si el flujo lo requiere): npm run build equivalente (terser re-minifica js: ELIMINA comentarios //, colapsa template literals multilinea, re-manglea const internos -> observerPLANIFY/limpiarLetrasXDeCabeceras/renderizarStickerEnCelda como identificadores pueden desaparecer; verificar POST-BUILD por STRINGS: [PLANIFY v6.30], dynamic-font-override, '#app', '✕', 'eliminarDia')",
+    "ST-10 VERIFICACION FINAL integra (node): (a) css balance 780/780 y tail en '}', (b) vm.Script app.js OK, (c) html '?v=6.30' x2 y '6.29' count=0, (d) sw 'planify-cache-v24' x1, (e) js strings: [PLANIFY v6.30], dynamic-font-override, limpiarLetrasXDeCabeceras (PRE-build) / '#app' o '✕' (POST-build), (f) git status --short -> SOLO los 4 archivos (index.html, sw.js, css/main.css, js/app.js) + task.json/review_feedback",
+    "ST-11 REPORTAR al usuario: (a) regla 4 del CSS descartada por selectores :contains invalidos (funcionalidad cubierta por JS), (b) ✕ U+2715 vs × U+00D7 (el replace no matchea el span eliminarDia; la limpieza real la hace el .remove() de la funcion 1), (c) window.cambiarFuenteApp v6.30 gana (style tag inyectado), (d) contenedor real del observer = #app, (e) selectores inertes existentes ([data-sticker] x12 reales; cal-dia/cal-evento NO existen como clase exacta), (f) MutationObserver primero en el bundle"
+  ],
+  "verificacion_post": [
+    "css/main.css: balance 780/780, balance final 0, tail termina en '}' del bloque v6.30, strings de la regla 4 (incluidos los :contains invalidos) presentes",
+    "js/app.js: vm.Script OK, strings [PLANIFY v6.30] y dynamic-font-override presentes, window.cambiarFuenteApp count==2 (v6.29 + v6.30; la ultima asignacion gana), tail termina en cierre del bloque (;\n}...() o similar segun literal)",
+    "POST-BUILD (si aplica): terser re-manglea internos -> verificar por STRINGS: [PLANIFY v6.30], dynamic-font-override, '#app', '✕' (U+2715), 'eliminarDia', 'font-family:' + '!important'. NO buscar limpiarLetrasXDeCabeceras/renderizarStickerEnCelda/observerPLANIFY como identificadores post-build (renombrados por terser, esperado)",
+    "index.html: '?v=6.30' x2, '?v=6.29' count=0",
+    "sw.js: 'planify-cache-v24' x1",
+    "git status --short: SOLO index.html, css/main.css, js/app.js, sw.js modificados (+ task.json/review_feedback del flujo); nada mas"
+  ],
+  "riesgos_implementador": [
+    "a) Regla 4 CSS (th button, th .close, th .close-x, .week-header-day button, .week-header-day span.x, th[data-day] button, th span:contains(\"×\"), th span:contains(\"x\")): selectores :contains son INVALIDOS en CSS -> CSSOM descarta la regla COMPLETA (toda la lista de la regla se pierde). NO eliminar la regla del bloque (spec literal); la funcionalidad queda cubierta por limpiarLetrasXDeCabeceras + observerPLANIFY. Documentar en reporte",
+    "b) Sobrescritura window.cambiarFuenteApp: v6.30 (style tag #dynamic-font-override con * {font-family} !important) reemplaza v6.29 (setProperty --app-font-family). Insertada al final -> ultima asignacion gana. La v6.29 sigue ejecutandose internamente en DOMContentLoaded (cargarAjustesGuardados) sin error; visualmente gana la v6.30 por inyeccion posterior del style tag",
+    "c) Bloque JS literal NO minificado: comentarios //, template literals MULTILINEA ( ` * { font-family: ${fuenteFinal} !important; } ` ) y espacios. Insertar LITERAL con separador ';' previo. El archivo deja de ser 1 linea hasta el build (esperado; terser re-minifica y elimina comentarios)",
+    "d) MutationObserver subtree:true sobre #app: re-dispara limpieza en cada mutacion; limpiarLetrasXDeCabeceras idempotente -> estable. renderizar() re-inyecta spans ✕ en cada render -> el observer re-limpiara (deseado). Sin bucle (tras limpiar no hay mutaciones nuevas)",
+    "e) regex /\\s*[xX×]/g usa U+00D7 (×): NO matchea el '✕' U+2715 del span eliminarDia (generado por renderizar()). La eliminacion del span en cabeceras depende del .remove()/queries de la funcion 1 (spec literal; NO modificar el regex). Ademas el replace puede quitar la 'x' de nombres de dias en OTRO idioma (riesgo menor; en espanol Lun..Dom no contienen x)",
+    "f) UTF-8 sin BOM: emoji 🔤, tildes y template literals con ${} -> escribir con encoding UTF-8 puro; verificar por indexOf",
+    "g) Balance CSS: 776+4=780/780 exacto; contar llaves del bloque pegado antes de verificar balance final",
+    "h) POST-BUILD: terser re-manglea const/funciones internas (observerPLANIFY, limpiarLetrasXDeCabeceras, renderizarStickerEnCelda pueden desaparecer como identificadores) -> verificar por STRINGS y por window.cambiarFuenteApp",
+    "i) <style id=\"dynamic-font-override\"> NO debe existir en index.html (count==0 verificado); se crea SOLO por JS en runtime"
+  ],
+  "commit_propuesto": "feat: eliminacion fisica de X por js override de fuentes y fix de stickers v6.30",
+  "fases": [
+    {
+      "fase": 58,
+      "version": "v6.35",
+      "estado": "COMPLETADO",
+      "descripcion": "Toggle de horas de sueño (desmarcar al reclicar), purgado de X en cabeceras semanales y celdas mensuales multilínea CSS",
+      "acciones": [
+        "bumps index.html ?v=6.35 x2",
+        "sw.js planify-cache-v29",
+        "IIFE v6.35 al inicio app.js: toggle sleep con closest + yaEstabaActivo (setItem/removeItem), purgarTextoXCabeceras + MutationObserver, readyState loading/else",
+        "CSS append: ocultamiento X cabeceras, month-cell min-height 105px multilínea, sleep active box-shadow+scale",
+        "ELIMINADOS 3 handlers de sueño previos: v6.29 addEventListener dataset.escuchado, v6.32 onclick, v6.34 click-listener closest",
+        "verificacion post-build: 1 closest, 1 setItem, 1 removeItem, 0 restos v6.29/6.32/6.34, CSS 838/838",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v635_apply_css"
+    },
+    {
+      "fase": 59,
+      "version": "v6.36",
+      "estado": "COMPLETADO",
+      "descripcion": "Sistema de inyección JS de estilos forzados (styleFix en head) e interceptación de DOM por service worker/PWA",
+      "acciones": [
+        "bumps index.html ?v=6.36 x2",
+        "sw.js planify-cache-v30",
+        "IIFE v6.36 al inicio de app.js: style tag planify-force-styles-v36 inyectado en head (ocultar X semanal, celdas mensuales 110px multilínea con [data-event], estado activo sueño)",
+        "toggle de sueño (closest + yaEstabaActivo, setItem/removeItem)",
+        "purgarX + MutationObserver con readyState loading/else",
+        "ELIMINADO IIFE v6.35 completo (corte por frontera de fusión de IIFEs de Terser + prefijo !)",
+        "ELIMINADO bloque CSS v6.35 de main.css (834/834)",
+        "verificacion post-build: 1 closest, 1 setItem, 1 removeItem, styleFix id x1, [data-event] x1, MutationObserver x3",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v636_apply_js"
+    },
+    {
+      "fase": 60,
+      "version": "v6.37",
+      "estado": "COMPLETADO",
+      "descripcion": "Eliminacion de X concatenada en string de cabeceras y inline styles en renderJS",
+      "acciones": [
+        "bumps index.html ?v=6.37 x2",
+        "sw.js planify-cache-v31",
+        "IIFE v6.37 al inicio: limpiarCabecerasSemanales (th, .week-header-day, .cal-header) con regex /\\s*[xX×]\\s*$/g + window export + DOMContentLoaded/readyState",
+        "EDIT renderizar(): eliminado span onclick=eliminarDia() con ✕ del template de cabeceras (era inmune a purgadores: sin clase ni tag button)",
+        "EDIT renderizar(): hook window.limpiarCabecerasSemanales() al inicio",
+        "inline styles en creacion de cal-evento-mini (calendario mensual): whiteSpace normal, wordBreak, fontSize 0.85rem, lineHeight 1.3, display block",
+        "inline styles en cell-content de renderizarStickerEnCelda",
+        "verificacion post-build: span X en th = 0, del-fila intacto, hooks x1, inline x1/x1",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v637_apply_js"
+    },
+    {
+      "fase": 61,
+      "version": "v6.38",
+      "estado": "COMPLETADO",
+      "descripcion": "Guard null-check en renderizarCalendario y renderizado completo de celdas mensuales",
+      "acciones": [
+        "bumps index.html ?v=6.38 x2",
+        "sw.js planify-cache-v32",
+        "EDIT renderizarCalendario: cal-titulo con fallback document.querySelector(.cal-titulo) y else que CONTINUA el renderizado (antes return void abortaba todo si faltaba #cal-titulo)",
+        "EDIT renderizarCalendario: n.style.display=grid forzado tras obtener cal-grid",
+        "CSS append: FIX VISTA MENSUAL v6.38 (#cal-grid grid 7 columnas, .cal-dia 95px, .cal-evento/.cal-evento-mini multilínea) 834+3=837/837",
+        "NOTA: segmentos minificados sin var (terser fusiona declaraciones en secuencia), cal-titulo si conserva var r=",
+        "verificacion post-build: guard x1, fallback x1, return fatal 0, grid display x1",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v638_apply_js"
+    },
+    {
+      "fase": 62,
+      "version": "v6.39",
+      "estado": "COMPLETADO",
+      "descripcion": "Renderizado explícito de stickers/emojis en celdas del calendario mensual",
+      "acciones": [
+        "bumps index.html ?v=6.39 x2",
+        "sw.js planify-cache-v33",
+        "EDIT renderizarCalendario: sustituido sticker texto plano (h.textContent=b.sticker+space) por span.cal-sticker-visible creado con createElement, textContent=b.sticker, inline styles (fontSize 1.2rem, marginRight 4px, inline-block, verticalAlign middle) y h.prepend() antes del texto del evento",
+        "texto de evento conserva truncado length>12 con slice(0,12)+...",
+        "CSS append: FIX STICKERS v6.39 (.cal-sticker-visible, [data-sticker], .cal-sticker visibles inline-block 1.2rem) 837+1=838/838",
+        "verificacion post-build: clase x1, prepend x1, fontSize 1.2rem x1, texto plano eliminado 0, slice(0,12) x1",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v639_apply_js"
+    },
+    {
+      "fase": 63,
+      "version": "v6.40",
+      "estado": "COMPLETADO",
+      "descripcion": "Fix definitivo de botones de sueño (toggle), inyección de stickers en celdas mensuales y sincronización de título de rutina diaria",
+      "acciones": [
+        "bumps index.html ?v=6.40 x2",
+        "sw.js planify-cache-v34",
+        "IIFE v6.40 al inicio: toggle global de sueño con containers .horas-sueño/.sueño-opciones/[data-sueño]/.sueño-btn, limpieza completa de estilos inline previos, clave planify_sueño_seleccionado",
+        "actualizarTituloDiario: sincroniza Rutina Diaria - d/m/a desde input fecha, listeners change + DOMContentLoaded",
+        "EDIT sticker renderizarCalendario: estilos individuales sustituidos por style.cssText con !important (fontSize 1.2rem, marginRight 6px, inline-block, verticalAlign middle)",
+        "CSS append: FIX INTERACTIVIDAD v6.40 (cursor/transition en botones sueño + .cal-sticker-visible 1.25rem) 838+2=840/840",
+        "NOTA: segmento post-build usa nombres minificados (y.sticker, h.prepend)",
+        "verificacion post-build: sueño_seleccionado 2 (set+remove), selectores x1, cssText x1, Rutina Diaria x1, CSS 840/840",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v640_apply_js"
+    },
+    {
+      "fase": 64,
+      "version": "v6.41",
+      "estado": "COMPLETADO",
+      "descripcion": "Toggle directo de sueño, stickers visibles en celdas y título dinámico en diario",
+      "acciones": [
+        "bumps index.html ?v=6.41 x2",
+        "sw.js planify-cache-v35",
+        "INSPECCION: botones de sueño son button.cloud-btn[data-sleep=4-6|7-9|10-12] en .sleep-clouds (HTML estatico #view-diario)",
+        "IIFE v6.41 al inicio: bindSueño con addEventListener click POR BOTON (.sleep-clouds .cloud-btn[data-sleep]) con dataset.v641 guard, toggle real (desmarca si activo, removeItem) con estilos inline azul cian",
+        "IIFE v6.41: listener click .cal-dia -> dataset.fecha -> setea input fecha + titulo Rutina Diaria - d/m/a",
+        "ELIMINADO toggle v6.36 document-level closest .sleep-hour-btn,[data-sleep] (evita doble toggle)",
+        "ELIMINADO truncado slice(0,12) en renderizarCalendario: h.textContent=y.texto completo, sticker span cal-sticker-visible prepend intacto",
+        "FIX: handler principal de la app (querySelectorAll .cloud-btn en DOMContentLoaded) ahora excluye .sleep-clouds para no pisar el toggle",
+        "FIX: coma antes de const tras eliminar v6.36 (SyntaxError) corregida a punto y coma",
+        "verificacion post-build: selector x1, dataset.v641 x2, set/removeItem 1/1, exclusion x1, slice(0,12) 0, toggle v6.36 0",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v641_apply_js"
+    },
+    {
+      "fase": 65,
+      "version": "v6.42",
+      "estado": "COMPLETADO",
+      "descripcion": "Decodificacion de stickers, ajuste de ancho en cal-evento y sincronizacion de fecha al hacer clic en dia",
+      "acciones": [
+        "bumps index.html ?v=6.42 x2",
+        "sw.js planify-cache-v36",
+        "INSPECCION: listener v6.41 termina en }}}) + , (comilla de secuencia en IIFE), no }}} ,",
+        "IIFE v6.42 al inicio: MAPA_STICKERS (salud gym avion musica cumple comida idea amor trabajo cama colores default) + window.obtenerStickerIcono (ID->emoji, si no es ID devuelve valor)",
+        "listener v6.42: click .cal-dia -> data-fecha -> input date .value + dispatchEvent change (bubbles) -> v6.40 actualiza titulo; ademas setea h1,h2,h3,.title,.card-title que incluyan Rutina Diaria",
+        "ELIMINADO listener cal-dia v6.41 (sustituido por v6.42 con dispatch change, incluye la coma de secuencia en la eliminacion)",
+        "renderizarCalendario: sticker ahora decodifica (window.obtenerStickerIcono(y.sticker||y.emoji)) con span cal-sticker-visible font-size 1.1rem + espacio tras emoji",
+        "CSS append FIX FORMATO DE TEXTO Y STICKERS v6.42: .cal-evento,.cal-evento-mini (white-space normal, word-wrap break-word, word-break keep-all, display block, width 100%, box-sizing, padding 4px 6px) + .cal-sticker-visible (inline-block, visibility visible, opacity 1)",
+        "balance CSS 842/842 pre-build; minifier elimina comentario y espacios (keep-all x1, visibility:visible x15 post-build)",
+        "verificacion post-build: obtenerStickerIcono def x1, decode en render x2 usos, listener viejo 0, dispatchEvent x1, ?v=6.42 x2, cache v36",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v642_apply_js"
+    },
+    {
+      "fase": 66,
+      "version": "v6.43",
+      "estado": "COMPLETADO",
+      "descripcion": "Titulo de diario alimentado por el evento del dia y rendering forzado de icono de sticker",
+      "acciones": [
+        "bumps index.html ?v=6.43 x2",
+        "sw.js planify-cache-v37",
+        "IIFE v6.43 al inicio: EMOJIS_DEFECTO (desechado por terser por no usarse) + obtenerIconoValido (si sticker falsy, >4 chars o incluye color/palette -> pin pin; si no, emoji directo)",
+        "listener v6.43: click .cal-dia -> extrae nombreEvento del primer .cal-evento/.cal-evento-mini/.cell-content (innerText sin saltos), sincroniza input date + dispatch change, titulo = nombreEvento - d/m/a | nombreEvento | Rutina Diaria - d/m/a | Rutina Diaria; dataset.esTituloDiario para reclicar dias",
+        "ELIMINADO listener v6.42 (por indices verificados: segmento len 495, fin en }) } ) + }() del IIFE) para evitar overwrite del titulo",
+        "renderizarCalendario: expresion v6.42 reemplazada por window.inyectarStickerEnEvento&&(y.sticker||y.emoji)&&window.inyectarStickerEnEvento(h,y.sticker||y.emoji) (guarda conserva eventos sin sticker)",
+        "inyectarStickerEnEvento: obtenerIconoValido inline por terser (o.length<=4), span cal-sticker-visible 1.1rem/5px con guard querySelector",
+        "verificacion post-build: def x1, uso en render x1, esTituloDiario x2, innerText.replace x1, template  -  y fallbacks confirmados, 3===t.length 0, ?v=6.43 x2, cache v37",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v643_apply_js"
+    },
+    {
+      "fase": 67,
+      "version": "v6.44",
+      "estado": "COMPLETADO",
+      "descripcion": "Titulo de diario exclusivamente con nombre de evento sin fecha concatenada y mapa exacto para pegatina paleta",
+      "acciones": [
+        "bumps index.html ?v=6.44 x2",
+        "sw.js planify-cache-v38",
+        "IIFE v6.44 al inicio: MAPA_STICKERS_EXACTO (colores/paleta/default->paleta, cuadros->cuadro, salud gym avion musica cumple comida idea amor trabajo cama) + window.obtenerEmojiCorrecto (lowercase trim, si ya es emoji <=4 chars sin color/btn lo devuelve, si no paleta)",
+        "listener v6.44: click .cal-dia -> clona .cal-evento para quitar span sticker (sin mutar DOM), nombreEvento limpio, titulo = nombreEvento | Rutina Diaria SIN concatenar fecha; condicion incluye t.textContent===nombreEvento para reclicar",
+        "NOTA: el listener v6.44 omite la sincronizacion del input de fecha (spec del usuario); el dispatch change de v6.42/6.43 desaparece con ellos",
+        "window.inyectarStickerEnEvento v6.44: obtenerEmojiCorrecto, elimina span previo (.remove) y SIEMPRE inyecta (default colores)",
+        "renderizarCalendario: expresion = window.inyectarStickerEnEvento&&window.inyectarStickerEnEvento(h,y.sticker||y.emoji||colores) - sin guard, todo evento recibe emoji",
+        "ELIMINADO bloque v6.43 completo (listener + definicion vieja de inyectarStickerEnEvento): terser habia desenvuelto su IIFE a secuencia top-level; junction con v6.42 quedo como ...prepend(a)}},function(){const e={salud y el ! inicial se perdio -> restaurado prepend ! tras el corte",
+        "verificacion post-build: e.textContent=t||\"Rutina Diaria\" (sin fecha), condicion textContent===t, cloneNode x2, y.emoji||colores x1, ${o} - ${t} 0, esTituloDiario x2, ?v=6.44 x2, cache v38",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v644_apply_js"
+    },
+    {
+      "fase": 68,
+      "version": "v6.45",
+      "estado": "COMPLETADO",
+      "descripcion": "Declaracion global de cambiarTab y correccion del mapa de sticker a imagenes superpuestas",
+      "acciones": [
+        "bumps index.html ?v=6.45 x2",
+        "sw.js planify-cache-v39",
+        "DIAGNOSTICO: cambiarTab YA existia como function cambiarTab(e) top-level y la cadena window.cambiarTab=cambiarTab (top-level) lo exponía; load test en Node (stub DOM) confirma window.cambiarTab definido tras load -> el error del usuario proviene de SW cacheado o fallo previo en su sesion",
+        "window.cambiarTab global al inicio absoluto (version usuario ADAPTADA: matcher t.id===\"view-\"+tabName porque las vistas reales son #view-diario/#view-semanal/#view-mensual sin data-tab-content; el snippet literal habria ocultado TODAS las vistas) + renderizarCalendario() al elegir mensual (comportamiento del original)",
+        "ELIMINADO window.cambiarTab=cambiarTab de la cadena de exposicion (la version v6.45 queda como definitiva; el function cambiarTab original sigue en scope para llamadas internas)",
+        "IIFE v6.45 insertado TRAS el IIFE v6.44 (no al inicio) para que overwrite obtenerEmojiCorrecto/inyectarStickerEnEvento; union por coma (})(); habria roto la secuencia top-level - 2 intentos fallidos resueltos)",
+        "MAPA_STICKERS_EXACTO v6.45: colores/paleta/cuadros/imagenes/default -> marco con imagen, resto de IDs igual que v6.44",
+        "verificacion post-build: window.cambiarTab=function(e) @0 con matcher view-, def obtenerEmojiCorrecto x2 (v6.44 @768 default paleta de colores, v6.45 @2108 default marco), inyectarStickerEnEvento v6.45, chain 0, ?v=6.45 x2, cache v39, load test LOAD OK con cambiarTab funcion",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v645_apply_js"
+    },
+    {
+      "fase": 69,
+      "version": "v6.46",
+      "estado": "COMPLETADO",
+      "descripcion": "Mapeo exhaustivo de las 12 pegatinas del modal a sus emojis exactos",
+      "acciones": [
+        "bumps index.html ?v=6.46 x2",
+        "sw.js planify-cache-v40",
+        "IIFE v6.46 con DICCIONARIO_PEGATINAS (56 claves): ambulancia/carrito/emergencia/auto-medico->🚑, hospital/clinica/salud/medico->🏥, cama/dormir/descanso/sueño->🛏️, colores/paleta/cuadros/imagenes/arte->🖼️, comida/pizza/almuerzo/cena->🍕, idea/foco/pensamiento/creatividad->💡, corazon/amor/heart/love->💖, trabajo/maletin/oficina/empleo->💼, gym/ejercicio/deporte/gimnasio->🏋️, avion/viaje/vuelo/aeropuerto->✈️, musica/nota/cancion/sonido->🎵, cumple/cumpleaños/pastel/torta->🎂, libros/libro/estudio/clases/lectura->📚",
+        "obtenerEmojiCorrecto v6.46: emoji directo (len<=4 y sin [a-zA-Z0-9_-]), lookup exacto, coincidencia parcial includes(), fallback neutro 📌 (ya no paisaje)",
+        "inyectarStickerEnEvento v6.46 re-escrito con cssText completo (mismo metodo que v6.45: span .cal-sticker-visible prepend)",
+        "IIFE insertado TRAS el IIFE v6.45 (junction con v6.42), union por coma -> la def v6.46 pisa a v6.45 y v6.44",
+        "verificacion post-build: DICCIONARIO completo presente, 3 defs de obtenerEmojiCorrecto/inyectarStickerEnEvento (v6.44/v6.45/v6.46), fallback 📌 x3, render y.emoji||colores intacto, ?v=6.46 x2, cache v40",
+        "test aislado del IIFE v6.46 extraido del build: 44 claves + emoji directo + PIZZA mayus + undefined/xyz fallback, TODOS OK (load test completo de la app no usable: iniciar() ejecuta render con APIs DOM profundas no relacionadas con el cambio)",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v646_apply_js"
+    },
+    {
+      "fase": 70,
+      "version": "v6.47",
+      "estado": "COMPLETADO",
+      "descripcion": "Cambio a emoji cama con persona 🛌 y mapeo forzado del primer sticker a ambulancia 🚑",
+      "acciones": [
+        "bumps index.html ?v=6.47 x2",
+        "sw.js planify-cache-v41",
+        "IIFE v6.47 insertado TRAS el IIFE v6.46 (junction con v6.42), union por coma -> defs v6.47 pisan a v6.46/v6.45/v6.44",
+        "DICCIONARIO_AJUSTADO v6.47: salud/emergencia/auto-medico/carrito/red/first/0/sticker-0 -> 🚑 (primer boton del modal), cama/dormir/descanso/sueño -> 🛌, hospital/clinica/medico -> 🏥, resto de stickers intactos",
+        "obtenerEmojiCorrecto v6.47: emoji directo con reemplazo forzado 🛏️->🛌, lookup exacto, keywords parciales (ambulan/emergen/salud -> 🚑; cama/dormir/sleep -> 🛌), fallback 📌",
+        "inyectarStickerEnEvento v6.47 identico (span .cal-sticker-visible prepend con cssText)",
+        "verificacion post-build: 4 defs obtenerEmojiCorrecto/inyectarStickerEnEvento, cama:\"🛌\" x1, red:\"🚑\" x1, sticker-0 x1, 0:\"🚑\" x1, keyword sleep, ?v=6.47 x2, cache v41",
+        "test aislado del IIFE v6.47 extraido del build (@4038..5268): 37 claves exactas + 🛏️ directo->🛌 + emoji passthrough + parciales ambulan/emergencias/camas/sleeping + fallbacks, TODOS OK",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v647_apply_js"
+    },
+    {
+      "fase": 71,
+      "version": "v6.48",
+      "estado": "COMPLETADO",
+      "descripcion": "Captura explicita del primer boton de pegatina del modal asignando emoji 🚑",
+      "acciones": [
+        "DIAGNOSTICO: el primer boton del modal tiene data-sticker=\"\" (vacio) -> seleccionarSticker guarda \"\" -> render usa y.emoji||\"colores\" -> obtenerEmojiCorrecto(\"colores\") -> 🖼️ (paisaje). Ese es el bug real, no un valor \"colores\" guardado",
+        "bumps index.html ?v=6.48 x2",
+        "sw.js planify-cache-v42",
+        "PATCH guardarEvento (minificado): modal-evento-sticker\").value || \"ambulancia\" -> si se selecciona el primer boton (valor vacio) se guarda sticker:\"ambulancia\" -> renderiza 🚑; tambien corrige eventos legacy con sticker vacio",
+        "IIFE v6.48 insertado tras v6.47: listener de clic document que marca dataset.stickerExacto=\"🚑\" en el primer boton/[data-sticker] con 🚑 (guard de parentNode anadido)",
+        "obtenerEmojiCorrecto v6.48: caso especial val===\"colores\"&&indexBoton===0 -> 🚑, lookup exacto, emoji directo con 🛏️->🛌, keywords parciales ambulan/emergen/salud->🚑 y cama/dormir/sleep->🛌, fallback 📌",
+        "DEVIACION DOCUMENTADA: el snippet del usuario traia EMOJI_MAP_v648 solo con 11 claves (regresion: los otros 10 stickers del modal habrian renderizado 📌); se completo el mapa con el diccionario v6.47 integro (56 claves) para no regresionar",
+        "verificacion post-build: 5 defs obtenerEmojiCorrecto/inyectarStickerEnEvento, patch guardarEvento x1, patron colores&&indexBoton x1, keyword sleep x2, ?v=6.48 x2, cache v42",
+        "test aislado del IIFE v6.48 (@5269..7109): las 12 claves reales del modal (data-sticker=\"\" rinde 📌 por diseno, cubierto por el patch de guardarEvento) + colores->🖼️, colores+index0->🚑, stickers, 🛏️->🛌, sleeping->🛌, fallbacks, TODOS OK",
+        "npm run check OK, build OK"
+      ],
+      "commit": "v648_apply_js"
+    },
+    {
+      "fase": 72,
+      "version": "v6.49",
+      "estado": "COMPLETADO",
+      "descripcion": "Restructuración CSS de celdas de calendario mensual: número superior izquierdo y contenedor de eventos inferior/centrado",
+      "acciones": [
+        "bumps index.html ?v=6.49 x2 (css/main.css?v=6.49 y js/app.js?v=6.49)",
+        "sw.js planify-cache-v43",
+        "bloque v6.49 anexado al FINAL de css/main.css: .cal-dia flex column (numero arriba, justify flex-start, height 100%), numero .cal-numero/>span:first-child alineado a la izquierda (0.95rem bold, margin-bottom 6px), eventos .cal-evento/.cal-evento-mini/.cell-content con width 100% flex row, padding 4px 6px, border-radius 6px y fondo rgba(255,255,255,.05)",
+        "verificacion post-build (css compilado): 3 reglas presentes tal cual (el minificador conservo 0.95rem/0.9), ?v=6.49 x2, cache v43",
+        "npm run build OK"
+      ],
+      "commit": "v649_apply_css"
+    },
+    {
+      "fase": 73,
+      "version": "v6.50",
+      "estado": "COMPLETADO",
+      "descripcion": "Centrado de tarjetas de eventos en celdas de calendario mensual e inyeccion de notas/detalles secundarios",
+      "acciones": [
+        "bumps index.html ?v=6.50 x2, sw.js planify-cache-v44",
+        "CSS v6.50 anexado al final de css/main.css: .cal-dia (flex column, justify space-between, min-height 85px, padding 6px 8px) PISA al v6.49 (misma especificidad + !important, gana el ultimo); numero .cal-numero/>span:first-child (0.9rem bold, margin-bottom 4px); .cal-evento-contenedor (column centrado, margin auto 0 -> centrado vertical, fondo rgba(255,255,255,.06), radius 6px); .cal-evento-titulo (0.88rem semibold, flex centrado con gap 4px); .cal-evento-detalles (0.75rem, opacity .8, line-height 1.1)",
+        "JS patch 1: el numero del dia ya NO es textContent suelto: se crea span.cal-numero como primer hijo (la regla CSS del numero ahora aplica de verdad)",
+        "JS patch 2: render del evento en renderizarCalendario reemplazado: span.cal-evento-mini -> div.cal-evento-contenedor con borderLeft 3px del color del evento + div.cal-evento-titulo (sticker via inyectarStickerEnEvento + span con texto) + div.cal-evento-detalles solo si hay notas",
+        "DEVIACION DOCUMENTADA del snippet: el esquema real del evento es {texto, notas, color, sticker} (guardarEvento) -> se uso y.texto||\"Sin título\" y y.notas (el snippet usaba titulo/nombre/descripcion/detalles inexistentes); el fallback de sticker en render se cambio de \"colores\" a \"ambulancia\" (coherente con v6.48: sticker vacio no debe pintar el paisaje)",
+        "verificacion post-build: cal-evento-contenedor/titulo/detalles x1 en JS, span.cal-numero x1, borderLeft 3px x1, texto Sin titulo x1, fallback ambulancia x1 (minificador renombro y->h), CSS con min-height:85px, contenedor/titulo/detalles completos, ?v=6.50 x2, cache v44",
+        "npm run build OK"
+      ],
+      "commit": "v650_apply_css_js"
+    },
+    {
+      "fase": 74,
+      "version": "v6.51",
+      "estado": "COMPLETADO",
+      "descripcion": "Titulo editable con persistencia local para el bloque de Rutina en el Planificador Diario",
+      "acciones": [
+        "bumps index.html ?v=6.51 x2 (css/main.css?v=6.51 y js/app.js?v=6.51)",
+        "sw.js planify-cache-v45",
+        "HTML: <h2 data-i18n=\"title\">Rutina Diaria</h2> -> <h2 data-i18n=\"title\" id=\"titulo-rutina-diaria\" contenteditable=\"true\">Rutina Diaria</h2>",
+        "JS: IIFE v6.51 insertado tras v6.48 (junction con v6.42): carga localStorage planify_titulo_rutina (default \"Rutina diaria\") y guarda en blur con trim + fallback al default; try/catch en ambos accesos",
+        "CSS: #titulo-rutina-diaria con cursor pointer, borde dashed transparente con transicion, hover (borde rgba(255,255,255,.4) + fondo .05) y focus (#38bdf8 + fondo rgba(56,189,248,.1))",
+        "CAVEAT: aplicarIdioma (data-i18n=\"title\") puede sobrescribir el titulo custom al cambiar idioma; el valor guardado se restaura en la proxima carga",
+        "verificacion post-build: HTML id+contenteditable x1, IIFE getElementById x1, planify_titulo_rutina x2, CSS base/hover/focus x1 cada una, ?v=6.51 x2, cache v45",
+        "smoke test del IIFE extraido del build: carga default \"Rutina diaria\" OK y carga de titulo guardado \"Inicio de clases\" OK",
+        "npm run build OK"
+      ],
+      "commit": "v651_apply_js"
+    },
+    {
+      "fase": 75,
+      "version": "v6.52",
+      "estado": "COMPLETADO",
+      "descripcion": "Sincronización automática de título diario al hacer clic en evento de calendario mensual",
+      "acciones": [
+        "bumps index.html ?v=6.52 x2, sw.js planify-cache-v46",
+        "IIFE v6.52 insertado tras v6.51 (junction con v6.42): window.actualizarTituloDiarioDesdeEvento(nuevoTitulo) -> textContent en #titulo-rutina-diaria (fallback .rutina-diaria-titulo, h2.rutina) + guarda en planify_titulo_rutina; default \"Rutina Diaria\" si vacio",
+        "listener document click con closest(\".cal-dia\"): si la celda tiene .cal-evento-titulo/.cal-evento/.cell-content -> clona, remueve .cal-sticker-visible (sticker no debe ir al titulo), innerText limpio -> actualizarTituloDiarioDesdeEvento; si la celda no tiene eventos -> reset a \"Rutina Diaria\"",
+        "NOTA BUILD: terser colapso el IIFE (sin scope necesario) -> window.actualizarTituloDiarioDesdeEvento=function(...) queda como secuencia top-level; verificado asi",
+        "verificacion post-build: def global x1, llamadas x2, closest(\".cal-dia\") x2, selector evento x1, cloneNode x3 (con otros usos preexistentes), ?v=6.52 x2, cache v46",
+        "simulacion de clics con el codigo minificado real: dia con evento -> titulo \"INICIO DE CLASES\" SIN sticker (clon + remove) y guardado en storage OK; dia vacio -> reset \"Rutina Diaria\" OK; clic fuera de .cal-dia -> intacto OK",
+        "interaccion con v6.51: el titulo editable sigue funcionando (blur guarda); v6.52 lo sobrescribe al hacer clic en un dia del calendario mensual (comportamiento deseado)",
+        "npm run build OK"
+      ],
+      "commit": "v652_apply_js"
+    },
+    {
+      "fase": 76,
+      "version": "v6.53",
+      "estado": "COMPLETADO",
+      "descripcion": "Estilización CSS y contraste radiante (cian/blanco) para el icono de selector de fecha nativo en input[type=date]",
+      "acciones": [
+        "bumps index.html ?v=6.53 x2, sw.js planify-cache-v47",
+        "CSS v6.53 anexado al final de css/main.css: input[type=\"date\"]::-webkit-calendar-picker-indicator con filter invert(.8) sepia(1) saturate(5) hue-rotate(170deg) brightness(1.2) -> icono negro nativo convertido a cian brillante, opacity .9, transicion 0.2s, padding 2px, cursor pointer",
+        "hover: opacity 1, filter invert(1) brightness(1.5) + drop-shadow cyan rgba(56,189,248,.8), transform scale(1.15)",
+        "verificacion post-build: ambas reglas presentes verbatim en css compilado (minificador conservo 0.8/0.9/0.2s), ?v=6.53 x2, cache v47",
+        "npm run build OK"
+      ],
+      "commit": "v653_apply_css"
+    },
+    {
+      "fase": 77,
+      "version": "v6.54",
+      "estado": "COMPLETADO",
+      "descripcion": "Adaptación CSS condicional por tema (light/dark) para la visibilidad del icono de fecha",
+      "acciones": [
+        "bumps index.html ?v=6.54 x2, sw.js planify-cache-v48",
+        "CSS v6.54 anexado al final de css/main.css (pisa al v6.53 por !important + orden): dark default con invert(0.85) saturate(3) y hover scale(1.12); light con invert(0.3) saturate(5) hue-rotate(190deg) brightness(0.7) y hover mas oscuro con drop-shadow sky",
+        "DEVIACION DOCUMENTADA: la app usa body.tema-claro como modo claro real (verificado: light-mode/light-theme/data-theme = 0 usos en js y css; tema-claro = 53 usos). Se anadieron selectores body.tema-claro al grupo light (y hover) ademas de los del snippet (body.light-mode, [data-theme=\"light\"], .light-theme) para que la regla realmente aplique",
+        "verificacion post-build: dark base x1, light base tema-claro x1, light hover tema-claro x1, selectores .light-theme y data-theme x2, ?v=6.54 x2, cache v48",
+        "npm run build OK"
+      ],
+      "commit": "v654_apply_css"
+    },
+    {
+      "fase": 78,
+      "version": "v6.55",
+      "estado": "COMPLETADO",
+      "descripcion": "Título del diario dinámico en función de la fecha seleccionada en el selector o calendario",
+      "acciones": [
+        "bumps index.html ?v=6.55 x2, sw.js planify-cache-v49",
+        "window.actualizarTituloSegunFecha(fechaISO): busca evento en storage y fija tituloEl.textContent = texto del evento o \"Rutina Diaria\"",
+        "ADAPTACION CLAVE REAL: el snippet usaba EVENTOS_PLANIFY/PLANIFY_DATA/planify_eventos (inexistentes); el app real persiste eventos en localStorage \"horario_eventos_cal\" (objeto por fecha YYYY-MM-DD con {texto,notas,color,sticker}) - usado como fuente de datos real",
+        "ADAPTACION dataset.fecha: en el clic de .cal-dia se usa calDia.dataset.fecha (lo setea renderizarCalendario) en vez del valor del input date, para que el titulo siga al dia clickeado aunque el input no se haya actualizado (evita regresion vs v6.52)",
+        "EXTRA: inicializacion al cargar (DOMContentLoaded) con el valor del input date para eliminar el bug del titulo global persistido al abrir la app",
+        "insercion: antes de la junction ,function(){const e={salud con slice(0,j+1)+iife+\",\\n\"+slice(j+1) (primer intento sin coma -> SyntaxError; restaurado via git checkout y reintentado)",
+        "verificacion: node --check, npm run check, npm run build OK; VM test sobre bloque compilado (wrapper function(){...}() conservado por terser por la declaracion interna function e): 9/9 PASS (carga inicial, fecha con evento, fecha sin evento, change listener date/no-date, click .cal-dia con/sin evento, click fuera, input vacio)"
+      ],
+      "commit": "v655_apply_js"
+    },
+    {
+      "fase": 79,
+      "version": "v6.56",
+      "estado": "COMPLETADO",
+      "descripcion": "Activación funcional del botón + en lista de tareas con menú desplegable autocompletable de sugerencias rápidas",
+      "acciones": [
+        "bumps index.html ?v=6.56 x2, sw.js planify-cache-v50",
+        "ADAPTACION SELECTORES: estructura real = input#new-todo-input (placeholder \"Nueva tarea...\"), button#add-todo-btn, ul#todo-list.notebook-todo-list dentro de .todo-input-group (los selectores del snippet .Lista_de_Tareas/.lista-tareas-items/.tareas-container no existen en el HTML)",
+        "CONFLICTO RESUELTO: existia listener previo en add-todo-btn (agrega li plano sin checkbox/eliminar). El modulo clona el boton (cloneNode+replaceChild) para eliminar listeners previos y evita doble alta; idempotente via dataset.v656 (el 2do init en setTimeout 500 se salta)",
+        "Clase .contenedor-input-tareas agregada al .todo-input-group por JS para que el CSS posicional (relative/flex) aplique al contenedor real",
+        "Items como li (no div) para respetar ul#todo-list: checkbox + span + boton eliminar X; checkbox tacha/opacidad; Enter agrega; clic sugerencia agrega+limpia+cierra; click fuera cierra; focus/input filtran en vivo",
+        "CSS v6.56 anexado al final de main.css: .contenedor-input-tareas, .desplegable-sugerencias-tareas (absolute top 105%, z-index 100, max-height 180px), .activo, .opcion-sugerencia-tarea (+hover), variantes body.tema-claro",
+        "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro SUGERENCIAS_BASE->e, inicializarModuloTareas->t): 23/23 PASS (menu, clon boton, 7 sugerencias, seleccion, filtro, boton con texto, Enter, eliminar, checkbox, click fuera, focus)",
+        "stubs del test: fakeEl con innerHTML setter que limpia children (realismo DOM), replaceChild con registro, sin bucles en contains"
+      ],
+      "commit": "v656_apply_js"
+    },
+    {
+      "fase": 80,
+      "version": "v6.57",
+      "estado": "COMPLETADO",
+      "descripcion": "Neutralización inclusiva de género en la tarjeta de agradecimientos y placeholder",
+      "acciones": [
+        "bumps index.html ?v=6.57 x2, sw.js planify-cache-v51",
+        "ADAPTACION markup real (.grateful-section): span.section-title data-i18n=grateful \"Agradecida por\" -> \"Agradecimientos\"; textarea#grateful-input placeholder \"¿De qué estás agradecida hoy?...\" -> \"¿Qué agradeces el día de hoy?...\" (se conservan ids/classes existentes; el snippet sugeria .tarjeta-agradecimiento/#input-agradecimiento que no existen en el HTML)",
+        "js/app.js TRADUCCIONES es: grateful:\"Agradecimientos\", gratefulPh:\"¿Qué agradeces el día de hoy?...\" (claves i18n intactas)",
+        "en: ya era neutral (\"I am Grateful for\"/\"What are you grateful for today?...\") - sin cambios",
+        "verificacion post-build: html titulo x1, html placeholder x1, js es x1 c/u, 0 residuales femeninos (agradecida=0 en html y js), ?v=6.57 x2, cache v51, build OK"
+      ],
+      "commit": "v657_apply_text"
+    },
+    {
+      "fase": 81,
+      "version": "v6.58",
+      "estado": "COMPLETADO",
+      "descripcion": "Integración de botones con desplegable de sugerencias contextuales e ideas inspiradoras en Metas, Agradecimientos y Afirmaciones",
+      "acciones": [
+        "bumps index.html ?v=6.58 x2, sw.js planify-cache-v52",
+        "ADAPTACION SELECTORES REALES: .goals-section, .grateful-section, .affirmations-section (cada una con span.section-title + textarea#goals-input/#grateful-input/#affirmations-input). Los selectores del snippet ([class*=\"Metas\"], #metas-section, etc.) no existian en el HTML",
+        "FIX DEL SNIPPET: el titulo se busca con .section-title, h3, h2, label, .titulo-seccion (el snippet omitia .section-title que es el elemento real); el textarea se busca scopeado dentro del contenedor (contenedor.querySelector(\"textarea, input\")) porque document.querySelector(\"textarea, input\") del snippet devolveria el PRIMER campo del documento",
+        "Botón ✨ Ideas + en wrapper .encabezado-con-sugerencias (flex space-between); menu .menu-ideas-flotante (absolute top 100% right 0, z-index 120, max-height 200px) con 5 opciones por seccion; clic opcion: inserta (concatena con \\n si hay texto), dispara Event input para autoguardado, cierra",
+        "Cierre: al abrir un menu se cierran los demas; toggle en el mismo boton; click en documento cierra todos",
+        "CSS v6.58 anexado al final de main.css + variantes body.tema-claro",
+        "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro BANCO_IDEAS->e): 17/17 PASS (3 botones, 5 opciones c/u, apertura, insercion, concat, evento input, cierre entre menus, toggle, click fuera, idempotencia doble init)",
+        "stub test: querySelector con selectores compuestos (coma) para emular el DOM real"
+      ],
+      "commit": "v658_apply_js"
+    },
+    {
+      "fase": 82,
+      "version": "v6.59",
+      "estado": "COMPLETADO",
+      "descripcion": "Depuración de UI: eliminación del botón duplicado de Tema Oscuro en la pestaña Vista del panel de control",
+      "acciones": [
+        "bumps index.html ?v=6.59 x2, sw.js planify-cache-v53",
+        "index.html: removido <button class=\"sp-btn\" id=\"btn-dark-mode\" onclick=\"toggleDarkMode()\" aria-label=\"Alternar modo oscuro\">🌙 Oscuro</button> (ubicado tras .view-toggle en la pestaña Vista); reemplazado por comentario de limpieza (el minificador lo elimina en build)",
+        "Seguridad verificada: js/app.js referencia btn-dark-mode SOLO con guarda a&&(a.textContent=...) dentro de toggleTheme, y toggleDarkMode()->toggleTheme(); el selector principal #btn-tema (☀️/🌙) de la barra superior queda intacto",
+        "LIMPIEZA EXTRA: eliminada la regla ARIA muerta del boton en scripts/optimize-a11y.js (linea 47) que generaba WARN permanente en cada build por el boton inexistente",
+        "verificacion: 0 ocurrencias de btn-dark-mode/Oscuro en index.html y css; build OK sin warning de btn-dark-mode (los demas WARN ARIA son preexistentes por normalizacion de comillas del minificador)"
+      ],
+      "commit": "v659_apply_html"
+    },
+    {
+      "fase": 83,
+      "version": "v6.60",
+      "estado": "COMPLETADO",
+      "descripcion": "Reestructuración de arquitectura de navegación, sincronización bi-direccional entre panel lateral y barra inferior, y fix de vista Anual",
+      "acciones": [
+        "bumps index.html ?v=6.60 x2, sw.js planify-cache-v54",
+        "ARQUITECTURA REAL: barra flotante = .tab-btn[data-tab] con onclick cambiarTab (diario/semanal/mensual) -> #view-diario/#view-semanal/#view-mensual; panel Vista = .planner-type-selector button[data-type] (tipos del GRID: diario/semanal/mensual/anual/personalizado) + .view-toggle (table/dashboard). #view-table esta ANIDADA dentro de #view-semanal. cambiarVista y cambiarTipoPlanificador son funciones globales (NO window); cambiarTab SI es window.cambiarTab",
+        "window.cambiarVistaPlanify(vista): dispatcher unico - diario/semanal/mensual -> window.cambiarTab(vista); anual -> reparar datos + cambiarTab(semanal) + cambiarVista(table) + cambiarTipoPlanificador(anual) + tabs flotantes inactivos; dashboard/table -> cambiarVista; sincroniza .planner-type-selector + view-toggle en ambos casos; persiste localStorage.planify_vista_activa",
+        "FIX ANUAL: PLANNER_TYPES ya tenia anual (12 meses + getDefaultAnual); el bug LUN-DOM venia de datos corruptos en localStorage horario_data_anual. repararDatosAnuales() valida dias (12, ENERGO..DICIEMBRE) y si no, removeItem para regenerar defaults - la vista anual muestra el grid de 12 meses",
+        "INTERCEPTOR DE CLICKS (delegacion document, SIN preventDefault para no romper onclick inline): botones [data-type] (excepto personalizado), .tab-btn[data-tab] diario/semanal/mensual (tab-perfil del panel lateral IGNORADO), #btn-view-table/#btn-view-dashboard",
+        "Init unico: guard inicioAplicado evita doble listener (DOMContentLoaded + setTimeout 300); aplica vista guardada al cargar",
+        "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro: inicioAplicado->e, VincularEventosNavegacion->a): 27/27 PASS (init, guard, semanal, anual corrupto/valido, diario/notas, mensual, dashboard, default, clicks tipos/tabs/toggle, personalizado y tab-perfil ignorados, click fuera)"
+      ],
+      "commit": "v660_apply_js"
+    },
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    {
+      "fase": 84,
+      "version": "v6.61",
+      "estado": "COMPLETADO",
+      "descripcion": "4ta pestana Anual en barra inferior + limpieza de botones duplicados del panel lateral",
+      "acciones": [
+        "bumps index.html ?v=6.61 x2, sw.js planify-cache-v55",
+        "HTML: <button class=\"tab-btn\" data-tab=\"anual\" onclick=\"cambiarVistaPlanify('anual')\"> 🗓️ <span data-i18n=\"tab_anual\">Anual</span> añadido tras boton mensual en .bottom-nav",
+        "HTML: bloque <div class=\"planner-type-selector\"> (5 botones data-type) REMOVIDO del panel lateral -> los tipos del GRID solo se eligen desde la pestaña Anual",
+        "Dispatcher v6.61 = mismo que v6.60 salvo: sync solo .bottom-nav .tab-btn[data-tab] (diario/semanal/mensual activo, anual inactivo); anual -> repararDatosAnuales + cambiarTab(semanal) + cambiarVista(table) + cambiarTipoPlanificador(anual) + todas las tabs inactivas + [data-tab=anual] activa",
+        "Interceptor ahora escucha solo .bottom-nav .tab-btn[data-tab], .view-toggle button (ya no [data-type] porque el selector no existe)",
+        "i18n: tab_anual:\"Anual\" (es) y tab_anual:\"Yearly\" (en) tras tab_mensual",
+        "CSS del snippet .barra-flotante-vistas NO aplica (clase inexistente; .bottom-nav/.tab-btn ya estilizan en css/main.css)",
+        "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro a e/a de nuevo): 17/17 PASS (init, anual secuencia+datos corruptos+pestana activa, mensual, diario/notas, dashboard, guard DOMContentLoaded, vista guardada re-aplicada, clicks pestanas y view-toggle, click fuera)"
+      ],
+      "commit": "v661_apply_js"
+    }
+  ]
 }

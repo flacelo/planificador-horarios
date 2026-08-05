@@ -419,6 +419,20 @@
     "npm run build OK"
    ],
    "commit": "v653_apply_css"
+  },
+  {
+   "fase": 77,
+   "version": "v6.54",
+   "estado": "COMPLETADO",
+   "descripcion": "Adaptación CSS condicional por tema (light/dark) para la visibilidad del icono de fecha",
+   "acciones": [
+    "bumps index.html ?v=6.54 x2, sw.js planify-cache-v48",
+    "CSS v6.54 anexado al final de css/main.css (pisa al v6.53 por !important + orden): dark default con invert(0.85) saturate(3) y hover scale(1.12); light con invert(0.3) saturate(5) hue-rotate(190deg) brightness(0.7) y hover mas oscuro con drop-shadow sky",
+    "DEVIACION DOCUMENTADA: la app usa body.tema-claro como modo claro real (verificado: light-mode/light-theme/data-theme = 0 usos en js y css; tema-claro = 53 usos). Se anadieron selectores body.tema-claro al grupo light (y hover) ademas de los del snippet (body.light-mode, [data-theme=\"light\"], .light-theme) para que la regla realmente aplique",
+    "verificacion post-build: dark base x1, light base tema-claro x1, light hover tema-claro x1, selectores .light-theme y data-theme x2, ?v=6.54 x2, cache v48",
+    "npm run build OK"
+   ],
+   "commit": "v654_apply_css"
   }
  ]
 }

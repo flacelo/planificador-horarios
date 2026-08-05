@@ -321,6 +321,25 @@
     "npm run check OK, build OK"
    ],
    "commit": "v647_apply_js"
+  },
+  {
+   "fase": 71,
+   "version": "v6.48",
+   "estado": "COMPLETADO",
+   "descripcion": "Captura explicita del primer boton de pegatina del modal asignando emoji 🚑",
+   "acciones": [
+    "DIAGNOSTICO: el primer boton del modal tiene data-sticker=\"\" (vacio) -> seleccionarSticker guarda \"\" -> render usa y.emoji||\"colores\" -> obtenerEmojiCorrecto(\"colores\") -> 🖼️ (paisaje). Ese es el bug real, no un valor \"colores\" guardado",
+    "bumps index.html ?v=6.48 x2",
+    "sw.js planify-cache-v42",
+    "PATCH guardarEvento (minificado): modal-evento-sticker\").value || \"ambulancia\" -> si se selecciona el primer boton (valor vacio) se guarda sticker:\"ambulancia\" -> renderiza 🚑; tambien corrige eventos legacy con sticker vacio",
+    "IIFE v6.48 insertado tras v6.47: listener de clic document que marca dataset.stickerExacto=\"🚑\" en el primer boton/[data-sticker] con 🚑 (guard de parentNode anadido)",
+    "obtenerEmojiCorrecto v6.48: caso especial val===\"colores\"&&indexBoton===0 -> 🚑, lookup exacto, emoji directo con 🛏️->🛌, keywords parciales ambulan/emergen/salud->🚑 y cama/dormir/sleep->🛌, fallback 📌",
+    "DEVIACION DOCUMENTADA: el snippet del usuario traia EMOJI_MAP_v648 solo con 11 claves (regresion: los otros 10 stickers del modal habrian renderizado 📌); se completo el mapa con el diccionario v6.47 integro (56 claves) para no regresionar",
+    "verificacion post-build: 5 defs obtenerEmojiCorrecto/inyectarStickerEnEvento, patch guardarEvento x1, patron colores&&indexBoton x1, keyword sleep x2, ?v=6.48 x2, cache v42",
+    "test aislado del IIFE v6.48 (@5269..7109): las 12 claves reales del modal (data-sticker=\"\" rinde 📌 por diseno, cubierto por el patch de guardarEvento) + colores->🖼️, colores+index0->🚑, stickers, 🛏️->🛌, sleeping->🛌, fallbacks, TODOS OK",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v648_apply_js"
   }
  ]
 }

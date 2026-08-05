@@ -480,6 +480,23 @@
     "verificacion post-build: html titulo x1, html placeholder x1, js es x1 c/u, 0 residuales femeninos (agradecida=0 en html y js), ?v=6.57 x2, cache v51, build OK"
    ],
    "commit": "v657_apply_text"
+  },
+  {
+   "fase": 81,
+   "version": "v6.58",
+   "estado": "COMPLETADO",
+   "descripcion": "Integración de botones con desplegable de sugerencias contextuales e ideas inspiradoras en Metas, Agradecimientos y Afirmaciones",
+   "acciones": [
+    "bumps index.html ?v=6.58 x2, sw.js planify-cache-v52",
+    "ADAPTACION SELECTORES REALES: .goals-section, .grateful-section, .affirmations-section (cada una con span.section-title + textarea#goals-input/#grateful-input/#affirmations-input). Los selectores del snippet ([class*=\"Metas\"], #metas-section, etc.) no existian en el HTML",
+    "FIX DEL SNIPPET: el titulo se busca con .section-title, h3, h2, label, .titulo-seccion (el snippet omitia .section-title que es el elemento real); el textarea se busca scopeado dentro del contenedor (contenedor.querySelector(\"textarea, input\")) porque document.querySelector(\"textarea, input\") del snippet devolveria el PRIMER campo del documento",
+    "Botón ✨ Ideas + en wrapper .encabezado-con-sugerencias (flex space-between); menu .menu-ideas-flotante (absolute top 100% right 0, z-index 120, max-height 200px) con 5 opciones por seccion; clic opcion: inserta (concatena con \\n si hay texto), dispara Event input para autoguardado, cierra",
+    "Cierre: al abrir un menu se cierran los demas; toggle en el mismo boton; click en documento cierra todos",
+    "CSS v6.58 anexado al final de main.css + variantes body.tema-claro",
+    "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro BANCO_IDEAS->e): 17/17 PASS (3 botones, 5 opciones c/u, apertura, insercion, concat, evento input, cierre entre menus, toggle, click fuera, idempotencia doble init)",
+    "stub test: querySelector con selectores compuestos (coma) para emular el DOM real"
+   ],
+   "commit": "v658_apply_js"
   }
  ]
 }

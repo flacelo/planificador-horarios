@@ -466,6 +466,20 @@
     "stubs del test: fakeEl con innerHTML setter que limpia children (realismo DOM), replaceChild con registro, sin bucles en contains"
    ],
    "commit": "v656_apply_js"
+  },
+  {
+   "fase": 80,
+   "version": "v6.57",
+   "estado": "COMPLETADO",
+   "descripcion": "Neutralización inclusiva de género en la tarjeta de agradecimientos y placeholder",
+   "acciones": [
+    "bumps index.html ?v=6.57 x2, sw.js planify-cache-v51",
+    "ADAPTACION markup real (.grateful-section): span.section-title data-i18n=grateful \"Agradecida por\" -> \"Agradecimientos\"; textarea#grateful-input placeholder \"¿De qué estás agradecida hoy?...\" -> \"¿Qué agradeces el día de hoy?...\" (se conservan ids/classes existentes; el snippet sugeria .tarjeta-agradecimiento/#input-agradecimiento que no existen en el HTML)",
+    "js/app.js TRADUCCIONES es: grateful:\"Agradecimientos\", gratefulPh:\"¿Qué agradeces el día de hoy?...\" (claves i18n intactas)",
+    "en: ya era neutral (\"I am Grateful for\"/\"What are you grateful for today?...\") - sin cambios",
+    "verificacion post-build: html titulo x1, html placeholder x1, js es x1 c/u, 0 residuales femeninos (agradecida=0 en html y js), ?v=6.57 x2, cache v51, build OK"
+   ],
+   "commit": "v657_apply_text"
   }
  ]
 }

@@ -285,6 +285,24 @@
     "npm run check OK, build OK"
    ],
    "commit": "v645_apply_js"
+  },
+  {
+   "fase": 69,
+   "version": "v6.46",
+   "estado": "COMPLETADO",
+   "descripcion": "Mapeo exhaustivo de las 12 pegatinas del modal a sus emojis exactos",
+   "acciones": [
+    "bumps index.html ?v=6.46 x2",
+    "sw.js planify-cache-v40",
+    "IIFE v6.46 con DICCIONARIO_PEGATINAS (56 claves): ambulancia/carrito/emergencia/auto-medico->🚑, hospital/clinica/salud/medico->🏥, cama/dormir/descanso/sueño->🛏️, colores/paleta/cuadros/imagenes/arte->🖼️, comida/pizza/almuerzo/cena->🍕, idea/foco/pensamiento/creatividad->💡, corazon/amor/heart/love->💖, trabajo/maletin/oficina/empleo->💼, gym/ejercicio/deporte/gimnasio->🏋️, avion/viaje/vuelo/aeropuerto->✈️, musica/nota/cancion/sonido->🎵, cumple/cumpleaños/pastel/torta->🎂, libros/libro/estudio/clases/lectura->📚",
+    "obtenerEmojiCorrecto v6.46: emoji directo (len<=4 y sin [a-zA-Z0-9_-]), lookup exacto, coincidencia parcial includes(), fallback neutro 📌 (ya no paisaje)",
+    "inyectarStickerEnEvento v6.46 re-escrito con cssText completo (mismo metodo que v6.45: span .cal-sticker-visible prepend)",
+    "IIFE insertado TRAS el IIFE v6.45 (junction con v6.42), union por coma -> la def v6.46 pisa a v6.45 y v6.44",
+    "verificacion post-build: DICCIONARIO completo presente, 3 defs de obtenerEmojiCorrecto/inyectarStickerEnEvento (v6.44/v6.45/v6.46), fallback 📌 x3, render y.emoji||colores intacto, ?v=6.46 x2, cache v40",
+    "test aislado del IIFE v6.46 extraido del build: 44 claves + emoji directo + PIZZA mayus + undefined/xyz fallback, TODOS OK (load test completo de la app no usable: iniciar() ejecuta render con APIs DOM profundas no relacionadas con el cambio)",
+    "npm run check OK, build OK"
+   ],
+   "commit": "v646_apply_js"
   }
  ]
 }

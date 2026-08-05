@@ -354,6 +354,22 @@
     "npm run build OK"
    ],
    "commit": "v649_apply_css"
+  },
+  {
+   "fase": 73,
+   "version": "v6.50",
+   "estado": "COMPLETADO",
+   "descripcion": "Centrado de tarjetas de eventos en celdas de calendario mensual e inyeccion de notas/detalles secundarios",
+   "acciones": [
+    "bumps index.html ?v=6.50 x2, sw.js planify-cache-v44",
+    "CSS v6.50 anexado al final de css/main.css: .cal-dia (flex column, justify space-between, min-height 85px, padding 6px 8px) PISA al v6.49 (misma especificidad + !important, gana el ultimo); numero .cal-numero/>span:first-child (0.9rem bold, margin-bottom 4px); .cal-evento-contenedor (column centrado, margin auto 0 -> centrado vertical, fondo rgba(255,255,255,.06), radius 6px); .cal-evento-titulo (0.88rem semibold, flex centrado con gap 4px); .cal-evento-detalles (0.75rem, opacity .8, line-height 1.1)",
+    "JS patch 1: el numero del dia ya NO es textContent suelto: se crea span.cal-numero como primer hijo (la regla CSS del numero ahora aplica de verdad)",
+    "JS patch 2: render del evento en renderizarCalendario reemplazado: span.cal-evento-mini -> div.cal-evento-contenedor con borderLeft 3px del color del evento + div.cal-evento-titulo (sticker via inyectarStickerEnEvento + span con texto) + div.cal-evento-detalles solo si hay notas",
+    "DEVIACION DOCUMENTADA del snippet: el esquema real del evento es {texto, notas, color, sticker} (guardarEvento) -> se uso y.texto||\"Sin título\" y y.notas (el snippet usaba titulo/nombre/descripcion/detalles inexistentes); el fallback de sticker en render se cambio de \"colores\" a \"ambulancia\" (coherente con v6.48: sticker vacio no debe pintar el paisaje)",
+    "verificacion post-build: cal-evento-contenedor/titulo/detalles x1 en JS, span.cal-numero x1, borderLeft 3px x1, texto Sin titulo x1, fallback ambulancia x1 (minificador renombro y->h), CSS con min-height:85px, contenedor/titulo/detalles completos, ?v=6.50 x2, cache v44",
+    "npm run build OK"
+   ],
+   "commit": "v650_apply_css_js"
   }
  ]
 }

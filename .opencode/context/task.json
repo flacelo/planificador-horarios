@@ -449,6 +449,23 @@
     "verificacion: node --check, npm run check, npm run build OK; VM test sobre bloque compilado (wrapper function(){...}() conservado por terser por la declaracion interna function e): 9/9 PASS (carga inicial, fecha con evento, fecha sin evento, change listener date/no-date, click .cal-dia con/sin evento, click fuera, input vacio)"
    ],
    "commit": "v655_apply_js"
+  },
+  {
+   "fase": 79,
+   "version": "v6.56",
+   "estado": "COMPLETADO",
+   "descripcion": "Activación funcional del botón + en lista de tareas con menú desplegable autocompletable de sugerencias rápidas",
+   "acciones": [
+    "bumps index.html ?v=6.56 x2, sw.js planify-cache-v50",
+    "ADAPTACION SELECTORES: estructura real = input#new-todo-input (placeholder \"Nueva tarea...\"), button#add-todo-btn, ul#todo-list.notebook-todo-list dentro de .todo-input-group (los selectores del snippet .Lista_de_Tareas/.lista-tareas-items/.tareas-container no existen en el HTML)",
+    "CONFLICTO RESUELTO: existia listener previo en add-todo-btn (agrega li plano sin checkbox/eliminar). El modulo clona el boton (cloneNode+replaceChild) para eliminar listeners previos y evita doble alta; idempotente via dataset.v656 (el 2do init en setTimeout 500 se salta)",
+    "Clase .contenedor-input-tareas agregada al .todo-input-group por JS para que el CSS posicional (relative/flex) aplique al contenedor real",
+    "Items como li (no div) para respetar ul#todo-list: checkbox + span + boton eliminar X; checkbox tacha/opacidad; Enter agrega; clic sugerencia agrega+limpia+cierra; click fuera cierra; focus/input filtran en vivo",
+    "CSS v6.56 anexado al final de main.css: .contenedor-input-tareas, .desplegable-sugerencias-tareas (absolute top 105%, z-index 100, max-height 180px), .activo, .opcion-sugerencia-tarea (+hover), variantes body.tema-claro",
+    "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro SUGERENCIAS_BASE->e, inicializarModuloTareas->t): 23/23 PASS (menu, clon boton, 7 sugerencias, seleccion, filtro, boton con texto, Enter, eliminar, checkbox, click fuera, focus)",
+    "stubs del test: fakeEl con innerHTML setter que limpia children (realismo DOM), replaceChild con registro, sin bucles en contains"
+   ],
+   "commit": "v656_apply_js"
   }
  ]
 }

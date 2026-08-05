@@ -388,6 +388,23 @@
     "npm run build OK"
    ],
    "commit": "v651_apply_js"
+  },
+  {
+   "fase": 75,
+   "version": "v6.52",
+   "estado": "COMPLETADO",
+   "descripcion": "Sincronización automática de título diario al hacer clic en evento de calendario mensual",
+   "acciones": [
+    "bumps index.html ?v=6.52 x2, sw.js planify-cache-v46",
+    "IIFE v6.52 insertado tras v6.51 (junction con v6.42): window.actualizarTituloDiarioDesdeEvento(nuevoTitulo) -> textContent en #titulo-rutina-diaria (fallback .rutina-diaria-titulo, h2.rutina) + guarda en planify_titulo_rutina; default \"Rutina Diaria\" si vacio",
+    "listener document click con closest(\".cal-dia\"): si la celda tiene .cal-evento-titulo/.cal-evento/.cell-content -> clona, remueve .cal-sticker-visible (sticker no debe ir al titulo), innerText limpio -> actualizarTituloDiarioDesdeEvento; si la celda no tiene eventos -> reset a \"Rutina Diaria\"",
+    "NOTA BUILD: terser colapso el IIFE (sin scope necesario) -> window.actualizarTituloDiarioDesdeEvento=function(...) queda como secuencia top-level; verificado asi",
+    "verificacion post-build: def global x1, llamadas x2, closest(\".cal-dia\") x2, selector evento x1, cloneNode x3 (con otros usos preexistentes), ?v=6.52 x2, cache v46",
+    "simulacion de clics con el codigo minificado real: dia con evento -> titulo \"INICIO DE CLASES\" SIN sticker (clon + remove) y guardado en storage OK; dia vacio -> reset \"Rutina Diaria\" OK; clic fuera de .cal-dia -> intacto OK",
+    "interaccion con v6.51: el titulo editable sigue funcionando (blur guarda); v6.52 lo sobrescribe al hacer clic en un dia del calendario mensual (comportamiento deseado)",
+    "npm run build OK"
+   ],
+   "commit": "v652_apply_js"
   }
  ]
 }

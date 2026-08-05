@@ -511,6 +511,22 @@
     "verificacion: 0 ocurrencias de btn-dark-mode/Oscuro en index.html y css; build OK sin warning de btn-dark-mode (los demas WARN ARIA son preexistentes por normalizacion de comillas del minificador)"
    ],
    "commit": "v659_apply_html"
+  },
+  {
+   "fase": 83,
+   "version": "v6.60",
+   "estado": "COMPLETADO",
+   "descripcion": "Reestructuración de arquitectura de navegación, sincronización bi-direccional entre panel lateral y barra inferior, y fix de vista Anual",
+   "acciones": [
+    "bumps index.html ?v=6.60 x2, sw.js planify-cache-v54",
+    "ARQUITECTURA REAL: barra flotante = .tab-btn[data-tab] con onclick cambiarTab (diario/semanal/mensual) -> #view-diario/#view-semanal/#view-mensual; panel Vista = .planner-type-selector button[data-type] (tipos del GRID: diario/semanal/mensual/anual/personalizado) + .view-toggle (table/dashboard). #view-table esta ANIDADA dentro de #view-semanal. cambiarVista y cambiarTipoPlanificador son funciones globales (NO window); cambiarTab SI es window.cambiarTab",
+    "window.cambiarVistaPlanify(vista): dispatcher unico - diario/semanal/mensual -> window.cambiarTab(vista); anual -> reparar datos + cambiarTab(semanal) + cambiarVista(table) + cambiarTipoPlanificador(anual) + tabs flotantes inactivos; dashboard/table -> cambiarVista; sincroniza .planner-type-selector + view-toggle en ambos casos; persiste localStorage.planify_vista_activa",
+    "FIX ANUAL: PLANNER_TYPES ya tenia anual (12 meses + getDefaultAnual); el bug LUN-DOM venia de datos corruptos en localStorage horario_data_anual. repararDatosAnuales() valida dias (12, ENERGO..DICIEMBRE) y si no, removeItem para regenerar defaults - la vista anual muestra el grid de 12 meses",
+    "INTERCEPTOR DE CLICKS (delegacion document, SIN preventDefault para no romper onclick inline): botones [data-type] (excepto personalizado), .tab-btn[data-tab] diario/semanal/mensual (tab-perfil del panel lateral IGNORADO), #btn-view-table/#btn-view-dashboard",
+    "Init unico: guard inicioAplicado evita doble listener (DOMContentLoaded + setTimeout 300); aplica vista guardada al cargar",
+    "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro: inicioAplicado->e, VincularEventosNavegacion->a): 27/27 PASS (init, guard, semanal, anual corrupto/valido, diario/notas, mensual, dashboard, default, clicks tipos/tabs/toggle, personalizado y tab-perfil ignorados, click fuera)"
+   ],
+   "commit": "v660_apply_js"
   }
  ]
 }

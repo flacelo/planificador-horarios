@@ -497,6 +497,20 @@
     "stub test: querySelector con selectores compuestos (coma) para emular el DOM real"
    ],
    "commit": "v658_apply_js"
+  },
+  {
+   "fase": 82,
+   "version": "v6.59",
+   "estado": "COMPLETADO",
+   "descripcion": "Depuración de UI: eliminación del botón duplicado de Tema Oscuro en la pestaña Vista del panel de control",
+   "acciones": [
+    "bumps index.html ?v=6.59 x2, sw.js planify-cache-v53",
+    "index.html: removido <button class=\"sp-btn\" id=\"btn-dark-mode\" onclick=\"toggleDarkMode()\" aria-label=\"Alternar modo oscuro\">🌙 Oscuro</button> (ubicado tras .view-toggle en la pestaña Vista); reemplazado por comentario de limpieza (el minificador lo elimina en build)",
+    "Seguridad verificada: js/app.js referencia btn-dark-mode SOLO con guarda a&&(a.textContent=...) dentro de toggleTheme, y toggleDarkMode()->toggleTheme(); el selector principal #btn-tema (☀️/🌙) de la barra superior queda intacto",
+    "LIMPIEZA EXTRA: eliminada la regla ARIA muerta del boton en scripts/optimize-a11y.js (linea 47) que generaba WARN permanente en cada build por el boton inexistente",
+    "verificacion: 0 ocurrencias de btn-dark-mode/Oscuro en index.html y css; build OK sin warning de btn-dark-mode (los demas WARN ARIA son preexistentes por normalizacion de comillas del minificador)"
+   ],
+   "commit": "v659_apply_html"
   }
  ]
 }

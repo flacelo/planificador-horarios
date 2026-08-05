@@ -43,8 +43,6 @@ function optimizeHTML(html) {
     { from: '<button onclick="cambiarVista(\'dashboard\')" id="btn-view-dashboard">📊 Dashboard</button>', to: '<button onclick="cambiarVista(\'dashboard\')" id="btn-view-dashboard" aria-label="Vista dashboard">📊 Dashboard</button>' },
     // fullscreen button
     { from: '<button class="sp-btn" id="btn-fullscreen" onclick="conmutarPantallaCompleta()">⛶ Pantalla completa</button>', to: '<button class="sp-btn" id="btn-fullscreen" onclick="conmutarPantallaCompleta()" aria-label="Alternar pantalla completa">⛶ Pantalla completa</button>' },
-    // dark mode
-    { from: '<button class="sp-btn" id="btn-dark-mode" onclick="toggleDarkMode()">🌙 Oscuro</button>', to: '<button class="sp-btn" id="btn-dark-mode" onclick="toggleDarkMode()" aria-label="Alternar modo oscuro">🌙 Oscuro</button>' },
     // close-other-sessions
     { from: '<button class="sp-btn" id="btn-cerrar-otras" onclick="cerrarOtrasSesiones()" style="font-size:0.78em;width:100%">🔒 Cerrar sesión en otros dispositivos</button>', to: '<button class="sp-btn" id="btn-cerrar-otras" onclick="cerrarOtrasSesiones()" style="font-size:0.78em;width:100%" aria-label="Cerrar sesiones en otros dispositivos">🔒 Cerrar sesión en otros dispositivos</button>' },
     // CTA link (buy license)

@@ -340,6 +340,20 @@
     "npm run check OK, build OK"
    ],
    "commit": "v648_apply_js"
+  },
+  {
+   "fase": 72,
+   "version": "v6.49",
+   "estado": "COMPLETADO",
+   "descripcion": "Restructuración CSS de celdas de calendario mensual: número superior izquierdo y contenedor de eventos inferior/centrado",
+   "acciones": [
+    "bumps index.html ?v=6.49 x2 (css/main.css?v=6.49 y js/app.js?v=6.49)",
+    "sw.js planify-cache-v43",
+    "bloque v6.49 anexado al FINAL de css/main.css: .cal-dia flex column (numero arriba, justify flex-start, height 100%), numero .cal-numero/>span:first-child alineado a la izquierda (0.95rem bold, margin-bottom 6px), eventos .cal-evento/.cal-evento-mini/.cell-content con width 100% flex row, padding 4px 6px, border-radius 6px y fondo rgba(255,255,255,.05)",
+    "verificacion post-build (css compilado): 3 reglas presentes tal cual (el minificador conservo 0.95rem/0.9), ?v=6.49 x2, cache v43",
+    "npm run build OK"
+   ],
+   "commit": "v649_apply_css"
   }
  ]
 }

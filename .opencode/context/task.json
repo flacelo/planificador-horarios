@@ -637,6 +637,22 @@
         "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado: 22/22 PASS (escenario bug recarga con dias corrompidos -> 12 meses, simetrico semanal, cambio real anual/semanal, aliases annual/weekly, mensual/dashboard/undefined sin forzar, datos guardados validos/invalidos, fallback sin global, doble clic idempotente, persistencia)"
       ],
       "commit": "v663_apply_js"
+    },
+    {
+      "fase": 87,
+      "version": "v6.64",
+      "estado": "COMPLETADO",
+      "descripcion": "Reconstruccion dinamica del header y columnas al conmutar entre Semanal (LUN-DOM) y Anual (ENE-DIC)",
+      "acciones": [
+        "bumps index.html ?v=6.64 x2, sw.js planify-cache-v58",
+        "CAUSA RAIZ: guardarDatosTipo(e) guarda {dias: dias actuales, filas: filas} SIN validar contra el tipo -> si en algun momento el global dias tenia los 12 meses (mutacion por aplicarIdioma/flujos previos) mientras plannerType=\"semanal\", la clave horario_data_semanal queda con dias mensuales; y el load path de cambiarTipoPlanificador restaura dias sin validar -> al volver a Semanal se muestran 12 columnas",
+        "FIX: window.forzarConmutacionGrid(modoTarget): (1) persiste horario_planner_type + planify_tipo_planificador (inerte); (2) si el tipo interno difiere -> cambiarTipoPlanificador(t) (carga filas+dias reales); (3) VALIDACION POST-CARGA: si dias no corresponde al modo (anual: 12 + ENERO..DICIEMBRE; semanal: 7 + LUNES..) -> dias = PLANNER_TYPES[t].dias.slice() (nombres completos; renderizar trunca a 3 letras con substring(0,3)); (4) renderizar() SIEMPRE -> reconstruccion explicita de #header-row y #tbody",
+        "Wrapper: window.cambiarVistaPlanify intercepta semanal/weekly/anual/annual -> forzarConmutacionGrid(normalizado) antes de delegar con el valor ORIGINAL al dispatcher previo (cadena v6.63->v6.62->v6.61 intacta: el v6.63 early-path valida de nuevo horario_data_t con la MISMA regla -> resultado consistente)",
+        "DESVIACIONES del snippet: (1) dias es let (NO window.dias): window.dias=[...] no mutaria el binding real -> asignacion desnuda dias= (mismo script, muta el top-level binding); (2) arreglos base del snippet en 3 letras (LUN/MAR... ENE/FEB...) -> se usa PLANNER_TYPES[t].dias (nombres completos LUNES..DOMINGO / ENERO..DICIEMBRE): el header ya trunca a 3 letras y los nombres completos preservan mapearEventosGCal (mapea {LUNES:1,...}) y el texto de recordatorios (dias[c] en checkReminders); (3) el listener DOM del snippet (textContent includes) NO se anade: es redundante con el interceptor delegado v6.61 (.bottom-nav .tab-btn[data-tab]) y rompe con i18n (Weekly/Yearly); el wrapper del dispatcher cubre todos los paths de clic",
+        "INSERCION: antes de la junction ,function(){const e={salud, elemento de cadena SIN ; final; Terser: ,function(){window.forzarConmutacionGrid=...}()",
+        "verificacion: node --check, npm run build OK; VM test bloque compilado: 19/19 PASS (bug reportado: anual->semanal con horario_data_semanal corrupto a 12 meses restaura 7 LUNES, sin datos, switch normal, early-returns ambas direcciones, aliases, mensual/dashboard/undefined sin forzar, fallback sin global, doble clic idempotente, ciclo anual<->semanal con ambas claves corruptas)"
+      ],
+      "commit": "v664_apply_js"
     }
   ]
 }

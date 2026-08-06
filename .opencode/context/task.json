@@ -1090,6 +1090,27 @@
         "vm_test": "ROLLBACK - no aplica (repositorio restaurado a v6.84)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.87",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 110 (v6.87): Ocultar boton Exportar JSON via CSS estatico",
+      "archivos": [
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "El bloque del usuario incluye button:contains(...) que NO es selector CSS valido (regla descartada por el navegador) y display:none solo para data-action/gestion-datos-json",
+        "El boton real es id=\"btn-export-json\" con texto \"🚨 Exportar JSON\" en index.html - se anadio regla efectiva #btn-export-json { display:none !important }",
+        "100% CSS, js/app.js NO modificado",
+        "Bump: ?v=6.86 -> ?v=6.87 (x2) y planify-cache-v80 -> planify-cache-v81"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "N/A - cambio 100% CSS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

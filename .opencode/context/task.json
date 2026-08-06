@@ -1007,6 +1007,27 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.83",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 106 (v6.83): Rollback definitivo a v6.81 estable (commit 81f8aa5) y actualizacion de version de cache a v77",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "git checkout 81f8aa5 -- index.html js/app.js css/main.css sw.js (solo sw.js/cs/main.css sin cambios pendientes)",
+        "Eliminado con el rollback: IIFE v6.82 (modulo reloj + boton hora actual)",
+        "Bump forzado: ?v=6.81 -> ?v=6.83 (x2 en index.html) y planify-cache-v75 -> planify-cache-v77 (sw.js) para descartar scripts defectuosos en navegadores/PWA"
+      ],
+      "verificacion": {
+        "build": "PENDIENTE",
+        "vm_test": "ROLLBACK - no aplica (repositorio restaurado a estado estable)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

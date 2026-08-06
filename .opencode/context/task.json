@@ -690,6 +690,28 @@
         "vm_test": "20/20 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.67",
+      "fecha": "2026-08-05",
+      "alcance": "Implementacion completa del Dashboard estilo SaaS Dark Premium con KPIs, grafica de barras neon, anillo por categoria y metricas dinamicas",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "Datos reales desde filas[].celdas[].done (estructura real de la app) en vez de horario_actividades (clave inexistente en la app)",
+        "Barras semanales y distribucion por DIA (LUN-DOM) con pct real de cumplimiento en vez de valores estaticos/random del spec (la app no tiene categorias por actividad)",
+        "Anillo y top-cat muestran el dia de mejor cumplimiento (texto dinamico con id dash-top-cat-pct)",
+        "renderDashboard() legacy (Chart.js) ya no se ejecuta al abrir dashboard: los wrappers de cambiarVista y cambiarVistaPlanify interceptan dashboard y no llaman al original, curando la pantalla oscura"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "25/25 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

@@ -669,6 +669,27 @@
         "vm_test": "24/24 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.66",
+      "fecha": "2026-08-05",
+      "alcance": "Integracion de cabeceras de rango semanal (Semana del X al Y de M, AAAA) y titulo mensual con botones de navegacion (◀ MES AAAA ▶) en barras barra-nav-fecha",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "Barras insertadas DENTRO de #view-semanal/#view-mensual (no en parentNode del spec) para que se oculten al cambiar de vista",
+        "cal-header legacy del calendario mensual ocultado via CSS (evita flechas duplicadas con nav-bar-mensual)",
+        "Meses y formato localizados segun _idiomaActual (MESES/MESES_EN)"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "20/20 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

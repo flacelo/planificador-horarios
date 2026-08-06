@@ -756,6 +756,29 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.70",
+      "fecha": "2026-08-05",
+      "alcance": "Binding universal del boton Dashboard del panel lateral, logs de diagnostico en consola, HTML_DASHBOARD_SAAS mejorado con metricas reales de localStorage",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "El binding usa capture:true para interceptar clics antes de otros listeners",
+        "Selector closeSelector(\"button,a,div,span\") captura cualquier elemento clickeable",
+        "horario_actividades NO existe como array real: fallback a [] en localStorage.getItem",
+        "CSS v6.70 añade #dashboard-view fullscreen (min-height:100vh) para ocupar todo el area de trabajo",
+        "Terser fusiona el IIFE v6.70 con el bloque v6.69 en un solo bloque de comas"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

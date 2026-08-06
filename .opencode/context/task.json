@@ -827,6 +827,29 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.73",
+      "fecha": "2026-08-05",
+      "alcance": "Event delegation global para botones de sidebar, remocion de boton redundante en cabecera semanal e inyeccion garantizada de overlay Dashboard",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "Terser tiene fusionados los IIFEs v6.61-v6.72 en un solo bloque: imposible reemplazo quirurgico del modulo v6.72, se inserta IIFE v6.73 nuevo antes de la junction",
+        "abrirOverlayDashboard() oculta primero los overlays legacy (v672, v671, #dashboard-view v6.67) para evitar apilamiento de pantallas",
+        "Delegacion global con capture:true evalua txt==dashboard / id incluye dashboard / btn-sidebar-dashboard / planificador",
+        "limpiarBotonesRedundantes() elimina fisicamente botones con texto dashboard en .header-actions/.resumen-header (excepto sidebar), ejecutado en cada click + setTimeout 500ms",
+        "Overlay v6.73 con z-index 9999999 (mayor que v6.72 999999 y v6.71 999999)"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

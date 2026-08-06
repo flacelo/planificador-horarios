@@ -602,6 +602,24 @@
         "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado (terser renombro a e/a de nuevo): 17/17 PASS (init, anual secuencia+datos corruptos+pestana activa, mensual, diario/notas, dashboard, guard DOMContentLoaded, vista guardada re-aplicada, clicks pestanas y view-toggle, click fuera)"
       ],
       "commit": "v661_apply_js"
+    },
+    {
+      "fase": 85,
+      "version": "v6.62",
+      "estado": "COMPLETADO",
+      "descripcion": "Correccion del renderizado del grid entre vista Semanal (LUN-DOM) y vista Anual (ENE-DIC)",
+      "acciones": [
+        "bumps index.html ?v=6.62 x2, sw.js planify-cache-v56",
+        "CAUSA RAIZ: en v6.61 el dispatcher para semanal solo llamaba cambiarTab(semanal) (alterna visibilidad de #view-semanal) SIN tocar plannerType; si el tipo interno quedaba en \"anual\" por un clic previo, la vista semanal mostraba el grid de 12 meses",
+        "FIX: nuevo IIFE v6.62 que envuelve window.cambiarVistaPlanify (captura orig en var e): antes de delegar, si el target es semanal/weekly llama cambiarTipoPlanificador(\"semanal\") y si es anual/annual llama cambiarTipoPlanificador(\"anual\") -> forzando el re-render del grid con dias LUN..DOM o meses ENE..DIC",
+        "cambiarTipoPlanificador es funcion global (NO window.cambiarTipoPlanificador): guarda typeof desnuda, igual que el codigo compilado v6.60/61; su early-return if(e===plannerType) evita re-renders redundantes",
+        "FALLBACK (si la global no existiera): localStorage.setItem(\"horario_planner_type\", tipo) + renderizar() - adaptado de la clave real CONFIG.STORAGE.PLANNER_TYPE y la funcion real renderizar (el snippet pedia planify_tipo_planificador/renderizarGrid que no existen)",
+        "El wrapper pasa el valor ORIGINAL (sin normalizar) al dispatcher orig para no alterar su logica de aliases (diario/notas, journal, monthly, planificador...)",
+        "INSERCION: antes de la junction ,function(){const e={salud como elemento de cadena SIN punto y coma final (el ; rompe la cadena: el bloque siguiente empieza con coma -> SyntaxError; leccion v6.62, corregido tras revert con git checkout)",
+        "Terser: quito los parentesis del IIFE -> ,function(){var e=window.cambiarVistaPlanify;...}() (renombros: vistaTarget->a, target->t, tipo->o)",
+        "verificacion: node --check, npm run build OK; VM test bloque compilado: 16/16 PASS (wrapper reemplaza, semanal tras anual, anual, aliases annual/weekly, sin switch en mensual/dashboard/table/diario-notas, mayusculas, undefined, vacio, fallback storage+renderizar, fallback mensual sin storage)"
+      ],
+      "commit": "v662_apply_js"
     }
   ]
 }

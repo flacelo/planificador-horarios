@@ -1028,6 +1028,26 @@
         "vm_test": "ROLLBACK - no aplica (repositorio restaurado a estado estable)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.84",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 107 (v6.84): Ocultamiento CSS estatico 100% seguro de botones redundantes en resumen",
+      "archivos": [
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "Regla de seguridad: js/app.js NO modificado (bloque puramente CSS agregado al final de css/main.css)",
+        "Selectores: .resumen-header button, .tarjeta-resumen button, #resumen-hoy button { display:none !important }",
+        "Bump: ?v=6.83 -> ?v=6.84 (x2) y planify-cache-v77 -> planify-cache-v78"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "N/A - cambio 100% CSS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

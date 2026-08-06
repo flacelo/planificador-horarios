@@ -984,6 +984,29 @@
         "vm_test": "ROLLBACK - no aplica (repositorio restaurado a estado pre-reloj)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.82",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 105 (v6.82): Modulo aislado para Reloj Digital y boton de Hora Actual con proteccion estricta de renderizado",
+      "archivos": [
+        "js/app.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "Base: rollback v6.81 (estado v6.75/e988a2c restaurado) - IIFE v6.82 insertado antes de la junction",
+        "AISLAMIENTO: solo oculta botones con textContent horario/dashboard (display:none, no los elimina -> evita mutaciones childList) y agrega #modulo-acciones-v682 al resumen",
+        "Proteccion anti-bucle: guard getElementById(reloj-resumen-v682) antes de inyectar; setInterval 1000ms actualiza el reloj y re-inyecta solo si falta",
+        "NO se modifican renderizar/renderizarCalendario/renderGrid ni estructuras de layout (verificado en bundle)",
+        "Fix tecnico: el IIFE del usuario terminaba con })(); y la junction inicia con ,function(){... -> ; antes de , rompe la expresion de coma; se elimino el punto y coma final al insertar",
+        "Build fallo una vez (SyntaxError ,) -> git checkout -- + re-aplicacion con IIFE2 (sin ; final)"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

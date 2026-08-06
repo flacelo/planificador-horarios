@@ -734,6 +734,28 @@
         "vm_test": "21/21 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.69",
+      "fecha": "2026-08-05",
+      "alcance": "Dashboard dinamico con HTML inyectado via activarDashboardGarantizado, KPIs reales de filas, click listener para nav-dashboard",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "Terser fusiona IIFEs v6.67+v6.68+v6.69 en un solo bloque: funcionalmente equivalente, la extraccion VM requiere balance por fusion",
+        "activarDashboardGarantizado reinyega HTML_DASHBOARD cada vez que se llama (garantiza contenido visible)",
+        "CSS v6.68 ya resuelve visibilidad con .modo-dashboard-activo: v6.69 es la capa de fallback por si el contenedor no existe",
+        "Click listener captura #btn-view-dashboard y selectores globales [data-modo] para compatibilidad maxima"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

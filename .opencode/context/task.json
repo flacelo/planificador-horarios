@@ -916,6 +916,28 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.79",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 102 (v6.79): Remocion directa en template string de JS de botones antiguos y sustitucion por Reloj Digital y Scroll a hora actual",
+      "archivos": [
+        "js/app.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "La unica aparicion de los botones \"Ver horario\"/\"Dashboard\" estaba en renderDaySummary() de js/app.js (bloque div.ds-actions); se reemplazo el div completo por .resumen-acciones-v679",
+        "Se conservaron los divs cierre </div></div> previos (estructura ds-body/ds-stats intacta)",
+        "Botones del sidebar (#btn-sidebar-dashboard) y textos de tutorial en index.html se conservan (no son plantilla re-renderizable)",
+        "Nombres de funciones v679 son renombrados por Terser (verificacion via strings: reloj-resumen-v679, btn-ir-hora-actual, resumen-acciones-v679, rgba(56, 189, 248, 0.35), .fila-hora, .time-block)",
+        "IIFE v6.79 insertado antes de junction; cache planify-cache-v73; ?v=6.79 x2 en index.html"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

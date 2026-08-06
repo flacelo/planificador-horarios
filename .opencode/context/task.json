@@ -850,6 +850,29 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.74",
+      "fecha": "2026-08-05",
+      "alcance": "Fix definitivo de handlers de clic para Volver al Planificador y boton Dashboard de cabecera semanal",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "Comparaciones de texto ahora usan .includes() en vez de igualdad estricta: txt.includes(volver/cerrar/dashboard/planificador), id.includes(cerrar/dashboard), cls.includes(btn-cerrar-dash/btn-dashboard)",
+        "La condicion de planificador excluye \"volver\" (txt.includes(planificador) && !txt.includes(volver)) para que \"✖ Volver al Planificador\" no abra nada y cierre via condicion volver/cerrar",
+        "Funciones expuestas como window.ocultarOverlayDashboard / window.abrirOverlayDashboard (globales)",
+        "ocultarOverlayDashboard oculta TODOS los overlays legacy: v674, v673, v671, v672, #dashboard-view v6.67",
+        "Overlay v6.74: #dashboard-overlay-v674 con z-index 9999999, clase btn-cerrar-dash en el boton de cierre"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

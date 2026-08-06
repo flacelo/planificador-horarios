@@ -1,0 +1,32 @@
+APROBADO
+
+VERIFICACIÓN ITERACIÓN v6.30 (eliminación física de 'X' por JS + override de fuentes + fix stickers)
+Fecha: 2026-08-03 | Repo: PLANIFY | HEAD: 6c75520 (v6.29)
+
+[PASS] 1. Repo: git status --short = M en .opencode/context/task.json, css/main.css, index.html, js/app.js, sw.js + ?? .opencode/context/review_feedback.txt. Exactamente lo esperado; sin archivos extra ni artefactos nuevos.
+[PASS] 2. index.html: ?v=6.30 x2, ?v=6.29 x0 (git diff + node). Sin cambios de stylesheet ni rel=preconnect; los links a css/main.css, panel.css, dashboard.css, grid.css y chart.js quedan intactos.
+[PASS] 3. sw.js: planify-cache-v24 x1, planify-cache-v23 x0; única línea cambiada (cache bump), ASSETS sin alteraciones.
+[PASS] 4. node --check js/app.js: OK. npm.cmd run check: OK (node --check js/app.js). No se re-ejecutó build (ya minificado: 147,448 bytes, 1 línea).
+[PASS] 5. Script de strings independiente sobre estado ACTUAL (23 checks, 23 PASS tras diagnóstico de 3 falsos positivos):
+  - html: ?v=6.30==2, ?v=6.29==0.
+  - sw: planify-cache-v24==1, planify-cache-v23==0.
+  - css: {==}==780/780; :contains("×")==1; :contains("x")==1; .sticker-badge/.sticker-icon/.cal-sticker + [data-sticker] presentes; tail termina en }.
+  - js: [PLANIFY v6.30] x1; dynamic-font-override x2; window.limpiarLetrasXDeCabeceras x3; window.renderizarStickerEnCelda x1; window.cambiarFuenteApp x3 (1 v6.29 + asignación v6.30 + llamada interna DOMContentLoaded; la última asignación gana); MutationObserver x1; observerPLANIFY x2; regex [xX×] x1; planify_fuente_seleccionada x4; tail termina en "});" (bloque v6.30 cierra DOMContentLoaded; "}();" es el cierre del IIFE v6.29 PRE-inserción).
+[PASS] 6. Auditoría SEMÁNTICA de tails (CSS últimos ~1100 chars / JS últimos ~3000 chars):
+  - CSS: 4 reglas del usuario íntegras y sin parafrasear: (1) tamaño calendario (.calendar-day/.month-cell/td.cal-dia font-size:1rem!important + .event-tag/.cell-content/.month-cell-text/.cal-evento/.event-item 0.95rem!important); (2) stickers visibles (.sticker-badge,.sticker-icon,.cal-sticker,[data-sticker] 1.4rem!important, opacity/visibility); (3) ocultar X (th button, th .close, .close-x, .btn-remove, .week-header-day button, span.x, th[data-day] button, :contains("×"), :contains("x") → display:none!important...pointer-events:none!important); (4) :root --app-font-family + body,button,...{font-family:var(--app-font-family)!important} (override previo).
+  - JS: 3 funciones + observer + DOMContentLoaded con textos exactos: mapa {'inter':"'Inter', sans-serif", poppins, roboto, montserrat, outfit, playfair, arial}; styleTag id "dynamic-font-override"; console.log "[PLANIFY v6.30] 🔤 Fuente forzada globalmente a:" (string exacta verificada con U+1F524); template "* { font-family: ${fuenteFinal} !important; }"; guardas includes(" ×"/" x"/" X") + replace(/\s*[xX×]/g,""); stickers via .sticker-badge/.month-cell-text en .cell-content; observerPLANIFY.observe(...,{childList:!0,subtree:!0}) sobre querySelector("main, #app, .app-container")||document.body; localStorage planify_fuente_seleccionada.
+
+FALSOS POSITIVOS INVESTIGADOS Y RESUELTOS (diagnóstico, no fallos):
+- "pointer-events: none !important" count=0 en CSS: el minificador del build elimina espacios → presente como "pointer-events:none!important" (x3). Semántica idéntica.
+- "childList: true, subtree: true" count=0 en JS: Terser reescribe true→!0 → "childList:!0,subtree:!0" presente. Semántica idéntica.
+- "respetando el nombre del día" count=0 en JS: texto vive en COMENTARIO del bloque fuente (v630_block_js.js línea 10); scripts/build.js usa Terser con output:{comments:false} → los comentarios se eliminan en build. El código funcional que implementa esa intención (guardas includes + regex que preserva el nombre del día) está presente e intacto. No es omisión ni parafraseo del bloque funcional.
+
+OBSERVACIONES / RIESGO RESIDUAL (no bloqueantes, confirmados):
+1. index.html difiere de HEAD en 1 par extra <meta name="description">+<meta name="keywords"> (343 chars): lo inyecta scripts/optimize-a11y.js (paso 6 de npm run build) cada build por no-idempotencia (HEAD ya acumula 88 copias idénticas). Es artefacto del pipeline estándar, no edición manual del head; sin impacto funcional.
+2. Regla CSS con :contains("×")/:contains("x") es selector inválido en CSSOM → la regla completa se descarta en navegadores; cubierto por JS (window.limpiarLetrasXDeCabeceras + btn.remove() físico). Riesgo conocido aceptado.
+3. Regex /\s*[xX×]/g no matchea "✕" U+2715 (v6.29 eliminarDia): cubierto porque el bloque elimina físicamente los botones con .remove() antes de tocar innerHTML. Riesgo conocido aceptado.
+4. observerPLANIFY es idempotente: solo invoca limpiarLetrasXDeCabeceras (re-remove de nodos ya eliminados = no-op), sin bucle infinito.
+5. Mojibake en consola PowerShell es artefacto de display ANSI; contenido real UTF-8 validado vía Node con encoding utf8 explícito.
+6. Pendiente no verificable en este entorno: prueba funcional en navegador (click en X de cabecera semanal, cambio de fuente persistido, stickers en calendario mensual) y runtime PWA con cache v24.
+
+Veredicto: APROBADO. Todas las áreas PASS (repo, html, sw, css, js, sintaxis); riesgos residuales documentados sin impacto en el entregable.

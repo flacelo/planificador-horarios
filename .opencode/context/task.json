@@ -938,6 +938,30 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.80",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 103 (v6.80): Emergency Rollback de MutationObservers y restauracion de renderizado de cuadriculas semanal, mensual y panel lateral",
+      "archivos": [
+        "js/app.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "CAUSA RAIZ del congelamiento: IIFE v6.78 registraba MutationObserver sobre document.body (childList+subtree) cuyo callback actualizaba innerHTML del resumen -> cada mutacion disparaba el observer -> bucle infinito",
+        "IIFE v6.78 eliminado por completo (2093 chars): incluye setInterval(reloj,1000), MutationObserver, actualizarWidgetResumen y re-inyeccion de .resumen-acciones-v678",
+        "setInterval v6.79 del reloj eliminado; se conserva el delegado click capture v6.79 (no hace bucle) para el boton \"Ir a la hora actual\"",
+        "Terser quita el parentesis inicial de IIFEs tras coma (el IIFE v6.78 inicia con function(){ sin parentesis) - marcador de corte ajustado",
+        "window.renderGrid NO existe en el bundle; se agrego fallback window.renderizar (funcion global real del grid semanal) en ocultarOverlayDashboard y en el re-render de DOMContentLoaded",
+        "Quedan 3 MutationObserver legacy (v6.73 limpiador botones, limpiador texto X, observerPLANIFY original) - no relacionados con el bucle",
+        "Plantilla estatica v6.79 en renderDaySummary conservada (marcado HTML simple, sin scripts)"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

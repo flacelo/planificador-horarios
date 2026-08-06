@@ -1132,6 +1132,28 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.89",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 112 (v6.89): Rollback a version estable v6.87 (commit f89dab7) y actualizacion a cache v83",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "git checkout f89dab7 -- index.html js/app.js css/main.css sw.js",
+        "Eliminado con el rollback: botones #btn-export-word/#btn-export-pdf del index.html y IIFE v6.88 de exportacion (verificado ausentes)",
+        "Se mantiene el CSS v6.87 (ocultamiento boton Exportar JSON) porque f89dab7 ya lo incluye",
+        "Bump forzado: ?v=6.87 -> ?v=6.89 (x2) y planify-cache-v81 -> planify-cache-v83"
+      ],
+      "verificacion": {
+        "build": "PENDIENTE",
+        "vm_test": "ROLLBACK - no aplica (repositorio restaurado a v6.87)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

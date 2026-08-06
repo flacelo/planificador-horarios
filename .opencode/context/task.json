@@ -620,6 +620,23 @@
         "verificacion: node --check, npm run build OK; VM test bloque compilado: 16/16 PASS (wrapper reemplaza, semanal tras anual, anual, aliases annual/weekly, sin switch en mensual/dashboard/table/diario-notas, mayusculas, undefined, vacio, fallback storage+renderizar, fallback mensual sin storage)"
       ],
       "commit": "v662_apply_js"
+    },
+    {
+      "fase": 86,
+      "version": "v6.63",
+      "estado": "COMPLETADO",
+      "descripcion": "Fix definitivo de la vista Anual - forzar renderizado de 12 columnas mensuales en lugar del grid semanal LUN-DOM",
+      "acciones": [
+        "bumps index.html ?v=6.63 x2, sw.js planify-cache-v57",
+        "CAUSA RAIZ REAL (v6.62 insuficiente): aplicarIdioma() hace dias=DIAS_ES/DIAS_EN.slice() + renderizar() SIEMPRE (sin mirar plannerType). Al recargar la pagina con planify_vista_activa=\"anual\" y horario_planner_type=\"anual\" persistidos: aplicarIdioma renderiza el grid semanal LUN-DOM, y el init v6.61 (setTimeout 300) llama cambiarVistaPlanify(\"anual\") -> cambiarTipoPlanificador(\"anual\") hace early-return (if(e===plannerType)return;) porque el tipo YA es anual -> NUNCA re-renderiza -> queda el grid semanal vacio",
+        "FIX: window.forzarVistaAnualOSemanal(tipo): persiste horario_planner_type + planify_tipo_planificador (clave inerte, pedida por requerimiento; el motor real usa horario_planner_type); si el tipo interno difiere -> cambiarTipoPlanificador(tipo) (carga datos + render); si YA coincide (early-return) -> fuerza dias: valida horario_data_<tipo> guardado (anual: 12 dias ENERO..DICIEMBRE; semanal: 7 dias LUNES..) y si es invalido cae a PLANNER_TYPES[tipo].dias, luego renderizar() SIEMPRE",
+        "Wrapper: window.cambiarVistaPlanify intercepta semanal/weekly/anual/annual -> forzarVistaAnualOSemanal(normalizado) antes de delegar al dispatcher previo (v6.62) con el valor ORIGINAL sin normalizar (no altera su logica de aliases)",
+        "DESVIACIONES del snippet documentadas: (1) el snippet definia window.forzarVistaAnualO Semanal con ESPACIO en el identificador (invalido en JS) -> se nombro forzarVistaAnualOSemanal (como lo invoca el propio snippet); (2) la rama typeof window.horario_planner_type es codigo muerto (no existe tal variable global; el estado real es plannerType + localStorage) -> omitida; (3) window.cambiarTipoPlanificador -> global desnuda con typeof guard (patron del codigo compilado; en script clasico son equivalentes)",
+        "La llamada doble (onclick inline + interceptor delegado) es idempotente: el early-return path solo re-renderiza columnas correctas",
+        "INSERCION: antes de la junction ,function(){const e={salud como elemento de cadena SIN ; final (leccion v6.62); Terser lo dejo como ,function(){window.forzarVistaAnualOSemanal=...}()",
+        "verificacion: node --check, npm run check, npm run build OK; VM test bloque compilado: 22/22 PASS (escenario bug recarga con dias corrompidos -> 12 meses, simetrico semanal, cambio real anual/semanal, aliases annual/weekly, mensual/dashboard/undefined sin forzar, datos guardados validos/invalidos, fallback sin global, doble clic idempotente, persistencia)"
+      ],
+      "commit": "v663_apply_js"
     }
   ]
 }

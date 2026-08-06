@@ -1111,6 +1111,27 @@
         "vm_test": "N/A - cambio 100% CSS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.88",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 111 (v6.88): Incorporacion de botones Descargar Word y Descargar PDF en Ajustes",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "Botones insertados en .config-actions de la seccion Gestion de Datos, inmediatamente despues de #btn-export-excel (se agrego type=\"button\" por seguridad)",
+        "IIFE v6.88 insertado antes de junction (sin ; final); export Word genera .doc via Blob application/msword con BOM, export PDF via window.print()",
+        "Fix en el codigo del usuario: el xmlns del HTML de Word tenia un fragmento de URL markdown ([http://www.w3.org/TR/REC-html40](...)) que se limpio a la URL real http://www.w3.org/TR/REC-html40",
+        "Bump: ?v=6.87 -> ?v=6.88 (x2) y planify-cache-v81 -> planify-cache-v82"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

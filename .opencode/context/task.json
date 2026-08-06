@@ -962,6 +962,28 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.81",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 104 (v6.81): Rollback a v6.77 (Estado estable previo a la implementacion del reloj)",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "v6.76 y v6.77 NO existen como commits en el historial git; el ultimo estado pre-reloj estable es el commit e988a2c (v6.75, restauracion total de vistas al cerrar dashboard)",
+        "Se restauro index.html, js/app.js, css/main.css y sw.js desde e988a2c via git checkout",
+        "Se elimino con el rollback: IIFE v6.78 (reloj + MutationObserver), IIFE v6.79 (reloj v679 + click), plantilla resumen-acciones-v679 y el estabilizador v6.80",
+        "Bump forzado de cache: ?v=6.75 -> ?v=6.81 (x2 en index.html) y planify-cache-v69 -> planify-cache-v75 (sw.js) para limpiar scripts defectuosos en navegadores"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "ROLLBACK - no aplica (repositorio restaurado a estado pre-reloj)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

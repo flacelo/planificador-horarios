@@ -653,6 +653,22 @@
         "verificacion: node --check, npm run build OK; VM test bloque compilado: 19/19 PASS (bug reportado: anual->semanal con horario_data_semanal corrupto a 12 meses restaura 7 LUNES, sin datos, switch normal, early-returns ambas direcciones, aliases, mensual/dashboard/undefined sin forzar, fallback sin global, doble clic idempotente, ciclo anual<->semanal con ambas claves corruptas)"
       ],
       "commit": "v664_apply_js"
+    },
+    {
+      "version": "6.65",
+      "fecha": "2026-08-05",
+      "alcance": "Restaurar titulo de mes en vista mensual (AGOSTO 2026) y rediseno de vista anual: panel Objetivos y Metas del Anio con 12 tarjetas (Enero-Diciembre) y textareas persistidas en planify_metas_anuales",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "24/24 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

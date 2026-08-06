@@ -779,6 +779,30 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.71",
+      "fecha": "2026-08-05",
+      "alcance": "Fix definitivo de capa CSS: Dashboard como overlay fixed independiente en document.body con z-index 999999 y boton de salida",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "v6.70 inyectaba #dashboard-view dentro de padres con display:none/overflow:hidden: v6.71 crea #dashboard-view-body-v671 como hijo directo de document.body",
+        "cssText inline fuerza position:fixed, 100vw/100vh, z-index:999999, overflow-y:auto (no depende de ninguna clase CSS padre)",
+        "Boton #btn-cerrar-dashboard-v671 con listener que oculta el contenedor (display:none)",
+        "CSS backup v6.71 en main.css para #dashboard-view-body-v671 por si los estilos inline fallan",
+        "La funcion mostrarDashboardSaaSBody reemplaza a mostrarDashboardV670 (v6.70 se mantiene en bundle pero el click listener v6.71 apunta a la nueva)",
+        "horario_actividades fallback a [] si no existe en localStorage"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

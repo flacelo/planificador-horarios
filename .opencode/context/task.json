@@ -873,6 +873,27 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.75",
+      "fecha": "2026-08-05",
+      "alcance": "Remocion de boton Dashboard en cabecera semanal/mensual y restauracion de visibilidad/render en vista Mensual al cerrar overlay",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "#btn-view-dashboard ya no existe en index.html (fue removido en v6.72): el requisito de eliminacion de boton redundante queda cubierto y se refuerza via borrarBotonesDashboardHeader() que remueve en runtime cualquier boton con texto dashboard en .resumen-header/.header-actions/.barra-nav-fecha",
+        "ocultarOverlayDashboard (redefinida en v6.75) ahora: 1) oculta overlays legacy, 2) restaura display via removeProperty + visibility/opacity en #planner-view/#view-semanal/#view-mensual/#vista-anual-metas/#cal-grid/.cal-container/.main-grid-container, 3) re-renderiza con window.cambiarVistaPlanify(vistaActiva) y renderizarCalendario() si mensual",
+        "window.renderizarCalendario y window.cambiarVistaPlanify existen en el bundle (verificado pre-build)",
+        "El click handler v6.75 cierra solo (volver/planificador); el v6.74 sigue abriendo (dashboard)"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

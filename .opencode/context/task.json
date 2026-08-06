@@ -712,6 +712,28 @@
         "vm_test": "25/25 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.68",
+      "fecha": "2026-08-05",
+      "alcance": "Fix de pantalla negra en Dashboard, forzado de display/visibilidad e integracion de Dashboard General en el contenedor principal",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "No existen #app-content/.main-content en el DOM real: #dashboard-view ya es hermano de las vistas; el CSS v6.68 (#dashboard-view + .modo-dashboard-activo) resuelve la visibilidad con display:block!important",
+        "renderizarDashboardSaaS no es global (closure v6.67): v6.68 expone shim que dispara el render via cambiarVistaPlanify(\"dashboard\")",
+        "No hay botones duplicados de dashboard en cabeceras (unico boton: #btn-view-dashboard): el listener v6.68 ademas cubre los IDs reales #btn-view-dashboard/#btn-view-table; btn-modo-* / [data-modo] se soportan para futuro",
+        "Terser fusiono el IIFE v6.68 con el bloque v6.67 (secuencia de comas): funcionalmente equivalente"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "21/21 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

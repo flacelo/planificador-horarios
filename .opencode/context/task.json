@@ -894,6 +894,28 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.78",
+      "fecha": "2026-08-06",
+      "alcance": "Sustitucion de botones antiguos por Reloj Digital en Vivo y boton inteligente \"Ir a la hora actual\" en tarjeta de resumen",
+      "archivos": [
+        "index.html",
+        "js/app.js",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "Saltos de version: el repo estaba en v6.75 (cache v69); se aplico el bump directo ?v=6.78 / planify-cache-v72 segun especificacion (v6.76/v6.77 no registrados en este repositorio)",
+        "actualizarWidgetResumen elimina botones con texto horario/dashboard dentro de .resumen-header/#resumen-hoy/.tarjeta-resumen y crea .resumen-acciones-v678",
+        "Reloj con toLocaleTimeString HH:MM:SS AM/PM, setInterval 1000ms, MutationObserver sobre document.body (childList+subtree) para re-inyeccion",
+        "irAHoraActual busca celdas .col-hora/.grid-hora-label/td/div cuyo texto empiece con HH:00, hace scrollIntoView smooth/center y resalta 2s (setTimeout 2000ms)"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

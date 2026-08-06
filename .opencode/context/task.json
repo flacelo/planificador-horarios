@@ -1048,6 +1048,26 @@
         "vm_test": "N/A - cambio 100% CSS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.85",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 108 (v6.85): Auto-activacion de pestana Perfil al abrir el Panel de Control para evitar estado vacio",
+      "archivos": [
+        "js/app.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "IIFE v6.85 insertado antes de junction (patron establecido); se quito el ; final para no romper la expresion de coma",
+        "Delegacion click capture sobre #btn-sidebar-toggle/.sidebar-toggle/.gear-btn/#btn-panel-control; setTimeout 60ms; si ningun panel interno visible (.sidebar-body > div/.panel-content > div con display!=none y sin clase hidden) clickea la primera pestana (.sidebar-header button/.panel-control-tabs button/#panel-control button)",
+        "NO toca funciones de renderizado ni estructura del layout"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

@@ -1154,6 +1154,30 @@
         "vm_test": "ROLLBACK - no aplica (repositorio restaurado a v6.87)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.90",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 113 (v6.90): Incorporacion de modulo autonomo js/export-pdf.js para exportacion a PDF sin tocar js/app.js",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "css/main.css",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "NUEVO archivo js/export-pdf.js (IIFE aislado: click en #btn-export-pdf -> preventDefault + window.print)",
+        "js/app.js CONGELADO: verificado identico al commit f89dab7 (git diff vacio)",
+        "index.html: boton #btn-export-pdf insertado en .config-actions tras el Excel (type=\"button\" anadido) y <script src=\"js/export-pdf.js?v=6.90\"> antes de </body>",
+        "css/main.css: bloque @media print (fondo blanco, oculta sidebar/panel/botones/resumen-header, cuadricula full width)",
+        "Bump: ?v=6.89 -> ?v=6.90 (x2 + ?v=6.90 del nuevo script = 3 referencias) y planify-cache-v83 -> planify-cache-v84",
+        "Nota: el build minifica el CSS (width:100%!important compactado) - tests ajustados"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "8/8 PASS"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

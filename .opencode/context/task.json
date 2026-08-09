@@ -1535,6 +1535,30 @@
         "vm_test": "PASS (6/6 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.16",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 130 (v7.16): Sanitizacion de fondos oscuros (negros/gris plomo) en los clones de impresion de las vistas Semanal y Mensual",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "SANITIZACION DEL CLON (clonarVistaVisible): al clonar cada vista se remueven explicitamente las clases de tema oscuro ('tema-estelar', 'tema-ejecutivo', 'dark', 'tema-oscuro', 'theme-dark') del nodo clonado Y de todos sus descendientes (querySelectorAll), para que las reglas .tema-estelar .celda etc. no pinten celdas oscuras en el iframe",
+        "El clon raiz fuerza inline background-color:#ffffff y color:#0f172a; el CSS del iframe con !important (mayor prioridad que estilos inline sin !important) cubre los fondos oscuros remanentes de app.js en celdas",
+        "CSS IFRAME: nueva regla table, th, td, tr, .cal-dia, .cell, .week-grid { background:#ffffff !important; color:#0f172a !important; } + cabeceras ampliadas thead th/.cal-dia-nombre/.week-header-day/.day-header/.hora-col/.celda-header en #f1f5f9/#334155/600; bordes 1px solid #cbd5e1 (ya presentes)",
+        "css/main.css: nuevo @media print (v7.16) con table,th,td,tr,.cal-dia,.cell,.week-grid,.celda,.grid-cell,.month-cell,.cal-container,.main-grid-container en fondo blanco/color #0f172a/borde #cbd5e1 + cabeceras #f1f5f9/#334155; sin cambios de padding/margin (no desplaza nada)",
+        "js/app.js CONGELADO (identico a f89dab7); cero cambios en DOM o estructura visual en pantalla",
+        "Bump: ?v=7.15 -> ?v=7.16 (3 referencias) y planify-cache-v102 -> planify-cache-v103"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (3/3 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

@@ -1,4 +1,4 @@
-/* PLANIFY v6.97 - EXPORTACIÓN PDF MEDIANTE CAPTURA DE VISTA LIMPIA */
+/* PLANIFY v6.98 - EXPORTACIÓN PDF AISLANDO SOLO LA VISTA ACTIVA */
 (function() {
   document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
@@ -7,8 +7,21 @@
 
       e.preventDefault();
 
-      // 1. Identificar la vista o cuadrícula activa de la agenda
-      const vistaActiva = document.querySelector('.main-grid-container, #planner-view, .cal-container, main, #main-container') || document.body;
+      // 1. Detectar dinámicamente la vista activa entre las vistas principales
+      let vistaActiva = null;
+      const vistas = document.querySelectorAll('.tab-content, .view-content, [data-tab-content]');
+      vistas.forEach(function(v) {
+        if (vistaActiva) return;
+        if (v.classList && (v.classList.contains('active') || v.classList.contains('visible')) || (v.style && v.style.display === 'block')) {
+          vistaActiva = v;
+        }
+      });
+      if (!vistaActiva) {
+        vistaActiva = document.querySelector('.tab-content, .view-content, [data-tab-content]');
+      }
+      if (!vistaActiva) {
+        vistaActiva = document.querySelector('.main-grid-container, #planner-view, .cal-container, main, #main-container') || document.body;
+      }
 
       // 2. Crear una ventana o iframe temporal de impresión 100% aislado
       const iframe = document.createElement('iframe');
@@ -28,7 +41,7 @@
         estilosHTML += style.outerHTML;
       });
 
-      // 4. Inyectar contenido limpio sin panel lateral ni overlays
+      // 4. Inyectar ÚNICAMENTE la vista activa, descartando cualquier otra vista
       doc.open();
       doc.write(`
         <!DOCTYPE html>
@@ -39,6 +52,8 @@
           <style>
             body { background: #ffffff !important; color: #000000 !important; padding: 20px !important; }
             .sidebar, #panel-control, .modal-overlay, button, .btn { display: none !important; }
+            .tab-content, .view-content, [data-tab-content] { display: none !important; }
+            .tab-content.active, .view-content.active, [data-tab-content].active { display: block !important; }
             table, .main-grid-container { width: 100% !important; margin: 0 !important; box-shadow: none !important; }
           </style>
         </head>

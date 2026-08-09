@@ -1395,6 +1395,28 @@
         "vm_test": "PASS (4/4 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.01",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 124 (v7.01): Captura PDF 100% silenciosa en segundo plano - clonacion de la vista activa sin tocar el DOM del usuario",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "REGLA DE ORO CUMPLIDA: js/export-pdf.js ya NO oculta vistas ni modales del DOM real, NO aplica display:none al body ni clases printing-* en la app (verificado por test: 0 nodos con display important, body real sin clases)",
+        "v7.01: solo lectura de la vista activa (#vista-*/#view-* con display != none + fallback .active no-tab); clon outerHTML inyectado en iframe fixed 0x0 offscreen; body DEL IFRAME recibe las clases printing-<sufijo> y printing-<id-real> para neutralizar las reglas @media print body:not(.printing-*) de las hojas copiadas (evita PDF en blanco por las reglas v6.99/v7.00); CSS quirurgico con [data-planify-print]{display:block!important} + id activo block!important; print a los 300ms y removeChild a los 500ms sin restauraciones",
+        "css/main.css SIN CAMBIOS en v7.01 (botones/header/sidebar intactos); index.html solo bumps de version",
+        "js/app.js CONGELADO: identico a f89dab7",
+        "Bump: ?v=7.00 -> ?v=7.01 (3 referencias) y planify-cache-v94 -> planify-cache-v95"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (5/5 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

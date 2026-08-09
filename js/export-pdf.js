@@ -1,4 +1,4 @@
-/* PLANIFY v7.00 - EXPORTACIÓN PDF AISLANDO LA VISTA ACTIVA (DOBLE VARIANTE DE IDS) */
+/* PLANIFY v7.01 - CAPTURA PDF 100% SILENCIOSA SIN TOCAR EL DOM DE LA APLICACIÓN */
 (function() {
   var VISTAS = [
     '#vista-semanal', '#vista-mensual', '#vista-diario',
@@ -11,26 +11,6 @@
     '#modal-ajustes', '#modal-settings', '.modal'
   ];
 
-  function ocultar(sel, activa, restauraciones) {
-    var el = document.querySelector(sel);
-    if (!el || el === activa) return;
-    var disp = { value: el.style.getPropertyValue('display'), prio: el.style.getPropertyPriority('display') };
-    restauraciones.push({ el: el, disp: disp });
-    el.style.setProperty('display', 'none', 'important');
-  }
-
-  function restaurar(restauraciones) {
-    restauraciones.forEach(function(r) {
-      if (r.disp.prio) {
-        r.el.style.setProperty('display', r.disp.value, r.disp.prio);
-      } else if (r.disp.value) {
-        r.el.style.display = r.disp.value;
-      } else {
-        r.el.style.removeProperty('display');
-      }
-    });
-  }
-
   document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
       var btnPdf = e.target.closest('#btn-export-pdf');
@@ -38,14 +18,13 @@
 
       e.preventDefault();
 
-      // 1. Detectar la vista visible actual entre las variantes conocidas
+      // 1. Detectar la vista activa SIN modificar el DOM real (solo lectura)
       var activa = null;
       VISTAS.forEach(function(sel) {
         if (activa) return;
         var el = document.querySelector(sel);
         if (el && el.style && el.style.display !== 'none') activa = el;
       });
-      // 1b. Fallback: cualquier nodo con clase .active que NO sea pestaña de panel ni modal
       if (!activa) {
         document.querySelectorAll('.view-content.active, .tab-content.active, [data-tab-content].active').forEach(function(el) {
           if (activa) return;
@@ -61,22 +40,8 @@
 
       var idReal = activa.id ? String(activa.id) : 'vista-activa';
       var sufijo = String(idReal).replace(/^#?view-|^#?vista-/, '');
-      var clasePrint = 'printing-' + sufijo;
-      var clasesPrint = [clasePrint, 'printing-' + idReal];
 
-      // 2. Ocultar temporalmente TODAS las demás vistas y modales, guardando su estado
-      var restauraciones = [];
-      VISTAS.forEach(function(sel) { ocultar(sel, activa, restauraciones); });
-      MODALES.forEach(function(sel) { ocultar(sel, activa, restauraciones); });
-
-      // 3. Marcar el body con las clases de impresión (ambas variantes de id)
-      var bodyClasePrevia = null;
-      if (document.body && document.body.classList) {
-        bodyClasePrevia = document.body.className || '';
-        clasesPrint.forEach(function(c) { document.body.classList.add(c); });
-      }
-
-      // 4. Crear el iframe temporal de impresión 100% aislado
+      // 2. Iframe offscreen silencioso (nada del DOM del usuario se modifica)
       var iframe = document.createElement('iframe');
       iframe.style.position = 'fixed';
       iframe.style.right = '0';
@@ -88,13 +53,15 @@
 
       var doc = iframe.contentWindow.document;
 
-      // 5. Copiar las hojas de estilo del documento original
+      // 3. Copiar las hojas de estilo del documento original
       var estilosHTML = '';
       document.querySelectorAll('style, link[rel="stylesheet"]').forEach(function(style) {
         estilosHTML += style.outerHTML;
       });
 
-      // 6. Inyectar ÚNICAMENTE la vista activa envuelta en un contenedor garantizado visible
+      // 4. Clonar ÚNICAMENTE la vista activa en el DOM virtual del iframe.
+      //    Las clases printing-* se aplican SOLO al body del iframe (no al real)
+      //    para neutralizar las reglas @media print body:not(.printing-*) de las hojas copiadas.
       doc.open();
       doc.write('<!DOCTYPE html><html><head><title>PLANIFY - Exportación PDF</title>' +
         estilosHTML +
@@ -106,21 +73,19 @@
         '[data-planify-print] .tab-content, [data-planify-print] .view-content, [data-planify-print] [data-tab-content] { display: block !important; }' +
         '[data-planify-print] #' + idReal + ' { display: block !important; }' +
         'table, .main-grid-container { width: 100% !important; margin: 0 !important; box-shadow: none !important; }' +
-        '</style></head><body><div data-planify-print="1">' +
+        '</style></head>' +
+        '<body class="printing-' + sufijo + ' printing-' + idReal + '">' +
+        '<div data-planify-print="1">' +
         (activa.outerHTML || '') +
         '</div></body></html>');
       doc.close();
 
-      // 7. Disparar la impresión del contenido aislado y restaurar el DOM al completar
+      // 5. Disparar la impresión del clon aislado y limpiar el iframe
       setTimeout(function() {
         iframe.contentWindow.focus();
         iframe.contentWindow.print();
 
         setTimeout(function() {
-          restaurar(restauraciones);
-          if (document.body && document.body.classList && bodyClasePrevia !== null) {
-            clasesPrint.forEach(function(c) { document.body.classList.remove(c); });
-          }
           if (iframe.parentNode) {
             document.body.removeChild(iframe);
           }

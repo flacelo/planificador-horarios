@@ -1559,6 +1559,31 @@
         "vm_test": "PASS (3/3 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.17",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 131 (v7.17): Purga profunda de fondos oscuros (#0f172a/#1e293b) en clones de impresion de las 4 vistas (Diario, Semanal, Mensual, Anual)",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "CAUSA RAIZ: js/app.js pinta estilos INLINE oscuros (background-color:#0f172a/#1e293b y gradientes) y clases oscuras en tarjetas/cajas de las vistas; las reglas v7.16 solo cubrian tablas/celdas/cabeceras, no tarjetas ni contenedores",
+        "PURGA JS (clonarVistaVisible): nueva funcion esColorOscuro() que detecta colores oscuros (hex, rgb, luminancia < 128, o gradientes) tanto en style.backgroundColor como en style.background; se limpian en el clon y TODOS los descendientes; clases removidas ampliadas con dark-mode; los fondos CLAROS/coloreados de eventos (ej. #4ade80) se conservan",
+        "El clon raiz se fuerza a background-color:#ffffff + color:#0f172a inline; los inline restantes son cubiertos por el CSS !important del iframe (prioridad sobre inline sin !important)",
+        "CSS IFRAME AMPLIADO: contenedores/tarjetas/modales/inputs (.card/.section-card/.dash-card/.main-card-container/.vista-container/.main-container/.cal-container/.grid-container/.month-grid/.tab-content/.view-content/.modal*/.tarjeta y [class*=\"tarjeta\"]) en background #ffffff !important + color #0f172a !important; tarjetas con borde 1px solid #e2e8f0 !important; celdas/tablas borde #cbd5e1 !important; cabeceras ampliadas con meses (.month-header/.cal-titulo/[class*=month-title]/[class*=cal-title]) en #f1f5f9/#334155/600",
+        "css/main.css: @media print v7.17 con la misma lista amplia (contenedores, tarjetas, inputs, cabeceras de meses); sin cambios de padding/margins (no desplaza nada)",
+        "js/app.js CONGELADO (identico a f89dab7); cero cambios en DOM o estructura visual en pantalla",
+        "Bump: ?v=7.16 -> ?v=7.17 (3 referencias) y planify-cache-v103 -> planify-cache-v104"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (3/3 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

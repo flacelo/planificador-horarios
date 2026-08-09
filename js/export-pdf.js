@@ -1,4 +1,4 @@
-/* PLANIFY v7.16 - EXPORTACIÓN PDF: SANITIZACIÓN DE FONDOS OSCUROS EN CLONES DE IMPRESIÓN */
+/* PLANIFY v7.17 - EXPORTACIÓN PDF: PURGA PROFUNDA DE FONDOS OSCUROS EN CLONES Y CSS DE IMPRESIÓN */
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -35,6 +35,25 @@
     return activa;
   }
 
+  function esColorOscuro(valor) {
+    if (!valor) return false;
+    var v = String(valor).trim();
+    var m = v.match(/rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)/);
+    var lum = -1;
+    if (m) {
+      lum = 0.299 * Number(m[1]) + 0.587 * Number(m[2]) + 0.114 * Number(m[3]);
+    } else {
+      var hx = v.match(/#([0-9a-f]{6}|[0-9a-f]{3})/i);
+      if (hx) {
+        var h = hx[1];
+        if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+        lum = 0.299 * parseInt(h.slice(0, 2), 16) + 0.587 * parseInt(h.slice(2, 4), 16) + 0.114 * parseInt(h.slice(4, 6), 16);
+      }
+    }
+    if (lum !== -1) return lum < 128;
+    return v.indexOf('gradient') !== -1;
+  }
+
   function clonarVistaVisible(el) {
     var clon = el.cloneNode ? el.cloneNode(true) : el;
     var nodos = [clon];
@@ -43,7 +62,11 @@
     }
     nodos.forEach(function(n) {
       if (n.classList && n.classList.remove) {
-        n.classList.remove('tema-estelar', 'tema-ejecutivo', 'dark', 'tema-oscuro', 'theme-dark');
+        n.classList.remove('tema-estelar', 'tema-ejecutivo', 'dark', 'dark-mode', 'tema-oscuro', 'theme-dark');
+      }
+      if (n.style) {
+        if (esColorOscuro(n.style.backgroundColor)) n.style.backgroundColor = '';
+        if (esColorOscuro(n.style.background)) n.style.background = '';
       }
     });
     clon.style.backgroundColor = '#ffffff';
@@ -149,8 +172,10 @@
       '[data-planify-print] .card, [data-planify-print] .section-card, [data-planify-print] .dash-card, [data-planify-print] .main-card-container, [data-planify-print] .tarjeta-resumen, [data-planify-print] .month-cell { background: #ffffff !important; color: #0f172a !important; }' +
       'table, .main-grid-container, .cal-container { border-collapse: collapse !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; box-shadow: none !important; }' +
       'table, th, td, tr, .cal-dia, .cell, .week-grid { background: #ffffff !important; color: #0f172a !important; }' +
+      '.card, .section-card, .dash-card, .main-card-container, .vista-container, .main-container, .cal-container, .grid-container, .month-grid, .tab-content, .view-content, .modal, .modal-content, .modal-box, input, select, textarea, .tarjeta, [class*="tarjeta"] { background: #ffffff !important; color: #0f172a !important; }' +
+      '[class*="tarjeta"] { border: 1px solid #e2e8f0 !important; }' +
       'table, th, td, .celda, .grid-cell, .month-cell { border: 1px solid #cbd5e1 !important; }' +
-      'thead th, .cal-dia-nombre, .week-header-day, .day-header, .hora-col, .celda-header { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
+      'thead th, .cal-dia-nombre, .week-header-day, .day-header, .hora-col, .celda-header, .month-header, .cal-titulo, [class*="month-title"], [class*="cal-title"] { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
       'th, td, .celda, .grid-cell, .month-cell, .cell-content { padding: 8px 10px !important; border-radius: 6px !important; }' +
       '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 6px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '</style></head>' +

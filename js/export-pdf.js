@@ -1,9 +1,10 @@
-/* PLANIFY v7.11 - EXPORTACIÓN PDF CON CLONADO FORZADO VISIBLE Y MULTIPÁGINA */
+/* PLANIFY v7.12 - EXPORTACIÓN PDF CON ORDEN CRONOLÓGICO Y MAQUETACIÓN PROFESIONAL */
 (function() {
+  // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
+    { id: 'vista-diaria', sel: '#vista-diaria, #view-diario', label: 'Vista Diaria', def: false },
     { id: 'vista-semanal', sel: '#vista-semanal, #view-semanal', label: 'Vista Semanal', def: true },
     { id: 'vista-mensual', sel: '#vista-mensual, #view-mensual', label: 'Vista Mensual', def: true },
-    { id: 'vista-diaria', sel: '#vista-diaria, #view-diario', label: 'Vista Diaria', def: false },
     { id: 'vista-anual', sel: '#vista-anual-metas', label: 'Vista Anual', def: false }
   ];
   var MODALES_UI = [
@@ -34,7 +35,6 @@
     return activa;
   }
 
-  // Clona el nodo y fuerza visibilidad TOTAL en el clon (nunca hereda display:none de la vista inactiva)
   function clonarVistaVisible(el) {
     var clon = el.cloneNode ? el.cloneNode(true) : el;
     clon.style.display = 'block';
@@ -70,7 +70,7 @@
 
     var sub = document.createElement('div');
     sub.style.cssText = 'font-size:12.5px;color:#64748b;margin-bottom:14px;';
-    sub.textContent = 'Selecciona las vistas a incluir (cada una será una página):';
+    sub.textContent = 'Selecciona las vistas a incluir (cada una será una página, en orden cronológico):';
     panel.appendChild(sub);
 
     OPCIONES.forEach(function(o) {
@@ -126,18 +126,18 @@
     doc.write('<!DOCTYPE html><html><head><title>PLANIFY - Exportación PDF</title>' +
       estilosHTML +
       '<style>' +
-      'body { background: #ffffff !important; color: #111827 !important; padding: 16px 20px !important; }' +
+      'body { background: #ffffff !important; color: #111827 !important; padding: 16px 20px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '@media print { .pdf-page-break { page-break-after: always; break-after: page; } }' +
       '.sidebar, #panel-control, #side-panel, .side-panel, .sidebar-panel, .modal-overlay, .side-overlay, .sidebar-overlay, .modal, button, .btn, #modal-export-pdf-overlay { display: none !important; }' +
+      '.no-print, input[type="button"], input[type="submit"], .editar, .edit, .controls, .acciones, .actions { display: none !important; }' +
       '.tab-content, .view-content, [data-tab-content] { display: none !important; }' +
-      '[data-planify-print] { display: block !important; }' +
-      '[data-planify-print] .pdf-seccion { display: block !important; visibility: visible !important; opacity: 1 !important; }' +
-      '[data-planify-print] .tab-content, [data-planify-print] .view-content, [data-planify-print] [data-tab-content] { display: block !important; visibility: visible !important; opacity: 1 !important; }' +
+      '[data-planify-print] { display: block !important; width: 100% !important; overflow: visible !important; }' +
+      '[data-planify-print] .pdf-seccion { display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; overflow: visible !important; page-break-after: always; break-after: page; page-break-inside: avoid; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
+      '[data-planify-print] .tab-content, [data-planify-print] .view-content, [data-planify-print] [data-tab-content] { display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; overflow: visible !important; }' +
       'table { border-collapse: collapse !important; width: 100% !important; margin: 0 0 4px !important; box-shadow: none !important; }' +
       'table, th, td, .celda, .grid-cell, .month-cell { border: 1px solid #e2e8f0 !important; }' +
       'th, td, .celda, .grid-cell, .month-cell, .cell-content { padding: 8px 10px !important; border-radius: 6px !important; }' +
-      '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 8px !important; }' +
-      '.pdf-seccion { page-break-inside: avoid; }' +
+      '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 8px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '</style></head>' +
       '<body class="' + (clasesPrint || '') + '">' +
       '<div data-planify-print="1">' + nodosHTML + '</div>' +
@@ -168,6 +168,7 @@
       if (seleccionadas.length === 0) seleccionadas.push('vista-semanal');
     }
 
+    // Orden cronológico estricto: las secciones se concatenan iterando OPCIONES, no el orden de selección
     var partes = [];
     var clasesPrint = [];
     OPCIONES.forEach(function(o) {

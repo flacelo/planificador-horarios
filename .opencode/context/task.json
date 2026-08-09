@@ -1485,6 +1485,30 @@
         "vm_test": "PASS (5/5 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.13",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 128 (v7.13): Eliminacion de hojas en blanco alternadas y maquetacion limpia tipo informe A4 en exportacion PDF",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "CAUSA RAIZ (8 paginas): doble salto de pagina - div .pdf-page-break con page-break-after: always + .pdf-seccion con page-break-after: always generaban una hoja vacia entre vistas",
+        "FIX: eliminado el div .pdf-page-break (incluida su regla @media print); unico salto ahora en .pdf-seccion { page-break-after: always; break-after: page; page-break-inside: avoid; margin: 0; padding: 0; } y .pdf-seccion:last-child { page-break-after: auto; break-after: auto; } para no dejar hoja vacia al final",
+        "MAQUETACION A4: [data-planify-print] y .pdf-seccion forzados a width:100% !important; max-width:100% !important; margin:0 !important; padding:0 !important; background:#ffffff !important; color:#0f172a !important",
+        "Tarjeta oscura centrada: [data-planify-print] * { box-shadow: none !important; border: none !important; } + tarjetas (.card/.section-card/.dash-card/.main-card-container/.tarjeta-resumen/.month-cell) a fondo blanco y texto #0f172a",
+        "Tablas/calendarios: table, .main-grid-container, .cal-container a width:100% !important; max-width:100% !important; border-collapse: collapse; sin box-shadow; body del iframe sin padding (padding:0 !important)",
+        "js/app.js CONGELADO (identico a f89dab7); css/main.css sin cambios; pantalla intacta",
+        "Bump: ?v=7.12 -> ?v=7.13 (3 referencias) y planify-cache-v98 -> planify-cache-v99"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (5/5 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

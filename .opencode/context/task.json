@@ -1306,6 +1306,27 @@
         "vm_test": "PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.97",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 120 (v6.97): Fix definitivo de PDF usando iframe de captura aislado para omitir físicamente el panel lateral",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "js/export-pdf.js reemplazado por completo: enfoque desacoplado -> iframe fixed 0x0 temporal, copia de style/link del documento, inyeccion de la vista activa (.main-grid-container, #planner-view, .cal-container, main, #main-container) con CSS que oculta sidebar/panel/overlay/buttons, iframe.contentWindow.print() a los 300ms y removeChild a los 1000ms",
+        "js/app.js CONGELADO: identico a f89dab7",
+        "css/main.css sin cambios en v6.97 (bloque print v6.96 intacto)",
+        "Bump: ?v=6.96 -> ?v=6.97 (3 referencias) y planify-cache-v90 -> planify-cache-v91"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (4/4 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

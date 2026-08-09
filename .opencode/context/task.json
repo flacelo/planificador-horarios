@@ -1327,6 +1327,28 @@
         "vm_test": "PASS (4/4 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.98",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 121 (v6.98): Bugfix exportacion/impresion PDF - la vista mensual mezclaba elementos de la vista semanal; se aísla estrictamente la vista activa",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "CAUSA RAIZ: querySelector del iframe caia en main/#main-container (contenedor global con TODAS las vistas) y la regla print v6.96 (display:block !important) anulaba los display:none inline de las vistas inactivas -> mezcla de vistas",
+        "FIX: js/export-pdf.js ahora detecta dinamicamente la vista activa entre .tab-content/.view-content/[data-tab-content] (clase .active o display:block inline, usado por cambiarTab en js/app.js); inyecta SOLO su outerHTML en el iframe; CSS de enmascarado .tab-content/.view-content/[data-tab-content]{display:none !important} + .active{display:block !important}; fallback al contenedor global si no hay vistas",
+        "js/app.js CONGELADO: identico a f89dab7",
+        "css/main.css sin cambios en v6.98",
+        "Bump: ?v=6.97 -> ?v=6.98 (3 referencias) y planify-cache-v91 -> planify-cache-v92"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (6/6 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

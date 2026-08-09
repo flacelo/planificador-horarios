@@ -1417,6 +1417,29 @@
         "vm_test": "PASS (5/5 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.10",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 125 (v7.10): Exportacion PDF multipagina seleccionable con modal selector y estetica minimalista",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "MODAL: al hacer clic en #btn-export-pdf se abre modal #modal-export-pdf creado dinamicamente en JS (overlay + panel), con 4 checkboxes estilizados (Semanal x, Mensual x, Diaria, Anual) y boton #btn-generar-pdf \"Generar y Descargar PDF\"; cierre por X, click en overlay o al generar",
+        "MULTIPAGINA: al generar se clonan SOLO las vistas seleccionadas (#vista-semanal/#view-semanal, #vista-mensual/#view-mensual, #vista-diaria/#view-diario, #vista-anual-metas) via outerHTML; cada seccion va en <section class=\"pdf-seccion\"> separadas por <div class=\"pdf-page-break\"> con @media print { .pdf-page-break { page-break-after: always; break-after: page; } }; si ninguna seleccionada, fallback a la vista activa detectada",
+        "ESTETICA PDF (CSS inyectado en el iframe): bordes 1px solid #e2e8f0 en table/th/td/.celda/.grid-cell/.month-cell; padding 8px 10px; border-radius 6px; radius 8px en .cal-evento/.evento/.event-item/.card/.dash-card/.tour-card; ocultamiento de botones/modales/UI (.modal, button, .btn, #modal-export-pdf-overlay)",
+        "DOM de la app intacto: solo lectura, sin display:none en body/vistas, iframe fixed 0x0 offscreen, print a 300ms y removeChild a 500ms",
+        "js/app.js CONGELADO: identico a f89dab7; css/main.css sin cambios",
+        "Bump: ?v=7.01 -> ?v=7.10 (3 referencias) y planify-cache-v95 -> planify-cache-v96"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (6/6 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

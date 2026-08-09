@@ -1440,6 +1440,29 @@
         "vm_test": "PASS (6/6 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.11",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 126 (v7.11): Fix vista previa PDF en blanco - clonado forzado visible de las vistas seleccionadas",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "CAUSA RAIZ: los nodos clonados heredaban display:none inline (vistas inactivas segun cambiarTab) y el body del iframe habia perdido las clases printing-* en v7.10, dejando activas las reglas @media print body:not(.printing-*) de las hojas copiadas (v6.99/v7.00) que ocultan #view-*/#vista-* al imprimir",
+        "FIX clonarVistaVisible(el): cloneNode(true) -> clon.style.display=block, visibility=visible, opacity=1, classList.add(active) -> clon.outerHTML (el DOM real NO se toca)",
+        "Cada seccion <section class=\"pdf-seccion\" style=\"display:block;visibility:visible;opacity:1;\">; CSS del iframe reforzado: [data-planify-print] .pdf-seccion y [data-planify-print] .tab-content/.view-content/[data-tab-content] con display:block !important + visibility:visible !important + opacity:1 !important",
+        "body DEL IFRAME recibe las clases printing-<sufijo> y printing-<id-real> de TODAS las vistas seleccionadas para neutralizar las reglas :not()",
+        "js/app.js CONGELADO: identico a f89dab7; css/main.css sin cambios; pantalla intacta",
+        "Bump: ?v=7.10 -> ?v=7.11 (3 referencias) y planify-cache-v96 -> planify-cache-v97"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (5/5 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

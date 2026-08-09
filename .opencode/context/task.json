@@ -1220,6 +1220,26 @@
         "vm_test": "PASS (3/3 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.93",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 116 (v6.93): Correccion en js/export-pdf.js para ocultar temporalmente el panel lateral al exportar a PDF",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "js/export-pdf.js reemplazado por completo: oculta .sidebar/#sidebar/#panel-control/.sidebar-panel y .modal-overlay/.sidebar-overlay (display none) antes del print; window.print() a los 100ms; restauracion (display vacio) a los 500ms tras print",
+        "js/app.js CONGELADO: identico a f89dab7",
+        "Bump: ?v=6.92 -> ?v=6.93 (3 referencias) y planify-cache-v86 -> planify-cache-v87"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (4/4 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

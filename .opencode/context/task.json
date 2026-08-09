@@ -1284,6 +1284,28 @@
         "vm_test": "PASS (4/4 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.96",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 119 (v6.96): Fix definitivo de PDF removiendo overflow/modal-open de body e invocando requestAnimationFrame",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "js/export-pdf.js reemplazado por completo: libera html/body de clases sidebar-open/modal-open/no-scroll y overflow=visible; clic de cierre; setProperty(display none important) en sidebar y overlay; requestAnimationFrame + setTimeout 200ms + window.print() + restauracion a los 400ms",
+        "css/main.css: bloque @media print final (v6.95 compactado por build, sin comentario) sustituido por v6.96 (ocultar header/nav/buttons + desbloqueo html/body + grid full width)",
+        "js/app.js CONGELADO: identico a f89dab7",
+        "Bump: ?v=6.95 -> ?v=6.96 (3 referencias) y planify-cache-v89 -> planify-cache-v90"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (4/4 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

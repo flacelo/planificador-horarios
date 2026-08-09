@@ -1509,6 +1509,32 @@
         "vm_test": "PASS (5/5 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.15",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 129 (v7.15): Pulido visual de colores, contrastes, bordes y padding EXCLUSIVO en modo claro (pantalla e impresion) - 100% estilos CSS",
+      "archivos": [
+        "css/main.css",
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "BLOQUE CSS ANEXADO al final de css/main.css (modo claro puro): redifinicion de variables slate en :root (--text-primary:#0f172a, --text-secondary/--text-muted/--text-light:#64748b, --surface*:#ffffff, --border-color:#cbd5e1, --border-light:#e2e8f0, --shadow-*: 0 1px 3px rgba(0,0,0,.05))",
+        "FONDO MODO CLARO: body -> #f8fafc (slate-50); .app -> #ffffff con borde 1px solid #e2e8f0 y sombra sutil 0 1px 3px rgba(0,0,0,.05), backdrop-filter:none",
+        "TARJETAS: .card/.section-card/.vista-container/.main-container/.main-card-container -> fondo #ffffff + borde 1px #e2e8f0 + sombra sutil; TODAS las reglas prefijadas con body:not(.tema-estelar):not(.tema-ejecutivo) para NO afectar temas oscuros (los temas usan selectores propios con !important de mayor especificidad)",
+        "TABLAS/CUADRICULA: celdas (td.celda/.grid-cell/.month-cell/.cal-dia/table td/th) borde 1px solid #cbd5e1 + padding 8px 10px; cabeceras (thead th/.week-header-day/.day-header/.cal-dia-nombre) fondo #f1f5f9 texto #334155 font-weight 600; secundario (.celda-header/.hora-col/.cal-titulo) #64748b; eventos (.cal-evento/.evento/.event-item/.card) border-radius 6px",
+        "@media print NUEVO al final: body #ffffff/#0f172a sin tocar padding/margins (no desplaza nada), bordes de celdas 1px solid #cbd5e1 !important, cabeceras slate-100, tarjetas fondo blanco borde #e2e8f0 box-shadow:none",
+        "export-pdf.js (solo CSS del iframe): quitado border:none !important del universal [data-planify-print] * (eliminaba los bordes de tabla en el PDF); bordes de tabla en iframe -> #cbd5e1; añadida regla thead th slate-100; radius de eventos 8px -> 6px",
+        "DOM INTACTO: js/app.js CONGELADO (identico a f89dab7); cero movimientos/posiciones de elementos; ninguna clase de tema oscuro modificada",
+        "Bump: ?v=7.13 -> ?v=7.15 (3 referencias) y planify-cache-v99 -> planify-cache-v102"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (6/6 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

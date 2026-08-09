@@ -1240,6 +1240,28 @@
         "vm_test": "PASS (4/4 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.94",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 117 (v6.94): Corrección en js/export-pdf.js para simular clic de cierre del panel antes de invocar window.print()",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "js/export-pdf.js reemplazado por completo: delegacion de click via closest(#btn-export-pdf); cierre del panel con btnCerrarPanel.click() o classList.remove + display none; overlay oculto; print a los 250ms; restauracion a los 300ms si estaba visible",
+        "css/main.css: bloque @media print v6.94 anexado (display none !important + visibility hidden !important para sidebar/overlay)",
+        "js/app.js CONGELADO: identico a f89dab7",
+        "Bump: ?v=6.93 -> ?v=6.94 (3 referencias) y planify-cache-v87 -> planify-cache-v88"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (5/5 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

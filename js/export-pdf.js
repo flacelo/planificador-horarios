@@ -1,4 +1,4 @@
-/* PLANIFY v6.96 - EXPORTACIÓN PDF LIMPIA CON CIERRE AUTOMÁTICO DE PANEL */
+/* PLANIFY v6.97 - EXPORTACIÓN PDF MEDIANTE CAPTURA DE VISTA LIMPIA */
 (function() {
   document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
@@ -7,43 +7,58 @@
 
       e.preventDefault();
 
-      // 1. Clic automático en el botón de cerrar sidebar/panel si existe
-      const btnCerrar = document.querySelector('#btn-close-sidebar, .close-sidebar, .sidebar-close, #btn-panel-close, .close-btn');
-      if (btnCerrar) {
-        btnCerrar.click();
-      }
+      // 1. Identificar la vista o cuadrícula activa de la agenda
+      const vistaActiva = document.querySelector('.main-grid-container, #planner-view, .cal-container, main, #main-container') || document.body;
 
-      // 2. Remover clases de bloqueo en html y body
-      document.documentElement.classList.remove('sidebar-open', 'modal-open', 'no-scroll');
-      document.body.classList.remove('sidebar-open', 'modal-open', 'no-scroll');
-      document.documentElement.style.overflow = 'visible';
-      document.body.style.overflow = 'visible';
+      // 2. Crear una ventana o iframe temporal de impresión 100% aislado
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
 
-      // 3. Forzar ocultamiento físico del panel y overlay
-      const sidebar = document.querySelector('.sidebar, #sidebar, #panel-control, .sidebar-panel, [class*="sidebar"]');
-      const overlay = document.querySelector('.modal-overlay, .sidebar-overlay, .overlay, .backdrop');
+      const doc = iframe.contentWindow.document;
 
-      if (sidebar) {
-        sidebar.classList.remove('active', 'open', 'show');
-        sidebar.style.setProperty('display', 'none', 'important');
-      }
-      if (overlay) {
-        overlay.classList.remove('active', 'open', 'show');
-        overlay.style.setProperty('display', 'none', 'important');
-      }
-
-      // 4. Esperar a que la pantalla se redibuje limpia y disparar la impresión
-      requestAnimationFrame(function() {
-        setTimeout(function() {
-          window.print();
-
-          // Restaurar visualización tras imprimir
-          setTimeout(function() {
-            if (sidebar) sidebar.style.display = '';
-            if (overlay) overlay.style.display = '';
-          }, 400);
-        }, 250);
+      // 3. Copiar las hojas de estilo del documento original para mantener el formato impecable
+      let estilosHTML = '';
+      document.querySelectorAll('style, link[rel="stylesheet"]').forEach(style => {
+        estilosHTML += style.outerHTML;
       });
+
+      // 4. Inyectar contenido limpio sin panel lateral ni overlays
+      doc.open();
+      doc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>PLANIFY - Exportación PDF</title>
+          ${estilosHTML}
+          <style>
+            body { background: #ffffff !important; color: #000000 !important; padding: 20px !important; }
+            .sidebar, #panel-control, .modal-overlay, button, .btn { display: none !important; }
+            table, .main-grid-container { width: 100% !important; margin: 0 !important; box-shadow: none !important; }
+          </style>
+        </head>
+        <body>
+          ${vistaActiva.outerHTML}
+        </body>
+        </html>
+      `);
+      doc.close();
+
+      // 5. Disparar la impresión del contenido aislado
+      setTimeout(function() {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+
+        // Remover el iframe temporal después de imprimir
+        setTimeout(function() {
+          document.body.removeChild(iframe);
+        }, 1000);
+      }, 300);
     });
   });
 })();

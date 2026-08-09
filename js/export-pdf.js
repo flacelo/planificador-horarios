@@ -1,4 +1,4 @@
-/* PLANIFY v6.95 - EXPORTACIÓN PDF CON CIERRE Y ESPERA DE ANIMACIÓN */
+/* PLANIFY v6.96 - EXPORTACIÓN PDF CON DESBLOQUEO COMPLETO DE VIEWPORT */
 (function() {
   document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
@@ -7,35 +7,41 @@
 
       e.preventDefault();
 
-      // 1. Buscar los elementos del panel y overlays
+      // 1. Localizar sidebar, overlay y contenedores de modales
       const sidebar = document.querySelector('.sidebar, #sidebar, #panel-control, .sidebar-panel, [class*="sidebar"]');
-      const overlay = document.querySelector('.modal-overlay, .sidebar-overlay, .overlay, .backdrop');
+      const overlay = document.querySelector('.modal-overlay, .sidebar-overlay, .overlay, .backdrop, [class*="overlay"]');
       const btnCerrar = document.querySelector('#btn-close-sidebar, .close-sidebar, .sidebar-close, #btn-panel-close');
 
-      // 2. Simular clic de cierre o remover clases activas de inmediato
-      if (btnCerrar) {
-        btnCerrar.click();
-      }
+      // 2. Liberar body/html de cualquier clase o estilo de bloqueo
+      document.documentElement.classList.remove('sidebar-open', 'modal-open', 'no-scroll');
+      document.body.classList.remove('sidebar-open', 'modal-open', 'no-scroll');
+      document.documentElement.style.overflow = 'visible';
+      document.body.style.overflow = 'visible';
+
+      // 3. Simular clic de cierre y forzar ocultamiento físico
+      if (btnCerrar) btnCerrar.click();
 
       if (sidebar) {
         sidebar.classList.remove('active', 'open', 'show');
-        sidebar.style.display = 'none';
+        sidebar.style.setProperty('display', 'none', 'important');
       }
       if (overlay) {
         overlay.classList.remove('active', 'open', 'show');
-        overlay.style.display = 'none';
+        overlay.style.setProperty('display', 'none', 'important');
       }
 
-      // 3. Esperar 350ms a que el navegador redibuje la pantalla completamente limpia
-      setTimeout(function() {
-        window.print();
-
-        // 4. Restaurar estilos tras cerrar la ventana de impresión
+      // 4. Forzar al motor gráfico del navegador a redibujar antes de imprimir
+      requestAnimationFrame(function() {
         setTimeout(function() {
-          if (sidebar) sidebar.style.display = '';
-          if (overlay) overlay.style.display = '';
-        }, 500);
-      }, 350);
+          window.print();
+
+          // 5. Restaurar visibilidad tras imprimir
+          setTimeout(function() {
+            if (sidebar) sidebar.style.display = '';
+            if (overlay) overlay.style.display = '';
+          }, 400);
+        }, 200);
+      });
     });
   });
 })();

@@ -1199,6 +1199,27 @@
         "vm_test": "PASS (4/4 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.92",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 115 (v6.92): Correccion de vista de impresion PDF - Ocultamiento de modales y panel de ajustes en @media print",
+      "archivos": [
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "Se ANEXO el bloque @media print v6.92 sin reemplazar el v6.90 (son complementarios: v6.90 oculta .resumen-header y fuerza .main-grid-container full width; v6.92 oculta modales/sidebar/header/bottom-nav/buttons y pagina tablas)",
+        "js/export-pdf.js NO requiere cambios: no existe funcion descargarPDF(); el IIFE confia en las reglas @media print (verificado)",
+        "js/app.js CONGELADO: identico a f89dab7",
+        "Bump: ?v=6.91 -> ?v=6.92 (3 referencias) y planify-cache-v85 -> planify-cache-v86"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (3/3 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

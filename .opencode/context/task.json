@@ -1463,6 +1463,28 @@
         "vm_test": "PASS (5/5 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.12",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 127 (v7.12): Optimizacion del orden cronologico de vistas y maquetacion profesional del PDF",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "ORDEN: OPCIONES reordenadas a Diaria (#vista-diaria/#view-diario) -> Semanal (#vista-semanal/#view-semanal) -> Mensual (#vista-mensual/#view-mensual) -> Anual (#vista-anual-metas); el modal muestra ese orden y las secciones se concatenan iterando OPCIONES (independiente del orden de seleccion)",
+        "MAQUETACION PDF: .pdf-seccion con page-break-after: always + break-after: page + page-break-inside: avoid; -webkit-print-color-adjust/print-color-adjust: exact !important en body, .pdf-seccion y bloques de eventos (.cal-evento/.evento/.card); width:100% !important + overflow:visible !important en [data-planify-print] y secciones; ocultamiento de .no-print, input[type=button/submit], .editar/.edit/.controls/.acciones/.actions",
+        "Defaults del modal: Semanal y Mensual seleccionadas; Diaria y Anual deseleccionadas",
+        "js/app.js CONGELADO: identico a f89dab7; css/main.css sin cambios; pantalla intacta",
+        "Bump: ?v=7.11 -> ?v=7.12 (3 referencias) y planify-cache-v97 -> planify-cache-v98"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (5/5 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

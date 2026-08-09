@@ -1178,6 +1178,27 @@
         "vm_test": "8/8 PASS"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.91",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 114 (v6.91): Depuracion de Ajustes - Removido boton Exportar JSON y selector de tipografia via CSS/HTML estatico",
+      "archivos": [
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "js/app.js CONGELADO: verificado identico a f89dab7",
+        "CSS v6.91: selectores del usuario (#btn-export-json, #font-family-select, .font-selection-group, etc.) + COMPLEMENTO real: el selector de tipografia en index.html es select#font-select en un .config-row de Preferencias -> se anadio #font-select y .config-row:has(#font-select)",
+        "index.html: boton JSON y config-row Tipografia envueltos en comentarios v6.91; el minificador HTML del build elimino los comentarios con su contenido -> elementos FISICAMENTE REMOVIDOS del HTML (resultado aun mas limpio; verificado ausentes)",
+        "Bump: ?v=6.90 -> ?v=6.91 (3 referencias) y planify-cache-v84 -> planify-cache-v85"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (4/4 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

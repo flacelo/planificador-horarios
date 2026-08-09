@@ -1262,6 +1262,28 @@
         "vm_test": "PASS (5/5 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.95",
+      "fecha": "2026-08-06",
+      "alcance": "Fase 118 (v6.95): Corrección con retardo de 350ms en js/export-pdf.js para remoción física del panel previo a window.print()",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "js/export-pdf.js reemplazado por completo: remocion de clases active/open/show + display none en sidebar y overlay, clic de cierre si existe, print a los 350ms y restauracion de display a los 500ms",
+        "css/main.css: bloque @media print v6.95 anexado (display/visibility none !important + opacity 0 + width/height 0 para sidebar/overlay/[class*=\"sidebar\"])",
+        "js/app.js CONGELADO: identico a f89dab7",
+        "Bump: ?v=6.94 -> ?v=6.95 (3 referencias) y planify-cache-v88 -> planify-cache-v89"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (4/4 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

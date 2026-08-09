@@ -1,4 +1,4 @@
-/* PLANIFY v6.94 - MÓDULO AUTÓNOMO DE EXPORTACIÓN PDF CON CIERRE DE PANEL */
+/* PLANIFY v6.95 - EXPORTACIÓN PDF CON CIERRE Y ESPERA DE ANIMACIÓN */
 (function() {
   document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
@@ -7,36 +7,35 @@
 
       e.preventDefault();
 
-      // 1. Identificar el botón de cerrar del sidebar/panel o los selectores del panel
-      const btnCerrarPanel = document.querySelector('#btn-close-sidebar, .close-sidebar, .sidebar-close, #btn-panel-close');
-      const sidebar = document.querySelector('.sidebar, #sidebar, #panel-control, .sidebar-panel');
-      const overlay = document.querySelector('.modal-overlay, .sidebar-overlay, .overlay');
+      // 1. Buscar los elementos del panel y overlays
+      const sidebar = document.querySelector('.sidebar, #sidebar, #panel-control, .sidebar-panel, [class*="sidebar"]');
+      const overlay = document.querySelector('.modal-overlay, .sidebar-overlay, .overlay, .backdrop');
+      const btnCerrar = document.querySelector('#btn-close-sidebar, .close-sidebar, .sidebar-close, #btn-panel-close');
 
-      // Guardar el estado previo para reabrirlo después
-      const estabaVisible = sidebar && (sidebar.classList.contains('active') || sidebar.classList.contains('open') || sidebar.style.display !== 'none');
+      // 2. Simular clic de cierre o remover clases activas de inmediato
+      if (btnCerrar) {
+        btnCerrar.click();
+      }
 
-      // 2. Forzar el cierre o remoción física temporal del panel
-      if (btnCerrarPanel) {
-        btnCerrarPanel.click();
-      } else if (sidebar) {
-        sidebar.classList.remove('active', 'open');
+      if (sidebar) {
+        sidebar.classList.remove('active', 'open', 'show');
         sidebar.style.display = 'none';
       }
-      if (overlay) overlay.style.display = 'none';
+      if (overlay) {
+        overlay.classList.remove('active', 'open', 'show');
+        overlay.style.display = 'none';
+      }
 
-      // 3. Esperar a que la animación de cierre termine (250ms) y disparar impresión limpia
+      // 3. Esperar 350ms a que el navegador redibuje la pantalla completamente limpia
       setTimeout(function() {
         window.print();
 
-        // 4. Tras la impresión, restaurar el panel si estaba abierto
+        // 4. Restaurar estilos tras cerrar la ventana de impresión
         setTimeout(function() {
-          if (estabaVisible && sidebar) {
-            sidebar.style.display = '';
-            sidebar.classList.add('active');
-            if (overlay) overlay.style.display = '';
-          }
-        }, 300);
-      }, 250);
+          if (sidebar) sidebar.style.display = '';
+          if (overlay) overlay.style.display = '';
+        }, 500);
+      }, 350);
     });
   });
 })();

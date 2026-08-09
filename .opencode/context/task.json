@@ -1349,6 +1349,29 @@
         "vm_test": "PASS (6/6 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "6.99",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 122 (v6.99): Aislamiento estricto de la vista activa en exportacion/impresion PDF - ocultamiento explicito de todas las demas vistas via manipulacion temporal del DOM y CSS quirurgico",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "CAUSA: la seleccion previa (.tab-content/.view-content/.active) podia elegir #tab-perfil (tab-content active del panel) o caer al contenedor global, inyectando la vista semanal junto a la mensual",
+        "FIX js/export-pdf.js: (1) deteccion por ids explicitos #view-semanal/#view-mensual/#view-diario/#view-table/#view-dashboard con display != none; (2) ocultamiento fisico temporal con setProperty(display none important) de TODAS las demas vistas guardando previos; (3) clase body printing-<sufijo>; (4) iframe con CSS quirurgico que descarta .tab-content/.view-content y los ids de las otras vistas y fuerza display:block!important en el id activo; (5) restauracion completa del DOM (displays previos, clase body, removeChild iframe) a los 500ms tras print a los 300ms",
+        "css/main.css: bloque @media print v6.99 anexado con body:not(.printing-*) #view-* { display:none !important } (verificado sobrevivio al build minificado)",
+        "js/app.js CONGELADO: identico a f89dab7",
+        "Bump: ?v=6.98 -> ?v=6.99 (3 referencias) y planify-cache-v92 -> planify-cache-v93"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (6/6 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

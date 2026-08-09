@@ -1,4 +1,4 @@
-/* PLANIFY v7.15 - EXPORTACIÓN PDF: PULIDO VISUAL MODO CLARO (BORDES, CONTRASTE Y CABECERAS) */
+/* PLANIFY v7.16 - EXPORTACIÓN PDF: SANITIZACIÓN DE FONDOS OSCUROS EN CLONES DE IMPRESIÓN */
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -37,6 +37,17 @@
 
   function clonarVistaVisible(el) {
     var clon = el.cloneNode ? el.cloneNode(true) : el;
+    var nodos = [clon];
+    if (clon.querySelectorAll) {
+      Array.prototype.push.apply(nodos, clon.querySelectorAll('*'));
+    }
+    nodos.forEach(function(n) {
+      if (n.classList && n.classList.remove) {
+        n.classList.remove('tema-estelar', 'tema-ejecutivo', 'dark', 'tema-oscuro', 'theme-dark');
+      }
+    });
+    clon.style.backgroundColor = '#ffffff';
+    clon.style.color = '#0f172a';
     clon.style.display = 'block';
     clon.style.visibility = 'visible';
     clon.style.opacity = '1';
@@ -137,8 +148,9 @@
       '[data-planify-print] .tab-content, [data-planify-print] .view-content, [data-planify-print] [data-tab-content] { display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; overflow: visible !important; }' +
       '[data-planify-print] .card, [data-planify-print] .section-card, [data-planify-print] .dash-card, [data-planify-print] .main-card-container, [data-planify-print] .tarjeta-resumen, [data-planify-print] .month-cell { background: #ffffff !important; color: #0f172a !important; }' +
       'table, .main-grid-container, .cal-container { border-collapse: collapse !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; box-shadow: none !important; }' +
+      'table, th, td, tr, .cal-dia, .cell, .week-grid { background: #ffffff !important; color: #0f172a !important; }' +
       'table, th, td, .celda, .grid-cell, .month-cell { border: 1px solid #cbd5e1 !important; }' +
-      'thead th { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
+      'thead th, .cal-dia-nombre, .week-header-day, .day-header, .hora-col, .celda-header { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
       'th, td, .celda, .grid-cell, .month-cell, .cell-content { padding: 8px 10px !important; border-radius: 6px !important; }' +
       '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 6px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '</style></head>' +

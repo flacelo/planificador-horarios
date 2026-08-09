@@ -1,4 +1,4 @@
-/* PLANIFY v7.13 - EXPORTACIÓN PDF: PÁGINAS LIMPIAS A4 SIN HOJAS EN BLANCO */
+/* PLANIFY v7.15 - EXPORTACIÓN PDF: PULIDO VISUAL MODO CLARO (BORDES, CONTRASTE Y CABECERAS) */
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -131,15 +131,16 @@
       '.no-print, input[type="button"], input[type="submit"], .editar, .edit, .controls, .acciones, .actions { display: none !important; }' +
       '.tab-content, .view-content, [data-tab-content] { display: none !important; }' +
       '[data-planify-print] { display: block !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; background: #ffffff !important; color: #0f172a !important; overflow: visible !important; }' +
-      '[data-planify-print] * { box-shadow: none !important; border: none !important; }' +
+      '[data-planify-print] * { box-shadow: none !important; }' +
       '[data-planify-print] .pdf-seccion { display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; background: #ffffff !important; color: #0f172a !important; overflow: visible !important; page-break-after: always; break-after: page; page-break-inside: avoid; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '[data-planify-print] .pdf-seccion:last-child { page-break-after: auto; break-after: auto; }' +
       '[data-planify-print] .tab-content, [data-planify-print] .view-content, [data-planify-print] [data-tab-content] { display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; overflow: visible !important; }' +
       '[data-planify-print] .card, [data-planify-print] .section-card, [data-planify-print] .dash-card, [data-planify-print] .main-card-container, [data-planify-print] .tarjeta-resumen, [data-planify-print] .month-cell { background: #ffffff !important; color: #0f172a !important; }' +
       'table, .main-grid-container, .cal-container { border-collapse: collapse !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; box-shadow: none !important; }' +
-      'table, th, td, .celda, .grid-cell, .month-cell { border: 1px solid #e2e8f0 !important; }' +
+      'table, th, td, .celda, .grid-cell, .month-cell { border: 1px solid #cbd5e1 !important; }' +
+      'thead th { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
       'th, td, .celda, .grid-cell, .month-cell, .cell-content { padding: 8px 10px !important; border-radius: 6px !important; }' +
-      '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 8px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
+      '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 6px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '</style></head>' +
       '<body class="' + (clasesPrint || '') + '">' +
       '<div data-planify-print="1">' + nodosHTML + '</div>' +

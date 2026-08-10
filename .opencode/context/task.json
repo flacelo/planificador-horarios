@@ -1940,11 +1940,26 @@
       "desviaciones": "El prompt cito v7.37/planify-cache-v123/Fase 149 que YA EXISTEN (commit 37e2759, Fase 149 registrada). Se aplica como v7.39 (patron real siguiente a v7.38), cache v125, Fase 151, para no duplicar versiones ni fases.",
       "verificacion": "VM test 16/16 PASS: main.css (min-height 48px flex bg blanco, hijos 600, titulo/strong 14px/700, muted/subtext/pendiente 334155/12px), clon setProperty important (banner + hijos), iframe (min-height 48px, strong, muted), regresiones v7.36/v7.37/v7.38 intactas, js/app.js identico a f89dab7, ?v=7.39 x3, planify-cache-v125. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 152,
+      "version": "v7.40",
+      "fecha": "2026-08-10",
+      "alcance": "Fix bitemático del banner de resumen de hoy: blanco plata #cbd5e1 sobre #1e293b en Modo Oscuro, y azul noche #0f172a sobre #ffffff en Modo Claro / PDF. En css/main.css: bloque v7.40 con estilos base (.resumen-hoy-container/.resumen-barra/[class*=resumen-] a min-height 48px, padding 10px 18px, flex, gap 14px, border-radius 12px, transición), modo oscuro con body:not(.light-theme)/.dark-mode a background #1e293b, border #334155, color #f8fafc e hijos a #cbd5e1 y titulo/strong a #ffffff/14px/700, y modo claro con body.light-theme a background #ffffff, border #e2e8f0, color #0f172a, hijos a #334155 y titulo/strong a #0f172a/14px/700. En js/export-pdf.js: sanitización bitemática v7.40 en clonarVistaVisible() que fuerza la versión clara en el clon (setProperty display flex, visibility visible, background-color #ffffff, border 1px solid #cbd5e1, color #0f172a, opacity 1; hijos a #1e293b) y reglas iframe que neutralizan cualquier tema oscuro (body:not(.light-theme)/.dark-mode forzados a blanco)",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.40, planify-cache-v126, Fase 152).",
+      "verificacion": "VM test 18/18 PASS: main.css base/oscuro/claro completos, clon setProperty version clara (border cbd5e1, hijos 1e293b), iframe neutraliza temas oscuros, regresiones v7.38/v7.39 intactas, js/app.js identico a f89dab7, ?v=7.40 x3, planify-cache-v126. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.39",
-    "numero": 151,
+    "version": "v7.40",
+    "numero": 152,
     "estado": "EN PROGRESO"
   }
 }

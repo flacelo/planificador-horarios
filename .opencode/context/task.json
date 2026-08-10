@@ -1970,11 +1970,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.41, planify-cache-v127, Fase 153).",
       "verificacion": "VM test 16/16 PASS: main.css ids con bg 1e293b, sobreescritura oscura universal (f1f5f9/strong blanco/span cbd5e1), modo claro (blanco/0f172a), clon setProperty ids (bg blanco/border cbd5e1/hijos 0f172a), iframe #resumenHoy con text-shadow none, regresiones v7.38/v7.40 intactas, js/app.js identico a f89dab7, ?v=7.41 x3, planify-cache-v127. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 154,
+      "version": "v7.42",
+      "fecha": "2026-08-10",
+      "alcance": "Fix definitivo de visibilidad en banner de resumen anulando inline styles con el selector [style] en CSS. En css/main.css: bloque v7.42 de máxima especificidad con #resumenHoy/#resumen-hoy/.resumen-hoy-container/.resumen-barra/div[class*=resumen] a background #1e293b, border #475569, radius 12px, padding 10px 16px; en modo oscuro (body:not(.light-theme)) TODOS los hijos INCLUYENDO *[style] forzados a color #f1f5f9, opacity 1, visibility visible, text-shadow none y font-weight 600 (anulando cualquier style=color inyectado por JS); strong a #ffffff/700; span y span[style] a #cbd5e1; en modo claro (body.light-theme) fondo #ffffff, border #cbd5e1 e hijos (incluyendo *[style]) a #0f172a. En js/export-pdf.js: bloque v7.42 en clonarVistaVisible() que aplica setProperty (bg #ffffff, border 1px solid #cbd5e1, color #0f172a; hijos a #0f172a/opacity 1/visibility visible) y luego removeAttribute(style) en cada hijo para limpiar inline styles de color; regla *[style]/span[style] añadida al CSS del iframe",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "El prompt cito v7.41/planify-cache-v127/Fase 153 que YA EXISTEN (commit 2e6147f, Fase 153 registrada). Se aplica como v7.42 (patron real siguiente a v7.41), cache v128, Fase 154, para no duplicar versiones ni fases.",
+      "verificacion": "VM test 15/15 PASS: main.css con selectores *[style]/span[style] en modo oscuro (f1f5f9) y claro (0f172a), clon removeAttribute style en hijos, iframe con regla *[style], regresiones v7.40/v7.41 intactas, js/app.js identico a f89dab7, ?v=7.42 x3, planify-cache-v128. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.41",
-    "numero": 153,
+    "version": "v7.42",
+    "numero": 154,
     "estado": "EN PROGRESO"
   }
 }

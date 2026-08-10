@@ -1610,6 +1610,32 @@
         "vm_test": "PASS (4/4 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.19",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 133 (v7.19): Vista Diario sin sombras oscuras ni bordes grises pesados (pantalla + PDF)",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "NOTA: .notebook-container NO existe en la app; la raiz real es #view-diario (estilo notebook) con .planner-notebook, .notebook-grid y .notebook-col como contenedores secundarios",
+        "PANTALLA (modo claro): #view-diario forzado a background #ffffff, color #0f172a, border 1px solid #e2e8f0, box-shadow none, width/max-width 100% (elimina sombra 0 10px 25px y tarjeta crema encogida)",
+        "CUADROS INTERNOS: .card-section y .planner-notebook en blanco puro con borde 1px solid #cbd5e1 (nitido suave), sin sombra; secciones pastel (goals/grateful/affirmations/morning) a blanco con borde #cbd5e1; botones mood-btn/cloud-btn/sleep-clouds/aesthetic-btn sin gradiente ni fondos de color (blanco + #cbd5e1 + texto #0f172a); routine-checkboxes en #1e293b; notebook-grid/col blancos sin borde ni sombra",
+        "@media print: mismas reglas con radius 0 y padding 0 en el contenedor para informe A4 profesional",
+        "PDF/IFRAME: reglas [data-planify-print] para .notebook-container (por seguridad), .planner-notebook, .notebook-grid, .notebook-col, mood-btn/cloud-btn/sleep-clouds/aesthetic-btn blancos, card-section borde #cbd5e1, routine-checkboxes #1e293b; la purga de clases oscuras en la raiz del clon (v7.16) sigue activa en clonarVistaVisible (tema-estelar/tema-ejecutivo/dark/dark-mode) + raiz forzada a #ffffff",
+        "Inputs/Textareas: ya cubiertos por v7.18 (blanco + borde #cbd5e1 + texto #1e293b)",
+        "js/app.js CONGELADO (identico a f89dab7); cero cambios de posicion de botones o componentes",
+        "Bump: ?v=7.18 -> ?v=7.19 (3 referencias) y planify-cache-v105 -> planify-cache-v106"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (5/5 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

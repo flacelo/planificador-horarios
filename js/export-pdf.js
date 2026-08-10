@@ -1,4 +1,4 @@
-/* PLANIFY v7.18 - EXPORTACIÓN PDF: PULIDO EXCLUSIVO VISTA DIARIO (#view-diario) */
+/* PLANIFY v7.19 - EXPORTACIÓN PDF: VISTA DIARIO SIN SOMBRAS NI BORDES PESADOS */
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -173,11 +173,14 @@
       '[data-planify-print] #view-diario, [data-planify-print] #vista-diario { background: #ffffff !important; color: #0f172a !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border-radius: 0 !important; border: 1px solid #cbd5e1 !important; }' +
       '[data-planify-print] #view-diario .notebook-header, [data-planify-print] #vista-diario .notebook-header { background: none !important; border-bottom: 1px solid #e2e8f0 !important; }' +
       '[data-planify-print] #view-diario .notebook-header h2, [data-planify-print] #vista-diario .notebook-header h2 { color: #0f172a !important; }' +
-      '[data-planify-print] #view-diario .card-section, [data-planify-print] #vista-diario .card-section { background: #ffffff !important; border: 1px solid #e2e8f0 !important; box-shadow: none !important; color: #0f172a !important; }' +
+      '[data-planify-print] #view-diario .card-section, [data-planify-print] #vista-diario .card-section { background: #ffffff !important; border: 1px solid #cbd5e1 !important; box-shadow: none !important; color: #0f172a !important; }' +
       '[data-planify-print] #view-diario .section-title, [data-planify-print] #vista-diario .section-title { color: #334155 !important; }' +
       '[data-planify-print] #view-diario .goals-section, [data-planify-print] #view-diario .grateful-section, [data-planify-print] #view-diario .affirmations-section, [data-planify-print] #view-diario .morning-section, [data-planify-print] #vista-diario .goals-section, [data-planify-print] #vista-diario .grateful-section, [data-planify-print] #vista-diario .affirmations-section, [data-planify-print] #vista-diario .morning-section { background: #ffffff !important; border-color: #e2e8f0 !important; }' +
       '[data-planify-print] #view-diario .aesthetic-input, [data-planify-print] #view-diario .aesthetic-textarea, [data-planify-print] #vista-diario .aesthetic-input, [data-planify-print] #vista-diario .aesthetic-textarea { background: #ffffff !important; border: 1px solid #cbd5e1 !important; color: #1e293b !important; }' +
       '[data-planify-print] #view-diario .day-summary, [data-planify-print] #vista-diario .day-summary { background: #ffffff !important; border: 1px solid #e2e8f0 !important; box-shadow: none !important; color: #0f172a !important; }' +
+      '[data-planify-print] .notebook-container, [data-planify-print] .planner-notebook, [data-planify-print] .notebook-grid, [data-planify-print] .notebook-col { background: #ffffff !important; border: 1px solid #cbd5e1 !important; box-shadow: none !important; color: #0f172a !important; }' +
+      '[data-planify-print] #view-diario .mood-btn, [data-planify-print] #view-diario .cloud-btn, [data-planify-print] #view-diario .sleep-clouds, [data-planify-print] #view-diario .aesthetic-btn, [data-planify-print] #vista-diario .mood-btn, [data-planify-print] #vista-diario .cloud-btn, [data-planify-print] #vista-diario .sleep-clouds, [data-planify-print] #vista-diario .aesthetic-btn { background: #ffffff !important; color: #0f172a !important; border: 1px solid #cbd5e1 !important; box-shadow: none !important; }' +
+      '[data-planify-print] #view-diario .routine-checkboxes, [data-planify-print] #vista-diario .routine-checkboxes { color: #1e293b !important; }' +
       'table, .main-grid-container, .cal-container { border-collapse: collapse !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; box-shadow: none !important; }' +
       'table, th, td, tr, .cal-dia, .cell, .week-grid { background: #ffffff !important; color: #0f172a !important; }' +
       '.card, .section-card, .dash-card, .main-card-container, .vista-container, .main-container, .cal-container, .grid-container, .month-grid, .tab-content, .view-content, .modal, .modal-content, .modal-box, input, select, textarea, .tarjeta, [class*="tarjeta"] { background: #ffffff !important; color: #0f172a !important; }' +

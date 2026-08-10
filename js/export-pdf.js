@@ -317,6 +317,22 @@
           lb.style.lineHeight = '1.1';
         }
       });
+      // Refuerzo v7.55: encabezados thead y leyenda inferior contiguos en el clon PDF
+      Array.prototype.forEach.call(clon.querySelectorAll('table.tabla-semanal thead, .tabla-semanal thead, #vista-semanal thead'), function(th) {
+        if (th.style) {
+          th.style.display = 'table-header-group';
+          th.style.visibility = 'visible';
+          th.style.opacity = '1';
+        }
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.seccion-leyenda-inferior, .leyenda-categorias, .leyenda-contenedor, .leyenda'), function(l) {
+        if (l.style) {
+          l.style.display = 'flex';
+          l.style.flexWrap = 'wrap';
+          l.style.visibility = 'visible';
+          l.style.opacity = '1';
+        }
+      });
     }
     clon.style.pageBreakAfter = 'avoid';
     clon.style.breakAfter = 'avoid';

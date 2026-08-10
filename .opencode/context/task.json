@@ -2066,6 +2066,12 @@
       "alcance": "Refactorizacion directa en js/app.js (DESBLOQUEADO por decision del usuario): renderDaySummary sin colores inline grises/deslavados (default #f0f1f5->#475569, dot pendientes #ddd->#475569) + bloque CSS limpio main.css v7.48 (.summary-banner + .summary-cat-item + refuerzo selectores reales #day-summary .ds-* blancos) + ?v=7.48 x3 + cache v134. NOTA BASELINE: js/app.js ya NO es identico a f89dab7; nuevo baseline = hash del commit v7.48. export-pdf.js NO modificado (sigue v7.46)",
       "commit": "cbb1bb5",
       "baseline_app_js": "cbb1bb5 (reemplaza f89dab7: app.js desbloqueado)"
+    },
+    {
+      "fase": 161,
+      "version": "v7.49",
+      "estado": "completada",
+      "alcance": "Banner resumen modo oscuro: app.js renderDaySummary contenedor #day-summary ahora con clase summary-banner (sin inline claros: #ffffff/#f0f1f5/#ddd verificados 0 en banner tras v7.48) + CSS v7.49 #day-summary/.summary-banner/.resumen-barra fondo #1e293b border rgba(255,255,255,0.1) color #ffffff + hijos blancos + ?v=7.49 x3 + cache v135. export-pdf.js NO modificado (sigue v7.46)"
     }
   ],
   "ultima_fase": {

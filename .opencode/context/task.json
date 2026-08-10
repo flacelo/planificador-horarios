@@ -2080,6 +2080,12 @@
       "version": "v7.50",
       "estado": "completada",
       "alcance": "Fix quirurgico de visibilidad permanente para botones Ver Horario/Dashboard y bitematizacion adaptativa de banner de resumen en Modo Claro/Oscuro. CSS v7.50: botones #day-summary/.summary-banner/[data-action] opacity/visibility 1, blanco con texto #0f172a, hover; banner claro (body.light-mode/theme-light/[data-theme=light]) #ffffff/#e2e8f0; oscuro retenido #1e293b/#334155, hijos #f8fafc. export-pdf.js v7.50: clon PDF blanco puro (#day-summary/.summary-banner/[class*=resumen] bg #ffffff, border #e2e8f0, hijos #0f172a opacity 1). app.js CONGELADO restaurado (no tocado). ?v=7.50 x3 + cache v136. baseline app.js sigue 2cf580d"
+    },
+    {
+      "fase": 163,
+      "version": "v7.51",
+      "estado": "completada",
+      "alcance": "Fix exclusivo de visibilidad y efecto hover para botones Ver Horario y Dashboard. CSS v7.51: estado normal (opacity/visibility 1, cursor pointer), oscuro reposo rgba(255,255,255,.1)/#f8fafc y hover #38bdf8 con glow + translateY(-1px), claro reposo #f1f5f9/#0f172a y hover #0284c7/#ffffff con sombra. app.js CONGELADO (no tocado, baseline 2cf580d), export-pdf.js sin cambios. ?v=7.51 x3 + cache v137"
     }
   ],
   "ultima_fase": {

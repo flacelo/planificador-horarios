@@ -1865,11 +1865,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.34, planify-cache-v120, Fase 146).",
       "verificacion": "VM test 8/8 PASS (12 asserts): inyeccion in situ tarjetas pastel, selectores reales, tabla 100%/620px, celdas padding 6px + multilinea, iframe 98vh/10.5px, main.css @media print, inyeccion th v7.33 intacta, js/app.js identico a f89dab7, ?v=7.34 x3, planify-cache-v120. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 147,
+      "version": "v7.35",
+      "fecha": "2026-08-10",
+      "alcance": "Fix de exportación A4 unipágina: contención en 1 sola hoja landscape, compactado de leyenda/licencia y eliminación de hojas fantasmas 2 a 6: en clonarVistaVisible() de js/export-pdf.js las celdas td/tr pasan a padding 2px 3px, line-height 1.15 y font-size 10px (reemplaza el padding 6px de v7.34); leyenda (.leyenda-categorias/.leyenda-etiquetas/.leyenda-contenedor/.leyenda) con flex wrap gap 4px margin-top 4px max-height 28px overflow hidden e items 8.5px/1px 4px; licencia (.footer-licencia/.licencia-texto/[data-licencia]) 8px line-height 1; clon con page-break-after/inside avoid, break-after/inside avoid, max-height 98vh y overflow hidden; @page del iframe a A4 landscape margin 4mm 6mm; css/main.css añade @media print con @page 4mm 6mm, html/body/[data-planify-print] height 100%/max-height 100vh/overflow hidden, saltos de página evitados y compactación de celdas/leyenda/licencia",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.35, planify-cache-v121, Fase 147).",
+      "verificacion": "VM test 9/9 PASS (14 asserts): celdas 2px 3px/1.15/10px, leyenda 28px flex wrap, items 8.5px, licencia 8px, clon break-avoid 98vh, @page 4mm 6mm, iframe [data-planify-print] 98vh, main.css @media print unipagina, tarjetas pastel v7.34 intactas, js/app.js identico a f89dab7, ?v=7.35 x3, planify-cache-v121. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.34",
-    "numero": 146,
+    "version": "v7.35",
+    "numero": 147,
     "estado": "EN PROGRESO"
   }
 }

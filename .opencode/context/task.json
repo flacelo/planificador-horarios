@@ -1880,11 +1880,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.35, planify-cache-v121, Fase 147).",
       "verificacion": "VM test 9/9 PASS (14 asserts): celdas 2px 3px/1.15/10px, leyenda 28px flex wrap, items 8.5px, licencia 8px, clon break-avoid 98vh, @page 4mm 6mm, iframe [data-planify-print] 98vh, main.css @media print unipagina, tarjetas pastel v7.34 intactas, js/app.js identico a f89dab7, ?v=7.35 x3, planify-cache-v121. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 148,
+      "version": "v7.36",
+      "fecha": "2026-08-10",
+      "alcance": "Fix de exportación multivista A4 landscape: aislamiento por página para 4 vistas, visibilidad completa de resumen de actividades y encaje íntegro de la cuadrícula semanal. En js/export-pdf.js: cada vista seleccionada de generarPDF() se envuelve en .pdf-seccion.planify-pdf-page (1 página A4 landscape independiente por vista, break-after page salvo la última); clonarVistaVisible() ajusta proporciones verticales eliminando la contención que recortaba (clon con height auto/max-height none/overflow visible), celdas td/tr a padding 3px 2px, font-size 9.5px y line-height 1.2, eventos (.evento-card/.pildora-actividad/[class*=evento]) a 9px/2px 4px/1.1 preservando colores pastel con propiedades individuales, y corrige la barra de resumen (.resumen-barra/[class*=resumen]) con white-space normal, flex wrap, overflow visible y font-size 10px; iframe con @page A4 landscape 6mm, table height auto, reglas .planify-pdf-page:not(:last-child) break-after page y resumen-barra; css/main.css añade @media print v7.36 (@page 6mm, html/body height auto overflow visible, .planify-pdf-page page-break-inside avoid, resumen legible, ocultar .btn-remove/.remove-btn/.day-header-delete/.no-print/nav/header)",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.36, planify-cache-v122, Fase 148).",
+      "verificacion": "VM test 20/20 PASS: envoltura .planify-pdf-page por vista, break-after page excepto ultima, resumen-barra legible in situ/iframe/main.css, clon sin recorte (maxHeight none/overflow visible, table height auto), celdas 3px 2px/9.5px/1.2, eventos 9px, @page iframe 6mm, main.css @media print v7.36 completo, regresiones v7.33/v7.34/v7.35 intactas, js/app.js identico a f89dab7, ?v=7.36 x3, planify-cache-v122. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.35",
-    "numero": 147,
+    "version": "v7.36",
+    "numero": 148,
     "estado": "EN PROGRESO"
   }
 }

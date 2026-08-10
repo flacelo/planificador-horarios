@@ -2000,11 +2000,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.43, planify-cache-v129, Fase 155).",
       "verificacion": "VM test 17/17 PASS: main.css banner rgba oscuro, hijos f8fafc/strong blanco, light-mode claro, @media print claro, clon setProperty selectores nuevos, iframe summary-banner sin shadow/backdrop, regresiones v7.41/v7.42 intactas, js/app.js identico a f89dab7, ?v=7.43 x3, planify-cache-v129. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 156,
+      "version": "v7.44",
+      "fecha": "2026-08-10",
+      "alcance": "Fix nuclear de visibilidad de texto en banner de resumen con sobreescritura universal de opacidad y color blanco puro. En css/main.css: bloque v7.44 con .resumen-hoy/.resumen-barra/.summary-banner/[class*=resumen]/#resumen-hoy a background #1e293b, border rgba(255,255,255,0.2), radius 12px y padding 12px 18px; TODOS los hijos forzados a #ffffff, opacity 1, text-shadow 0 1px 2px rgba(0,0,0,0.5), font-weight 600 y letter-spacing 0.2px; span[style*=color] a font-weight 700; @media print con fondo #ffffff/border #cbd5e1 e hijos a #0f172a sin text-shadow. En js/export-pdf.js: sanitización nuclear v7.44 en clonarVistaVisible() sobre .resumen-hoy/.resumen-barra/.summary-banner/[class*=resumen]/#resumen-hoy con setProperty (bg #ffffff, border 1px solid #cbd5e1; hijos a #0f172a/opacity 1) y regla span[style*=color] añadida al CSS del iframe",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.44, planify-cache-v130, Fase 156).",
+      "verificacion": "VM test 14/14 PASS: main.css banner 1e293b/hijos blancos con text-shadow/span[style*=color] 700/print claro, clon setProperty version clara, iframe span[style*=color], regresiones v7.42/v7.43 intactas, js/app.js identico a f89dab7, ?v=7.44 x3, planify-cache-v130. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.43",
-    "numero": 155,
+    "version": "v7.44",
+    "numero": 156,
     "estado": "EN PROGRESO"
   }
 }

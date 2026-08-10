@@ -1,4 +1,4 @@
-// PLANIFY v7.34 - Exportador PDF Premium (Padding, Alto Vertical A4 y Multilínea)
+// PLANIFY v7.35 - Exportador PDF Unipágina A4 Landscape (Leyenda + Licencia contenidas)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -95,9 +95,24 @@
         if (t.setAttribute) t.setAttribute('style', 'height:100%!important;min-height:620px!important;');
       });
       Array.prototype.forEach.call(clon.querySelectorAll('td, tr'), function(c) {
-        if (c.setAttribute) c.setAttribute('style', 'padding-top:6px!important;padding-bottom:6px!important;vertical-align:middle!important;word-break:break-word!important;white-space:normal!important;');
+        if (c.setAttribute) c.setAttribute('style', 'padding:2px 3px!important;line-height:1.15!important;font-size:10px!important;vertical-align:middle!important;word-break:break-word!important;white-space:normal!important;');
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias, .leyenda-etiquetas, .leyenda-contenedor, .leyenda'), function(l) {
+        if (l.setAttribute) l.setAttribute('style', 'display:flex!important;flex-wrap:wrap!important;gap:4px!important;margin-top:4px!important;padding:2px 0!important;max-height:28px!important;overflow:hidden!important;');
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias span, .leyenda-etiquetas span, .leyenda span, .legend-item'), function(i) {
+        if (i.setAttribute) i.setAttribute('style', 'font-size:8.5px!important;padding:1px 4px!important;height:auto!important;line-height:1!important;');
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.footer-licencia, .licencia-texto, [data-licencia]'), function(f) {
+        if (f.setAttribute) f.setAttribute('style', 'margin-top:2px!important;font-size:8px!important;padding:0!important;line-height:1!important;');
       });
     }
+    clon.style.pageBreakAfter = 'avoid';
+    clon.style.breakAfter = 'avoid';
+    clon.style.pageBreakInside = 'avoid';
+    clon.style.breakInside = 'avoid';
+    clon.style.maxHeight = '98vh';
+    clon.style.overflow = 'hidden';
     clon.style.backgroundColor = '#ffffff';
     clon.style.color = '#0f172a';
     clon.style.display = 'block';
@@ -256,7 +271,7 @@
       'thead th, .cal-dia-nombre, .week-header-day, .day-header, .hora-col, .celda-header, .month-header, .cal-titulo, [class*="month-title"], [class*="cal-title"] { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
       'th, td, .celda, .grid-cell, .month-cell, .cell-content { padding: 8px 10px !important; border-radius: 6px !important; }' +
       '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 6px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
-      '@page { size: A4 landscape; margin: 5mm; }' +
+      '@page { size: A4 landscape; margin: 4mm 6mm; }' +
       '[data-planify-print] .btn-remove, [data-planify-print] .remove-btn, [data-planify-print] .btn-eliminar-fila, [data-planify-print] .btn-delete, [data-planify-print] .close-x, [data-planify-print] .day-header-delete, [data-planify-print] [data-action="delete"], [data-planify-print] .delete-icon, [data-planify-print] .btn-eliminar, [data-planify-print] button.close, [data-planify-print] .x-btn, [data-planify-print] .close-btn, [data-planify-print] button { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }' +
       '[data-planify-print] th, [data-planify-print] .day-header, [data-planify-print] .tabla-semanal th, [data-planify-print] th[class*="header"], [data-planify-print] th * { background-color: #0f172a !important; color: #ffffff !important; font-weight: 700 !important; text-align: center !important; padding: 6px !important; font-size: 11px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '[data-planify-print] .col-hora, [data-planify-print] td:first-child, [data-planify-print] .hora-cell { background-color: #f1f5f9 !important; color: #0f172a !important; font-weight: 700 !important; text-align: center !important; }' +
@@ -264,6 +279,11 @@
       '[data-planify-print] table { height: 98vh !important; }' +
       '[data-planify-print] td, [data-planify-print] th { vertical-align: middle !important; }' +
       '[data-planify-print] .evento-item, [data-planify-print] .pildora-actividad, [data-planify-print] [data-planify-event], [data-planify-print] [data-evento] { padding: 4px 6px !important; font-size: 10.5px !important; line-height: 1.3 !important; border-radius: 5px !important; }' +
+      '[data-planify-print] td, [data-planify-print] tr { padding: 2px 3px !important; line-height: 1.15 !important; font-size: 10px !important; }' +
+      '[data-planify-print] .leyenda-categorias, [data-planify-print] .leyenda-etiquetas, [data-planify-print] .leyenda-contenedor, [data-planify-print] .leyenda { display: flex !important; flex-wrap: wrap !important; gap: 4px !important; margin-top: 4px !important; padding: 2px 0 !important; max-height: 28px !important; overflow: hidden !important; }' +
+      '[data-planify-print] .leyenda span, [data-planify-print] .legend-item { font-size: 8.5px !important; padding: 1px 4px !important; height: auto !important; line-height: 1 !important; }' +
+      '[data-planify-print] .footer-licencia, [data-planify-print] .licencia-texto, [data-planify-print] [data-licencia] { margin-top: 2px !important; font-size: 8px !important; padding: 0 !important; line-height: 1 !important; }' +
+      '[data-planify-print] { page-break-inside: avoid !important; page-break-after: avoid !important; break-after: avoid !important; max-height: 98vh !important; overflow: hidden !important; }' +
       '</style></head>' +
       '<body class="' + (clasesPrint || '') + '">' +
       '<div data-planify-print="1">' + nodosHTML + '</div>' +

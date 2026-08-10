@@ -1985,11 +1985,26 @@
       "desviaciones": "El prompt cito v7.41/planify-cache-v127/Fase 153 que YA EXISTEN (commit 2e6147f, Fase 153 registrada). Se aplica como v7.42 (patron real siguiente a v7.41), cache v128, Fase 154, para no duplicar versiones ni fases.",
       "verificacion": "VM test 15/15 PASS: main.css con selectores *[style]/span[style] en modo oscuro (f1f5f9) y claro (0f172a), clon removeAttribute style en hijos, iframe con regla *[style], regresiones v7.40/v7.41 intactas, js/app.js identico a f89dab7, ?v=7.42 x3, planify-cache-v128. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 155,
+      "version": "v7.43",
+      "fecha": "2026-08-10",
+      "alcance": "Fix nuclear de visibilidad con sobreescritura universal (*) en banner de resumen de hoy para alto contraste en modo oscuro y claro/PDF. En css/main.css: bloque v7.43 con .resumen-hoy/.resumen-barra/.summary-banner/[class*=resumen]/#resumen-hoy a background rgba(30,41,59,0.85), border rgba(255,255,255,0.15), radius 12px, padding 10px 16px, box-shadow y backdrop-filter blur(8px); TODOS los hijos forzados a #f8fafc, opacity 1, text-shadow none y font-weight 500; strong/b a #ffffff/700; body.light-mode con fondo #ffffff/border #cbd5e1 e hijos a #0f172a; @media print con fondo blanco e hijos #0f172a. En js/export-pdf.js: sanitización nuclear v7.43 en clonarVistaVisible() sobre .resumen-hoy/.resumen-barra/.summary-banner/[class*=resumen]/#resumen-hoy con setProperty (bg #ffffff, border 1px solid #cbd5e1; hijos a #0f172a/opacity 1) y reglas equivalentes en el CSS del iframe (box-shadow none, backdrop-filter none)",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.43, planify-cache-v129, Fase 155).",
+      "verificacion": "VM test 17/17 PASS: main.css banner rgba oscuro, hijos f8fafc/strong blanco, light-mode claro, @media print claro, clon setProperty selectores nuevos, iframe summary-banner sin shadow/backdrop, regresiones v7.41/v7.42 intactas, js/app.js identico a f89dab7, ?v=7.43 x3, planify-cache-v129. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.42",
-    "numero": 154,
+    "version": "v7.43",
+    "numero": 155,
     "estado": "EN PROGRESO"
   }
 }

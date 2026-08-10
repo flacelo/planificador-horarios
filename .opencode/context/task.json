@@ -2015,11 +2015,25 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.44, planify-cache-v130, Fase 156).",
       "verificacion": "VM test 14/14 PASS: main.css banner 1e293b/hijos blancos con text-shadow/span[style*=color] 700/print claro, clon setProperty version clara, iframe span[style*=color], regresiones v7.42/v7.43 intactas, js/app.js identico a f89dab7, ?v=7.44 x3, planify-cache-v130. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 157,
+      "version": "v7.45",
+      "fecha": "2026-08-10",
+      "alcance": "Ajuste de fondo #1e293b y contraste blanco radiante en el banner de resumen de hoy. En css/main.css: bloque v7.45 con .resumen-hoy/.resumen-barra/.summary-banner/[class*=resumen]/#resumen-hoy a background y background-color #1e293b, border #334155, radius 12px y padding 10px 16px; TODOS los hijos forzados a #ffffff, opacity 1 y font-weight 600; span a #f8fafc; body.light-mode con fondo #f8fafc, border #cbd5e1 e hijos a #0f172a; @media print con fondo #ffffff/border #cbd5e1 e hijos a #0f172a. Tarea CSS-only (sin cambios en js/export-pdf.js)",
+      "archivos": [
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.45, planify-cache-v131, Fase 157). Prompt CSS-only, no se modifico js/export-pdf.js.",
+      "verificacion": "VM test 11/11 PASS: banner background/background-color 1e293b, hijos blancos 600, span f8fafc, light-mode f8fafc/0f172a, print blanco/0f172a, regresiones v7.41/v7.43/v7.44 intactas, js/app.js identico a f89dab7, ?v=7.45 x3, planify-cache-v131. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.44",
-    "numero": 156,
+    "version": "v7.45",
+    "numero": 157,
     "estado": "EN PROGRESO"
   }
 }

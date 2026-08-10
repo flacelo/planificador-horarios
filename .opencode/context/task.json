@@ -1584,6 +1584,32 @@
         "vm_test": "PASS (3/3 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.18",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 132 (v7.18): Pulido exclusivo de la Vista Diario (#view-diario) en pantalla y en exportacion PDF/impresion",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "IDENTIFICACION: la vista diario real es #view-diario (estilo notebook crema #fdfbf7, radius 18px, sombra 0 10px 25px, secciones pastel goals/grateful/affirmations/morning y inputs .aesthetic-input/.aesthetic-textarea) - la tarjeta crema con sombra y radius grande era la que se encogia en A4",
+        "PANTALLA (modo claro, solo #view-diario): contenedor a #ffffff con borde 1px #e2e8f0, radius 12px, sombra sutil 0 1px 3px; cabecera .notebook-header sin fondo (background:none) y borde inferior 1px #e2e8f0, titulo h2 en #0f172a; .card-section blancas con borde #e2e8f0 sin sombra; secciones pastel forzadas a #ffffff con borde #e2e8f0; inputs/textarea en blanco con borde #cbd5e1 y texto #1e293b; .day-summary limpio",
+        "PDF/IFRAME ([data-planify-print] #view-diario/#vista-diario): background #ffffff !important, color #0f172a !important, width/max-width 100% !important, margin/padding 0 !important, box-shadow none !important, border-radius 0 !important, borde 1px #cbd5e1 !important; mismas reglas de cabecera, secciones, inputs y day-summary",
+        "@media print (main.css): mismas reglas de pantalla aplicadas a #view-diario sin tocar padding/margin global (no desplaza nada)",
+        "El clon hereda la purga v7.17 (clases oscuras e inline oscuros eliminados); los fondos pastel del notebook se conservan en el clon pero son cubiertos por el CSS !important del iframe",
+        "js/app.js CONGELADO (identico a f89dab7); cero cambios en DOM; solo export-pdf.js + CSS",
+        "Bump: ?v=7.17 -> ?v=7.18 (3 referencias) y planify-cache-v104 -> planify-cache-v105 (patron del proyecto: +1 por version)",
+        "Deploy: git push a main (Vercel auto-deploy)"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (4/4 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

@@ -1,4 +1,4 @@
-/* PLANIFY v7.19 - EXPORTACIÓN PDF: VISTA DIARIO SIN SOMBRAS NI BORDES PESADOS */
+/* PLANIFY v7.20 - EXPORTACIÓN PDF: VISTA SEMANAL SIMÉTRICA, CENTRADA Y BLANCA */
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -162,7 +162,7 @@
       '<style>' +
       'body { background: #ffffff !important; color: #0f172a !important; padding: 0 !important; margin: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '.sidebar, #panel-control, #side-panel, .side-panel, .sidebar-panel, .modal-overlay, .side-overlay, .sidebar-overlay, .modal, button, .btn, #modal-export-pdf-overlay { display: none !important; }' +
-      '.no-print, input[type="button"], input[type="submit"], .editar, .edit, .controls, .acciones, .actions { display: none !important; }' +
+      '.no-print, input[type="button"], input[type="submit"], .editar, .edit, .controls, .acciones, .actions, .empty-state, #empty-state, #horario-vacio-banner { display: none !important; }' +
       '.tab-content, .view-content, [data-tab-content] { display: none !important; }' +
       '[data-planify-print] { display: block !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; background: #ffffff !important; color: #0f172a !important; overflow: visible !important; }' +
       '[data-planify-print] * { box-shadow: none !important; }' +
@@ -181,6 +181,14 @@
       '[data-planify-print] .notebook-container, [data-planify-print] .planner-notebook, [data-planify-print] .notebook-grid, [data-planify-print] .notebook-col { background: #ffffff !important; border: 1px solid #cbd5e1 !important; box-shadow: none !important; color: #0f172a !important; }' +
       '[data-planify-print] #view-diario .mood-btn, [data-planify-print] #view-diario .cloud-btn, [data-planify-print] #view-diario .sleep-clouds, [data-planify-print] #view-diario .aesthetic-btn, [data-planify-print] #vista-diario .mood-btn, [data-planify-print] #vista-diario .cloud-btn, [data-planify-print] #vista-diario .sleep-clouds, [data-planify-print] #vista-diario .aesthetic-btn { background: #ffffff !important; color: #0f172a !important; border: 1px solid #cbd5e1 !important; box-shadow: none !important; }' +
       '[data-planify-print] #view-diario .routine-checkboxes, [data-planify-print] #vista-diario .routine-checkboxes { color: #1e293b !important; }' +
+      '[data-planify-print] #view-semanal table, [data-planify-print] #view-table table, [data-planify-print] #vista-semanal table, [data-planify-print] #tabla { table-layout: fixed !important; width: 100% !important; background: #ffffff !important; border-collapse: collapse !important; box-shadow: none !important; }' +
+      '[data-planify-print] #view-semanal tr, [data-planify-print] #view-table tr, [data-planify-print] #vista-semanal tr, [data-planify-print] #tabla tr { background: #ffffff !important; }' +
+      '[data-planify-print] #view-semanal thead th, [data-planify-print] #view-table thead th, [data-planify-print] #vista-semanal thead th, [data-planify-print] #tabla thead th { background: #f8fafc !important; border: 1px solid #cbd5e1 !important; color: #0f172a !important; font-weight: 700 !important; text-align: center !important; vertical-align: middle !important; padding: 8px 4px !important; }' +
+      '[data-planify-print] #view-semanal td, [data-planify-print] #view-table td, [data-planify-print] #vista-semanal td, [data-planify-print] #tabla td, [data-planify-print] #view-semanal .celda, [data-planify-print] #view-table .celda { border: 1px solid #cbd5e1 !important; background: #ffffff !important; color: #0f172a !important; text-align: center !important; vertical-align: middle !important; padding: 6px 4px !important; }' +
+      '[data-planify-print] #view-semanal .hora-col, [data-planify-print] #view-table .hora-col, [data-planify-print] #vista-semanal .hora-col, [data-planify-print] #view-semanal .hora-cell, [data-planify-print] #view-table .hora-cell, [data-planify-print] #view-semanal .celda-header, [data-planify-print] #view-table .celda-header { width: 85px !important; text-align: center !important; vertical-align: middle !important; font-weight: 600 !important; color: #334155 !important; }' +
+      '[data-planify-print] #view-semanal .cal-evento, [data-planify-print] #view-table .cal-evento, [data-planify-print] #vista-semanal .cal-evento, [data-planify-print] #view-semanal .evento, [data-planify-print] #view-table .evento { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; font-weight: 500 !important; font-size: 0.85rem !important; color: #0f172a !important; border-radius: 6px !important; }' +
+      '[data-planify-print] .leyenda { justify-content: center !important; }' +
+      '[data-planify-print] .leyenda span { color: #0f172a !important; background: #f8fafc !important; border: 1px solid #e2e8f0 !important; }' +
       'table, .main-grid-container, .cal-container { border-collapse: collapse !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; box-shadow: none !important; }' +
       'table, th, td, tr, .cal-dia, .cell, .week-grid { background: #ffffff !important; color: #0f172a !important; }' +
       '.card, .section-card, .dash-card, .main-card-container, .vista-container, .main-container, .cal-container, .grid-container, .month-grid, .tab-content, .view-content, .modal, .modal-content, .modal-box, input, select, textarea, .tarjeta, [class*="tarjeta"] { background: #ffffff !important; color: #0f172a !important; }' +

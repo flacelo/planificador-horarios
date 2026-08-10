@@ -1636,6 +1636,32 @@
         "vm_test": "PASS (5/5 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "version": "7.20",
+      "fecha": "2026-08-09",
+      "alcance": "Fase 134 (v7.20): Rediseno simetrico, centrado de celdas y sanitizacion a fondo blanco puro para Vista Semanal (pantalla + PDF)",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": [
+        "NOTA DE VERSIONES: la solicitud citaba ?v=7.19 y planify-cache-v102, pero el historial real estaba en ?v=7.19/planify-cache-v106; se aplico el patron del proyecto (+1): ?v=7.20 (3 referencias) y planify-cache-v107; fase siguiente real: 134",
+        "IDENTIFICACION: tabla real de la vista semanal es #tabla dentro de #view-semanal/#view-table; columna de hora .hora-col/.hora-cell/.celda-header; leyenda .leyenda; banner vacio es .empty-state#empty-state (no existe #horario-vacio-banner, incluido igualmente por seguridad)",
+        "PANTALLA (modo claro): #view-semanal/#view-table/#tabla con table-layout:fixed + width:100% + fondo blanco + border-collapse; TH de dias con #f8fafc, borde #cbd5e1, texto #0f172a, weight 700, centrados, padding 8px 4px; TD/.celda blancos con borde #cbd5e1, texto #0f172a, text-align center, vertical-align middle, padding 6px 4px",
+        "COLUMNA HORA: ancho fijo 85px (rango pedido 80-90px), centrada horizontal y verticalmente, weight 600, color #334155; con table-layout fixed las 7 columnas de dias se distribuyen equitativamente",
+        "ACTIVIDADES: .cal-evento/.evento con display:flex; align-items:center; justify-content:center; text-align:center; font-weight:500; font-size:0.85rem; color #0f172a; radius 6px (se conservan sus colores pastel de categoria)",
+        "LEYENDA: .leyenda centrada; pildoras .leyenda span con texto #0f172a, fondo #f8fafc y borde #e2e8f0",
+        "PDF/IMPRESION: mismas reglas en @media print (main.css) y CSS del iframe ([data-planify-print] #view-semanal/#view-table/#vista-semanal/#tabla) incluyendo TR blancos; ocultamiento de .empty-state, #empty-state y #horario-vacio-banner en el iframe y en @media print para dejar solo la tabla y leyendas; la purga de fondos oscuros v7.16/v7.17 sigue activa en el clon",
+        "js/app.js CONGELADO (identico a f89dab7); cero cambios de posicion de botones o componentes; solo css/main.css + js/export-pdf.js + index.html + sw.js"
+      ],
+      "verificacion": {
+        "build": "OK",
+        "vm_test": "PASS (4/4 grupos)"
+      },
+      "commit": "PENDIENTE"
     }
   ]
 }

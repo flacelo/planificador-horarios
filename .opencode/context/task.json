@@ -2104,6 +2104,12 @@
       "version": "v7.54",
       "estado": "completada",
       "alcance": "Ajuste de densidad vertical en Vista Semanal PDF: encaje completo de 7:00 a 23:00, leyenda e informacion inferior sin recortes. export-pdf.js v7.54 (bloque en clonarVistaVisible): td/th padding 2px 3px height auto, eventos 8.5px lh 1.1, col-hora 8px padding 2px, leyenda flex wrap gap 4 margin-top 4 + etiquetas 8px. main.css: @media print A4 landscape margin 4mm 5mm, tabla semanal 100% collapse, th/td 2px 3px, leyenda margin-top 4px. app.js CONGELADO (baseline 2cf580d). ?v=7.54 x3 + cache v140"
+    },
+    {
+      "fase": 167,
+      "version": "v7.55",
+      "estado": "completada",
+      "alcance": "DESVIACION: el prompt repitio v7.54/v140/Fase 166 (ya aplicada en e8eb5c9) con contenido distinto -> aplicado como v7.55. Correccion de densidad vertical y visibilidad de dias/leyenda en Vista Semanal: CSS .semanal-container/#vista-semanal flex column sin overflow, thead sticky con var(--bg-header), td 4px 6px 0.82rem, seccion-leyenda-inferior flex center gap 8, @media print @page 5mm tabla 100% page-break-inside auto, tr avoid, th/td 2px 4px 8.5px, leyenda avoid 6px. export-pdf.js v7.55: thead table-header-group + leyenda visible contiguos en clon. app.js CONGELADO (baseline 2cf580d). ?v=7.55 x3 + cache v141"
     }
   ],
   "ultima_fase": {

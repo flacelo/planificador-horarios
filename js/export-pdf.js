@@ -1,4 +1,4 @@
-// PLANIFY v7.46 - Override Definitivo Fondo Oscuro y Texto Blanco Banner Resumen (App + PDF)
+// PLANIFY v7.50 - Override Definitivo Fondo Oscuro y Texto Blanco Banner Resumen (App + PDF)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -248,6 +248,21 @@
               if (h.style) {
                 h.style.setProperty('color', '#0f172a', 'important');
                 h.style.setProperty('opacity', '1', 'important');
+              }
+            });
+          }
+        });
+      }
+      // Fix v7.50: banner y botones en versión impresa blanca pura dentro del clon PDF
+      if (clon.querySelectorAll) {
+        Array.prototype.forEach.call(clon.querySelectorAll('#day-summary, .summary-banner, .resumen-barra, [class*="resumen"]'), function(rb) {
+          if (rb.style) {
+            rb.style.backgroundColor = '#ffffff';
+            rb.style.border = '1px solid #e2e8f0';
+            Array.prototype.forEach.call(rb.querySelectorAll('*'), function(h) {
+              if (h.style) {
+                h.style.color = '#0f172a';
+                h.style.opacity = '1';
               }
             });
           }

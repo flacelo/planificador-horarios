@@ -2074,6 +2074,12 @@
       "alcance": "Banner resumen modo oscuro: app.js renderDaySummary contenedor #day-summary ahora con clase summary-banner (sin inline claros: #ffffff/#f0f1f5/#ddd verificados 0 en banner tras v7.48) + CSS v7.49 #day-summary/.summary-banner/.resumen-barra fondo #1e293b border rgba(255,255,255,0.1) color #ffffff + hijos blancos + ?v=7.49 x3 + cache v135. export-pdf.js NO modificado (sigue v7.46)",
       "commit": "2cf580d",
       "baseline_app_js": "2cf580d (reemplaza cbb1bb5)"
+    },
+    {
+      "fase": 162,
+      "version": "v7.50",
+      "estado": "completada",
+      "alcance": "Fix quirurgico de visibilidad permanente para botones Ver Horario/Dashboard y bitematizacion adaptativa de banner de resumen en Modo Claro/Oscuro. CSS v7.50: botones #day-summary/.summary-banner/[data-action] opacity/visibility 1, blanco con texto #0f172a, hover; banner claro (body.light-mode/theme-light/[data-theme=light]) #ffffff/#e2e8f0; oscuro retenido #1e293b/#334155, hijos #f8fafc. export-pdf.js v7.50: clon PDF blanco puro (#day-summary/.summary-banner/[class*=resumen] bg #ffffff, border #e2e8f0, hijos #0f172a opacity 1). app.js CONGELADO restaurado (no tocado). ?v=7.50 x3 + cache v136. baseline app.js sigue 2cf580d"
     }
   ],
   "ultima_fase": {

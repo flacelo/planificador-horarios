@@ -1,4 +1,4 @@
-// PLANIFY v7.37 - Fix Definitivo Visibilidad y Contraste Barra Resumen de Hoy (App + PDF)
+// PLANIFY v7.38 - Aislamiento de Páginas PDF Multivista (1 hoja por vista, Cuadrícula Completa)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -328,6 +328,13 @@
       '[data-planify-print] { page-break-inside: avoid !important; height: auto !important; max-height: none !important; overflow: visible !important; }' +
       '[data-planify-print] .planify-pdf-page { width: 100% !important; box-sizing: border-box !important; page-break-inside: avoid !important; }' +
       '[data-planify-print] .planify-pdf-page:not(:last-child) { break-after: page !important; page-break-after: always !important; }' +
+      '[data-planify-print] .planify-pdf-page { display: flex !important; flex-direction: column !important; justify-content: space-between !important; height: 100vh !important; max-height: 100vh !important; overflow: hidden !important; page-break-after: always !important; break-after: page !important; page-break-inside: avoid !important; break-inside: avoid !important; box-sizing: border-box !important; }' +
+      '[data-planify-print] .planify-pdf-page:last-child { page-break-after: auto !important; break-after: auto !important; }' +
+      '[data-planify-print] .planify-pdf-page #vista-semanal, [data-planify-print] .planify-pdf-page #view-semanal, [data-planify-print] .planify-pdf-page #view-table, [data-planify-print] .planify-pdf-page [data-vista="semanal"] { display: flex !important; flex-direction: column !important; height: 100% !important; }' +
+      '[data-planify-print] .planify-pdf-page table { font-size: 9.5px !important; border-collapse: collapse !important; }' +
+      '[data-planify-print] .planify-pdf-page td, [data-planify-print] .planify-pdf-page th { padding: 2px 4px !important; line-height: 1.2 !important; }' +
+      '[data-planify-print] .planify-pdf-page .leyenda-categorias, [data-planify-print] .planify-pdf-page .footer-licencia { margin-top: 4px !important; padding: 2px 0 !important; font-size: 8.5px !important; }' +
+      '[data-planify-print] .planify-pdf-page #view-semanal .leyenda-categorias, [data-planify-print] .planify-pdf-page #view-table .leyenda-categorias, [data-planify-print] .planify-pdf-page #view-semanal .leyenda, [data-planify-print] .planify-pdf-page #view-table .leyenda, [data-planify-print] .planify-pdf-page #view-semanal .footer-licencia, [data-planify-print] .planify-pdf-page #view-table .footer-licencia, [data-planify-print] .planify-pdf-page #view-semanal [data-licencia], [data-planify-print] .planify-pdf-page #view-table [data-licencia] { margin-top: auto !important; }' +
       '</style></head>' +
       '<body class="' + (clasesPrint || '') + '">' +
       '<div data-planify-print="1">' + nodosHTML + '</div>' +

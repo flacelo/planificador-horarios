@@ -1910,11 +1910,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.37, planify-cache-v123, Fase 149).",
       "verificacion": "VM test 16/16 PASS: main.css pantalla (flex/contraste/text-muted), main.css @media print, clon in situ (display flex/visible/opacity/color/gap 12px), iframe (flex/bg/borde + contraste hijos), regresiones v7.36 intactas (resumen whiteSpace normal, planify-pdf-page, celdas 3px 2px), js/app.js identico a f89dab7, ?v=7.37 x3, planify-cache-v123. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 150,
+      "version": "v7.38",
+      "fecha": "2026-08-10",
+      "alcance": "Aislamiento de páginas independientes para exportación multivista PDF (1 página por vista) y encaje íntegro de la cuadrícula semanal con leyenda. En js/export-pdf.js: el CSS embebido del iframe refuerza .planify-pdf-page con display flex column, justify-content space-between, height/max-height 100vh, overflow hidden, page-break-after always (auto en :last-child) y page-break-inside/break-inside avoid; selectores reales (#view-semanal/#view-table/[data-vista=semanal]) a flex column height 100%; table 9.5px collapse; td/th 2px 4px line-height 1.2; leyenda/footer compactados 8.5px y anclados al pie con margin-top auto para que la leyenda quede dentro de la hoja. En css/main.css: bloque @media print v7.38 con las mismas reglas (@page A4 landscape 6mm, .planify-pdf-page estricto, :last-child auto, semanal flex column, tabla 9.5px, celdas 2px 4px, leyenda/footer al pie)",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.38, planify-cache-v124, Fase 150). Se añadieron selectores reales y anclaje margin-top auto como refuerzo en el iframe para garantizar el encaje de la leyenda.",
+      "verificacion": "VM test 18/18 PASS: main.css @media print v7.38 completo (flex 100vh, last-child auto, semanal flex, tabla 9.5px, celdas 2px 4px, leyenda pie), iframe con reglas equivalentes + selectores reales #view-semanal/#view-table + margin-top auto, regresiones v7.36/v7.37 intactas, js/app.js identico a f89dab7, ?v=7.38 x3, planify-cache-v124. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.37",
-    "numero": 149,
+    "version": "v7.38",
+    "numero": 150,
     "estado": "EN PROGRESO"
   }
 }

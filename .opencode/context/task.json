@@ -1822,11 +1822,25 @@
       "desviaciones": "None. El snippet literal se integro preservando el flujo existente (modal/OPCIONES/clonarVistaVisible/imprimirVistas) en lugar de reemplazar el archivo. No hubo cambios en css/main.css en esta version.",
       "verificacion": "VM test 6/6 PASS (11 asserts): @page A4 landscape 6mm (sin portrait), deteccion #view-*.active prioritaria, remocion fisica X intacta, timeout 350/500, modal/generarPDF/pdf-print-iframe intactos, js/app.js identico a f89dab7, ?v=7.31 x3, planify-cache-v117. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 144,
+      "version": "v7.32",
+      "fecha": "2026-08-10",
+      "alcance": "Fix de aislamiento de PDF de vista única, remoción física de botones X y alto contraste en cabeceras de días/horas: en js/export-pdf.js la purga física de clonarVistaVisible() se amplía con button.close/.x-btn/.close-btn/[onclick*=eliminar]/[onclick*=remove]; window.detectarVistaActiva queda expuesta globalmente y exportarVistaAPDF() la usa como fallback tras detectar #view-semanal.active/#vista-semanal.active por niveles; el clon aislado recibe id pdf-clone-isolated; @page pasa a A4 landscape margin 5mm; CSS del iframe añade th/.day-header/.tabla-semanal th/th[class*=header]/th * en #0f172a con texto #ffffff 700 11px, .col-hora/td:first-child/.hora-cell en #f1f5f9/#0f172a, y ocultamiento de todo button residual dentro de [data-planify-print]; limpieza del iframe a 1000ms (print sigue 350ms)",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "El snippet literal proponía reemplazar todo export-pdf.js; se integró preservando el flujo existente (modal #modal-export-pdf, OPCIONES cronológicas, clonarVistaVisible con purga esColorOscuro, imprimirVistas con wrapper [data-planify-print] y CSS acumulado v7.13-v7.31). No hubo cambios en css/main.css.",
+      "verificacion": "VM test 8/8 PASS (13 asserts): @page landscape 5mm, clon pdf-clone-isolated, purga ampliada, window.detectarVistaActiva, alto contraste th/col-hora en iframe, button oculto, timeout 350/1000, modal intacto, js/app.js identico a f89dab7, ?v=7.32 x3, planify-cache-v118. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.31",
-    "numero": 143,
+    "version": "v7.32",
+    "numero": 144,
     "estado": "EN PROGRESO"
   }
 }

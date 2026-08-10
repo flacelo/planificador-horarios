@@ -1748,11 +1748,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.25, planify-cache-v112, Fase 138).",
       "verificacion": "VM test 7/7 PASS (12 asserts): th #0f172a/opacity/visibility, td:first-child #e2e8f0, tabla 100% collapse, .pdf-export-container, iframe con selectores universales, bloque v7.24 intacto, js/app.js identico a f89dab7, ?v=7.25 x3, planify-cache-v112. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 139,
+      "version": "v7.26",
+      "fecha": "2026-08-10",
+      "alcance": "Rediseño de alto contraste e inyección directa para días y horas en PDF semanal: @media print cabeceras de días (th #vista-semanal/.tabla-semanal + reales #view-semanal/#view-table/#tabla thead y sus hijos *) con fondo #0f172a, texto #ffffff, weight 800, 12px, uppercase, letter-spacing 0.5px, opacity/visibility forzados y borde #1e293b; columna de rangos horarios (td:first-child, .col-hora, .hora-cell + reales) con #e2e8f0/#0f172a/700/11px y borde #cbd5e1; tabla al 100% con border-collapse collapse; píldoras .actividad-pill/.evento-item/.pildora-actividad/[data-evento] + eventos reales con radius 6px y weight 600; .pdf-export-container con th #0f172a/blanco y td:first-child #e2e8f0; mismas reglas inyectadas al iframe de export-pdf.js",
+      "archivos": [
+        "css/main.css",
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.26, planify-cache-v113, Fase 139).",
+      "verificacion": "VM test 8/8 PASS (12 asserts): th #0f172a/letter-spacing/borde #1e293b, td:first-child #e2e8f0, tabla 100% collapse, pildoras con [data-evento], .pdf-export-container, iframe con mismas reglas, bloque v7.25 intacto, js/app.js identico a f89dab7, ?v=7.26 x3, planify-cache-v113. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.25",
-    "numero": 138,
+    "version": "v7.26",
+    "numero": 139,
     "estado": "EN PROGRESO"
   }
 }

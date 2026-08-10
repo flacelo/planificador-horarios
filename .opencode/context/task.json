@@ -1733,11 +1733,26 @@
       "desviaciones": "None. Versiones citadas en el prompt coinciden con el patron real (?v=7.24, planify-cache-v111, Fase 137). Test 7 del suite: falso fallo por substring mal formado; verificado por separado (bloque v7.23 y v7.22 intactos).",
       "verificacion": "VM test 8/8 PASS (13 asserts + verificacion extra de regresion v7.22/v7.23): th #1e293b/blanco/800/13px/uppercase, columna hora #f1f5f9/11px, th * blancos, pildoras, .pdf-export-container, iframe con mismas reglas, js/app.js identico a f89dab7, ?v=7.24 x3, planify-cache-v111. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 138,
+      "version": "v7.25",
+      "fecha": "2026-08-10",
+      "alcance": "Inyección de estilos de alta visibilidad para días y horas en iframe de impresión PDF: @media print fuerza en cabeceras de días (th de #vista-semanal/.tabla-semanal + reales #view-semanal/#view-table/#tabla thead) fondo #0f172a con texto #ffffff, weight 800, 12px, uppercase, text-shadow none, opacity 1 y visibility visible; columna de horas (td:first-child, .col-hora, .hora-cell + reales .hora-cell/.hora-col/.celda-header) con fondo #e2e8f0, texto #0f172a, 11px, opacity/visibility forzados; tabla extendida a width 100% con border-collapse collapse; .pdf-export-container con las mismas reglas en th/th * y td:first-child/*; mismas reglas con selectores universales (*) inyectadas al iframe de export-pdf.js",
+      "archivos": [
+        "css/main.css",
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.25, planify-cache-v112, Fase 138).",
+      "verificacion": "VM test 7/7 PASS (12 asserts): th #0f172a/opacity/visibility, td:first-child #e2e8f0, tabla 100% collapse, .pdf-export-container, iframe con selectores universales, bloque v7.24 intacto, js/app.js identico a f89dab7, ?v=7.25 x3, planify-cache-v112. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.24",
-    "numero": 137,
+    "version": "v7.25",
+    "numero": 138,
     "estado": "EN PROGRESO"
   }
 }

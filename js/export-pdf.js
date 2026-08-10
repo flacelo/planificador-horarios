@@ -1,4 +1,4 @@
-/* PLANIFY v7.30 - EXPORTACIÓN PDF: AISLAMIENTO FÍSICO DEL CLON IFRAME Y REMOCIÓN TOTAL DE 'X' */
+/* PLANIFY v7.31 - EXPORTACIÓN PDF: A4 LANDSCAPE, PURGA FÍSICA DE 'X' Y BYPASS DE CACHÉ */
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -234,7 +234,7 @@
       'thead th, .cal-dia-nombre, .week-header-day, .day-header, .hora-col, .celda-header, .month-header, .cal-titulo, [class*="month-title"], [class*="cal-title"] { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
       'th, td, .celda, .grid-cell, .month-cell, .cell-content { padding: 8px 10px !important; border-radius: 6px !important; }' +
       '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 6px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
-      '@page { size: A4 portrait; margin: 8mm; }' +
+      '@page { size: A4 landscape; margin: 6mm; }' +
       '[data-planify-print] .btn-remove, [data-planify-print] .remove-btn, [data-planify-print] .btn-eliminar-fila, [data-planify-print] .btn-delete, [data-planify-print] .close-x, [data-planify-print] .day-header-delete, [data-planify-print] [data-action="delete"], [data-planify-print] .delete-icon, [data-planify-print] .btn-eliminar { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }' +
       '</style></head>' +
       '<body class="' + (clasesPrint || '') + '">' +
@@ -248,7 +248,7 @@
       setTimeout(function() {
         if (iframe.parentNode) document.body.removeChild(iframe);
       }, 500);
-    }, 300);
+    }, 350);
   }
 
   function generarPDF() {
@@ -286,8 +286,9 @@
   }
 
   window.exportarVistaAPDF = function() {
-    var vistaActiva = document.querySelector('.vista-container.active, .view-container.active, #vista-semanal.active, #vista-mensual.active, #vista-diario.active, #view-semanal.active, #view-mensual.active, #view-diario.active')
-      || document.querySelector('#vista-semanal, #view-semanal, #view-table');
+    var vistaActiva = document.querySelector('#view-semanal.active, #vista-semanal.active, #view-mensual.active, #vista-mensual.active, #view-diario.active, #vista-diario.active, #view-table.active')
+      || document.querySelector('.vista-container.active')
+      || document.querySelector('.view-container.active');
     if (!vistaActiva) vistaActiva = detectarVistaActiva();
     if (!vistaActiva) {
       console.error('No se encontró vista activa para PDF');

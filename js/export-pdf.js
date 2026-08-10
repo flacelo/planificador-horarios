@@ -1,4 +1,4 @@
-// PLANIFY v7.36 - Exportador PDF Multivista Multipágina (Resumen Visible y Cuadrícula Completa)
+// PLANIFY v7.37 - Fix Definitivo Visibilidad y Contraste Barra Resumen de Hoy (App + PDF)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -119,6 +119,19 @@
           rb.style.display = 'flex';
           rb.style.flexWrap = 'wrap';
           rb.style.overflow = 'visible';
+        }
+      });
+      // Fix definitivo v7.37: contraste y visibilidad forzada de la barra Resumen de hoy en el clon
+      Array.prototype.forEach.call(clon.querySelectorAll('.resumen-hoy-container, .resumen-barra, [class*="resumen-"]'), function(rb) {
+        if (rb.style) {
+          rb.style.display = 'flex';
+          rb.style.visibility = 'visible';
+          rb.style.opacity = '1';
+          rb.style.color = '#0f172a';
+          rb.style.alignItems = 'center';
+          rb.style.flexWrap = 'wrap';
+          rb.style.gap = '12px';
+          rb.style.lineHeight = '1.4';
         }
       });
       Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias, .leyenda-etiquetas, .leyenda-contenedor, .leyenda'), function(l) {
@@ -307,6 +320,8 @@
       '[data-planify-print] td, [data-planify-print] tr { padding: 3px 2px !important; line-height: 1.2 !important; font-size: 9.5px !important; }' +
       '[data-planify-print] .evento-card, [data-planify-print] .pildora-actividad, [data-planify-print] [class*="evento"] { font-size: 9px !important; padding: 2px 4px !important; line-height: 1.1 !important; }' +
       '[data-planify-print] .resumen-barra, [data-planify-print] [class*="resumen"] { white-space: normal !important; overflow: visible !important; font-size: 10px !important; }' +
+      '[data-planify-print] .resumen-hoy-container, [data-planify-print] .resumen-barra, [data-planify-print] [class*="resumen-"] { display: flex !important; align-items: center !important; flex-wrap: wrap !important; gap: 12px !important; background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 8px !important; margin-bottom: 12px !important; padding: 8px 12px !important; font-size: 11px !important; font-weight: 600 !important; line-height: 1.4 !important; color: #0f172a !important; visibility: visible !important; opacity: 1 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
+      '[data-planify-print] .resumen-hoy-container *, [data-planify-print] .resumen-barra * { color: #0f172a !important; opacity: 1 !important; visibility: visible !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '[data-planify-print] .leyenda-categorias, [data-planify-print] .leyenda-etiquetas, [data-planify-print] .leyenda-contenedor, [data-planify-print] .leyenda { display: flex !important; flex-wrap: wrap !important; gap: 4px !important; margin-top: 4px !important; padding: 2px 0 !important; max-height: 28px !important; overflow: hidden !important; }' +
       '[data-planify-print] .leyenda span, [data-planify-print] .legend-item { font-size: 8.5px !important; padding: 1px 4px !important; height: auto !important; line-height: 1 !important; }' +
       '[data-planify-print] .footer-licencia, [data-planify-print] .licencia-texto, [data-planify-print] [data-licencia] { margin-top: 2px !important; font-size: 8px !important; padding: 0 !important; line-height: 1 !important; }' +

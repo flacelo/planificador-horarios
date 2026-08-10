@@ -1,4 +1,4 @@
-/* PLANIFY v7.20 - EXPORTACIÓN PDF: VISTA SEMANAL SIMÉTRICA, CENTRADA Y BLANCA */
+/* PLANIFY v7.21 - EXPORTACIÓN PDF: ENCABEZADOS BLANCOS Y TARJETAS CENTRADAS VISTA SEMANAL */
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -189,6 +189,10 @@
       '[data-planify-print] #view-semanal .cal-evento, [data-planify-print] #view-table .cal-evento, [data-planify-print] #vista-semanal .cal-evento, [data-planify-print] #view-semanal .evento, [data-planify-print] #view-table .evento { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; font-weight: 500 !important; font-size: 0.85rem !important; color: #0f172a !important; border-radius: 6px !important; }' +
       '[data-planify-print] .leyenda { justify-content: center !important; }' +
       '[data-planify-print] .leyenda span { color: #0f172a !important; background: #f8fafc !important; border: 1px solid #e2e8f0 !important; }' +
+      '[data-planify-print] { background: #ffffff !important; box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }' +
+      '.print-container, .info-banner, .indicacion-horarios, [class*="info-banner"], [class*="indicacion"] { background: #ffffff !important; color: #0f172a !important; border: 1px solid #e2e8f0 !important; box-shadow: none !important; }' +
+      '[data-planify-print] #view-semanal thead th, [data-planify-print] #view-table thead th, [data-planify-print] #vista-semanal thead th, [data-planify-print] #tabla thead th { background: #f8fafc !important; color: #0f172a !important; font-weight: 600 !important; border: 1px solid #cbd5e1 !important; text-align: center !important; vertical-align: middle !important; padding: 10px 4px !important; }' +
+      '[data-planify-print] #view-semanal .cal-evento, [data-planify-print] #view-table .cal-evento, [data-planify-print] #vista-semanal .cal-evento, [data-planify-print] #view-semanal .evento, [data-planify-print] #view-table .evento, [data-planify-print] #view-semanal .evento-item, [data-planify-print] #view-table .evento-item, [data-planify-print] #view-semanal .bloque-horario, [data-planify-print] #view-table .bloque-horario { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; width: 100% !important; min-height: 100% !important; box-sizing: border-box !important; margin: 0 auto !important; padding: 4px 6px !important; color: #0f172a !important; border-radius: 6px !important; border: 1px solid #cbd5e1 !important; font-size: 0.82rem !important; font-weight: 500 !important; }' +
       'table, .main-grid-container, .cal-container { border-collapse: collapse !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; box-shadow: none !important; }' +
       'table, th, td, tr, .cal-dia, .cell, .week-grid { background: #ffffff !important; color: #0f172a !important; }' +
       '.card, .section-card, .dash-card, .main-card-container, .vista-container, .main-container, .cal-container, .grid-container, .month-grid, .tab-content, .view-content, .modal, .modal-content, .modal-box, input, select, textarea, .tarjeta, [class*="tarjeta"] { background: #ffffff !important; color: #0f172a !important; }' +

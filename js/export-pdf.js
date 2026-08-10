@@ -1,4 +1,4 @@
-// PLANIFY v7.43 - Fix Nuclear Visibilidad Banner Resumen de Hoy (Sobreescritura Universal App + PDF)
+// PLANIFY v7.44 - Force Brute Visibilidad Texto Blanco Banner Resumen (App + PDF)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -223,6 +223,21 @@
           }
         });
       }
+      // Sanitización nuclear v7.44: forzado absoluto de estilos claros en el banner del clon PDF
+      if (clon.querySelectorAll) {
+        Array.prototype.forEach.call(clon.querySelectorAll('.resumen-hoy, .resumen-barra, .summary-banner, [class*="resumen"], #resumen-hoy'), function(rb) {
+          if (rb.style && rb.style.setProperty) {
+            rb.style.setProperty('background-color', '#ffffff', 'important');
+            rb.style.setProperty('border', '1px solid #cbd5e1', 'important');
+            Array.prototype.forEach.call(rb.querySelectorAll('*'), function(h) {
+              if (h.style) {
+                h.style.setProperty('color', '#0f172a', 'important');
+                h.style.setProperty('opacity', '1', 'important');
+              }
+            });
+          }
+        });
+      }
       Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias, .leyenda-etiquetas, .leyenda-contenedor, .leyenda'), function(l) {
         if (l.setAttribute) l.setAttribute('style', 'display:flex!important;flex-wrap:wrap!important;gap:4px!important;margin-top:4px!important;padding:2px 0!important;max-height:28px!important;overflow:hidden!important;');
       });
@@ -423,6 +438,7 @@
       '[data-planify-print] .resumen-hoy, [data-planify-print] .resumen-barra, [data-planify-print] .summary-banner, [data-planify-print] [class*="resumen"], [data-planify-print] #resumen-hoy { background-color: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; padding: 10px 16px !important; box-shadow: none !important; backdrop-filter: none !important; }' +
       '[data-planify-print] .resumen-hoy *, [data-planify-print] .resumen-barra *, [data-planify-print] .summary-banner *, [data-planify-print] [class*="resumen"] *, [data-planify-print] #resumen-hoy * { color: #0f172a !important; opacity: 1 !important; text-shadow: none !important; font-weight: 500 !important; }' +
       '[data-planify-print] .resumen-hoy strong, [data-planify-print] .resumen-barra strong, [data-planify-print] [class*="resumen"] strong { color: #0f172a !important; font-weight: 700 !important; }' +
+      '[data-planify-print] .resumen-hoy span[style*="color"], [data-planify-print] .resumen-barra span[style*="color"], [data-planify-print] [class*="resumen"] span[style*="color"] { font-weight: 700 !important; color: #0f172a !important; }' +
       '[data-planify-print] .leyenda-categorias, [data-planify-print] .leyenda-etiquetas, [data-planify-print] .leyenda-contenedor, [data-planify-print] .leyenda { display: flex !important; flex-wrap: wrap !important; gap: 4px !important; margin-top: 4px !important; padding: 2px 0 !important; max-height: 28px !important; overflow: hidden !important; }' +
       '[data-planify-print] .leyenda span, [data-planify-print] .legend-item { font-size: 8.5px !important; padding: 1px 4px !important; height: auto !important; line-height: 1 !important; }' +
       '[data-planify-print] .footer-licencia, [data-planify-print] .licencia-texto, [data-planify-print] [data-licencia] { margin-top: 2px !important; font-size: 8px !important; padding: 0 !important; line-height: 1 !important; }' +

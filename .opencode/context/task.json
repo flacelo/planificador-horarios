@@ -1955,11 +1955,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.40, planify-cache-v126, Fase 152).",
       "verificacion": "VM test 18/18 PASS: main.css base/oscuro/claro completos, clon setProperty version clara (border cbd5e1, hijos 1e293b), iframe neutraliza temas oscuros, regresiones v7.38/v7.39 intactas, js/app.js identico a f89dab7, ?v=7.40 x3, planify-cache-v126. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 153,
+      "version": "v7.41",
+      "fecha": "2026-08-10",
+      "alcance": "Fix radical con sobreescritura universal para forzar legibilidad total (#f1f5f9/#ffffff) en el banner de resumen de hoy. En css/main.css: bloque v7.41 de máxima especificidad con #resumenHoy/#resumen-hoy/.resumen-hoy-container/.resumen-barra/div[class*=resumen] a background #1e293b, border #475569, radius 12px, padding 10px 16px; en modo oscuro (body:not(.light-theme)) TODOS los hijos forzados a color #f1f5f9, opacity 1, visibility visible, text-shadow none y font-weight 600 (rompiendo cualquier inline-style/transparencia); strong/h1-h4 a #ffffff/700; span/p a #cbd5e1; en modo claro (body.light-theme) fondo #ffffff, border #cbd5e1 e hijos a #0f172a. En js/export-pdf.js: remoción radical v7.41 en clonarVistaVisible() sobre #resumenHoy/#resumen-hoy/.resumen-hoy-container/.resumen-barra/div[class*=resumen] con setProperty (bg #ffffff, border 1px solid #cbd5e1, color #0f172a; hijos a #0f172a/opacity 1/visibility visible) y reglas equivalentes en el CSS del iframe",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.41, planify-cache-v127, Fase 153).",
+      "verificacion": "VM test 16/16 PASS: main.css ids con bg 1e293b, sobreescritura oscura universal (f1f5f9/strong blanco/span cbd5e1), modo claro (blanco/0f172a), clon setProperty ids (bg blanco/border cbd5e1/hijos 0f172a), iframe #resumenHoy con text-shadow none, regresiones v7.38/v7.40 intactas, js/app.js identico a f89dab7, ?v=7.41 x3, planify-cache-v127. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.40",
-    "numero": 152,
+    "version": "v7.41",
+    "numero": 153,
     "estado": "EN PROGRESO"
   }
 }

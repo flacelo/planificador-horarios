@@ -2092,6 +2092,12 @@
       "version": "v7.52",
       "estado": "completada",
       "alcance": "Fix infalible de hover CSS para botones: hover general global body:not(.light-mode) button:hover -> #38bdf8 cian glow + body.light-mode button:hover -> #0284c7 azul, sobre .btn-summary/.summary-actions/[data-action]/#day-summary button/.view-btn/btn-outline/btn-primary. app.js CONGELADO (baseline 2cf580d), export-pdf.js sin cambios. ?v=7.52 x3 + cache v138"
+    },
+    {
+      "fase": 165,
+      "version": "v7.53",
+      "estado": "completada",
+      "alcance": "Fix unificado: (1) visibilidad permanente de textos de botones Ver Horario y Dashboard (opacity/visibility 1, reposo y hover bitemáticos oscuro rgba(255,255,255,.1)/#f8fafc -> rgba(14,165,233,.3)/#38bdf8 y claro #f1f5f9/#0f172a -> #e2e8f0/#0284c7); (2) banner #day-summary en Modo Claro #ffffff/#cbd5e1 con texto #0f172a y .stat-label #475569; (3) cuadricula semanal clara border-collapse separate #cbd5e1, th #f8fafc, col-hora #f1f5f9. export-pdf.js v7.53: banner blanco limpio #ffffff/#0f172a/border #cbd5e1 en clon. app.js CONGELADO (baseline 2cf580d). ?v=7.53 x3 + cache v139"
     }
   ],
   "ultima_fase": {

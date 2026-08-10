@@ -268,6 +268,16 @@
           }
         });
       }
+      // Sanitización v7.53: banner blanco limpio con borde definido en la clonación PDF
+      if (clon.querySelectorAll) {
+        Array.prototype.forEach.call(clon.querySelectorAll('#day-summary, .summary-banner, .resumen-barra, [class*="resumen"]'), function(rb) {
+          if (rb.style) {
+            rb.style.backgroundColor = '#ffffff';
+            rb.style.color = '#0f172a';
+            rb.style.border = '1px solid #cbd5e1';
+          }
+        });
+      }
       Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias, .leyenda-etiquetas, .leyenda-contenedor, .leyenda'), function(l) {
         if (l.setAttribute) l.setAttribute('style', 'display:flex!important;flex-wrap:wrap!important;gap:4px!important;margin-top:4px!important;padding:2px 0!important;max-height:28px!important;overflow:hidden!important;');
       });

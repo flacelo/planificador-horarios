@@ -1850,11 +1850,26 @@
       "desviaciones": "El snippet literal proponía reemplazar todo export-pdf.js; se integró en clonarVistaVisible() (aplica tanto al flujo del modal como a exportarVistaAPDF) preservando modal/OPCIONES/imprimirVistas. No hubo cambios en css/main.css.",
       "verificacion": "VM test 8/8 PASS (10 asserts): inyeccion in situ th #0f172a/800/13px y td #f1f5f9/700/11px, selectores [class*=header], purga fisica button/svg, iframe button/svg ocultos, @page landscape 5mm, flujo intacto, js/app.js identico a f89dab7, ?v=7.33 x3, planify-cache-v119. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 146,
+      "version": "v7.34",
+      "fecha": "2026-08-10",
+      "alcance": "Acabado premium de PDF: optimización de padding en píldoras, distribución del alto vertical A4 y ajuste de texto multilínea sin alterar app.js: en clonarVistaVisible() de js/export-pdf.js se inyecta in situ en tarjetas/píldoras (.evento, .actividad, .tarjeta-semanal, [data-planify-event] + reales .cal-evento/.evento-item/.pildora-actividad/[data-evento]/.bloque-horario) padding 4px 6px, radius 6px, line-height 1.35, margin-bottom 2px, word-break break-word, white-space normal, font-size 11px; tabla (.tabla-semanal, table) con height 100% y min-height 620px; celdas td/tr con padding-top/bottom 6px y vertical-align middle + multilínea; css/main.css añade @media print con [data-planify-print] table height 98vh, td/th vertical-align middle y .evento-item/.pildora-actividad 10.5px/1.3/radius 5px; mismas reglas en el CSS del iframe",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.34, planify-cache-v120, Fase 146).",
+      "verificacion": "VM test 8/8 PASS (12 asserts): inyeccion in situ tarjetas pastel, selectores reales, tabla 100%/620px, celdas padding 6px + multilinea, iframe 98vh/10.5px, main.css @media print, inyeccion th v7.33 intacta, js/app.js identico a f89dab7, ?v=7.34 x3, planify-cache-v120. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.33",
-    "numero": 145,
+    "version": "v7.34",
+    "numero": 146,
     "estado": "EN PROGRESO"
   }
 }

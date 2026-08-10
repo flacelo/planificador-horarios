@@ -1763,11 +1763,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.26, planify-cache-v113, Fase 139).",
       "verificacion": "VM test 8/8 PASS (12 asserts): th #0f172a/letter-spacing/borde #1e293b, td:first-child #e2e8f0, tabla 100% collapse, pildoras con [data-evento], .pdf-export-container, iframe con mismas reglas, bloque v7.25 intacto, js/app.js identico a f89dab7, ?v=7.26 x3, planify-cache-v113. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 140,
+      "version": "v7.27",
+      "fecha": "2026-08-10",
+      "alcance": "Fix de fuerza bruta para visibilidad y contraste de días y horas en PDF semanal, sobrescribiendo reglas heredadas: @media print cabeceras de días (th #vista-semanal/.tabla-semanal + reales #view-semanal/#view-table/#tabla thead y sus hijos *) con #0f172a/#ffffff/800/12px/uppercase/letter-spacing 0.5px/opacity 1/visibility visible/borde #1e293b; columna de rangos horarios con #e2e8f0/#0f172a/700/11px/borde #cbd5e1; tabla 100% con border-collapse collapse; .pdf-export-container con las mismas reglas; en el iframe de export-pdf.js reglas con selectores de maxima especificidad ([data-planify-print] #view-semanal/#view-table/#tabla th, td:first-child, th *, td:first-child *, .hora-cell/.hora-col/.col-hora)",
+      "archivos": [
+        "css/main.css",
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.27, planify-cache-v114, Fase 140). Bloque CSS identico en contenido al v7.26; se aplica igual reforzando la cascada y con iframe de maxima especificidad.",
+      "verificacion": "VM test 7/7 PASS (11 asserts): th #0f172a/letter-spacing/borde #1e293b, td:first-child #e2e8f0, tabla 100% collapse, .pdf-export-container, iframe con selectores de maxima especificidad, bloque v7.26 intacto, js/app.js identico a f89dab7, ?v=7.27 x3, planify-cache-v114. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.26",
-    "numero": 139,
+    "version": "v7.27",
+    "numero": 140,
     "estado": "EN PROGRESO"
   }
 }

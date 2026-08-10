@@ -1,4 +1,4 @@
-// PLANIFY v7.33 - Exportador PDF Definitivo (Alto Contraste Garantizado en Días y Horas)
+// PLANIFY v7.34 - Exportador PDF Premium (Padding, Alto Vertical A4 y Multilínea)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -84,6 +84,18 @@
       });
       Array.prototype.forEach.call(clon.querySelectorAll('td:first-child, .col-hora, .hora-cell'), function(td) {
         if (td.setAttribute) td.setAttribute('style', 'background-color:#f1f5f9!important;color:#0f172a!important;font-weight:700!important;font-size:11px!important;text-align:center!important;padding:6px!important;border:1px solid #cbd5e1!important;');
+      });
+    }
+    // Acabado premium: respiración de tarjetas pastel y manejo multilínea (v7.34)
+    if (clon.querySelectorAll) {
+      Array.prototype.forEach.call(clon.querySelectorAll('.evento, .actividad, .tarjeta-semanal, [data-planify-event], .cal-evento, .evento-item, .pildora-actividad, [data-evento], .bloque-horario'), function(el) {
+        if (el.setAttribute) el.setAttribute('style', 'padding:4px 6px!important;border-radius:6px!important;line-height:1.35!important;margin-bottom:2px!important;word-break:break-word!important;white-space:normal!important;font-size:11px!important;');
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.tabla-semanal, table'), function(t) {
+        if (t.setAttribute) t.setAttribute('style', 'height:100%!important;min-height:620px!important;');
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('td, tr'), function(c) {
+        if (c.setAttribute) c.setAttribute('style', 'padding-top:6px!important;padding-bottom:6px!important;vertical-align:middle!important;word-break:break-word!important;white-space:normal!important;');
       });
     }
     clon.style.backgroundColor = '#ffffff';
@@ -249,6 +261,9 @@
       '[data-planify-print] th, [data-planify-print] .day-header, [data-planify-print] .tabla-semanal th, [data-planify-print] th[class*="header"], [data-planify-print] th * { background-color: #0f172a !important; color: #ffffff !important; font-weight: 700 !important; text-align: center !important; padding: 6px !important; font-size: 11px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '[data-planify-print] .col-hora, [data-planify-print] td:first-child, [data-planify-print] .hora-cell { background-color: #f1f5f9 !important; color: #0f172a !important; font-weight: 700 !important; text-align: center !important; }' +
       '[data-planify-print] button, [data-planify-print] svg { display: none !important; }' +
+      '[data-planify-print] table { height: 98vh !important; }' +
+      '[data-planify-print] td, [data-planify-print] th { vertical-align: middle !important; }' +
+      '[data-planify-print] .evento-item, [data-planify-print] .pildora-actividad, [data-planify-print] [data-planify-event], [data-planify-print] [data-evento] { padding: 4px 6px !important; font-size: 10.5px !important; line-height: 1.3 !important; border-radius: 5px !important; }' +
       '</style></head>' +
       '<body class="' + (clasesPrint || '') + '">' +
       '<div data-planify-print="1">' + nodosHTML + '</div>' +

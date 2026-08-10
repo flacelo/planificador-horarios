@@ -1688,6 +1688,26 @@
         "vm_test": "PASS (5/5 grupos)"
       },
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 135,
+      "version": "v7.22",
+      "fecha": "2026-08-10",
+      "alcance": "Sanitizacion y centrado en selectores reales de la Vista Semanal: encabezados superiores (.week-header/.week-header-day/.resumen-header/.tarjeta-resumen/#resumen-hoy/[class*=semana-]/[class*=resumen]) en blanco #ffffff con borde #e2e8f0; TH de #tabla weight 700 con padding 10px 4px; tarjetas .cal-evento/.evento/.evento-item/.bloque-horario y [data-evento] flex centradas con weight 600; leyenda sobre fondo blanco puro #ffffff con borde #e2e8f0; mismas reglas en @media print y en CSS del iframe de export-pdf.js",
+      "archivos": [
+        "css/main.css",
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None",
+      "verificacion": "VM test 7/7 PASS (17 asserts): reglas pantalla/print/iframe, js/app.js identico a f89dab7, ?v=7.22 x3, planify-cache-v109. Build OK.",
+      "commit": "PENDIENTE"
     }
-  ]
+  ],
+  "ultima_fase": {
+    "version": "v7.22",
+    "numero": 135,
+    "estado": "EN PROGRESO"
+  }
 }

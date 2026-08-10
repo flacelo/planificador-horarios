@@ -1,4 +1,4 @@
-// PLANIFY v7.38 - Aislamiento de Páginas PDF Multivista (1 hoja por vista, Cuadrícula Completa)
+// PLANIFY v7.39 - Fix Visibilidad, Contraste y Jerarquía Tipográfica Barra Resumen de Hoy (App + PDF)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -134,6 +134,25 @@
           rb.style.lineHeight = '1.4';
         }
       });
+      // Sanitización forzada con important del banner de resumen en el clon (v7.39)
+      if (clon.querySelectorAll) {
+        Array.prototype.forEach.call(clon.querySelectorAll('.resumen-hoy-container, .resumen-barra, [class*="resumen-"]'), function(rb) {
+          if (rb.style && rb.style.setProperty) {
+            rb.style.setProperty('display', 'flex', 'important');
+            rb.style.setProperty('visibility', 'visible', 'important');
+            rb.style.setProperty('color', '#0f172a', 'important');
+            rb.style.setProperty('background-color', '#ffffff', 'important');
+            rb.style.setProperty('opacity', '1', 'important');
+            Array.prototype.forEach.call(rb.querySelectorAll('*'), function(h) {
+              if (h.style) {
+                h.style.setProperty('color', '#0f172a', 'important');
+                h.style.setProperty('opacity', '1', 'important');
+                h.style.setProperty('visibility', 'visible', 'important');
+              }
+            });
+          }
+        });
+      }
       Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias, .leyenda-etiquetas, .leyenda-contenedor, .leyenda'), function(l) {
         if (l.setAttribute) l.setAttribute('style', 'display:flex!important;flex-wrap:wrap!important;gap:4px!important;margin-top:4px!important;padding:2px 0!important;max-height:28px!important;overflow:hidden!important;');
       });
@@ -322,6 +341,10 @@
       '[data-planify-print] .resumen-barra, [data-planify-print] [class*="resumen"] { white-space: normal !important; overflow: visible !important; font-size: 10px !important; }' +
       '[data-planify-print] .resumen-hoy-container, [data-planify-print] .resumen-barra, [data-planify-print] [class*="resumen-"] { display: flex !important; align-items: center !important; flex-wrap: wrap !important; gap: 12px !important; background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 8px !important; margin-bottom: 12px !important; padding: 8px 12px !important; font-size: 11px !important; font-weight: 600 !important; line-height: 1.4 !important; color: #0f172a !important; visibility: visible !important; opacity: 1 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '[data-planify-print] .resumen-hoy-container *, [data-planify-print] .resumen-barra * { color: #0f172a !important; opacity: 1 !important; visibility: visible !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
+      '[data-planify-print] .resumen-hoy-container, [data-planify-print] .resumen-barra, [data-planify-print] [class*="resumen-"] { min-height: 48px !important; padding: 8px 16px !important; display: flex !important; align-items: center !important; flex-wrap: wrap !important; gap: 12px !important; background-color: #ffffff !important; color: #0f172a !important; opacity: 1 !important; visibility: visible !important; }' +
+      '[data-planify-print] .resumen-hoy-container *, [data-planify-print] .resumen-barra *, [data-planify-print] [class*="resumen-"] span, [data-planify-print] [class*="resumen-"] p, [data-planify-print] [class*="resumen-"] div { color: #0f172a !important; font-weight: 600 !important; opacity: 1 !important; visibility: visible !important; white-space: normal !important; }' +
+      '[data-planify-print] .resumen-titulo, [data-planify-print] [class*="resumen-"] strong { color: #0f172a !important; font-size: 14px !important; font-weight: 700 !important; }' +
+      '[data-planify-print] [class*="resumen-"] .text-muted, [data-planify-print] [class*="resumen-"] .subtext, [data-planify-print] [class*="resumen-"] span[class*="pendiente"], [data-planify-print] [class*="resumen-"] span[class*="rutina"], [data-planify-print] [class*="resumen-"] span[class*="clase"] { color: #334155 !important; font-size: 12px !important; }' +
       '[data-planify-print] .leyenda-categorias, [data-planify-print] .leyenda-etiquetas, [data-planify-print] .leyenda-contenedor, [data-planify-print] .leyenda { display: flex !important; flex-wrap: wrap !important; gap: 4px !important; margin-top: 4px !important; padding: 2px 0 !important; max-height: 28px !important; overflow: hidden !important; }' +
       '[data-planify-print] .leyenda span, [data-planify-print] .legend-item { font-size: 8.5px !important; padding: 1px 4px !important; height: auto !important; line-height: 1 !important; }' +
       '[data-planify-print] .footer-licencia, [data-planify-print] .licencia-texto, [data-planify-print] [data-licencia] { margin-top: 2px !important; font-size: 8px !important; padding: 0 !important; line-height: 1 !important; }' +

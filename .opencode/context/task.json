@@ -1718,11 +1718,26 @@
       "desviaciones": "El prompt cito ?v=7.22 (ya aplicada en 3bce688) y Fase 125 (desalineada); se aplico el patron +1 real: ?v=7.23, planify-cache-v110 (coincide con el pedido) y Fase 136 del registro. Comentarios CSS eliminados por minificador (test 5 corregido por verificacion de contenido sin comentario).",
       "verificacion": "VM test 6/6 PASS (11 asserts): print th/columna hora #f1f5f9 + print-color-adjust exact, textos #0f172a, .pdf-export-container, iframe con mismas reglas, bloque v7.22 previo intacto, js/app.js identico a f89dab7, ?v=7.23 x3, planify-cache-v110. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 137,
+      "version": "v7.24",
+      "fecha": "2026-08-10",
+      "alcance": "Fix definitivo de visibilidad con alto contraste para días y horas en exportación PDF semanal: en @media print cabeceras de días (th de #vista-semanal/.tabla-semanal/header-dia y reales #view-semanal/#view-table/#tabla thead) con fondo oscuro #1e293b, texto #ffffff, weight 800, 13px, uppercase, letter-spacing 0.5px, borde #0f172a y print-color-adjust exact; columna de Rango Horario (td:first-child, .col-hora, .hora-cell + reales .hora-cell/.hora-col/.celda-header) con #f1f5f9/#0f172a/700/11px; textos dentro de th forzados a blanco; celdas .tabla-semanal td borde #e2e8f0; píldoras .actividad-pill/.evento-item/.pildora-actividad + eventos reales .cal-evento/.evento/[data-evento]/.bloque-horario con radius 6px, weight 600, color #0f172a; contenedor .pdf-export-container con th #1e293b/blanco y td:first-child #f1f5f9; mismas reglas en CSS del iframe de export-pdf.js",
+      "archivos": [
+        "css/main.css",
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas en el prompt coinciden con el patron real (?v=7.24, planify-cache-v111, Fase 137). Test 7 del suite: falso fallo por substring mal formado; verificado por separado (bloque v7.23 y v7.22 intactos).",
+      "verificacion": "VM test 8/8 PASS (13 asserts + verificacion extra de regresion v7.22/v7.23): th #1e293b/blanco/800/13px/uppercase, columna hora #f1f5f9/11px, th * blancos, pildoras, .pdf-export-container, iframe con mismas reglas, js/app.js identico a f89dab7, ?v=7.24 x3, planify-cache-v111. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.23",
-    "numero": 136,
+    "version": "v7.24",
+    "numero": 137,
     "estado": "EN PROGRESO"
   }
 }

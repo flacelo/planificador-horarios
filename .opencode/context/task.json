@@ -1925,11 +1925,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.38, planify-cache-v124, Fase 150). Se añadieron selectores reales y anclaje margin-top auto como refuerzo en el iframe para garantizar el encaje de la leyenda.",
       "verificacion": "VM test 18/18 PASS: main.css @media print v7.38 completo (flex 100vh, last-child auto, semanal flex, tabla 9.5px, celdas 2px 4px, leyenda pie), iframe con reglas equivalentes + selectores reales #view-semanal/#view-table + margin-top auto, regresiones v7.36/v7.37 intactas, js/app.js identico a f89dab7, ?v=7.38 x3, planify-cache-v124. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 151,
+      "version": "v7.39",
+      "fecha": "2026-08-10",
+      "alcance": "Fix de visibilidad, contraste y jerarquía tipográfica en la barra de Resumen de hoy (pantalla y exportación PDF). En css/main.css: bloque v7.39 con .resumen-hoy-container/.resumen-barra/[class*=resumen-] a min-height 48px, padding 8px 16px, flex, align-items center, flex-wrap wrap, gap 12px, background-color #ffffff, color #0f172a, opacity 1 y visibility visible; hijos (span/p/div) forzados a #0f172a, font-weight 600, opacity 1, visibility visible y white-space normal; .resumen-titulo y strong a 14px/700; .text-muted/.subtext/span[class*=pendiente]/[class*=rutina]/[class*=clase] a #334155 y 12px. En js/export-pdf.js: sanitización forzada con setProperty important en clonarVistaVisible() (display flex, visibility visible, color #0f172a, background-color #ffffff, opacity 1 en el banner y en todos sus hijos) y reglas equivalentes añadidas al CSS del iframe",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "El prompt cito v7.37/planify-cache-v123/Fase 149 que YA EXISTEN (commit 37e2759, Fase 149 registrada). Se aplica como v7.39 (patron real siguiente a v7.38), cache v125, Fase 151, para no duplicar versiones ni fases.",
+      "verificacion": "VM test 16/16 PASS: main.css (min-height 48px flex bg blanco, hijos 600, titulo/strong 14px/700, muted/subtext/pendiente 334155/12px), clon setProperty important (banner + hijos), iframe (min-height 48px, strong, muted), regresiones v7.36/v7.37/v7.38 intactas, js/app.js identico a f89dab7, ?v=7.39 x3, planify-cache-v125. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.38",
-    "numero": 150,
+    "version": "v7.39",
+    "numero": 151,
     "estado": "EN PROGRESO"
   }
 }

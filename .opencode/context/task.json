@@ -2058,6 +2058,12 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.47, planify-cache-v133, Fase 159). Prompt CSS-only, no se modifico js/export-pdf.js.",
       "verificacion": "VM test 11/11 PASS: .summary-banner 1e293b, hijos blancos con text-fill, .summary-item/.summary-cat-item translucidos, strong/b/.summary-value cian 38bdf8, print claro con text-fill 0f172a, regresiones v7.45/v7.46 intactas, js/app.js identico a f89dab7, ?v=7.47 x3, planify-cache-v133. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "fase": 160,
+      "version": "v7.48",
+      "estado": "completada",
+      "alcance": "Refactorizacion directa en js/app.js (DESBLOQUEADO por decision del usuario): renderDaySummary sin colores inline grises/deslavados (default #f0f1f5->#475569, dot pendientes #ddd->#475569) + bloque CSS limpio main.css v7.48 (.summary-banner + .summary-cat-item + refuerzo selectores reales #day-summary .ds-* blancos) + ?v=7.48 x3 + cache v134. NOTA BASELINE: js/app.js ya NO es identico a f89dab7; nuevo baseline = hash del commit v7.48. export-pdf.js NO modificado (sigue v7.46)"
     }
   ],
   "ultima_fase": {

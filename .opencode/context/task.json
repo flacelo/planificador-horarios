@@ -1703,11 +1703,26 @@
       "desviaciones": "None",
       "verificacion": "VM test 7/7 PASS (17 asserts): reglas pantalla/print/iframe, js/app.js identico a f89dab7, ?v=7.22 x3, planify-cache-v109. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 136,
+      "version": "v7.23",
+      "fecha": "2026-08-10",
+      "alcance": "Fix de contraste y visibilidad para texto de días y horas en exportación PDF semanal: @media print fuerza #f1f5f9/#0f172a/font-weight 700/borde #cbd5e1 con print-color-adjust exact en cabeceras de días (#vista-semanal table th, .tabla-semanal th, .header-dia) y columna de horas (td:first-child, .col-hora, .hora-cell); hijos (th *, td:first-child *) forzados a #0f172a; contenedor .pdf-export-container con las mismas reglas; selectores reales ampliados (#view-semanal/#view-table/#tabla th y td:first-child, .hora-cell/.hora-col/.celda-header); mismas reglas en CSS del iframe de export-pdf.js",
+      "archivos": [
+        "css/main.css",
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "El prompt cito ?v=7.22 (ya aplicada en 3bce688) y Fase 125 (desalineada); se aplico el patron +1 real: ?v=7.23, planify-cache-v110 (coincide con el pedido) y Fase 136 del registro. Comentarios CSS eliminados por minificador (test 5 corregido por verificacion de contenido sin comentario).",
+      "verificacion": "VM test 6/6 PASS (11 asserts): print th/columna hora #f1f5f9 + print-color-adjust exact, textos #0f172a, .pdf-export-container, iframe con mismas reglas, bloque v7.22 previo intacto, js/app.js identico a f89dab7, ?v=7.23 x3, planify-cache-v110. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.22",
-    "numero": 135,
+    "version": "v7.23",
+    "numero": 136,
     "estado": "EN PROGRESO"
   }
 }

@@ -1,4 +1,4 @@
-/* PLANIFY v7.22 - EXPORTACIÓN PDF: SANITIZACIÓN Y CENTRADO EN SELECTORES REALES VISTA SEMANAL */
+/* PLANIFY v7.23 - EXPORTACIÓN PDF: FIX LEGIBILIDAD DÍAS Y HORAS EN VISTA SEMANAL */
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -198,6 +198,8 @@
       '[data-planify-print] #view-semanal [data-evento], [data-planify-print] #view-table [data-evento], [data-planify-print] #vista-semanal [data-evento] { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; width: 100% !important; margin: 0 auto !important; padding: 4px 6px !important; box-sizing: border-box !important; border-radius: 6px !important; border: 1px solid #cbd5e1 !important; color: #0f172a !important; font-size: 0.82rem !important; font-weight: 600 !important; }' +
       '[data-planify-print] .leyenda { justify-content: center !important; background: #ffffff !important; }' +
       '[data-planify-print] .leyenda span { color: #0f172a !important; background: #ffffff !important; border: 1px solid #e2e8f0 !important; }' +
+      '[data-planify-print] table th, [data-planify-print] td:first-child, [data-planify-print] .hora-cell, [data-planify-print] .hora-col, [data-planify-print] .col-hora, [data-planify-print] .celda-header, [data-planify-print] .pdf-export-container td:first-child { background-color: #f1f5f9 !important; color: #0f172a !important; font-weight: 700 !important; border: 1px solid #cbd5e1 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
+      '[data-planify-print] th *, [data-planify-print] td:first-child * { color: #0f172a !important; }' +
       'table, .main-grid-container, .cal-container { border-collapse: collapse !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; box-shadow: none !important; }' +
       'table, th, td, tr, .cal-dia, .cell, .week-grid { background: #ffffff !important; color: #0f172a !important; }' +
       '.card, .section-card, .dash-card, .main-card-container, .vista-container, .main-container, .cal-container, .grid-container, .month-grid, .tab-content, .view-content, .modal, .modal-content, .modal-box, input, select, textarea, .tarjeta, [class*="tarjeta"] { background: #ffffff !important; color: #0f172a !important; }' +

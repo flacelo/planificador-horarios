@@ -1,4 +1,4 @@
-// PLANIFY v7.32 - Exportador PDF Aislado de Vista Única y Limpieza de Nodos
+// PLANIFY v7.33 - Exportador PDF Definitivo (Alto Contraste Garantizado en Días y Horas)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -70,11 +70,20 @@
         if (esColorOscuro(n.style.background)) n.style.background = '';
       }
     });
-    // Remoción física de nodos de eliminación ('X') dentro del clon (v7.30-v7.32)
+    // Remoción física de nodos de eliminación ('X'), botones y svg dentro del clon (v7.30-v7.33)
     if (clon.querySelectorAll) {
-      Array.prototype.forEach.call(clon.querySelectorAll('.btn-remove, .remove-btn, .btn-eliminar-fila, .btn-delete, .close-x, .day-header-delete, [data-action="delete"], .delete-icon, .btn-eliminar, button.close, .x-btn, .close-btn, [onclick*="eliminar"], [onclick*="remove"]'), function(n) {
+      Array.prototype.forEach.call(clon.querySelectorAll('.btn-remove, .remove-btn, .btn-eliminar-fila, .btn-delete, .close-x, .day-header-delete, [data-action="delete"], .delete-icon, .btn-eliminar, button.close, .x-btn, .close-btn, [onclick*="eliminar"], [onclick*="remove"], button, svg'), function(n) {
         if (n.remove) n.remove();
         else if (n.parentNode) n.parentNode.removeChild(n);
+      });
+    }
+    // Inyección in situ de estilos de alto contraste en cabeceras de días y columna de horas (v7.33)
+    if (clon.querySelectorAll) {
+      Array.prototype.forEach.call(clon.querySelectorAll('th, .day-header, .tabla-semanal th, upper-header, [class*="header"]'), function(th) {
+        if (th.setAttribute) th.setAttribute('style', 'background-color:#0f172a!important;color:#ffffff!important;font-weight:800!important;font-size:13px!important;text-align:center!important;padding:8px!important;border:1px solid #334155!important;text-transform:uppercase!important;');
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('td:first-child, .col-hora, .hora-cell'), function(td) {
+        if (td.setAttribute) td.setAttribute('style', 'background-color:#f1f5f9!important;color:#0f172a!important;font-weight:700!important;font-size:11px!important;text-align:center!important;padding:6px!important;border:1px solid #cbd5e1!important;');
       });
     }
     clon.style.backgroundColor = '#ffffff';
@@ -239,6 +248,7 @@
       '[data-planify-print] .btn-remove, [data-planify-print] .remove-btn, [data-planify-print] .btn-eliminar-fila, [data-planify-print] .btn-delete, [data-planify-print] .close-x, [data-planify-print] .day-header-delete, [data-planify-print] [data-action="delete"], [data-planify-print] .delete-icon, [data-planify-print] .btn-eliminar, [data-planify-print] button.close, [data-planify-print] .x-btn, [data-planify-print] .close-btn, [data-planify-print] button { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }' +
       '[data-planify-print] th, [data-planify-print] .day-header, [data-planify-print] .tabla-semanal th, [data-planify-print] th[class*="header"], [data-planify-print] th * { background-color: #0f172a !important; color: #ffffff !important; font-weight: 700 !important; text-align: center !important; padding: 6px !important; font-size: 11px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '[data-planify-print] .col-hora, [data-planify-print] td:first-child, [data-planify-print] .hora-cell { background-color: #f1f5f9 !important; color: #0f172a !important; font-weight: 700 !important; text-align: center !important; }' +
+      '[data-planify-print] button, [data-planify-print] svg { display: none !important; }' +
       '</style></head>' +
       '<body class="' + (clasesPrint || '') + '">' +
       '<div data-planify-print="1">' + nodosHTML + '</div>' +

@@ -2071,7 +2071,9 @@
       "fase": 161,
       "version": "v7.49",
       "estado": "completada",
-      "alcance": "Banner resumen modo oscuro: app.js renderDaySummary contenedor #day-summary ahora con clase summary-banner (sin inline claros: #ffffff/#f0f1f5/#ddd verificados 0 en banner tras v7.48) + CSS v7.49 #day-summary/.summary-banner/.resumen-barra fondo #1e293b border rgba(255,255,255,0.1) color #ffffff + hijos blancos + ?v=7.49 x3 + cache v135. export-pdf.js NO modificado (sigue v7.46)"
+      "alcance": "Banner resumen modo oscuro: app.js renderDaySummary contenedor #day-summary ahora con clase summary-banner (sin inline claros: #ffffff/#f0f1f5/#ddd verificados 0 en banner tras v7.48) + CSS v7.49 #day-summary/.summary-banner/.resumen-barra fondo #1e293b border rgba(255,255,255,0.1) color #ffffff + hijos blancos + ?v=7.49 x3 + cache v135. export-pdf.js NO modificado (sigue v7.46)",
+      "commit": "2cf580d",
+      "baseline_app_js": "2cf580d (reemplaza cbb1bb5)"
     }
   ],
   "ultima_fase": {

@@ -1836,11 +1836,25 @@
       "desviaciones": "El snippet literal proponía reemplazar todo export-pdf.js; se integró preservando el flujo existente (modal #modal-export-pdf, OPCIONES cronológicas, clonarVistaVisible con purga esColorOscuro, imprimirVistas con wrapper [data-planify-print] y CSS acumulado v7.13-v7.31). No hubo cambios en css/main.css.",
       "verificacion": "VM test 8/8 PASS (13 asserts): @page landscape 5mm, clon pdf-clone-isolated, purga ampliada, window.detectarVistaActiva, alto contraste th/col-hora en iframe, button oculto, timeout 350/1000, modal intacto, js/app.js identico a f89dab7, ?v=7.32 x3, planify-cache-v118. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 145,
+      "version": "v7.33",
+      "fecha": "2026-08-10",
+      "alcance": "Inyección in situ de estilos en TH para forzar visibilidad total de encabezados de días en PDF: en clonarVistaVisible() de js/export-pdf.js, tras la purga, se inyecta setAttribute(style) en cada cabecera (th, .day-header, .tabla-semanal th, upper-header, [class*=header]) con fondo #0f172a, texto #ffffff, weight 800, 13px, centrado, padding 8px, borde #334155, uppercase; y en cada celda de hora (td:first-child, .col-hora, .hora-cell) con #f1f5f9/#0f172a/700/11px/padding 6px/borde #cbd5e1; la purga física del clon ahora también remueve todos los button y svg; CSS del iframe oculta button y svg dentro de [data-planify-print]",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "El snippet literal proponía reemplazar todo export-pdf.js; se integró en clonarVistaVisible() (aplica tanto al flujo del modal como a exportarVistaAPDF) preservando modal/OPCIONES/imprimirVistas. No hubo cambios en css/main.css.",
+      "verificacion": "VM test 8/8 PASS (10 asserts): inyeccion in situ th #0f172a/800/13px y td #f1f5f9/700/11px, selectores [class*=header], purga fisica button/svg, iframe button/svg ocultos, @page landscape 5mm, flujo intacto, js/app.js identico a f89dab7, ?v=7.33 x3, planify-cache-v119. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.32",
-    "numero": 144,
+    "version": "v7.33",
+    "numero": 145,
     "estado": "EN PROGRESO"
   }
 }

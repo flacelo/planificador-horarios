@@ -1,4 +1,4 @@
-/* PLANIFY v7.31 - EXPORTACIÓN PDF: A4 LANDSCAPE, PURGA FÍSICA DE 'X' Y BYPASS DE CACHÉ */
+// PLANIFY v7.32 - Exportador PDF Aislado de Vista Única y Limpieza de Nodos
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -34,6 +34,7 @@
     if (!activa) activa = document.body;
     return activa;
   }
+  window.detectarVistaActiva = detectarVistaActiva;
 
   function esColorOscuro(valor) {
     if (!valor) return false;
@@ -69,9 +70,9 @@
         if (esColorOscuro(n.style.background)) n.style.background = '';
       }
     });
-    // Remoción física de nodos de eliminación ('X') dentro del clon (v7.30)
+    // Remoción física de nodos de eliminación ('X') dentro del clon (v7.30-v7.32)
     if (clon.querySelectorAll) {
-      Array.prototype.forEach.call(clon.querySelectorAll('.btn-remove, .remove-btn, .btn-eliminar-fila, .btn-delete, .close-x, .day-header-delete, [data-action="delete"], .delete-icon, .btn-eliminar'), function(n) {
+      Array.prototype.forEach.call(clon.querySelectorAll('.btn-remove, .remove-btn, .btn-eliminar-fila, .btn-delete, .close-x, .day-header-delete, [data-action="delete"], .delete-icon, .btn-eliminar, button.close, .x-btn, .close-btn, [onclick*="eliminar"], [onclick*="remove"]'), function(n) {
         if (n.remove) n.remove();
         else if (n.parentNode) n.parentNode.removeChild(n);
       });
@@ -234,8 +235,10 @@
       'thead th, .cal-dia-nombre, .week-header-day, .day-header, .hora-col, .celda-header, .month-header, .cal-titulo, [class*="month-title"], [class*="cal-title"] { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
       'th, td, .celda, .grid-cell, .month-cell, .cell-content { padding: 8px 10px !important; border-radius: 6px !important; }' +
       '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 6px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
-      '@page { size: A4 landscape; margin: 6mm; }' +
-      '[data-planify-print] .btn-remove, [data-planify-print] .remove-btn, [data-planify-print] .btn-eliminar-fila, [data-planify-print] .btn-delete, [data-planify-print] .close-x, [data-planify-print] .day-header-delete, [data-planify-print] [data-action="delete"], [data-planify-print] .delete-icon, [data-planify-print] .btn-eliminar { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }' +
+      '@page { size: A4 landscape; margin: 5mm; }' +
+      '[data-planify-print] .btn-remove, [data-planify-print] .remove-btn, [data-planify-print] .btn-eliminar-fila, [data-planify-print] .btn-delete, [data-planify-print] .close-x, [data-planify-print] .day-header-delete, [data-planify-print] [data-action="delete"], [data-planify-print] .delete-icon, [data-planify-print] .btn-eliminar, [data-planify-print] button.close, [data-planify-print] .x-btn, [data-planify-print] .close-btn, [data-planify-print] button { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }' +
+      '[data-planify-print] th, [data-planify-print] .day-header, [data-planify-print] .tabla-semanal th, [data-planify-print] th[class*="header"], [data-planify-print] th * { background-color: #0f172a !important; color: #ffffff !important; font-weight: 700 !important; text-align: center !important; padding: 6px !important; font-size: 11px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
+      '[data-planify-print] .col-hora, [data-planify-print] td:first-child, [data-planify-print] .hora-cell { background-color: #f1f5f9 !important; color: #0f172a !important; font-weight: 700 !important; text-align: center !important; }' +
       '</style></head>' +
       '<body class="' + (clasesPrint || '') + '">' +
       '<div data-planify-print="1">' + nodosHTML + '</div>' +
@@ -247,7 +250,7 @@
       iframe.contentWindow.print();
       setTimeout(function() {
         if (iframe.parentNode) document.body.removeChild(iframe);
-      }, 500);
+      }, 1000);
     }, 350);
   }
 
@@ -286,17 +289,19 @@
   }
 
   window.exportarVistaAPDF = function() {
-    var vistaActiva = document.querySelector('#view-semanal.active, #vista-semanal.active, #view-mensual.active, #vista-mensual.active, #view-diario.active, #vista-diario.active, #view-table.active')
-      || document.querySelector('.vista-container.active')
-      || document.querySelector('.view-container.active');
-    if (!vistaActiva) vistaActiva = detectarVistaActiva();
+    var vistaActiva = document.querySelector('#view-semanal.active, #vista-semanal.active')
+      || document.querySelector('#view-mensual.active, #vista-mensual.active')
+      || document.querySelector('#view-diario.active, #vista-diario.active')
+      || document.querySelector('.vista-container.active');
+    if (!vistaActiva && typeof window.detectarVistaActiva === 'function') vistaActiva = window.detectarVistaActiva();
     if (!vistaActiva) {
-      console.error('No se encontró vista activa para PDF');
+      console.error('[PLANIFY PDF] No se detectó ninguna vista activa.');
       return;
     }
     var clon = clonarVistaVisible(vistaActiva);
+    clon.id = 'pdf-clone-isolated';
     var idReal = vistaActiva.id ? String(vistaActiva.id) : 'vista-activa';
-    imprimirVistas('<section class="pdf-seccion" style="display:block;visibility:visible;opacity:1;">' + clon + '</section>', 'printing-' + idReal);
+    imprimirVistas('<section class="pdf-seccion" style="display:block;visibility:visible;opacity:1;">' + clon.outerHTML + '</section>', 'printing-' + idReal);
   };
 
   document.addEventListener('DOMContentLoaded', function() {

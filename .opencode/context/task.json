@@ -2086,6 +2086,12 @@
       "version": "v7.51",
       "estado": "completada",
       "alcance": "Fix exclusivo de visibilidad y efecto hover para botones Ver Horario y Dashboard. CSS v7.51: estado normal (opacity/visibility 1, cursor pointer), oscuro reposo rgba(255,255,255,.1)/#f8fafc y hover #38bdf8 con glow + translateY(-1px), claro reposo #f1f5f9/#0f172a y hover #0284c7/#ffffff con sombra. app.js CONGELADO (no tocado, baseline 2cf580d), export-pdf.js sin cambios. ?v=7.51 x3 + cache v137"
+    },
+    {
+      "fase": 164,
+      "version": "v7.52",
+      "estado": "completada",
+      "alcance": "Fix infalible de hover CSS para botones: hover general global body:not(.light-mode) button:hover -> #38bdf8 cian glow + body.light-mode button:hover -> #0284c7 azul, sobre .btn-summary/.summary-actions/[data-action]/#day-summary button/.view-btn/btn-outline/btn-primary. app.js CONGELADO (baseline 2cf580d), export-pdf.js sin cambios. ?v=7.52 x3 + cache v138"
     }
   ],
   "ultima_fase": {

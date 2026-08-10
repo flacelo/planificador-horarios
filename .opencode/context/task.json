@@ -2098,6 +2098,12 @@
       "version": "v7.53",
       "estado": "completada",
       "alcance": "Fix unificado: (1) visibilidad permanente de textos de botones Ver Horario y Dashboard (opacity/visibility 1, reposo y hover bitemáticos oscuro rgba(255,255,255,.1)/#f8fafc -> rgba(14,165,233,.3)/#38bdf8 y claro #f1f5f9/#0f172a -> #e2e8f0/#0284c7); (2) banner #day-summary en Modo Claro #ffffff/#cbd5e1 con texto #0f172a y .stat-label #475569; (3) cuadricula semanal clara border-collapse separate #cbd5e1, th #f8fafc, col-hora #f1f5f9. export-pdf.js v7.53: banner blanco limpio #ffffff/#0f172a/border #cbd5e1 en clon. app.js CONGELADO (baseline 2cf580d). ?v=7.53 x3 + cache v139"
+    },
+    {
+      "fase": 166,
+      "version": "v7.54",
+      "estado": "completada",
+      "alcance": "Ajuste de densidad vertical en Vista Semanal PDF: encaje completo de 7:00 a 23:00, leyenda e informacion inferior sin recortes. export-pdf.js v7.54 (bloque en clonarVistaVisible): td/th padding 2px 3px height auto, eventos 8.5px lh 1.1, col-hora 8px padding 2px, leyenda flex wrap gap 4 margin-top 4 + etiquetas 8px. main.css: @media print A4 landscape margin 4mm 5mm, tabla semanal 100% collapse, th/td 2px 3px, leyenda margin-top 4px. app.js CONGELADO (baseline 2cf580d). ?v=7.54 x3 + cache v140"
     }
   ],
   "ultima_fase": {

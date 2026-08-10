@@ -287,6 +287,36 @@
       Array.prototype.forEach.call(clon.querySelectorAll('.footer-licencia, .licencia-texto, [data-licencia]'), function(f) {
         if (f.setAttribute) f.setAttribute('style', 'margin-top:2px!important;font-size:8px!important;padding:0!important;line-height:1!important;');
       });
+      // Densidad vertical v7.54: cuadrícula completa 7:00-23:00, leyenda y licencia sin recortes
+      Array.prototype.forEach.call(clon.querySelectorAll('td, th'), function(c) {
+        if (c.setAttribute) c.setAttribute('style', 'padding:2px 3px!important;height:auto!important;max-height:none!important;line-height:1.1!important;vertical-align:middle!important;word-break:break-word!important;white-space:normal!important;');
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.evento, .cal-evento, .evento-item, .bloque-horario, [data-evento], .pildora-actividad, [data-planify-event]'), function(ev) {
+        if (ev.style) {
+          ev.style.fontSize = '8.5px';
+          ev.style.lineHeight = '1.1';
+        }
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.col-hora, td:first-child, .hora-cell'), function(ch) {
+        if (ch.style) {
+          ch.style.fontSize = '8px';
+          ch.style.padding = '2px';
+        }
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias, .leyenda-etiquetas, .leyenda-contenedor, .leyenda'), function(l) {
+        if (l.style) {
+          l.style.display = 'flex';
+          l.style.flexWrap = 'wrap';
+          l.style.gap = '4px';
+          l.style.marginTop = '4px';
+        }
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias span, .leyenda-etiquetas span, .leyenda span, .legend-item'), function(lb) {
+        if (lb.style) {
+          lb.style.fontSize = '8px';
+          lb.style.lineHeight = '1.1';
+        }
+      });
     }
     clon.style.pageBreakAfter = 'avoid';
     clon.style.breakAfter = 'avoid';

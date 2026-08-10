@@ -2044,11 +2044,25 @@
       "desviaciones": "El prompt cito v7.45/planify-cache-v131/Fase 157 que YA EXISTEN (commit 5ca93d4, Fase 157 registrada). Se aplica como v7.46 (patron real siguiente a v7.45), cache v132, Fase 158, para no duplicar versiones ni fases.",
       "verificacion": "VM test 14/14 PASS: main.css con .resumen-card 1e293b + box-shadow, hijos blancos sin text-shadow, span f8fafc, light-mode blanco, print blanco/0f172a, clon con .resumen-card, iframe .resumen-card sin shadow, regresiones v7.42/v7.44/v7.45 intactas, js/app.js identico a f89dab7, ?v=7.46 x3, planify-cache-v132. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 159,
+      "version": "v7.47",
+      "fecha": "2026-08-10",
+      "alcance": "Solución definitiva de visibilidad apuntando a las clases DOM reales .summary-banner y .summary-cat-item. En css/main.css: bloque v7.47 con .summary-banner a background #1e293b, border #334155, radius 12px y padding 10px 16px; TODOS sus hijos forzados a #ffffff, opacity 1, font-weight 600 y -webkit-text-fill-color #ffffff; .summary-item/.summary-cat-item con background rgba(255,255,255,0.12), border rgba(255,255,255,0.2), radius 8px y color blanco; strong/b/.summary-value a cian #38bdf8/700 con -webkit-text-fill-color; @media print con banner blanco/#cbd5e1, textos #0f172a (incl. -webkit-text-fill-color) y tarjetas de categoría #f1f5f9. Tarea CSS-only (sin cambios en js/export-pdf.js)",
+      "archivos": [
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.47, planify-cache-v133, Fase 159). Prompt CSS-only, no se modifico js/export-pdf.js.",
+      "verificacion": "VM test 11/11 PASS: .summary-banner 1e293b, hijos blancos con text-fill, .summary-item/.summary-cat-item translucidos, strong/b/.summary-value cian 38bdf8, print claro con text-fill 0f172a, regresiones v7.45/v7.46 intactas, js/app.js identico a f89dab7, ?v=7.47 x3, planify-cache-v133. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.46",
-    "numero": 158,
+    "version": "v7.47",
+    "numero": 159,
     "estado": "EN PROGRESO"
   }
 }

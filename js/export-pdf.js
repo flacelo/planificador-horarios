@@ -1,4 +1,4 @@
-// PLANIFY v7.40 - Fix Bitemático Banner Resumen de Hoy (Modo Oscuro + Modo Claro + PDF)
+// PLANIFY v7.41 - Fix Radical y Definitivo Banner Resumen de Hoy (Sobreescritura Universal)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -166,6 +166,23 @@
             Array.prototype.forEach.call(rb.querySelectorAll('*'), function(h) {
               if (h.style) {
                 h.style.setProperty('color', '#1e293b', 'important');
+                h.style.setProperty('opacity', '1', 'important');
+                h.style.setProperty('visibility', 'visible', 'important');
+              }
+            });
+          }
+        });
+      }
+      // Remoción radical v7.41 de estilos inline tontos en el banner del clon PDF
+      if (clon.querySelectorAll) {
+        Array.prototype.forEach.call(clon.querySelectorAll('#resumenHoy, #resumen-hoy, .resumen-hoy-container, .resumen-barra, div[class*="resumen"]'), function(rb) {
+          if (rb.style && rb.style.setProperty) {
+            rb.style.setProperty('background-color', '#ffffff', 'important');
+            rb.style.setProperty('border', '1px solid #cbd5e1', 'important');
+            rb.style.setProperty('color', '#0f172a', 'important');
+            Array.prototype.forEach.call(rb.querySelectorAll('*'), function(h) {
+              if (h.style) {
+                h.style.setProperty('color', '#0f172a', 'important');
                 h.style.setProperty('opacity', '1', 'important');
                 h.style.setProperty('visibility', 'visible', 'important');
               }
@@ -367,6 +384,8 @@
       '[data-planify-print] [class*="resumen-"] .text-muted, [data-planify-print] [class*="resumen-"] .subtext, [data-planify-print] [class*="resumen-"] span[class*="pendiente"], [data-planify-print] [class*="resumen-"] span[class*="rutina"], [data-planify-print] [class*="resumen-"] span[class*="clase"] { color: #334155 !important; font-size: 12px !important; }' +
       '[data-planify-print] .resumen-hoy-container, [data-planify-print] .resumen-barra, [data-planify-print] [class*="resumen-"] { border: 1px solid #cbd5e1 !important; border-radius: 12px !important; }' +
       '[data-planify-print] body.light-theme .resumen-hoy-container, [data-planify-print] body.light-theme .resumen-barra, [data-planify-print] body.light-theme [class*="resumen-"], [data-planify-print] body:not(.light-theme) .resumen-hoy-container, [data-planify-print] body:not(.light-theme) .resumen-barra, [data-planify-print] body:not(.light-theme) [class*="resumen-"], [data-planify-print] .dark-mode .resumen-hoy-container, [data-planify-print] .dark-mode .resumen-barra { background-color: #ffffff !important; border: 1px solid #cbd5e1 !important; color: #0f172a !important; }' +
+      '[data-planify-print] #resumenHoy, [data-planify-print] #resumen-hoy, [data-planify-print] .resumen-hoy-container, [data-planify-print] .resumen-barra, [data-planify-print] div[class*="resumen"] { background-color: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; padding: 10px 16px !important; color: #0f172a !important; }' +
+      '[data-planify-print] #resumenHoy *, [data-planify-print] #resumen-hoy *, [data-planify-print] .resumen-hoy-container *, [data-planify-print] .resumen-barra *, [data-planify-print] div[class*="resumen"] * { color: #0f172a !important; opacity: 1 !important; visibility: visible !important; text-shadow: none !important; font-weight: 600 !important; }' +
       '[data-planify-print] .leyenda-categorias, [data-planify-print] .leyenda-etiquetas, [data-planify-print] .leyenda-contenedor, [data-planify-print] .leyenda { display: flex !important; flex-wrap: wrap !important; gap: 4px !important; margin-top: 4px !important; padding: 2px 0 !important; max-height: 28px !important; overflow: hidden !important; }' +
       '[data-planify-print] .leyenda span, [data-planify-print] .legend-item { font-size: 8.5px !important; padding: 1px 4px !important; height: auto !important; line-height: 1 !important; }' +
       '[data-planify-print] .footer-licencia, [data-planify-print] .licencia-texto, [data-planify-print] [data-licencia] { margin-top: 2px !important; font-size: 8px !important; padding: 0 !important; line-height: 1 !important; }' +

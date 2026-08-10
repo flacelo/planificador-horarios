@@ -1778,11 +1778,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.27, planify-cache-v114, Fase 140). Bloque CSS identico en contenido al v7.26; se aplica igual reforzando la cascada y con iframe de maxima especificidad.",
       "verificacion": "VM test 7/7 PASS (11 asserts): th #0f172a/letter-spacing/borde #1e293b, td:first-child #e2e8f0, tabla 100% collapse, .pdf-export-container, iframe con selectores de maxima especificidad, bloque v7.26 intacto, js/app.js identico a f89dab7, ?v=7.27 x3, planify-cache-v114. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 141,
+      "version": "v7.28",
+      "fecha": "2026-08-10",
+      "alcance": "Fix unificado de legibilidad de días y horas, remoción de botones X y aislamiento de vista activa en PDF: botones de eliminacion (.btn-remove, .remove-btn, .btn-eliminar-fila, .btn-delete, .btn-eliminar, [data-action=delete] + reales .close-x/.day-header-delete) ocultos fisicamente en pantalla e impresion; @media print th con #0f172a/#ffffff/800/12px/uppercase/letter-spacing 0.5px/borde #1e293b incluyendo th[class*=header]; columna horaria #e2e8f0/#0f172a/11px; tabla 100% collapse; aislamiento de vistas en print (todas las vistas display none, solo .active display block, incluyendo reales #view-semanal/#view-table/#view-mensual/#view-diario/#view-dashboard/#vista-anual-metas); .pdf-export-container con mismas reglas; en iframe de export-pdf.js se verifico que detectarVistaActiva() ya clona unicamente la vista activa y se inyectaron reglas de X ocultos, th[class*=header] y aislamiento por .active",
+      "archivos": [
+        "css/main.css",
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.28, planify-cache-v115, Fase 141). El aislamiento de vista activa ya existia en detectarVistaActiva()/clonarVistaVisible(); se anadio el CSS de aislamiento (display none/active block) al iframe como refuerzo.",
+      "verificacion": "VM test 8/8 PASS (13 asserts): X ocultos pantalla+iframe, th con th[class*=header], columna horas #e2e8f0, aislamiento print y iframe, pdf-export-container, detectarVistaActiva intacta, bloque v7.27 intacto, js/app.js identico a f89dab7, ?v=7.28 x3, planify-cache-v115. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.27",
-    "numero": 140,
+    "version": "v7.28",
+    "numero": 141,
     "estado": "EN PROGRESO"
   }
 }

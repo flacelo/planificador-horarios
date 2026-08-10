@@ -2029,11 +2029,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.45, planify-cache-v131, Fase 157). Prompt CSS-only, no se modifico js/export-pdf.js.",
       "verificacion": "VM test 11/11 PASS: banner background/background-color 1e293b, hijos blancos 600, span f8fafc, light-mode f8fafc/0f172a, print blanco/0f172a, regresiones v7.41/v7.43/v7.44 intactas, js/app.js identico a f89dab7, ?v=7.45 x3, planify-cache-v131. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 158,
+      "version": "v7.46",
+      "fecha": "2026-08-10",
+      "alcance": "Override visual completo del banner de resumen: fondo oscuro #1e293b y forzado de texto blanco puro #ffffff para alto contraste. En css/main.css: bloque v7.46 con .resumen-hoy/.resumen-barra/.summary-banner/[class*=resumen]/#resumen-hoy/.resumen-card a background y background-color #1e293b, border #334155, radius 12px, padding 10px 16px y box-shadow 0 4px 12px rgba(0,0,0,0.3); TODOS los hijos forzados a #ffffff, opacity 1, font-weight 600 y text-shadow none; span a #f8fafc; body.light-mode con fondo #ffffff (actualizado vs v7.45 que usaba #f8fafc), border #cbd5e1 e hijos a #0f172a; @media print con fondo #ffffff/border #cbd5e1 e hijos a #0f172a. En js/export-pdf.js: sanitización override v7.46 en clonarVistaVisible() ampliando los selectores con .resumen-card (setProperty bg #ffffff, border 1px solid #cbd5e1; hijos a #0f172a/opacity 1) y reglas iframe equivalentes (box-shadow none)",
+      "archivos": [
+        "js/export-pdf.js",
+        "css/main.css",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "El prompt cito v7.45/planify-cache-v131/Fase 157 que YA EXISTEN (commit 5ca93d4, Fase 157 registrada). Se aplica como v7.46 (patron real siguiente a v7.45), cache v132, Fase 158, para no duplicar versiones ni fases.",
+      "verificacion": "VM test 14/14 PASS: main.css con .resumen-card 1e293b + box-shadow, hijos blancos sin text-shadow, span f8fafc, light-mode blanco, print blanco/0f172a, clon con .resumen-card, iframe .resumen-card sin shadow, regresiones v7.42/v7.44/v7.45 intactas, js/app.js identico a f89dab7, ?v=7.46 x3, planify-cache-v132. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.45",
-    "numero": 157,
+    "version": "v7.46",
+    "numero": 158,
     "estado": "EN PROGRESO"
   }
 }

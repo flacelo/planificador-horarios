@@ -1,4 +1,4 @@
-// PLANIFY v7.44 - Force Brute Visibilidad Texto Blanco Banner Resumen (App + PDF)
+// PLANIFY v7.46 - Override Definitivo Fondo Oscuro y Texto Blanco Banner Resumen (App + PDF)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -238,6 +238,21 @@
           }
         });
       }
+      // Sanitización override v7.46: incluye .resumen-card en la limpieza del clon PDF
+      if (clon.querySelectorAll) {
+        Array.prototype.forEach.call(clon.querySelectorAll('.resumen-hoy, .resumen-barra, .summary-banner, [class*="resumen"], #resumen-hoy, .resumen-card'), function(rb) {
+          if (rb.style && rb.style.setProperty) {
+            rb.style.setProperty('background-color', '#ffffff', 'important');
+            rb.style.setProperty('border', '1px solid #cbd5e1', 'important');
+            Array.prototype.forEach.call(rb.querySelectorAll('*'), function(h) {
+              if (h.style) {
+                h.style.setProperty('color', '#0f172a', 'important');
+                h.style.setProperty('opacity', '1', 'important');
+              }
+            });
+          }
+        });
+      }
       Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias, .leyenda-etiquetas, .leyenda-contenedor, .leyenda'), function(l) {
         if (l.setAttribute) l.setAttribute('style', 'display:flex!important;flex-wrap:wrap!important;gap:4px!important;margin-top:4px!important;padding:2px 0!important;max-height:28px!important;overflow:hidden!important;');
       });
@@ -436,6 +451,8 @@
       '[data-planify-print] #resumenHoy *, [data-planify-print] #resumen-hoy *, [data-planify-print] .resumen-hoy-container *, [data-planify-print] .resumen-barra *, [data-planify-print] div[class*="resumen"] * { color: #0f172a !important; opacity: 1 !important; visibility: visible !important; text-shadow: none !important; font-weight: 600 !important; }' +
       '[data-planify-print] #resumenHoy *[style], [data-planify-print] #resumen-hoy *[style], [data-planify-print] .resumen-hoy-container *[style], [data-planify-print] .resumen-barra *[style], [data-planify-print] div[class*="resumen"] *[style], [data-planify-print] #resumenHoy span[style], [data-planify-print] .resumen-hoy-container span[style], [data-planify-print] div[class*="resumen"] span[style] { color: #0f172a !important; opacity: 1 !important; visibility: visible !important; text-shadow: none !important; font-weight: 600 !important; }' +
       '[data-planify-print] .resumen-hoy, [data-planify-print] .resumen-barra, [data-planify-print] .summary-banner, [data-planify-print] [class*="resumen"], [data-planify-print] #resumen-hoy { background-color: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; padding: 10px 16px !important; box-shadow: none !important; backdrop-filter: none !important; }' +
+      '[data-planify-print] .resumen-hoy, [data-planify-print] .resumen-barra, [data-planify-print] .summary-banner, [data-planify-print] [class*="resumen"], [data-planify-print] #resumen-hoy, [data-planify-print] .resumen-card { background: #ffffff !important; background-color: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; padding: 10px 16px !important; box-shadow: none !important; }' +
+      '[data-planify-print] .resumen-hoy *, [data-planify-print] .resumen-barra *, [data-planify-print] .summary-banner *, [data-planify-print] [class*="resumen"] *, [data-planify-print] #resumen-hoy *, [data-planify-print] .resumen-card * { color: #0f172a !important; opacity: 1 !important; font-weight: 600 !important; text-shadow: none !important; }' +
       '[data-planify-print] .resumen-hoy *, [data-planify-print] .resumen-barra *, [data-planify-print] .summary-banner *, [data-planify-print] [class*="resumen"] *, [data-planify-print] #resumen-hoy * { color: #0f172a !important; opacity: 1 !important; text-shadow: none !important; font-weight: 500 !important; }' +
       '[data-planify-print] .resumen-hoy strong, [data-planify-print] .resumen-barra strong, [data-planify-print] [class*="resumen"] strong { color: #0f172a !important; font-weight: 700 !important; }' +
       '[data-planify-print] .resumen-hoy span[style*="color"], [data-planify-print] .resumen-barra span[style*="color"], [data-planify-print] [class*="resumen"] span[style*="color"] { font-weight: 700 !important; color: #0f172a !important; }' +

@@ -1793,11 +1793,26 @@
       "desviaciones": "None. Versiones citadas coinciden con el patron real (?v=7.28, planify-cache-v115, Fase 141). El aislamiento de vista activa ya existia en detectarVistaActiva()/clonarVistaVisible(); se anadio el CSS de aislamiento (display none/active block) al iframe como refuerzo.",
       "verificacion": "VM test 8/8 PASS (13 asserts): X ocultos pantalla+iframe, th con th[class*=header], columna horas #e2e8f0, aislamiento print y iframe, pdf-export-container, detectarVistaActiva intacta, bloque v7.27 intacto, js/app.js identico a f89dab7, ?v=7.28 x3, planify-cache-v115. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 142,
+      "version": "v7.30",
+      "fecha": "2026-08-10",
+      "alcance": "Aislamiento físico del clon iframe para PDF sin mezclas de vistas y remoción física de nodos X: en js/export-pdf.js clonarVistaVisible() ahora remueve fisicamente (n.remove()/removeChild) los nodos .btn-remove/.remove-btn/.btn-eliminar-fila/.btn-delete/.close-x/.day-header-delete/[data-action=delete]/.delete-icon/.btn-eliminar dentro del clon; detectarVistaActiva() ampliada con .vista-container.active/.view-container.active/#vista-semanal.active/#vista-mensual.active/#vista-diario.active/#view-*.active; nueva window.exportarVistaAPDF() que detecta la vista activa y clona SOLO ese nodo (aislamiento fisico sin mezclas) reutilizando imprimirVistas(); iframe con id pdf-print-iframe y limpieza previa del mismo; CSS del iframe con @page A4 portrait margin 8mm y regla global de ocultamiento de X; css/main.css con bloque global V7.30 (.btn-remove...delete-icon display none/visibility hidden/opacity 0/pointer-events none)",
+      "archivos": [
+        "css/main.css",
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "El prompt saltó v7.29 y cito v7.30; se aplicó ?v=7.30 (7.29 nunca fue usada). El snippet JS literal se integró preservando el flujo existente (modal #modal-export-pdf, OPCIONES cronológicas, clonarVistaVisible con purga esColorOscuro, print 300ms/removeChild 500ms) en lugar de reemplazar el archivo: la remoción física de X, la detección ampliada y exportarVistaAPDF implementan el aislamiento pedido sin romper el modal ni el CSS acumulado v7.13-v7.28.",
+      "verificacion": "VM test 9/9 PASS (14 asserts incl. test funcional de remoción de nodos X): X global en main.css, exportarVistaAPDF, pdf-print-iframe, remoción física, detección ampliada, @page A4, modal/generarPDF/print intactos, bloque v7.28 intacto, js/app.js identico a f89dab7, ?v=7.30 x3, planify-cache-v116. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.28",
-    "numero": 141,
+    "version": "v7.30",
+    "numero": 142,
     "estado": "EN PROGRESO"
   }
 }

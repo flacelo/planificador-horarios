@@ -1,4 +1,4 @@
-/* PLANIFY v7.28 - EXPORTACIÓN PDF: FIX UNIFICADO VISIBILIDAD, REMOCIÓN 'X' Y AISLAMIENTO VISTA ACTIVA */
+/* PLANIFY v7.30 - EXPORTACIÓN PDF: AISLAMIENTO FÍSICO DEL CLON IFRAME Y REMOCIÓN TOTAL DE 'X' */
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -21,7 +21,7 @@
       if (el && el.style && el.style.display !== 'none') activa = el;
     });
     if (!activa) {
-      document.querySelectorAll('.view-content.active, .tab-content.active, [data-tab-content].active').forEach(function(el) {
+      document.querySelectorAll('.view-content.active, .tab-content.active, [data-tab-content].active, .vista-container.active, .view-container.active, #vista-semanal.active, #vista-mensual.active, #vista-diario.active, #view-semanal.active, #view-mensual.active, #view-diario.active').forEach(function(el) {
         if (activa) return;
         var id = el.id || '';
         if (id.indexOf('tab-') === 0) return;
@@ -69,6 +69,13 @@
         if (esColorOscuro(n.style.background)) n.style.background = '';
       }
     });
+    // Remoción física de nodos de eliminación ('X') dentro del clon (v7.30)
+    if (clon.querySelectorAll) {
+      Array.prototype.forEach.call(clon.querySelectorAll('.btn-remove, .remove-btn, .btn-eliminar-fila, .btn-delete, .close-x, .day-header-delete, [data-action="delete"], .delete-icon, .btn-eliminar'), function(n) {
+        if (n.remove) n.remove();
+        else if (n.parentNode) n.parentNode.removeChild(n);
+      });
+    }
     clon.style.backgroundColor = '#ffffff';
     clon.style.color = '#0f172a';
     clon.style.display = 'block';
@@ -141,7 +148,10 @@
   }
 
   function imprimirVistas(nodosHTML, clasesPrint) {
+    var previo = document.getElementById('pdf-print-iframe');
+    if (previo && previo.parentNode) previo.parentNode.removeChild(previo);
     var iframe = document.createElement('iframe');
+    iframe.id = 'pdf-print-iframe';
     iframe.style.position = 'fixed';
     iframe.style.right = '0';
     iframe.style.bottom = '0';
@@ -224,6 +234,8 @@
       'thead th, .cal-dia-nombre, .week-header-day, .day-header, .hora-col, .celda-header, .month-header, .cal-titulo, [class*="month-title"], [class*="cal-title"] { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
       'th, td, .celda, .grid-cell, .month-cell, .cell-content { padding: 8px 10px !important; border-radius: 6px !important; }' +
       '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 6px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
+      '@page { size: A4 portrait; margin: 8mm; }' +
+      '[data-planify-print] .btn-remove, [data-planify-print] .remove-btn, [data-planify-print] .btn-eliminar-fila, [data-planify-print] .btn-delete, [data-planify-print] .close-x, [data-planify-print] .day-header-delete, [data-planify-print] [data-action="delete"], [data-planify-print] .delete-icon, [data-planify-print] .btn-eliminar { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }' +
       '</style></head>' +
       '<body class="' + (clasesPrint || '') + '">' +
       '<div data-planify-print="1">' + nodosHTML + '</div>' +
@@ -272,6 +284,19 @@
     cerrarModal();
     imprimirVistas(partes.join(''), clasesPrint.join(' '));
   }
+
+  window.exportarVistaAPDF = function() {
+    var vistaActiva = document.querySelector('.vista-container.active, .view-container.active, #vista-semanal.active, #vista-mensual.active, #vista-diario.active, #view-semanal.active, #view-mensual.active, #view-diario.active')
+      || document.querySelector('#vista-semanal, #view-semanal, #view-table');
+    if (!vistaActiva) vistaActiva = detectarVistaActiva();
+    if (!vistaActiva) {
+      console.error('No se encontró vista activa para PDF');
+      return;
+    }
+    var clon = clonarVistaVisible(vistaActiva);
+    var idReal = vistaActiva.id ? String(vistaActiva.id) : 'vista-activa';
+    imprimirVistas('<section class="pdf-seccion" style="display:block;visibility:visible;opacity:1;">' + clon + '</section>', 'printing-' + idReal);
+  };
 
   document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {

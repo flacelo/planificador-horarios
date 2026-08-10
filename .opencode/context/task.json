@@ -1808,11 +1808,25 @@
       "desviaciones": "El prompt saltó v7.29 y cito v7.30; se aplicó ?v=7.30 (7.29 nunca fue usada). El snippet JS literal se integró preservando el flujo existente (modal #modal-export-pdf, OPCIONES cronológicas, clonarVistaVisible con purga esColorOscuro, print 300ms/removeChild 500ms) en lugar de reemplazar el archivo: la remoción física de X, la detección ampliada y exportarVistaAPDF implementan el aislamiento pedido sin romper el modal ni el CSS acumulado v7.13-v7.28.",
       "verificacion": "VM test 9/9 PASS (14 asserts incl. test funcional de remoción de nodos X): X global en main.css, exportarVistaAPDF, pdf-print-iframe, remoción física, detección ampliada, @page A4, modal/generarPDF/print intactos, bloque v7.28 intacto, js/app.js identico a f89dab7, ?v=7.30 x3, planify-cache-v116. Build OK.",
       "commit": "PENDIENTE"
+    },
+    {
+      "numero": 143,
+      "version": "v7.31",
+      "fecha": "2026-08-10",
+      "alcance": "PDF forzado a A4 Landscape con purga física de nodos X y bypass de caché: en js/export-pdf.js la regla @page del iframe pasa a size A4 landscape margin 6mm (antes portrait 8mm); window.exportarVistaAPDF() prioriza deteccion de vista activa con #view-semanal.active/#vista-semanal.active/#view-mensual.active/#vista-mensual.active/#view-diario.active/#vista-diario.active/#view-table.active antes que .vista-container.active/.view-container.active; timeout de impresion sube a 350ms (removeChild 500ms intacto); purga fisica de nodos X y aislamiento del clon de v7.30 intactos",
+      "archivos": [
+        "js/export-pdf.js",
+        "index.html",
+        "sw.js"
+      ],
+      "desviaciones": "None. El snippet literal se integro preservando el flujo existente (modal/OPCIONES/clonarVistaVisible/imprimirVistas) en lugar de reemplazar el archivo. No hubo cambios en css/main.css en esta version.",
+      "verificacion": "VM test 6/6 PASS (11 asserts): @page A4 landscape 6mm (sin portrait), deteccion #view-*.active prioritaria, remocion fisica X intacta, timeout 350/500, modal/generarPDF/pdf-print-iframe intactos, js/app.js identico a f89dab7, ?v=7.31 x3, planify-cache-v117. Build OK.",
+      "commit": "PENDIENTE"
     }
   ],
   "ultima_fase": {
-    "version": "v7.30",
-    "numero": 142,
+    "version": "v7.31",
+    "numero": 143,
     "estado": "EN PROGRESO"
   }
 }

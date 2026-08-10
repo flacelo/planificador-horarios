@@ -1,4 +1,4 @@
-// PLANIFY v7.35 - Exportador PDF Unipágina A4 Landscape (Leyenda + Licencia contenidas)
+// PLANIFY v7.36 - Exportador PDF Multivista Multipágina (Resumen Visible y Cuadrícula Completa)
 (function() {
   // Orden cronológico estricto: Diaria -> Semanal -> Mensual -> Anual
   var OPCIONES = [
@@ -95,7 +95,31 @@
         if (t.setAttribute) t.setAttribute('style', 'height:100%!important;min-height:620px!important;');
       });
       Array.prototype.forEach.call(clon.querySelectorAll('td, tr'), function(c) {
-        if (c.setAttribute) c.setAttribute('style', 'padding:2px 3px!important;line-height:1.15!important;font-size:10px!important;vertical-align:middle!important;word-break:break-word!important;white-space:normal!important;');
+        if (c.style) {
+          c.style.padding = '3px 2px';
+          c.style.fontSize = '9.5px';
+          c.style.lineHeight = '1.2';
+          c.style.verticalAlign = 'middle';
+          c.style.wordBreak = 'break-word';
+          c.style.whiteSpace = 'normal';
+        }
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.evento-card, .pildora-actividad, [class*="evento"]'), function(ec) {
+        if (ec.style) {
+          ec.style.fontSize = '9px';
+          ec.style.padding = '2px 4px';
+          ec.style.lineHeight = '1.1';
+        }
+      });
+      // Corrección de la barra de resumen superior para que no trunque el texto (v7.36)
+      Array.prototype.forEach.call(clon.querySelectorAll('.resumen-barra, [class*="resumen"]'), function(rb) {
+        if (rb.style) {
+          rb.style.whiteSpace = 'normal';
+          rb.style.fontSize = '10px';
+          rb.style.display = 'flex';
+          rb.style.flexWrap = 'wrap';
+          rb.style.overflow = 'visible';
+        }
       });
       Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias, .leyenda-etiquetas, .leyenda-contenedor, .leyenda'), function(l) {
         if (l.setAttribute) l.setAttribute('style', 'display:flex!important;flex-wrap:wrap!important;gap:4px!important;margin-top:4px!important;padding:2px 0!important;max-height:28px!important;overflow:hidden!important;');
@@ -111,8 +135,9 @@
     clon.style.breakAfter = 'avoid';
     clon.style.pageBreakInside = 'avoid';
     clon.style.breakInside = 'avoid';
-    clon.style.maxHeight = '98vh';
-    clon.style.overflow = 'hidden';
+    clon.style.height = 'auto';
+    clon.style.maxHeight = 'none';
+    clon.style.overflow = 'visible';
     clon.style.backgroundColor = '#ffffff';
     clon.style.color = '#0f172a';
     clon.style.display = 'block';
@@ -271,19 +296,23 @@
       'thead th, .cal-dia-nombre, .week-header-day, .day-header, .hora-col, .celda-header, .month-header, .cal-titulo, [class*="month-title"], [class*="cal-title"] { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
       'th, td, .celda, .grid-cell, .month-cell, .cell-content { padding: 8px 10px !important; border-radius: 6px !important; }' +
       '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 6px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
-      '@page { size: A4 landscape; margin: 4mm 6mm; }' +
+      '@page { size: A4 landscape; margin: 6mm; }' +
       '[data-planify-print] .btn-remove, [data-planify-print] .remove-btn, [data-planify-print] .btn-eliminar-fila, [data-planify-print] .btn-delete, [data-planify-print] .close-x, [data-planify-print] .day-header-delete, [data-planify-print] [data-action="delete"], [data-planify-print] .delete-icon, [data-planify-print] .btn-eliminar, [data-planify-print] button.close, [data-planify-print] .x-btn, [data-planify-print] .close-btn, [data-planify-print] button { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }' +
       '[data-planify-print] th, [data-planify-print] .day-header, [data-planify-print] .tabla-semanal th, [data-planify-print] th[class*="header"], [data-planify-print] th * { background-color: #0f172a !important; color: #ffffff !important; font-weight: 700 !important; text-align: center !important; padding: 6px !important; font-size: 11px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '[data-planify-print] .col-hora, [data-planify-print] td:first-child, [data-planify-print] .hora-cell { background-color: #f1f5f9 !important; color: #0f172a !important; font-weight: 700 !important; text-align: center !important; }' +
       '[data-planify-print] button, [data-planify-print] svg { display: none !important; }' +
-      '[data-planify-print] table { height: 98vh !important; }' +
+      '[data-planify-print] table { height: auto !important; min-height: 0 !important; }' +
       '[data-planify-print] td, [data-planify-print] th { vertical-align: middle !important; }' +
       '[data-planify-print] .evento-item, [data-planify-print] .pildora-actividad, [data-planify-print] [data-planify-event], [data-planify-print] [data-evento] { padding: 4px 6px !important; font-size: 10.5px !important; line-height: 1.3 !important; border-radius: 5px !important; }' +
-      '[data-planify-print] td, [data-planify-print] tr { padding: 2px 3px !important; line-height: 1.15 !important; font-size: 10px !important; }' +
+      '[data-planify-print] td, [data-planify-print] tr { padding: 3px 2px !important; line-height: 1.2 !important; font-size: 9.5px !important; }' +
+      '[data-planify-print] .evento-card, [data-planify-print] .pildora-actividad, [data-planify-print] [class*="evento"] { font-size: 9px !important; padding: 2px 4px !important; line-height: 1.1 !important; }' +
+      '[data-planify-print] .resumen-barra, [data-planify-print] [class*="resumen"] { white-space: normal !important; overflow: visible !important; font-size: 10px !important; }' +
       '[data-planify-print] .leyenda-categorias, [data-planify-print] .leyenda-etiquetas, [data-planify-print] .leyenda-contenedor, [data-planify-print] .leyenda { display: flex !important; flex-wrap: wrap !important; gap: 4px !important; margin-top: 4px !important; padding: 2px 0 !important; max-height: 28px !important; overflow: hidden !important; }' +
       '[data-planify-print] .leyenda span, [data-planify-print] .legend-item { font-size: 8.5px !important; padding: 1px 4px !important; height: auto !important; line-height: 1 !important; }' +
       '[data-planify-print] .footer-licencia, [data-planify-print] .licencia-texto, [data-planify-print] [data-licencia] { margin-top: 2px !important; font-size: 8px !important; padding: 0 !important; line-height: 1 !important; }' +
-      '[data-planify-print] { page-break-inside: avoid !important; page-break-after: avoid !important; break-after: avoid !important; max-height: 98vh !important; overflow: hidden !important; }' +
+      '[data-planify-print] { page-break-inside: avoid !important; height: auto !important; max-height: none !important; overflow: visible !important; }' +
+      '[data-planify-print] .planify-pdf-page { width: 100% !important; box-sizing: border-box !important; page-break-inside: avoid !important; }' +
+      '[data-planify-print] .planify-pdf-page:not(:last-child) { break-after: page !important; page-break-after: always !important; }' +
       '</style></head>' +
       '<body class="' + (clasesPrint || '') + '">' +
       '<div data-planify-print="1">' + nodosHTML + '</div>' +
@@ -325,7 +354,7 @@
       var sufijo = String(idReal).replace(/^#?view-|^#?vista-/, '');
       clasesPrint.push('printing-' + sufijo);
       clasesPrint.push('printing-' + idReal);
-      partes.push('<section class="pdf-seccion" style="display:block;visibility:visible;opacity:1;">' + clonarVistaVisible(el) + '</section>');
+      partes.push('<section class="pdf-seccion planify-pdf-page" style="display:block;visibility:visible;opacity:1;">' + clonarVistaVisible(el) + '</section>');
     });
     if (partes.length === 0) partes.push('<div>No hay vistas disponibles para exportar.</div>');
 
@@ -346,7 +375,7 @@
     var clon = clonarVistaVisible(vistaActiva);
     clon.id = 'pdf-clone-isolated';
     var idReal = vistaActiva.id ? String(vistaActiva.id) : 'vista-activa';
-    imprimirVistas('<section class="pdf-seccion" style="display:block;visibility:visible;opacity:1;">' + clon.outerHTML + '</section>', 'printing-' + idReal);
+    imprimirVistas('<section class="pdf-seccion planify-pdf-page" style="display:block;visibility:visible;opacity:1;">' + clon.outerHTML + '</section>', 'printing-' + idReal);
   };
 
   document.addEventListener('DOMContentLoaded', function() {

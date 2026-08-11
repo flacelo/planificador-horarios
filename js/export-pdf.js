@@ -236,10 +236,10 @@
           thSem.style.setProperty('border', '1px solid #cbd5e1', 'important');
         });
       }
-      // v7.70: inyeccion directa de CONTAINER de cabecera explicito SI los encabezados estan ocultos o vacios
+      // v7.71: inyeccion forzada de cabecera CLARA con 8 celdas uniformes si no existe o se oculta
       var tablaCab = clon.querySelector('table.tabla-semanal, .semanal-grid table, table, #tabla');
       var cabecerasOK = false;
-      if (tablaCab && !/(^| )hidden($| )|display\s*:\s*none/.test(tablaCab.className || '')) {
+      if (tablaCab) {
         var thsCab = tablaCab.querySelectorAll('thead th');
         cabecerasOK = thsCab.length >= 8 && thsCab[0].textContent.trim() !== '';
       }
@@ -248,11 +248,12 @@
         if (viejaCab && viejaCab.parentNode) viejaCab.parentNode.removeChild(viejaCab);
         var cabecera = document.createElement('div');
         cabecera.className = 'pdf-cabecera-dias';
-        cabecera.style.cssText = 'display:grid!important;grid-template-columns:80px repeat(7,1fr)!important;background-color:#0f172a!important;color:#ffffff!important;font-weight:bold!important;text-align:center!important;font-size:11px!important;border:1px solid #cbd5e1!important;padding:6px 0!important;width:100%!important;box-sizing:border-box!important;';
+        cabecera.style.cssText = 'display:grid!important;grid-template-columns:repeat(8,1fr)!important;width:100%!important;box-sizing:border-box!important;';
         var titulosCab = ['HORA', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
         Array.prototype.forEach.call(titulosCab, function(t) {
           var d = document.createElement('div');
           d.textContent = t;
+          d.style.cssText = 'display:flex!important;align-items:center!important;justify-content:center!important;color:#0f172a!important;background-color:#f1f5f9!important;font-weight:bold!important;font-size:10px!important;text-align:center!important;border:1px solid #cbd5e1!important;visibility:visible!important;opacity:1!important;padding:6px 2px!important;';
           cabecera.appendChild(d);
         });
         tablaCab.parentNode.insertBefore(cabecera, tablaCab);

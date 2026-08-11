@@ -2212,6 +2212,12 @@
       "version": "v7.70",
       "estado": "completada",
       "alcance": "Inyeccion directa por DOM de cabecera explicita en PDF semanal (refuerzo condicional tras v7.69). js/export-pdf.js: bloque v7.70 - solo si el thead de la tabla clonada tiene <8 th o la primera celda vacia (encabezados ocultos/vacios): crea div .pdf-cabecera-dias (remove previo) con grid 80px repeat(7,1fr), bg #0f172a, color #ffffff, bold, center, 11px, border #cbd5e1, padding 6px 0, width 100%, 8 divs HORA/LUNES/MARTES/MIÉRCOLES/JUEVES/VIERNES/SÁBADO/DOMINGO, insertado justo arriba de la tabla (parentNode.insertBefore). Como el bloque v7.69 ya rellena el thead con 8 th, la condicion NO dispara en flujo normal (sin duplicados); dispara solo si algo fallo. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 181 (usada) -> Fase 184. ?v=7.70 x3 + cache v156. Build OK, test 9/9"
+    },
+    {
+      "fase": 185,
+      "version": "v7.71",
+      "estado": "completada",
+      "alcance": "Inyeccion forzada de cabecera CLARA (8 celdas uniformes) en PDF semanal: reemplaza contenedor oscuro v7.70. js/export-pdf.js: condicion igual (thetabla con <thead> <8 th o primera celda vacia -> inyecta); contenedor .pdf-cabecera-dias (remove previo) con grid repeat(8,1fr) uniforme; 8 celdas HORA/LUNES/MARTES/MIÉRCOLES/JUEVES/VIERNES/SÁBADO/DOMINGO con estilo emergencia: flex center, color #0f172a, bg #f1f5f9, bold, 10px, center, border #cbd5e1, visible, opacity 1, padding 6px 2px; insertado justo arriba de la tabla. En flujo normal el thead de v7.69 ya cubre (sin duplicados). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 182 (usada) -> Fase 185. ?v=7.71 x3 + cache v157. Build OK, test 10/10"
     }
   ],
   "ultima_fase": {

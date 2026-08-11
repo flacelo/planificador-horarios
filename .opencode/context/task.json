@@ -2218,6 +2218,12 @@
       "version": "v7.71",
       "estado": "completada",
       "alcance": "Inyeccion forzada de cabecera CLARA (8 celdas uniformes) en PDF semanal: reemplaza contenedor oscuro v7.70. js/export-pdf.js: condicion igual (thetabla con <thead> <8 th o primera celda vacia -> inyecta); contenedor .pdf-cabecera-dias (remove previo) con grid repeat(8,1fr) uniforme; 8 celdas HORA/LUNES/MARTES/MIÉRCOLES/JUEVES/VIERNES/SÁBADO/DOMINGO con estilo emergencia: flex center, color #0f172a, bg #f1f5f9, bold, 10px, center, border #cbd5e1, visible, opacity 1, padding 6px 2px; insertado justo arriba de la tabla. En flujo normal el thead de v7.69 ya cubre (sin duplicados). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 182 (usada) -> Fase 185. ?v=7.71 x3 + cache v157. Build OK, test 10/10"
+    },
+    {
+      "fase": 186,
+      "version": "v7.73",
+      "estado": "completada",
+      "alcance": "Inyeccion forzada EXCLUSIVA de cabecera abreviada (HORA+LUN+MAR+MIÉ+JUE+VIE+SÁB+DOM) en el thead de la tabla clonada para PDF (salto numerico: prompt v7.73/v159 sin v7.72; Fase pedia 184 que ya existia -> Fase 186). js/export-pdf.js bloque v7.73: tabla = clon.querySelector(table)||querySelector(.tabla-semanal); remueve SIEMPRE el thead previo; crea tr nuevo (bg #f1f5f9, border-bottom 2px #cbd5e1) con 8 th: color #0f172a, weight 800, center, padding 6px, 11px, HORA con width 10%; insertBefore(newThead, tabla.firstChild). NO agrega leyendas/resumen (verificado en el codigo del bloque). css/main.css: regla generica [data-planify-print] table thead/tr/th table-header-group visible opacity 1 #0f172a/#f1f5f9. Bloques previos v7.69 (thead nombres largos) y v7.71 (contenedor condicional) quedan neutralizados en el flujo por el v7.73 (incondicional, al final). app.js 0 cambios (baseline 2cf580d). ?v=7.73 x3 + cache v159. Build OK, test 11/11"
     }
   ],
   "ultima_fase": {

@@ -296,36 +296,26 @@
       });
       if (contenedorSemanal.firstChild) contenedorSemanal.insertBefore(headerPDF, contenedorSemanal.firstChild);
       else contenedorSemanal.appendChild(headerPDF);
-      // v7.77: thead nativo como PRIMERA FILA con nombres COMPLETOS (LUNES..DOMINGO) - bordes alineados al cuerpo
-      var divsFlotantes77 = contenedorSemanal.querySelectorAll('.cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header');
-      Array.prototype.forEach.call(divsFlotantes77, function(el) {
+      // v7.78: thead nativo con 8 th al 12.5% exacto, SIN inline styles (layout solo via CSS)
+      var divsFlotantes78 = contenedorSemanal.querySelectorAll('.cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header');
+      Array.prototype.forEach.call(divsFlotantes78, function(el) {
         if (el && el.parentNode) el.parentNode.removeChild(el);
       });
-      var tablaSem77 = contenedorSemanal.querySelector('table');
-      if (tablaSem77) {
-        var thead77 = tablaSem77.querySelector('thead');
-        var nombres77 = ['HORA', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
-        if (!thead77) {
-          thead77 = document.createElement('thead');
-          var tr77 = document.createElement('tr');
-          Array.prototype.forEach.call(nombres77, function(n) {
-            var th77 = document.createElement('th');
-            th77.textContent = n;
-            th77.style.cssText = 'background-color:#0f172a!important;color:#ffffff!important;font-weight:700!important;font-size:10px!important;padding:6px 2px!important;text-align:center!important;border:1px solid #cbd5e1!important;box-sizing:border-box!important;';
-            tr77.appendChild(th77);
-          });
-          thead77.appendChild(tr77);
-          if (tablaSem77.firstChild) tablaSem77.insertBefore(thead77, tablaSem77.firstChild);
-          else tablaSem77.appendChild(thead77);
-        } else {
-          var ths77 = thead77.querySelectorAll('tr th');
-          Array.prototype.forEach.call(ths77, function(thEl, i) {
-            if (i < 8) {
-              thEl.textContent = nombres77[i];
-              thEl.style.cssText = 'background-color:#0f172a!important;color:#ffffff!important;font-weight:700!important;font-size:10px!important;padding:6px 2px!important;text-align:center!important;border:1px solid #cbd5e1!important;box-sizing:border-box!important;';
-            }
-          });
-        }
+      var tablaSem78 = contenedorSemanal.querySelector('table');
+      if (tablaSem78) {
+        var oldThead78 = tablaSem78.querySelector('thead');
+        if (oldThead78 && oldThead78.parentNode) oldThead78.parentNode.removeChild(oldThead78);
+        var thead78 = document.createElement('thead');
+        var tr78 = document.createElement('tr');
+        var nombres78 = ['HORA', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
+        Array.prototype.forEach.call(nombres78, function(n) {
+          var th78 = document.createElement('th');
+          th78.textContent = n;
+          tr78.appendChild(th78);
+        });
+        thead78.appendChild(tr78);
+        if (tablaSem78.firstChild) tablaSem78.insertBefore(thead78, tablaSem78.firstChild);
+        else tablaSem78.appendChild(thead78);
       }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {

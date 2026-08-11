@@ -2248,6 +2248,12 @@
       "version": "v7.77",
       "estado": "completada",
       "alcance": "Integracion nativa de thead (PRIMERA FILA) en tabla semanal PDF con nombres COMPLETOS y estilo oscuro. js/export-pdf.js bloque v7.77 (despues del v7.76): elimina divs flotantes (.cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header); tabla = contenedorSemanal.querySelector(table); si no hay thead: crea thead>tr con 8 th (HORA/LUNES/MARTES/MIERCOLES/JUEVES/VIERNES/SABADO/DOMINGO) inline #0f172a/#ffffff/700/10px/6px 2px/center/border #cbd5e1 y insertBefore(firstChild); si ya hay thead: re-etiqueta hasta 8 th con mismos estilos. css/main.css v7.77 (append): [data-planify-print] table.tabla-semanal/.semanal-grid table 100%/collapse/fixed; table thead tr th oscuro. Sin cambios UI en vivo (solo clon). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 188 (usada) -> Fase 190. ?v=7.77 x3 + cache v163. Build OK, test 11/11"
+    },
+    {
+      "fase": 191,
+      "version": "v7.78",
+      "estado": "completada",
+      "alcance": "8 celdas th independientes al 12.5% EXACTO (width/min/max) en la primera fila del thead nativo, layout 100% via CSS sin inline styles. js/export-pdf.js bloque v7.78 (reemplaza v7.77): elimina divs flotantes (.cabecera-semanal-pdf-forzada,.cabecera-pdf-dias,#cabecera-pdf-dias,.pdf-cabecera-dias,.grid-header-pdf,.pdf-dias-header); remove thead previo; crea thead>tr con 8 th (HORA/LUNES/MARTES/MIERCOLES/JUEVES/VIERNES/SABADO/DOMINGO) SOLO textContent (sin style.cssText ni clases -> estructura nativa); insertBefore(firstChild). css/main.css v7.78 (append): table 100%/collapse/fixed; thead table-header-group; thead tr table-row; thead tr th table-cell 12.5%/12.5%/12.5% oscuro #0f172a/#ffffff 700 10px 6px 2px center border #cbd5e1. Reemplaza visualmente reglas v7.77 (th sin width). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 189 (usada) -> Fase 191. ?v=7.78 x3 + cache v164. Build OK, test 12/12"
     }
   ],
   "ultima_fase": {

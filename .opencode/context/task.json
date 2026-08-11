@@ -2146,6 +2146,12 @@
       "version": "v7.61",
       "estado": "completada",
       "alcance": "Fix definitivo visibilidad PDF Vista Semanal A4 Landscape. (1) js/export-pdf.js: th del clon con style in-situ OBLIGATORIO (display:table-cell,visibility visible,opacity 1,color #0f172a,background #f1f5f9,8.5px,padding 2px,border #cbd5e1) - reemplaza bloque claro v7.60; nuevo bloque v7.61 que inyecta estilo in-situ en .leyenda-categorias/.seccion-leyenda-inferior/.summary-banner/#day-summary (flex wrap visible, 8px, #0f172a) garantizando seccion inferior presente en el clon. (2) css/main.css: bloque @media print v7.61 con selectores mixtos (.tabla-semanal + #tabla real de la app): thead/tr/th table-header-group visible; th table-cell 8.5px 2px; tr/td height 17px, td 1px 2px 8px #0f172a; seccion inferior flex visible margin 3px; @page A4 landscape 3mm 4mm. app.js 0 cambios (baseline 2cf580d). ?v=7.61 x3 + cache v147. Test 16/16"
+    },
+    {
+      "fase": 174,
+      "version": "v7.61 (refuerzo)",
+      "estado": "completada",
+      "alcance": "REFUERZO brute-force cabeceras dias en clon PDF (sin bump: index sigue v7.61, cache sigue v147). Sustituye bloque th previo por setProperty over important: selectores th, .grid-header, .header-dia, thead tr * con display table-cell/visibility visible/opacity 1/color #0f172a/background #f1f5f9/bold/9px. Fallback fila cabecera grid: .grid-header thead .dias-header -> display grid (si .grid-header) o table-header-group (si thead). Verificado: limpieza de botones NO remueve/nombra thea/header-dia/grid-header. CSS @media print th sincronizado a 9px (antes 8.5px). Seccion inferior v7.61 y clon real intactos. app.js 0 cambios. Build OK, test 12/12"
     }
   ],
   "ultima_fase": {

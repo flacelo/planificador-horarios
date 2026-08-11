@@ -161,9 +161,25 @@
     }
     // Inyección in situ de estilos de alto contraste en cabeceras de días y columna de horas (v7.33)
     if (clon.querySelectorAll) {
-      Array.prototype.forEach.call(clon.querySelectorAll('th, .day-header, .tabla-semanal th, upper-header, [class*="header"]'), function(th) {
-        if (th.setAttribute) th.setAttribute('style', 'display:table-cell!important;visibility:visible!important;opacity:1!important;color:#0f172a!important;background-color:#f1f5f9!important;font-weight:bold!important;font-size:8.5px!important;text-align:center!important;padding:2px!important;border:1px solid #cbd5e1!important;');
+      // v7.61 REFUERZO: fuerza bruta inline setProperty over (important) en cabeceras de dias del clon
+      var headers = clon.querySelectorAll('th, .grid-header, .header-dia, thead tr *');
+      Array.prototype.forEach.call(headers, function(h) {
+        if (h.style && h.style.setProperty) {
+          h.style.setProperty('display', 'table-cell', 'important');
+          h.style.setProperty('visibility', 'visible', 'important');
+          h.style.setProperty('opacity', '1', 'important');
+          h.style.setProperty('color', '#0f172a', 'important');
+          h.style.setProperty('background-color', '#f1f5f9', 'important');
+          h.style.setProperty('font-weight', 'bold', 'important');
+          h.style.setProperty('font-size', '9px', 'important');
+        }
       });
+      var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
+      if (headerRow && headerRow.style) {
+        headerRow.style.setProperty('display', (headerRow.classList && headerRow.classList.contains('grid-header')) ? 'grid' : 'table-header-group', 'important');
+        headerRow.style.setProperty('visibility', 'visible', 'important');
+        headerRow.style.setProperty('opacity', '1', 'important');
+      }
       Array.prototype.forEach.call(clon.querySelectorAll('td:first-child, .col-hora, .hora-cell'), function(td) {
         if (td.setAttribute) td.setAttribute('style', 'background-color:#f1f5f9!important;color:#0f172a!important;font-weight:700!important;font-size:11px!important;text-align:center!important;padding:6px!important;border:1px solid #cbd5e1!important;');
       });

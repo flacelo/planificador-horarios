@@ -2128,6 +2128,12 @@
       "version": "v7.58",
       "estado": "completada",
       "alcance": "Rediseno del renderizado Vista Semanal en PDF: grid 7 columnas LUN-DOM (datos extraidos de la tabla #tabla via data-ci + hora de td.hora-cell input, checkbox ✓/☐ por estado done) + bloque Resumen Semanal inferior (Total/Completadas/Pendientes/%Exito) + seccion Notas y Prioridades de la Semana + licencia, todo en 1 pagina A4 landscape con CSS .pdf-week-* compacto (9px, 7 cols, resumen grid 1.1fr/1.4fr). App en vivo sin cambios (app.js CONGELADO baseline 2cf580d); solo aplica cuando el clon tiene td.hora-cell. Test funcional mock DOM 10/10 + estatico 14/14. ?v=7.58 x3 + cache v144"
+    },
+    {
+      "fase": 171,
+      "version": "v7.59",
+      "estado": "completada",
+      "alcance": "DESVIACION: prompt repitio v7.58/v144/Fase 170 (ya aplicada en dfb7d07) con contenido casi identico; aporte nuevo: ajuste de margenes y alturas para encaje en 1 pagina A4 landscape. Aplicado como v7.59: CSS proporciones exactas (.pdf-tarea 7.5px lh 1.1, gap 0, resumen compacto 12px, notas 3px, print grid height 100% overflow visible, dias flex none). Rediseno grid 7 dias + resumen semanal + notas de v7.58 reafirmado e intacto. app.js INTACTO (0 modificaciones, baseline 2cf580d/dfb7d07). Test 16/16 (12 estaticos + 4 funcionales mock). ?v=7.59 x3 + cache v145"
     }
   ],
   "ultima_fase": {

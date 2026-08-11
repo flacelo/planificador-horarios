@@ -258,25 +258,24 @@
         });
         tablaCab.parentNode.insertBefore(cabecera, tablaCab);
       }
-      // v7.74: cabecera alineada con thead NATIVO (anchos 12%/12.5%) - elimina contenedores flotantes externos
-      var divViejo = clon.querySelector('.cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias');
-      if (divViejo && divViejo.parentNode) divViejo.parentNode.removeChild(divViejo);
+      // v7.75: thead nativo como PRIMERA fila con anchos del cuerpo (10%/12.8%) - sin divs flotantes
       var tablaSemana = clon.querySelector('table');
       if (tablaSemana) {
-        var oldThead74 = tablaSemana.querySelector('thead');
-        if (oldThead74 && oldThead74.parentNode) oldThead74.parentNode.removeChild(oldThead74);
-        var newThead74 = document.createElement('thead');
-        var newTr74 = document.createElement('tr');
-        var titulos74 = ['HORA', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
-        var anchos74 = ['12%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%'];
-        Array.prototype.forEach.call(titulos74, function(t, i) {
-          var th74 = document.createElement('th');
-          th74.textContent = t;
-          th74.style.cssText = 'width:' + anchos74[i] + '!important;background:#f1f5f9!important;color:#0f172a!important;font-weight:800!important;text-align:center!important;padding:6px!important;border:1px solid #cbd5e1!important;font-size:10px!important;';
-          newTr74.appendChild(th74);
+        var oldThead75 = tablaSemana.querySelector('thead');
+        if (oldThead75 && oldThead75.parentNode) oldThead75.parentNode.removeChild(oldThead75);
+        var thead75 = document.createElement('thead');
+        var tr75 = document.createElement('tr');
+        tr75.style.cssText = 'background-color:#f1f5f9!important;';
+        var titulos75 = ['HORA', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
+        var anchos75 = ['10%', '12.8%', '12.8%', '12.8%', '12.8%', '12.8%', '12.8%', '12.8%'];
+        Array.prototype.forEach.call(titulos75, function(t, i) {
+          var th75 = document.createElement('th');
+          th75.textContent = t;
+          th75.style.cssText = 'width:' + anchos75[i] + '!important;text-align:center!important;padding:6px!important;font-size:10px!important;color:#0f172a!important;font-weight:bold!important;border:1px solid #cbd5e1!important;';
+          tr75.appendChild(th75);
         });
-        newThead74.appendChild(newTr74);
-        tablaSemana.insertBefore(newThead74, tablaSemana.firstChild);
+        thead75.appendChild(tr75);
+        tablaSemana.insertBefore(thead75, tablaSemana.firstChild);
       }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {

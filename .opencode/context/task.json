@@ -2164,6 +2164,12 @@
       "version": "v7.62",
       "estado": "completada",
       "alcance": "Cabeceras dias OSCURAS alto contraste (bg #0f172a, texto blanco radiante #ffffff, bold, 10px, padding 6px 4px, border #334155, display por tag THEAD->table-header-group/TR->table-row/TH->table-cell, todo setProperty important) + alargado vertical proporcional (td height 32px, padding 3px 4px, box-sizing border-box) para 1 sola pagina A4 Landscape. Selectores .tabla-semanal + #tabla real. CSS v7.62: @page 4mm 5mm (antes 3mm 4mm), thead bg #0f172a, th oscuro 10px, tr/td 32px 9px, col-hora/td:first-child #f1f5f9 bold 65px; reglas obsoletas v7.61 (tr/td 17px, th claro 9px) ELIMINADAS. Seccion inferior flex conservada. app.js 0 cambios (baseline 2cf580d). NOTA: el prompt pidio Fase 174 que ya existia -> registrado como Fase 176. ?v=7.62 x3 + cache v148. Test 16/16"
+    },
+    {
+      "fase": 177,
+      "version": "v7.63",
+      "estado": "completada",
+      "alcance": "DESVIACION VERIFICATIVA: el prompt repitio el contenido EXACTO de v7.62 (cabeceras oscuras #0f172a/#ffffff 10px 6px 4px #334155 con display por tag, celdas td 32px 3px 4px box-sizing, @page 4mm 5mm, tr/td 32px 9px, col-hora 65px) ya aplicado en 061458a. Verificados 100% presentes sin duplicados -> solo bump de version/cache: index ?v=7.62->7.63 x3 y cache v148->v149. Prompt pidio Fase 174 (ya existia) -> registrado como Fase 177. app.js 0 cambios. Build OK, test 13/13"
     }
   ],
   "ultima_fase": {

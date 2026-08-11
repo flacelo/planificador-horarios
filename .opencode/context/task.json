@@ -2152,6 +2152,12 @@
       "version": "v7.61 (refuerzo)",
       "estado": "completada",
       "alcance": "REFUERZO brute-force cabeceras dias en clon PDF (sin bump: index sigue v7.61, cache sigue v147). Sustituye bloque th previo por setProperty over important: selectores th, .grid-header, .header-dia, thead tr * con display table-cell/visibility visible/opacity 1/color #0f172a/background #f1f5f9/bold/9px. Fallback fila cabecera grid: .grid-header thead .dias-header -> display grid (si .grid-header) o table-header-group (si thead). Verificado: limpieza de botones NO remueve/nombra thea/header-dia/grid-header. CSS @media print th sincronizado a 9px (antes 8.5px). Seccion inferior v7.61 y clon real intactos. app.js 0 cambios. Build OK, test 12/12"
+    },
+    {
+      "fase": 175,
+      "version": "v7.61 (refuerzo 2)",
+      "estado": "completada",
+      "alcance": "Fix exclusivo visibilidad dias (LUN-DOM) en PDF Vista Semanal, misma version v7.61/v147 sin bumps (el prompt repitio v7.61/Fase 173/v147 -> refuerzo sobre commit 7290617). js/export-pdf.js: nuevo bloque brute-force con display CONDICIONAL por tag: THEAD->table-header-group, TR->table-row, TH->table-cell; selectores table.tabla-semanal thead/thead tr/th + #tabla equivalente (DOM real) + .grid-header/.header-dia; inyecta visibility visible, opacity 1, color #0f172a, background #f1f5f9, bold, 9px, text-align center, border 1px #cbd5e1 (todo over important). Limpieza de clon sigue solo interactivos. css/main.css: regla th del @media print completada con visibility/opacity/color/background-color/font-weight/bold/9px; thead/thead tr table-header-group visible ya presente (v7.61). Seccion inferior conservada via bloque v7.61 (compatibilidad). app.js 0 cambios. Build OK, test 12/12"
     }
   ],
   "ultima_fase": {

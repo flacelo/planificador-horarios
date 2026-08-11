@@ -161,17 +161,19 @@
     }
     // Inyección in situ de estilos de alto contraste en cabeceras de días y columna de horas (v7.33)
     if (clon.querySelectorAll) {
-      // v7.61 REFUERZO: fuerza bruta inline setProperty over (important) en cabeceras de dias del clon
-      var headers = clon.querySelectorAll('th, .grid-header, .header-dia, thead tr *');
+      // v7.61 REFUERZO 2: visibilidad por fuerza bruta con display condicional por tag (THEAD/TR/TH) en cabeceras de dias
+      var headers = clon.querySelectorAll('table.tabla-semanal thead, table.tabla-semanal thead tr, table.tabla-semanal th, #tabla thead, #tabla thead tr, #tabla th, .grid-header, .header-dia');
       Array.prototype.forEach.call(headers, function(h) {
         if (h.style && h.style.setProperty) {
-          h.style.setProperty('display', 'table-cell', 'important');
+          h.style.setProperty('display', h.tagName === 'THEAD' ? 'table-header-group' : (h.tagName === 'TR' ? 'table-row' : 'table-cell'), 'important');
           h.style.setProperty('visibility', 'visible', 'important');
           h.style.setProperty('opacity', '1', 'important');
           h.style.setProperty('color', '#0f172a', 'important');
           h.style.setProperty('background-color', '#f1f5f9', 'important');
           h.style.setProperty('font-weight', 'bold', 'important');
           h.style.setProperty('font-size', '9px', 'important');
+          h.style.setProperty('text-align', 'center', 'important');
+          h.style.setProperty('border', '1px solid #cbd5e1', 'important');
         }
       });
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');

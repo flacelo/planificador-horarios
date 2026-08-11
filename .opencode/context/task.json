@@ -2272,6 +2272,12 @@
       "version": "v7.81",
       "estado": "completada",
       "alcance": "Restauracion limpia de clonacion: se ELIMINARON 12.256 chars de inyeccion forzada (bloques v7.33-v7.60 cabeceras, v7.62 JS, v7.64, v7.65-7.80 completos: theads inventados, .pdf-dias-header, .pdf-cabecera-dias, .cabecera-semanal-pdf-forzada, .cabecera-grid-pdf, setProperty/headerRow). Ahora clon = el.cloneNode(true) exacto como se ve en la web; se conservan: remocion de botones/edicion v7.30-v7.33 (incluye .btn-remove, .remove-btn, .btn-delete), acabados v7.34-v7.41+ (tarjetas, resumenes, td:first-child col-hora), seccion inferior v7.61. css/main.css v7.81 (append): table 100%/collapse; thead+tr:first-child table-row visible opacity 1; th+tr:first-child td oscuros (#0f172a/#ffffff/bold/center/6px 4px/border #cbd5e1) - SIN table-layout fixed para clon exacto. Sin cambios UI activa. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 192 (usada) -> Fase 194. ?v=7.81 x3 + cache v167. Build OK (syntax check con cirugia), test 12/12"
+    },
+    {
+      "fase": 195,
+      "version": "v7.82",
+      "estado": "completada",
+      "alcance": "Alineacion estricta CSS de 8 columnas al 12.5% (sin JS). css/main.css v7.82 (append): [data-planify-print] table 100%/table-layout fixed/collapse; thead tr th + tr:first-child td + tr:first-child th -> width/min/max 12.5%, #0f172a/#ffffff 700 10px center 6px 2px border #cbd5e1 box-sizing; table td 12.5% box-sizing. Reemplaza en cascada reglas previas (v7.78/v7.79 th 12.5%); col-hora pasa a 12.5% como las demas (8 columnas uniformes). js/export-pdf.js INTACTO (clon limpio v7.81, sin createElement thead/tr/th). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 193 (usada) -> Fase 195. ?v=7.82 x3 + cache v168. Build OK, test 8/8"
     }
   ],
   "ultima_fase": {

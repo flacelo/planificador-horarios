@@ -2116,6 +2116,12 @@
       "version": "v7.56",
       "estado": "completada",
       "alcance": "DESVIACION: prompt repitio v7.55/v141/Fase 167 (ya aplicada en 8e44cbd) con contenido distinto -> aplicado como v7.56. Forzado estricto A4 Landscape 1 pagina PDF Vista Semanal: export-pdf.js iframe @page size A4 landscape margin 5mm !important (reemplaza 6mm), celdas td/th/col-hora font-size 10px padding 4px boxSizing border-box, leyenda/licencia pageBreakInside avoid margin-top 6px, clon width 100%. main.css @media print: html/body/[data-planify-print] 100% overflow hidden, * page-break avoid, tabla table-layout fixed, th/td 3px 4px 9.5px, leyenda flex gap 6. app.js CONGELADO (baseline 2cf580d). ?v=7.56 x3 + cache v142"
+    },
+    {
+      "fase": 169,
+      "version": "v7.57",
+      "estado": "completada",
+      "alcance": "Fix de exportacion multivista PDF: restauracion de aislamiento por pagina con .planify-pdf-page y saltos de pagina condicionales en A4 Landscape. export-pdf.js: regla iframe .planify-pdf-page reemplazada (era flex 100vh overflow hidden de v7.38 -> ahora display block, width 100%, padding 2mm 0, page-break-after always, :last-child auto); wrapper por vista y orden cronologico OPCIONES intactos. main.css @media print v7.57: @page 4mm 5mm, html/body overflow visible, [data-planify-print] visible, .planify-pdf-page bloques + :last-child auto, tablas fixed. app.js CONGELADO (baseline 2cf580d). ?v=7.57 x3 + cache v143"
     }
   ],
   "ultima_fase": {

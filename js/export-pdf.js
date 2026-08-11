@@ -161,20 +161,28 @@
     }
     // Inyección in situ de estilos de alto contraste en cabeceras de días y columna de horas (v7.33)
     if (clon.querySelectorAll) {
-      // v7.62: cabeceras de dias OSCURAS alto contraste con texto blanco nitido (display por tag THEAD/TR/TH)
-      var headers = clon.querySelectorAll('table.tabla-semanal thead, table.tabla-semanal thead tr, table.tabla-semanal th, #tabla thead, #tabla thead tr, #tabla th, .grid-header, .header-dia');
-      Array.prototype.forEach.call(headers, function(h) {
+      // v7.64: thead/tr del clon forzados visibles (display por tag THEAD/TR)
+      var headRows = clon.querySelectorAll('table.tabla-semanal thead, table.tabla-semanal thead tr, #tabla thead, #tabla thead tr, .grid-header, .dias-header');
+      Array.prototype.forEach.call(headRows, function(h) {
         if (h.style && h.style.setProperty) {
-          h.style.setProperty('display', h.tagName === 'THEAD' ? 'table-header-group' : (h.tagName === 'TR' ? 'table-row' : 'table-cell'), 'important');
+          h.style.setProperty('display', h.tagName === 'THEAD' ? 'table-header-group' : (h.tagName === 'TR' ? 'table-row' : 'flex'), 'important');
           h.style.setProperty('visibility', 'visible', 'important');
           h.style.setProperty('opacity', '1', 'important');
-          h.style.setProperty('color', '#ffffff', 'important');
-          h.style.setProperty('background-color', '#0f172a', 'important');
-          h.style.setProperty('font-weight', 'bold', 'important');
-          h.style.setProperty('font-size', '10px', 'important');
-          h.style.setProperty('text-align', 'center', 'important');
-          h.style.setProperty('padding', '6px 4px', 'important');
-          h.style.setProperty('border', '1px solid #334155', 'important');
+        }
+      });
+      // v7.64: celdas th de los dias con estilos inline explicitos (impiden ocultarse/transparentarse)
+      var headers = clon.querySelectorAll('table.tabla-semanal th, table th, #tabla th, .grid-header, .header-dia');
+      Array.prototype.forEach.call(headers, function(th) {
+        if (th.style && th.style.setProperty) {
+          th.style.setProperty('display', 'table-cell', 'important');
+          th.style.setProperty('visibility', 'visible', 'important');
+          th.style.setProperty('opacity', '1', 'important');
+          th.style.setProperty('color', '#0f172a', 'important');
+          th.style.setProperty('background-color', '#e2e8f0', 'important');
+          th.style.setProperty('font-weight', 'bold', 'important');
+          th.style.setProperty('font-size', '10px', 'important');
+          th.style.setProperty('text-align', 'center', 'important');
+          th.style.setProperty('border', '1px solid #cbd5e1', 'important');
         }
       });
       // v7.62: alargado vertical proporcional de la cuadricula (32px) para 1 sola pagina A4

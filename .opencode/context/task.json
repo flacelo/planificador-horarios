@@ -2230,6 +2230,12 @@
       "version": "v7.74",
       "estado": "completada",
       "alcance": "Alineacion de cabecera semanal con thead NATIVO (anchos 12%/12.5%) eliminando divs flotantes. js/export-pdf.js bloque v7.74: elimina .cabecera-pdf-dias/#cabecera-pdf-dias/.pdf-cabecera-dias; localiza tabla (querySelector table); remueve thead previo y crea thead nuevo con tr de 8 th: HORA (width 12%) + LUN..DOM (12.5% cada uno), bg #f1f5f9, color #0f172a, weight 800, center, padding 6px, border #cbd5e1, 10px; insertBefore en tabla. css/main.css v7.74: .cabecera-pdf-dias display none; [data-planify-print] table width 100% table-layout fixed border-collapse collapse; thead/tr table-header-group visible; thead th table-cell visible. Reemplaza bloque v7.73 (width 10%/11px) eliminado. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 185 (usada) -> Fase 187. ?v=7.74 x3 + cache v160. Build OK, test 12/12"
+    },
+    {
+      "fase": 188,
+      "version": "v7.75",
+      "estado": "completada",
+      "alcance": "Alineacion nativa de thead como PRIMERA fila de la tabla semanal PDF (anchos del cuerpo 10%/12.8%). js/export-pdf.js bloque v7.75: remueve thead previo; crea thead con tr inline bg #f1f5f9 y 8 th: HORA width 10%, LUN..DOM width 12.8% c/u, center, padding 6px, 10px, color #0f172a, bold, border #cbd5e1; insertBefore(tabla.firstChild). Sin divs flotantes (v7.74 elimino .cabecera-pdf-dias/.pdf-cabecera-dias; este bloque no crea contenedores externos). css/main.css v7.75: th print table-cell/visible/opacity 1 (append); thead/tr conserva table-header-group (regla v7.74) en lugar del table-cell que pedia el prompt para el thead (desviacion tecnica documentada: table-cell en thead romperia el layout de tabla; la intencion real = th alineados). table 100% fixed collapse (v7.74) intacta. Reemplaza bloque v7.74 (12%/12.5%). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 186 (usada) -> Fase 188. ?v=7.75 x3 + cache v161. Build OK, test 12/12"
     }
   ],
   "ultima_fase": {

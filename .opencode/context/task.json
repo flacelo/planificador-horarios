@@ -2170,6 +2170,12 @@
       "version": "v7.63",
       "estado": "completada",
       "alcance": "DESVIACION VERIFICATIVA: el prompt repitio el contenido EXACTO de v7.62 (cabeceras oscuras #0f172a/#ffffff 10px 6px 4px #334155 con display por tag, celdas td 32px 3px 4px box-sizing, @page 4mm 5mm, tr/td 32px 9px, col-hora 65px) ya aplicado en 061458a. Verificados 100% presentes sin duplicados -> solo bump de version/cache: index ?v=7.62->7.63 x3 y cache v148->v149. Prompt pidio Fase 174 (ya existia) -> registrado como Fase 177. app.js 0 cambios. Build OK, test 13/13"
+    },
+    {
+      "fase": 178,
+      "version": "v7.64",
+      "estado": "completada",
+      "alcance": "Fix estricto visibilidad dias LUN-DOM en PDF semanal - cabeceras CLARAS legibles (bg #e2e8f0, texto #0f172a, bold, 10px, center, border #cbd5e1) con estilo inline explicito en cada th (display table-cell/visibility visible/opacity 1 over important) y selectores table.tabla-semanal th, table th, #tabla th, .grid-header, .header-dia. thead/thead tr forzados visibles con display por tag (THEAD->table-header-group, TR->table-row, otros flex). css/main.css: reglas oscuras v7.62 REEMPLAZADAS in situ por version clara (thead/thead tr height:auto + bg #e2e8f0; th claro 10px 6px 4px border #cbd5e1). Conservados: celdas td 32px (alargado v7.62/63), col-hora 65px, @page 4mm 5mm, seccion inferior. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 175 (ya existia) -> registrado como Fase 178. ?v=7.64 x3 + cache v150. Build OK, test 15/15"
     }
   ],
   "ultima_fase": {

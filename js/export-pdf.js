@@ -277,6 +277,25 @@
         thead75.appendChild(tr75);
         tablaSemana.insertBefore(thead75, tablaSemana.firstChild);
       }
+      // v7.76: cabecera FLEX forzada de 8 columnas adaptada a la estructura real de divs/grid
+      var contenedorSemanal = clon.querySelector('#vista-semanal, .vista-semanal, .semanal-container') || clon;
+      var cabecerasAntiguas = contenedorSemanal.querySelectorAll('.cabecera-pdf-dias, .grid-header-pdf, thead');
+      Array.prototype.forEach.call(cabecerasAntiguas, function(el) {
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+      });
+      var headerPDF = document.createElement('div');
+      headerPDF.className = 'cabecera-semanal-pdf-forzada';
+      headerPDF.style.cssText = 'display:flex!important;width:100%!important;background-color:#f1f5f9!important;border:1px solid #cbd5e1!important;box-sizing:border-box!important;margin-bottom:2px!important;';
+      var titulos76 = ['HORA', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
+      var anchos76 = ['12%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%'];
+      Array.prototype.forEach.call(titulos76, function(titulo, idx) {
+        var col = document.createElement('div');
+        col.innerText = titulo;
+        col.style.cssText = 'width:' + anchos76[idx] + '!important;text-align:center!important;padding:6px 2px!important;font-size:10px!important;font-weight:800!important;color:#0f172a!important;border-right:' + (idx < 7 ? '1px solid #cbd5e1' : 'none') + '!important;box-sizing:border-box!important;';
+        headerPDF.appendChild(col);
+      });
+      if (contenedorSemanal.firstChild) contenedorSemanal.insertBefore(headerPDF, contenedorSemanal.firstChild);
+      else contenedorSemanal.appendChild(headerPDF);
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {
         headerRow.style.setProperty('display', (headerRow.classList && headerRow.classList.contains('grid-header')) ? 'grid' : 'table-header-group', 'important');

@@ -2182,6 +2182,12 @@
       "version": "v7.65",
       "estado": "completada",
       "alcance": "EMERGENCIA: barra de dias SI O SI arriba de la rejilla en el clon PDF. js/export-pdf.js: elimina .pdf-dias-header previo (evita duplicados), crea barraDias grid 80px repeat(7,1fr) con celdas HORA+LUN+MAR+MIÉ+JUE+VIE+SÁB+DOM (8 celdas, bold 11px, center, bg #e2e8f0, texto #0f172a, padding 6px 2px, border #cbd5e1, radius 4px, todo cssText important) e insertBefore al inicio del contenedor principal (.planify-pdf-page, #vista-semanal, .vista-semanal o el propio clon). Bloque th claros v7.64, celdas 32px y clon real intactos (la barra es refuerzo adicional). Sin cambios CSS (todo inline). app.js 0 cambios (baseline 2cf580d). ?v=7.65 x3 + cache v151. Build OK, test 11/11"
+    },
+    {
+      "fase": 180,
+      "version": "v7.66",
+      "estado": "completada",
+      "alcance": "Alineado exacto de la barra de dias del PDF: reemplaza bloque .pdf-dias-header v7.65. Esquina HORA ahora es celda independiente con bg #cbd5e1 y border #94a3b8; array de dias solo LUN-DOM (7 celdas) con bg #e2e8f0/border #cbd5e1; grid permanece 80px repeat(7,1fr) insertado al inicio del contenedor principal; elimina .pdf-dias-header previo (sin duplicados). Bloque th claros v7.64 y clon real intactos. app.js 0 cambios (baseline 2cf580d). ?v=7.66 x3 + cache v152. Build OK, test 10/10"
     }
   ],
   "ultima_fase": {

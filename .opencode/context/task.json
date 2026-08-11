@@ -2266,6 +2266,12 @@
       "version": "v7.80",
       "estado": "completada",
       "alcance": "Fix definitivo alineacion cabecera 8 columnas con doble caso. js/export-pdf.js bloque v7.80 (reemplaza v7.79): elimina residuos (thead, .cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header, .cabecera-grid-pdf); estilosCelda80 compartidos (12.5%/center/#0f172a/#ffffff/bold/10px/border #cbd5e1/box-sizing/6px 2px); caso (a) si hay table -> thead nativo con 8 th insertBefore firstChild; caso (b) si no -> div.cabecera-grid-pdf grid repeat(8,1fr) 100% con 8 divs hijos centrados insertado al inicio del contenedor semanal. css/main.css v7.80 (append): respaldo [data-planify-print] .semanal-grid + table.tabla-semanal 100%/box-sizing. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 191 (usada) -> Fase 193. ?v=7.80 x3 + cache v166. Build OK, test 11/11"
+    },
+    {
+      "fase": 194,
+      "version": "v7.81",
+      "estado": "completada",
+      "alcance": "Restauracion limpia de clonacion: se ELIMINARON 12.256 chars de inyeccion forzada (bloques v7.33-v7.60 cabeceras, v7.62 JS, v7.64, v7.65-7.80 completos: theads inventados, .pdf-dias-header, .pdf-cabecera-dias, .cabecera-semanal-pdf-forzada, .cabecera-grid-pdf, setProperty/headerRow). Ahora clon = el.cloneNode(true) exacto como se ve en la web; se conservan: remocion de botones/edicion v7.30-v7.33 (incluye .btn-remove, .remove-btn, .btn-delete), acabados v7.34-v7.41+ (tarjetas, resumenes, td:first-child col-hora), seccion inferior v7.61. css/main.css v7.81 (append): table 100%/collapse; thead+tr:first-child table-row visible opacity 1; th+tr:first-child td oscuros (#0f172a/#ffffff/bold/center/6px 4px/border #cbd5e1) - SIN table-layout fixed para clon exacto. Sin cambios UI activa. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 192 (usada) -> Fase 194. ?v=7.81 x3 + cache v167. Build OK (syntax check con cirugia), test 12/12"
     }
   ],
   "ultima_fase": {

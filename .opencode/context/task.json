@@ -2260,6 +2260,12 @@
       "version": "v7.79",
       "estado": "completada",
       "alcance": "Inyeccion JS CELDA POR CELDA en thead para alineacion exacta de columnas. js/export-pdf.js bloque v7.79 (reemplaza v7.78): elimina divs flotantes (6 selectores); tablaClon = contenedorSemanal.querySelector(table); thead existente o creado; thead.innerHTML=''; trHeader + 8 th independientes, cada uno con 9 setProperty(...,'important') (width 12.5%, center, bg #0f172a, color #ffffff, 10px, 700, 6px 2px, border #cbd5e1, box-sizing) - sin amontonamiento, cada th alineado con su columna. css/main.css v7.79 (append): table 100%/collapse/fixed; thead tr th width 12.5%/center/box-sizing (refuerza v7.78). app.js 0 cambios (baseline 2cf580d). Test: expectativa corregida (9 setProperty en fuente, se ejecutan 8x en runtime; inicial 72 era error del test). NOTA: prompt pidio Fase 190 (usada) -> Fase 192. ?v=7.79 x3 + cache v165. Build OK, test 13/13"
+    },
+    {
+      "fase": 193,
+      "version": "v7.80",
+      "estado": "completada",
+      "alcance": "Fix definitivo alineacion cabecera 8 columnas con doble caso. js/export-pdf.js bloque v7.80 (reemplaza v7.79): elimina residuos (thead, .cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header, .cabecera-grid-pdf); estilosCelda80 compartidos (12.5%/center/#0f172a/#ffffff/bold/10px/border #cbd5e1/box-sizing/6px 2px); caso (a) si hay table -> thead nativo con 8 th insertBefore firstChild; caso (b) si no -> div.cabecera-grid-pdf grid repeat(8,1fr) 100% con 8 divs hijos centrados insertado al inicio del contenedor semanal. css/main.css v7.80 (append): respaldo [data-planify-print] .semanal-grid + table.tabla-semanal 100%/box-sizing. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 191 (usada) -> Fase 193. ?v=7.80 x3 + cache v166. Build OK, test 11/11"
     }
   ],
   "ultima_fase": {

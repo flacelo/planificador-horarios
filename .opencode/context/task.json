@@ -2176,6 +2176,12 @@
       "version": "v7.64",
       "estado": "completada",
       "alcance": "Fix estricto visibilidad dias LUN-DOM en PDF semanal - cabeceras CLARAS legibles (bg #e2e8f0, texto #0f172a, bold, 10px, center, border #cbd5e1) con estilo inline explicito en cada th (display table-cell/visibility visible/opacity 1 over important) y selectores table.tabla-semanal th, table th, #tabla th, .grid-header, .header-dia. thead/thead tr forzados visibles con display por tag (THEAD->table-header-group, TR->table-row, otros flex). css/main.css: reglas oscuras v7.62 REEMPLAZADAS in situ por version clara (thead/thead tr height:auto + bg #e2e8f0; th claro 10px 6px 4px border #cbd5e1). Conservados: celdas td 32px (alargado v7.62/63), col-hora 65px, @page 4mm 5mm, seccion inferior. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 175 (ya existia) -> registrado como Fase 178. ?v=7.64 x3 + cache v150. Build OK, test 15/15"
+    },
+    {
+      "fase": 179,
+      "version": "v7.65",
+      "estado": "completada",
+      "alcance": "EMERGENCIA: barra de dias SI O SI arriba de la rejilla en el clon PDF. js/export-pdf.js: elimina .pdf-dias-header previo (evita duplicados), crea barraDias grid 80px repeat(7,1fr) con celdas HORA+LUN+MAR+MIÉ+JUE+VIE+SÁB+DOM (8 celdas, bold 11px, center, bg #e2e8f0, texto #0f172a, padding 6px 2px, border #cbd5e1, radius 4px, todo cssText important) e insertBefore al inicio del contenedor principal (.planify-pdf-page, #vista-semanal, .vista-semanal o el propio clon). Bloque th claros v7.64, celdas 32px y clon real intactos (la barra es refuerzo adicional). Sin cambios CSS (todo inline). app.js 0 cambios (baseline 2cf580d). ?v=7.65 x3 + cache v151. Build OK, test 11/11"
     }
   ],
   "ultima_fase": {

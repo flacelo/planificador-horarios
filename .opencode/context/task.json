@@ -2242,6 +2242,12 @@
       "version": "v7.76",
       "estado": "completada",
       "alcance": "Cabecera FLEX forzada de 8 columnas adaptada a la estructura real de divs/grid. js/export-pdf.js bloque v7.76 (despues del v7.75): contenedor = clon.querySelector(#vista-semanal,.vista-semanal,.semanal-container)||clon; elimina .cabecera-pdf-dias/.grid-header-pdf/thead (incluye el thead creado por v7.75); crea div.cabecera-semanal-pdf-forzada (flex, 100%, #f1f5f9, border #cbd5e1, margin-bottom 2px) con 8 divs: HORA 12%, LUN..DOM 12.5%, center, 6px 2px, 10px, 800, #0f172a, border-right condicional; insertBefore al inicio. css/main.css v7.76 (append): @media print .cabecera-semanal-pdf-forzada flex/visible/opacity/100% + div block/visible/#0f172a. Cero cambios en vista web en vivo (solo clon). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 187 (usada) -> Fase 189. ?v=7.76 x3 + cache v162. Build OK, test 11/11"
+    },
+    {
+      "fase": 190,
+      "version": "v7.77",
+      "estado": "completada",
+      "alcance": "Integracion nativa de thead (PRIMERA FILA) en tabla semanal PDF con nombres COMPLETOS y estilo oscuro. js/export-pdf.js bloque v7.77 (despues del v7.76): elimina divs flotantes (.cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header); tabla = contenedorSemanal.querySelector(table); si no hay thead: crea thead>tr con 8 th (HORA/LUNES/MARTES/MIERCOLES/JUEVES/VIERNES/SABADO/DOMINGO) inline #0f172a/#ffffff/700/10px/6px 2px/center/border #cbd5e1 y insertBefore(firstChild); si ya hay thead: re-etiqueta hasta 8 th con mismos estilos. css/main.css v7.77 (append): [data-planify-print] table.tabla-semanal/.semanal-grid table 100%/collapse/fixed; table thead tr th oscuro. Sin cambios UI en vivo (solo clon). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 188 (usada) -> Fase 190. ?v=7.77 x3 + cache v163. Build OK, test 11/11"
     }
   ],
   "ultima_fase": {

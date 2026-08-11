@@ -162,7 +162,7 @@
     // Inyección in situ de estilos de alto contraste en cabeceras de días y columna de horas (v7.33)
     if (clon.querySelectorAll) {
       Array.prototype.forEach.call(clon.querySelectorAll('th, .day-header, .tabla-semanal th, upper-header, [class*="header"]'), function(th) {
-        if (th.setAttribute) th.setAttribute('style', 'background-color:#f8fafc!important;color:#0f172a!important;font-weight:800!important;font-size:13px!important;text-align:center!important;padding:8px!important;border:1px solid #cbd5e1!important;text-transform:uppercase!important;');
+        if (th.setAttribute) th.setAttribute('style', 'display:table-cell!important;visibility:visible!important;opacity:1!important;color:#0f172a!important;background-color:#f1f5f9!important;font-weight:bold!important;font-size:8.5px!important;text-align:center!important;padding:2px!important;border:1px solid #cbd5e1!important;');
       });
       Array.prototype.forEach.call(clon.querySelectorAll('td:first-child, .col-hora, .hora-cell'), function(td) {
         if (td.setAttribute) td.setAttribute('style', 'background-color:#f1f5f9!important;color:#0f172a!important;font-weight:700!important;font-size:11px!important;text-align:center!important;padding:6px!important;border:1px solid #cbd5e1!important;');
@@ -406,6 +406,10 @@
           th.style.visibility = 'visible';
           th.style.opacity = '1';
         }
+      });
+      // v7.61: sección inferior VISIBLE y OBLIGATORIA en el clon (leyenda categorías / resumen diario)
+      Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias, .seccion-leyenda-inferior, .summary-banner, #day-summary'), function(sec) {
+        if (sec.setAttribute) sec.setAttribute('style', 'display:flex!important;flex-wrap:wrap!important;visibility:visible!important;opacity:1!important;margin-top:4px!important;font-size:8px!important;color:#0f172a!important;');
       });
       Array.prototype.forEach.call(clon.querySelectorAll('.seccion-leyenda-inferior, .leyenda-categorias, .leyenda-contenedor, .leyenda'), function(l) {
         if (l.style) {

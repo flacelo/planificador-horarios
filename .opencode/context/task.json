@@ -2224,6 +2224,12 @@
       "version": "v7.73",
       "estado": "completada",
       "alcance": "Inyeccion forzada EXCLUSIVA de cabecera abreviada (HORA+LUN+MAR+MIÉ+JUE+VIE+SÁB+DOM) en el thead de la tabla clonada para PDF (salto numerico: prompt v7.73/v159 sin v7.72; Fase pedia 184 que ya existia -> Fase 186). js/export-pdf.js bloque v7.73: tabla = clon.querySelector(table)||querySelector(.tabla-semanal); remueve SIEMPRE el thead previo; crea tr nuevo (bg #f1f5f9, border-bottom 2px #cbd5e1) con 8 th: color #0f172a, weight 800, center, padding 6px, 11px, HORA con width 10%; insertBefore(newThead, tabla.firstChild). NO agrega leyendas/resumen (verificado en el codigo del bloque). css/main.css: regla generica [data-planify-print] table thead/tr/th table-header-group visible opacity 1 #0f172a/#f1f5f9. Bloques previos v7.69 (thead nombres largos) y v7.71 (contenedor condicional) quedan neutralizados en el flujo por el v7.73 (incondicional, al final). app.js 0 cambios (baseline 2cf580d). ?v=7.73 x3 + cache v159. Build OK, test 11/11"
+    },
+    {
+      "fase": 187,
+      "version": "v7.74",
+      "estado": "completada",
+      "alcance": "Alineacion de cabecera semanal con thead NATIVO (anchos 12%/12.5%) eliminando divs flotantes. js/export-pdf.js bloque v7.74: elimina .cabecera-pdf-dias/#cabecera-pdf-dias/.pdf-cabecera-dias; localiza tabla (querySelector table); remueve thead previo y crea thead nuevo con tr de 8 th: HORA (width 12%) + LUN..DOM (12.5% cada uno), bg #f1f5f9, color #0f172a, weight 800, center, padding 6px, border #cbd5e1, 10px; insertBefore en tabla. css/main.css v7.74: .cabecera-pdf-dias display none; [data-planify-print] table width 100% table-layout fixed border-collapse collapse; thead/tr table-header-group visible; thead th table-cell visible. Reemplaza bloque v7.73 (width 10%/11px) eliminado. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 185 (usada) -> Fase 187. ?v=7.74 x3 + cache v160. Build OK, test 12/12"
     }
   ],
   "ultima_fase": {

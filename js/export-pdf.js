@@ -296,37 +296,38 @@
       });
       if (contenedorSemanal.firstChild) contenedorSemanal.insertBefore(headerPDF, contenedorSemanal.firstChild);
       else contenedorSemanal.appendChild(headerPDF);
-      // v7.79: thead con 8 th independientes inyectados CELDA POR CELDA (setProperty important) - sin amontonamiento
-      var divsFlotantes79 = contenedorSemanal.querySelectorAll('.cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header');
-      Array.prototype.forEach.call(divsFlotantes79, function(el) {
+      // v7.80: cabecera 8 columnas - caso tabla (thead nativo) o caso grid (.cabecera-grid-pdf) - estilos inline directos
+      var residuos80 = contenedorSemanal.querySelectorAll('thead, .cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header, .cabecera-grid-pdf');
+      Array.prototype.forEach.call(residuos80, function(el) {
         if (el && el.parentNode) el.parentNode.removeChild(el);
       });
-      var tablaClon = contenedorSemanal.querySelector('table');
-      if (tablaClon) {
-        var thead79 = tablaClon.querySelector('thead');
-        if (!thead79) {
-          thead79 = document.createElement('thead');
-          if (tablaClon.firstChild) tablaClon.insertBefore(thead79, tablaClon.firstChild);
-          else tablaClon.appendChild(thead79);
-        }
-        thead79.innerHTML = '';
-        var trHeader = document.createElement('tr');
-        var diasNombres = ['HORA', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
-        Array.prototype.forEach.call(diasNombres, function(nombre) {
-          var th79 = document.createElement('th');
-          th79.textContent = nombre;
-          th79.style.setProperty('width', '12.5%', 'important');
-          th79.style.setProperty('text-align', 'center', 'important');
-          th79.style.setProperty('background-color', '#0f172a', 'important');
-          th79.style.setProperty('color', '#ffffff', 'important');
-          th79.style.setProperty('font-size', '10px', 'important');
-          th79.style.setProperty('font-weight', '700', 'important');
-          th79.style.setProperty('padding', '6px 2px', 'important');
-          th79.style.setProperty('border', '1px solid #cbd5e1', 'important');
-          th79.style.setProperty('box-sizing', 'border-box', 'important');
-          trHeader.appendChild(th79);
+      var estilosCelda80 = 'width:12.5%!important;text-align:center!important;background-color:#0f172a!important;color:#ffffff!important;font-weight:bold!important;font-size:10px!important;border:1px solid #cbd5e1!important;box-sizing:border-box!important;padding:6px 2px!important;';
+      var titulos80 = ['HORA', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
+      var tablaSem80 = contenedorSemanal.querySelector('table');
+      if (tablaSem80) {
+        var thead80 = document.createElement('thead');
+        var tr80 = document.createElement('tr');
+        Array.prototype.forEach.call(titulos80, function(t) {
+          var th80 = document.createElement('th');
+          th80.textContent = t;
+          th80.style.cssText = estilosCelda80;
+          tr80.appendChild(th80);
         });
-        thead79.appendChild(trHeader);
+        thead80.appendChild(tr80);
+        if (tablaSem80.firstChild) tablaSem80.insertBefore(thead80, tablaSem80.firstChild);
+        else tablaSem80.appendChild(thead80);
+      } else {
+        var cabeceraGrid80 = document.createElement('div');
+        cabeceraGrid80.className = 'cabecera-grid-pdf';
+        cabeceraGrid80.style.cssText = 'display:grid!important;grid-template-columns:repeat(8, 1fr)!important;width:100%!important;';
+        Array.prototype.forEach.call(titulos80, function(t) {
+          var divCol80 = document.createElement('div');
+          divCol80.textContent = t;
+          divCol80.style.cssText = estilosCelda80;
+          cabeceraGrid80.appendChild(divCol80);
+        });
+        if (contenedorSemanal.firstChild) contenedorSemanal.insertBefore(cabeceraGrid80, contenedorSemanal.firstChild);
+        else contenedorSemanal.appendChild(cabeceraGrid80);
       }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {

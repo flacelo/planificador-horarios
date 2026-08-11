@@ -2158,6 +2158,12 @@
       "version": "v7.61 (refuerzo 2)",
       "estado": "completada",
       "alcance": "Fix exclusivo visibilidad dias (LUN-DOM) en PDF Vista Semanal, misma version v7.61/v147 sin bumps (el prompt repitio v7.61/Fase 173/v147 -> refuerzo sobre commit 7290617). js/export-pdf.js: nuevo bloque brute-force con display CONDICIONAL por tag: THEAD->table-header-group, TR->table-row, TH->table-cell; selectores table.tabla-semanal thead/thead tr/th + #tabla equivalente (DOM real) + .grid-header/.header-dia; inyecta visibility visible, opacity 1, color #0f172a, background #f1f5f9, bold, 9px, text-align center, border 1px #cbd5e1 (todo over important). Limpieza de clon sigue solo interactivos. css/main.css: regla th del @media print completada con visibility/opacity/color/background-color/font-weight/bold/9px; thead/thead tr table-header-group visible ya presente (v7.61). Seccion inferior conservada via bloque v7.61 (compatibilidad). app.js 0 cambios. Build OK, test 12/12"
+    },
+    {
+      "fase": 176,
+      "version": "v7.62",
+      "estado": "completada",
+      "alcance": "Cabeceras dias OSCURAS alto contraste (bg #0f172a, texto blanco radiante #ffffff, bold, 10px, padding 6px 4px, border #334155, display por tag THEAD->table-header-group/TR->table-row/TH->table-cell, todo setProperty important) + alargado vertical proporcional (td height 32px, padding 3px 4px, box-sizing border-box) para 1 sola pagina A4 Landscape. Selectores .tabla-semanal + #tabla real. CSS v7.62: @page 4mm 5mm (antes 3mm 4mm), thead bg #0f172a, th oscuro 10px, tr/td 32px 9px, col-hora/td:first-child #f1f5f9 bold 65px; reglas obsoletas v7.61 (tr/td 17px, th claro 9px) ELIMINADAS. Seccion inferior flex conservada. app.js 0 cambios (baseline 2cf580d). NOTA: el prompt pidio Fase 174 que ya existia -> registrado como Fase 176. ?v=7.62 x3 + cache v148. Test 16/16"
     }
   ],
   "ultima_fase": {

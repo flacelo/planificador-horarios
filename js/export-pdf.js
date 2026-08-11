@@ -236,6 +236,27 @@
           thSem.style.setProperty('border', '1px solid #cbd5e1', 'important');
         });
       }
+      // v7.70: inyeccion directa de CONTAINER de cabecera explicito SI los encabezados estan ocultos o vacios
+      var tablaCab = clon.querySelector('table.tabla-semanal, .semanal-grid table, table, #tabla');
+      var cabecerasOK = false;
+      if (tablaCab && !/(^| )hidden($| )|display\s*:\s*none/.test(tablaCab.className || '')) {
+        var thsCab = tablaCab.querySelectorAll('thead th');
+        cabecerasOK = thsCab.length >= 8 && thsCab[0].textContent.trim() !== '';
+      }
+      if (tablaCab && !cabecerasOK) {
+        var viejaCab = clon.querySelector('.pdf-cabecera-dias');
+        if (viejaCab && viejaCab.parentNode) viejaCab.parentNode.removeChild(viejaCab);
+        var cabecera = document.createElement('div');
+        cabecera.className = 'pdf-cabecera-dias';
+        cabecera.style.cssText = 'display:grid!important;grid-template-columns:80px repeat(7,1fr)!important;background-color:#0f172a!important;color:#ffffff!important;font-weight:bold!important;text-align:center!important;font-size:11px!important;border:1px solid #cbd5e1!important;padding:6px 0!important;width:100%!important;box-sizing:border-box!important;';
+        var titulosCab = ['HORA', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
+        Array.prototype.forEach.call(titulosCab, function(t) {
+          var d = document.createElement('div');
+          d.textContent = t;
+          cabecera.appendChild(d);
+        });
+        tablaCab.parentNode.insertBefore(cabecera, tablaCab);
+      }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {
         headerRow.style.setProperty('display', (headerRow.classList && headerRow.classList.contains('grid-header')) ? 'grid' : 'table-header-group', 'important');

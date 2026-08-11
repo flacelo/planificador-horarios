@@ -2254,6 +2254,12 @@
       "version": "v7.78",
       "estado": "completada",
       "alcance": "8 celdas th independientes al 12.5% EXACTO (width/min/max) en la primera fila del thead nativo, layout 100% via CSS sin inline styles. js/export-pdf.js bloque v7.78 (reemplaza v7.77): elimina divs flotantes (.cabecera-semanal-pdf-forzada,.cabecera-pdf-dias,#cabecera-pdf-dias,.pdf-cabecera-dias,.grid-header-pdf,.pdf-dias-header); remove thead previo; crea thead>tr con 8 th (HORA/LUNES/MARTES/MIERCOLES/JUEVES/VIERNES/SABADO/DOMINGO) SOLO textContent (sin style.cssText ni clases -> estructura nativa); insertBefore(firstChild). css/main.css v7.78 (append): table 100%/collapse/fixed; thead table-header-group; thead tr table-row; thead tr th table-cell 12.5%/12.5%/12.5% oscuro #0f172a/#ffffff 700 10px 6px 2px center border #cbd5e1. Reemplaza visualmente reglas v7.77 (th sin width). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 189 (usada) -> Fase 191. ?v=7.78 x3 + cache v164. Build OK, test 12/12"
+    },
+    {
+      "fase": 192,
+      "version": "v7.79",
+      "estado": "completada",
+      "alcance": "Inyeccion JS CELDA POR CELDA en thead para alineacion exacta de columnas. js/export-pdf.js bloque v7.79 (reemplaza v7.78): elimina divs flotantes (6 selectores); tablaClon = contenedorSemanal.querySelector(table); thead existente o creado; thead.innerHTML=''; trHeader + 8 th independientes, cada uno con 9 setProperty(...,'important') (width 12.5%, center, bg #0f172a, color #ffffff, 10px, 700, 6px 2px, border #cbd5e1, box-sizing) - sin amontonamiento, cada th alineado con su columna. css/main.css v7.79 (append): table 100%/collapse/fixed; thead tr th width 12.5%/center/box-sizing (refuerza v7.78). app.js 0 cambios (baseline 2cf580d). Test: expectativa corregida (9 setProperty en fuente, se ejecutan 8x en runtime; inicial 72 era error del test). NOTA: prompt pidio Fase 190 (usada) -> Fase 192. ?v=7.79 x3 + cache v165. Build OK, test 13/13"
     }
   ],
   "ultima_fase": {

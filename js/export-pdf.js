@@ -194,27 +194,27 @@
           c.style.setProperty('box-sizing', 'border-box', 'important');
         }
       });
-      // v7.67: cabeceras HORA+LUN-DOM inyectadas DENTRO del thead de la tabla clonada (evita desfases de CSS Grid externos)
+      // v7.68: alineacion exacta y matematica de etiquetas de dias (renombra la fila real del grid en orden estricto)
       var viejoHeader = clon.querySelector('.pdf-dias-header');
       if (viejoHeader && viejoHeader.parentNode) viejoHeader.parentNode.removeChild(viejoHeader);
-      var tablaSemanal = clon.querySelector('table');
-      if (tablaSemanal) {
-        var thead = tablaSemanal.querySelector('thead');
-        if (!thead) {
-          thead = document.createElement('thead');
-          tablaSemanal.insertBefore(thead, tablaSemanal.firstChild);
-        }
-        var titulos = ['HORA', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
-        var fila = document.createElement('tr');
-        fila.style.cssText = 'background-color:#e2e8f0!important;';
-        Array.prototype.forEach.call(titulos, function(t, i) {
-          var th = document.createElement('th');
-          th.innerText = t;
-          th.style.cssText = 'display:table-cell!important;visibility:visible!important;opacity:1!important;color:#0f172a!important;background-color:' + (i === 0 ? '#cbd5e1' : '#e2e8f0') + '!important;font-weight:bold!important;font-size:11px!important;text-align:center!important;padding:6px 2px!important;border:1px solid #cbd5e1!important;width:' + (i === 0 ? '80px' : 'auto') + '!important;';
-          fila.appendChild(th);
+      var theadClon = clon.querySelector('thead');
+      if (theadClon && theadClon.textContent.indexOf('HORA') !== -1 && theadClon.parentNode) theadClon.parentNode.removeChild(theadClon);
+      var titulos = ['HORA', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
+      var filaReal = clon.querySelectorAll('thead tr th');
+      var celdasFilaSuperior = (filaReal && filaReal.length >= 8) ? filaReal : clon.querySelectorAll('.grid-header, .semanal-header, .dia-header, [class*="header"]');
+      if (celdasFilaSuperior.length >= 8) {
+        Array.prototype.forEach.call(celdasFilaSuperior, function(celda, idx) {
+          if (idx < 8) {
+            celda.textContent = titulos[idx];
+            celda.style.setProperty('color', '#0f172a', 'important');
+            celda.style.setProperty('background-color', idx === 0 ? '#cbd5e1' : '#e2e8f0', 'important');
+            celda.style.setProperty('visibility', 'visible', 'important');
+            celda.style.setProperty('opacity', '1', 'important');
+            celda.style.setProperty('font-weight', 'bold', 'important');
+            celda.style.setProperty('font-size', '11px', 'important');
+            celda.style.setProperty('text-align', 'center', 'important');
+          }
         });
-        thead.innerHTML = '';
-        thead.appendChild(fila);
       }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {

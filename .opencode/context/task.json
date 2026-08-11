@@ -2194,6 +2194,12 @@
       "version": "v7.67",
       "estado": "completada",
       "alcance": "Cabeceras HORA+LUN-DOM inyectadas DENTRO del thead de la tabla clonada (abandona barra .pdf-dias-header externa con CSS Grid). js/export-pdf.js: elimina .pdf-dias-header previo si existe; clon.querySelector(table); uso/crea thead (insertBefore en tabla); construye fila tr (bg #e2e8f0) con 8 th: columna 0 HORA (bg #cbd5e1, width 80px) y LUN-DOM (bg #e2e8f0, width auto); th con inline table-cell/visible/opacity 1/#0f172a/bold/11px/center/padding 6px 2px/border #cbd5e1 (todo important). Implementado con creacion ES5 (innerText) en lugar de template literal del prompt por compatibilidad con el minificador del build (mismo DOM resultante). Bloque th v7.64 conservado. app.js 0 cambios (baseline 2cf580d). ?v=7.67 x3 + cache v153. Build OK, test 11/11"
+    },
+    {
+      "fase": 182,
+      "version": "v7.68",
+      "estado": "completada",
+      "alcance": "Alineacion exacta y matematica de etiquetas de dias (corrige desfasaje HORA sobre LUNES). js/export-pdf.js: elimina .pdf-dias-header previo; elimina el thead SOLO si contiene HORA (el inyectado por v7.67), preservando el thead real de la app; titulos = [HORA,LUN,MAR,MIÉ,JUE,VIE,SÁB,DOM]; selecciona la fila real thead tr th cuando tiene >=8 celdas (fallback al selector del prompt .grid-header, .semanal-header, .dia-header, [class*=header]); renombra textContent y aplica estilos setProperty important en ORDEN ESTRICTO por indice: col 0 #cbd5e1 (HORA), cols 1-7 #e2e8f0, color #0f172a, visible, opacity 1, bold, 11px, center. Mejora tecnica vs prompt: no borra thead de la app (evita regresion) y prioriza fila real antes del selector amplio [class*=header]. Bloque th v7.64 conservado. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 179 (usada) -> Fase 182. ?v=7.68 x3 + cache v154. Build OK, test 11/11"
     }
   ],
   "ultima_fase": {

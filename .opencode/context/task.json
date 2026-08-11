@@ -2134,6 +2134,12 @@
       "version": "v7.59",
       "estado": "completada",
       "alcance": "DESVIACION: prompt repitio v7.58/v144/Fase 170 (ya aplicada en dfb7d07) con contenido casi identico; aporte nuevo: ajuste de margenes y alturas para encaje en 1 pagina A4 landscape. Aplicado como v7.59: CSS proporciones exactas (.pdf-tarea 7.5px lh 1.1, gap 0, resumen compacto 12px, notas 3px, print grid height 100% overflow visible, dias flex none). Rediseno grid 7 dias + resumen semanal + notas de v7.58 reafirmado e intacto. app.js INTACTO (0 modificaciones, baseline 2cf580d/dfb7d07). Test 16/16 (12 estaticos + 4 funcionales mock). ?v=7.59 x3 + cache v145"
+    },
+    {
+      "fase": 172,
+      "version": "v7.60",
+      "estado": "completada",
+      "alcance": "FIX BUG: Vista Semanal vacia en PDF. Causa: hook v7.58 reemplazaba innerHTML del clon con grid generado (si tbody no matcheaba -> vacio). Se DESACTIVA el hook (funciones de grid quedan como dead code reversible, documentado): la semanal vuelve a clonar el nodo real del DOM visible (cabeceras dias, col HORas, celdas+clases, leyenda/resumen intactos). Los theads del clon pasan a fondo claro #f8fafc con texto #0f172a (antes #0f172a/blanco). Remocion extendida: .btn-agregar/[onclick*=agregar]/inputs de edicion/[contenteditable]. CSS v7.60: tabla 100% fixed en clon, th y hora-cell claros, leyenda flex centrada debajo. app.js 0 cambios (baseline 2cf580d). NOTA DESVIACION: prompt repitio v7.59/v145/F171 (aplicada en a2f6dbb) -> aplicado como v7.60/v146/F172. ?v=7.60 x3 + cache v146. Test 15/15"
     }
   ],
   "ultima_fase": {

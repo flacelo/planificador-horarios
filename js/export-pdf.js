@@ -137,10 +137,8 @@
 
   function clonarVistaVisible(el) {
     var clon = el.cloneNode ? el.cloneNode(true) : el;
-    // Rediseño v7.58: la Vista Semanal en el PDF pasa a grid de días + resumen semanal
-    if (esVistaSemanalPDF(clon)) {
-      clon.innerHTML = construirResumenSemanalPDF(clon);
-    }
+    // v7.60: rediseño grid v7.58 DESACTIVADO (causaba Vista Semanal vacía en PDF si no se detectaba tbody).
+    // La Vista Semanal se exporta clonando el nodo real del DOM visible (cabeceras, HORAS, celdas, leyenda intactos).
     var nodos = [clon];
     if (clon.querySelectorAll) {
       Array.prototype.push.apply(nodos, clon.querySelectorAll('*'));
@@ -156,7 +154,7 @@
     });
     // Remoción física de nodos de eliminación ('X'), botones y svg dentro del clon (v7.30-v7.33)
     if (clon.querySelectorAll) {
-      Array.prototype.forEach.call(clon.querySelectorAll('.btn-remove, .remove-btn, .btn-eliminar-fila, .btn-delete, .close-x, .day-header-delete, [data-action="delete"], .delete-icon, .btn-eliminar, button.close, .x-btn, .close-btn, [onclick*="eliminar"], [onclick*="remove"], button, svg'), function(n) {
+      Array.prototype.forEach.call(clon.querySelectorAll('.btn-remove, .remove-btn, .btn-eliminar-fila, .btn-delete, .close-x, .day-header-delete, [data-action="delete"], .delete-icon, .btn-eliminar, .btn-agregar, [onclick*="eliminar"], [onclick*="remove"], [onclick*="agregar"], input.editar, input.edicion, [contenteditable="true"], button.close, .x-btn, .close-btn, button, svg'), function(n) {
         if (n.remove) n.remove();
         else if (n.parentNode) n.parentNode.removeChild(n);
       });
@@ -164,7 +162,7 @@
     // Inyección in situ de estilos de alto contraste en cabeceras de días y columna de horas (v7.33)
     if (clon.querySelectorAll) {
       Array.prototype.forEach.call(clon.querySelectorAll('th, .day-header, .tabla-semanal th, upper-header, [class*="header"]'), function(th) {
-        if (th.setAttribute) th.setAttribute('style', 'background-color:#0f172a!important;color:#ffffff!important;font-weight:800!important;font-size:13px!important;text-align:center!important;padding:8px!important;border:1px solid #334155!important;text-transform:uppercase!important;');
+        if (th.setAttribute) th.setAttribute('style', 'background-color:#f8fafc!important;color:#0f172a!important;font-weight:800!important;font-size:13px!important;text-align:center!important;padding:8px!important;border:1px solid #cbd5e1!important;text-transform:uppercase!important;');
       });
       Array.prototype.forEach.call(clon.querySelectorAll('td:first-child, .col-hora, .hora-cell'), function(td) {
         if (td.setAttribute) td.setAttribute('style', 'background-color:#f1f5f9!important;color:#0f172a!important;font-weight:700!important;font-size:11px!important;text-align:center!important;padding:6px!important;border:1px solid #cbd5e1!important;');

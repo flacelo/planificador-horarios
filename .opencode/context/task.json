@@ -2110,6 +2110,12 @@
       "version": "v7.55",
       "estado": "completada",
       "alcance": "DESVIACION: el prompt repitio v7.54/v140/Fase 166 (ya aplicada en e8eb5c9) con contenido distinto -> aplicado como v7.55. Correccion de densidad vertical y visibilidad de dias/leyenda en Vista Semanal: CSS .semanal-container/#vista-semanal flex column sin overflow, thead sticky con var(--bg-header), td 4px 6px 0.82rem, seccion-leyenda-inferior flex center gap 8, @media print @page 5mm tabla 100% page-break-inside auto, tr avoid, th/td 2px 4px 8.5px, leyenda avoid 6px. export-pdf.js v7.55: thead table-header-group + leyenda visible contiguos en clon. app.js CONGELADO (baseline 2cf580d). ?v=7.55 x3 + cache v141"
+    },
+    {
+      "fase": 168,
+      "version": "v7.56",
+      "estado": "completada",
+      "alcance": "DESVIACION: prompt repitio v7.55/v141/Fase 167 (ya aplicada en 8e44cbd) con contenido distinto -> aplicado como v7.56. Forzado estricto A4 Landscape 1 pagina PDF Vista Semanal: export-pdf.js iframe @page size A4 landscape margin 5mm !important (reemplaza 6mm), celdas td/th/col-hora font-size 10px padding 4px boxSizing border-box, leyenda/licencia pageBreakInside avoid margin-top 6px, clon width 100%. main.css @media print: html/body/[data-planify-print] 100% overflow hidden, * page-break avoid, tabla table-layout fixed, th/td 3px 4px 9.5px, leyenda flex gap 6. app.js CONGELADO (baseline 2cf580d). ?v=7.56 x3 + cache v142"
     }
   ],
   "ultima_fase": {

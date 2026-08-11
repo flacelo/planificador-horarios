@@ -194,26 +194,46 @@
           c.style.setProperty('box-sizing', 'border-box', 'important');
         }
       });
-      // v7.68: alineacion exacta y matematica de etiquetas de dias (renombra la fila real del grid en orden estricto)
+      // v7.69: thead explicito con cabecera OSCURA obligatoria (HORA + dias completos) y estilos in situ
       var viejoHeader = clon.querySelector('.pdf-dias-header');
       if (viejoHeader && viejoHeader.parentNode) viejoHeader.parentNode.removeChild(viejoHeader);
-      var theadClon = clon.querySelector('thead');
-      if (theadClon && theadClon.textContent.indexOf('HORA') !== -1 && theadClon.parentNode) theadClon.parentNode.removeChild(theadClon);
-      var titulos = ['HORA', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
-      var filaReal = clon.querySelectorAll('thead tr th');
-      var celdasFilaSuperior = (filaReal && filaReal.length >= 8) ? filaReal : clon.querySelectorAll('.grid-header, .semanal-header, .dia-header, [class*="header"]');
-      if (celdasFilaSuperior.length >= 8) {
-        Array.prototype.forEach.call(celdasFilaSuperior, function(celda, idx) {
-          if (idx < 8) {
-            celda.textContent = titulos[idx];
-            celda.style.setProperty('color', '#0f172a', 'important');
-            celda.style.setProperty('background-color', idx === 0 ? '#cbd5e1' : '#e2e8f0', 'important');
-            celda.style.setProperty('visibility', 'visible', 'important');
-            celda.style.setProperty('opacity', '1', 'important');
-            celda.style.setProperty('font-weight', 'bold', 'important');
-            celda.style.setProperty('font-size', '11px', 'important');
-            celda.style.setProperty('text-align', 'center', 'important');
-          }
+      var theadSem = clon.querySelector('table.tabla-semanal thead, .semanal-grid thead, table thead, #tabla thead');
+      if (!theadSem) {
+        var tablaSem = clon.querySelector('table');
+        if (tablaSem) {
+          theadSem = document.createElement('thead');
+          tablaSem.insertBefore(theadSem, tablaSem.firstChild);
+        }
+      }
+      if (theadSem) {
+        theadSem.style.setProperty('display', 'table-header-group', 'important');
+        theadSem.style.setProperty('visibility', 'visible', 'important');
+        theadSem.style.setProperty('opacity', '1', 'important');
+        theadSem.style.setProperty('height', 'auto', 'important');
+        var filaSem = theadSem.querySelector('tr');
+        if (!filaSem) { filaSem = document.createElement('tr'); theadSem.appendChild(filaSem); }
+        if (filaSem.style) {
+          filaSem.style.setProperty('display', 'table-row', 'important');
+          filaSem.style.setProperty('visibility', 'visible', 'important');
+          filaSem.style.setProperty('opacity', '1', 'important');
+        }
+        var titulosDias = ['HORA', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
+        Array.prototype.forEach.call(titulosDias, function(nombre, i) {
+          var thSem = filaSem.children[i] || document.createElement('th');
+          if (i >= filaSem.children.length) filaSem.appendChild(thSem);
+          var previo = thSem.textContent || '';
+          var fecha = previo.match(/\d{1,2}\/\d{1,2}/);
+          thSem.textContent = nombre + (fecha ? ' ' + fecha[0] : '');
+          thSem.style.setProperty('display', 'table-cell', 'important');
+          thSem.style.setProperty('visibility', 'visible', 'important');
+          thSem.style.setProperty('opacity', '1', 'important');
+          thSem.style.setProperty('color', '#ffffff', 'important');
+          thSem.style.setProperty('background-color', '#0f172a', 'important');
+          thSem.style.setProperty('font-weight', 'bold', 'important');
+          thSem.style.setProperty('text-align', 'center', 'important');
+          thSem.style.setProperty('padding', '6px 4px', 'important');
+          thSem.style.setProperty('font-size', '10px', 'important');
+          thSem.style.setProperty('border', '1px solid #cbd5e1', 'important');
         });
       }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');

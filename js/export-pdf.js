@@ -55,8 +55,92 @@
     return v.indexOf('gradient') !== -1;
   }
 
+  // REDISEÑO v7.58: Vista Semanal PDF = grid 7 días + resumen semanal en 1 página A4 landscape
+  function escHtmlPdf(t) {
+    return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function textoLimpioPdf(td) {
+    var tmp = td.cloneNode(true);
+    if (tmp.querySelectorAll) {
+      Array.prototype.forEach.call(tmp.querySelectorAll('span, input, .del-fila'), function(sp) {
+        if (sp.remove) sp.remove();
+        else if (sp.parentNode) sp.parentNode.removeChild(sp);
+      });
+    }
+    return (tmp.textContent || '').trim();
+  }
+  function esVistaSemanalPDF(clon) {
+    if (!clon || !clon.querySelectorAll) return false;
+    return clon.querySelectorAll('td.hora-cell, .hora-cell').length > 0;
+  }
+  function construirGridSemanalPDF(dias, porDia, total, hechas) {
+    var pct = total > 0 ? Math.round(hechas / total * 100) : 0;
+    var hoy = new Date();
+    var fecha = String(hoy.getDate()).padStart ? String(hoy.getDate()).padStart(2, '0') + '/' + String(hoy.getMonth() + 1).padStart(2, '0') + '/' + hoy.getFullYear() : (hoy.getDate() + '/' + (hoy.getMonth() + 1) + '/' + hoy.getFullYear());
+    var h = '<div class="pdf-week-grid">';
+    h += '<div class="pdf-week-cabecera">PLANIFY · Vista Semanal · ' + fecha + '</div>';
+    h += '<div class="pdf-week-dias">';
+    for (var d = 0; d < 7; d++) {
+      h += '<div class="pdf-week-dia"><div class="pdf-week-dia-nombre">' + escHtmlPdf(dias[d]) + '</div><div class="pdf-week-tareas">';
+      var tasks = porDia[d] || [];
+      if (!tasks.length) {
+        h += '<div class="pdf-task-vacio">—</div>';
+      }
+      tasks.forEach(function(t) {
+        h += '<div class="pdf-tarea' + (t.done ? ' hecho' : '') + '">';
+        h += '<span class="pdf-check">' + (t.done ? '✓' : '☐') + '</span>';
+        if (t.hora) h += '<span class="pdf-hora">' + escHtmlPdf(t.hora) + '</span>';
+        h += '<span class="pdf-tit">' + escHtmlPdf(t.titulo) + '</span></div>';
+      });
+      h += '</div></div>';
+    }
+    h += '</div>';
+    h += '<div class="pdf-week-resumen">';
+    h += '<div class="pdf-metricas">';
+    h += '<div class="pdf-met"><span class="pdf-met-v">' + total + '</span><span class="pdf-met-l">Total</span></div>';
+    h += '<div class="pdf-met"><span class="pdf-met-v">' + hechas + '</span><span class="pdf-met-l">Completadas</span></div>';
+    h += '<div class="pdf-met"><span class="pdf-met-v">' + (total - hechas) + '</span><span class="pdf-met-l">Pendientes</span></div>';
+    h += '<div class="pdf-met"><span class="pdf-met-v">' + pct + '%</span><span class="pdf-met-l">% Éxito</span></div>';
+    h += '</div>';
+    h += '<div class="pdf-notas"><strong>Notas y Prioridades de la Semana</strong><span class="pdf-notas-caja"></span></div>';
+    h += '</div>';
+    h += '<div class="pdf-licencia">🔒 Licencia personal · PLANIFY</div>';
+    h += '</div>';
+    return h;
+  }
+  function construirResumenSemanalPDF(clon) {
+    var dias = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
+    var porDia = [];
+    for (var d = 0; d < 7; d++) porDia.push([]);
+    var total = 0, hechas = 0;
+    var tbody = clon.querySelector('#tabla tbody, .tabla-semanal tbody, table tbody');
+    if (tbody && tbody.querySelectorAll) {
+      Array.prototype.forEach.call(tbody.querySelectorAll('tr'), function(tr) {
+        var horaInput = tr.querySelector('td.hora-cell input, .hora-cell input');
+        var hora = horaInput ? String(horaInput.value || '').trim() : '';
+        var doneAll = tr.classList && tr.classList.contains('done');
+        Array.prototype.forEach.call(tr.querySelectorAll('td.celda'), function(td) {
+          var ci = parseInt(td.getAttribute('data-ci'), 10);
+          if (isNaN(ci) || ci < 0 || ci > 6) return;
+          var done = (td.classList && td.classList.contains('done')) || doneAll;
+          if (td.classList && td.classList.contains('merged-cell')) done = porDia[ci].length > 0 ? porDia[ci][porDia[ci].length - 1].done : done;
+          var tit = textoLimpioPdf(td);
+          if (!tit || tit === '—') return;
+          total++;
+          if (done) hechas++;
+          porDia[ci].push({ hora: hora, titulo: tit, done: done });
+        });
+      });
+    }
+    return construirGridSemanalPDF(dias, porDia, total, hechas);
+  }
+
   function clonarVistaVisible(el) {
     var clon = el.cloneNode ? el.cloneNode(true) : el;
+    // Rediseño v7.58: la Vista Semanal en el PDF pasa a grid de días + resumen semanal
+    if (esVistaSemanalPDF(clon)) {
+      clon.innerHTML = construirResumenSemanalPDF(clon);
+    }
     var nodos = [clon];
     if (clon.querySelectorAll) {
       Array.prototype.push.apply(nodos, clon.querySelectorAll('*'));

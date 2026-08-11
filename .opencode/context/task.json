@@ -2200,6 +2200,12 @@
       "version": "v7.68",
       "estado": "completada",
       "alcance": "Alineacion exacta y matematica de etiquetas de dias (corrige desfasaje HORA sobre LUNES). js/export-pdf.js: elimina .pdf-dias-header previo; elimina el thead SOLO si contiene HORA (el inyectado por v7.67), preservando el thead real de la app; titulos = [HORA,LUN,MAR,MIÉ,JUE,VIE,SÁB,DOM]; selecciona la fila real thead tr th cuando tiene >=8 celdas (fallback al selector del prompt .grid-header, .semanal-header, .dia-header, [class*=header]); renombra textContent y aplica estilos setProperty important en ORDEN ESTRICTO por indice: col 0 #cbd5e1 (HORA), cols 1-7 #e2e8f0, color #0f172a, visible, opacity 1, bold, 11px, center. Mejora tecnica vs prompt: no borra thead de la app (evita regresion) y prioriza fila real antes del selector amplio [class*=header]. Bloque th v7.64 conservado. app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 179 (usada) -> Fase 182. ?v=7.68 x3 + cache v154. Build OK, test 11/11"
+    },
+    {
+      "fase": 183,
+      "version": "v7.69",
+      "estado": "completada",
+      "alcance": "Restauracion y forzado OBLIGATORIO de fila de cabecera HORA + LUNES-DOMINGO (nombres completos) en PDF Vista Semanal. js/export-pdf.js: elimina .pdf-dias-header previo; busca o CREA thead en la tabla clonada (selectores .tabla-semanal/.semanal-grid/table/#tabla); fuerza en thead y tr: display table-header-group/table-row, visibility visible, opacity 1, height auto; inyecta/renombra 8 th: col 1 HORA, cols 2-8 LUNES/MARTES/MIÉRCOLES/JUEVES/VIERNES/SÁBADO/DOMINGO conservando fechas dinamicas existentes (regex dd/dd); th inline OSCURO: #ffffff sobre #0f172a, bold, center, padding 6px 4px, 10px, border #cbd5e1 (todo setProperty important). css/main.css: thead print sin bg (solo display/visible/auto) y th print OSCURO #ffffff/#0f172a (reemplaza th claro v7.64). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 180 (usada) -> Fase 183. ?v=7.69 x3 + cache v155. Build OK, test 12/12"
     }
   ],
   "ultima_fase": {

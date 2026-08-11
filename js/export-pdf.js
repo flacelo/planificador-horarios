@@ -333,6 +333,20 @@
           l.style.opacity = '1';
         }
       });
+      // Distribución proporcional v7.56: celdas y columnas de horas legibles, leyenda/licencia contiguas
+      Array.prototype.forEach.call(clon.querySelectorAll('td, th, .col-hora, .hora-cell, .celda-header'), function(c) {
+        if (c.style) {
+          c.style.fontSize = '10px';
+          c.style.padding = '4px';
+          c.style.boxSizing = 'border-box';
+        }
+      });
+      Array.prototype.forEach.call(clon.querySelectorAll('.leyenda-categorias, .leyenda-etiquetas, .leyenda-contenedor, .seccion-leyenda-inferior, .footer-licencia, .licencia-texto, [data-licencia]'), function(l) {
+        if (l.style) {
+          l.style.pageBreakInside = 'avoid';
+          l.style.marginTop = '6px';
+        }
+      });
     }
     clon.style.pageBreakAfter = 'avoid';
     clon.style.breakAfter = 'avoid';
@@ -341,6 +355,7 @@
     clon.style.height = 'auto';
     clon.style.maxHeight = 'none';
     clon.style.overflow = 'visible';
+    clon.style.width = '100%';
     clon.style.backgroundColor = '#ffffff';
     clon.style.color = '#0f172a';
     clon.style.display = 'block';
@@ -499,7 +514,7 @@
       'thead th, .cal-dia-nombre, .week-header-day, .day-header, .hora-col, .celda-header, .month-header, .cal-titulo, [class*="month-title"], [class*="cal-title"] { background: #f1f5f9 !important; color: #334155 !important; font-weight: 600 !important; }' +
       'th, td, .celda, .grid-cell, .month-cell, .cell-content { padding: 8px 10px !important; border-radius: 6px !important; }' +
       '.cal-evento, .evento, .event-item, .card, .dash-card, .tour-card { border-radius: 6px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
-      '@page { size: A4 landscape; margin: 6mm; }' +
+      '@page { size: A4 landscape; margin: 5mm !important; }' +
       '[data-planify-print] .btn-remove, [data-planify-print] .remove-btn, [data-planify-print] .btn-eliminar-fila, [data-planify-print] .btn-delete, [data-planify-print] .close-x, [data-planify-print] .day-header-delete, [data-planify-print] [data-action="delete"], [data-planify-print] .delete-icon, [data-planify-print] .btn-eliminar, [data-planify-print] button.close, [data-planify-print] .x-btn, [data-planify-print] .close-btn, [data-planify-print] button { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }' +
       '[data-planify-print] th, [data-planify-print] .day-header, [data-planify-print] .tabla-semanal th, [data-planify-print] th[class*="header"], [data-planify-print] th * { background-color: #0f172a !important; color: #ffffff !important; font-weight: 700 !important; text-align: center !important; padding: 6px !important; font-size: 11px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
       '[data-planify-print] .col-hora, [data-planify-print] td:first-child, [data-planify-print] .hora-cell { background-color: #f1f5f9 !important; color: #0f172a !important; font-weight: 700 !important; text-align: center !important; }' +

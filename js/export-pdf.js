@@ -258,6 +258,24 @@
         });
         tablaCab.parentNode.insertBefore(cabecera, tablaCab);
       }
+      // v7.73: cabecera EXCLUSIVA HORA+LUN..DOM (abreviaturas) forzada en el thead de la tabla clonada - sin leyendas ni resumen
+      var tablaSemanal = clon.querySelector('table') || clon.querySelector('.tabla-semanal');
+      if (tablaSemanal) {
+        var oldThead = tablaSemanal.querySelector('thead');
+        if (oldThead && oldThead.parentNode) oldThead.parentNode.removeChild(oldThead);
+        var newThead = document.createElement('thead');
+        var newTr = document.createElement('tr');
+        newTr.style.cssText = 'background-color:#f1f5f9!important;border-bottom:2px solid #cbd5e1!important;';
+        var titulosCorto = ['HORA', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
+        Array.prototype.forEach.call(titulosCorto, function(t, i) {
+          var thCorto = document.createElement('th');
+          thCorto.textContent = t;
+          thCorto.style.cssText = 'color:#0f172a!important;font-weight:800!important;text-align:center!important;padding:6px!important;font-size:11px!important;' + (i === 0 ? 'width:10%!important;' : '');
+          newTr.appendChild(thCorto);
+        });
+        newThead.appendChild(newTr);
+        tablaSemanal.insertBefore(newThead, tablaSemanal.firstChild);
+      }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {
         headerRow.style.setProperty('display', (headerRow.classList && headerRow.classList.contains('grid-header')) ? 'grid' : 'table-header-group', 'important');

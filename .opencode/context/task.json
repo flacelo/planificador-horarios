@@ -2122,6 +2122,12 @@
       "version": "v7.57",
       "estado": "completada",
       "alcance": "Fix de exportacion multivista PDF: restauracion de aislamiento por pagina con .planify-pdf-page y saltos de pagina condicionales en A4 Landscape. export-pdf.js: regla iframe .planify-pdf-page reemplazada (era flex 100vh overflow hidden de v7.38 -> ahora display block, width 100%, padding 2mm 0, page-break-after always, :last-child auto); wrapper por vista y orden cronologico OPCIONES intactos. main.css @media print v7.57: @page 4mm 5mm, html/body overflow visible, [data-planify-print] visible, .planify-pdf-page bloques + :last-child auto, tablas fixed. app.js CONGELADO (baseline 2cf580d). ?v=7.57 x3 + cache v143"
+    },
+    {
+      "fase": 170,
+      "version": "v7.58",
+      "estado": "completada",
+      "alcance": "Rediseno del renderizado Vista Semanal en PDF: grid 7 columnas LUN-DOM (datos extraidos de la tabla #tabla via data-ci + hora de td.hora-cell input, checkbox ✓/☐ por estado done) + bloque Resumen Semanal inferior (Total/Completadas/Pendientes/%Exito) + seccion Notas y Prioridades de la Semana + licencia, todo en 1 pagina A4 landscape con CSS .pdf-week-* compacto (9px, 7 cols, resumen grid 1.1fr/1.4fr). App en vivo sin cambios (app.js CONGELADO baseline 2cf580d); solo aplica cuando el clon tiene td.hora-cell. Test funcional mock DOM 10/10 + estatico 14/14. ?v=7.58 x3 + cache v144"
     }
   ],
   "ultima_fase": {

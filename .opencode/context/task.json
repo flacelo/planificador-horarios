@@ -2140,6 +2140,12 @@
       "version": "v7.60",
       "estado": "completada",
       "alcance": "FIX BUG: Vista Semanal vacia en PDF. Causa: hook v7.58 reemplazaba innerHTML del clon con grid generado (si tbody no matcheaba -> vacio). Se DESACTIVA el hook (funciones de grid quedan como dead code reversible, documentado): la semanal vuelve a clonar el nodo real del DOM visible (cabeceras dias, col HORas, celdas+clases, leyenda/resumen intactos). Los theads del clon pasan a fondo claro #f8fafc con texto #0f172a (antes #0f172a/blanco). Remocion extendida: .btn-agregar/[onclick*=agregar]/inputs de edicion/[contenteditable]. CSS v7.60: tabla 100% fixed en clon, th y hora-cell claros, leyenda flex centrada debajo. app.js 0 cambios (baseline 2cf580d). NOTA DESVIACION: prompt repitio v7.59/v145/F171 (aplicada en a2f6dbb) -> aplicado como v7.60/v146/F172. ?v=7.60 x3 + cache v146. Test 15/15"
+    },
+    {
+      "fase": 173,
+      "version": "v7.61",
+      "estado": "completada",
+      "alcance": "Fix definitivo visibilidad PDF Vista Semanal A4 Landscape. (1) js/export-pdf.js: th del clon con style in-situ OBLIGATORIO (display:table-cell,visibility visible,opacity 1,color #0f172a,background #f1f5f9,8.5px,padding 2px,border #cbd5e1) - reemplaza bloque claro v7.60; nuevo bloque v7.61 que inyecta estilo in-situ en .leyenda-categorias/.seccion-leyenda-inferior/.summary-banner/#day-summary (flex wrap visible, 8px, #0f172a) garantizando seccion inferior presente en el clon. (2) css/main.css: bloque @media print v7.61 con selectores mixtos (.tabla-semanal + #tabla real de la app): thead/tr/th table-header-group visible; th table-cell 8.5px 2px; tr/td height 17px, td 1px 2px 8px #0f172a; seccion inferior flex visible margin 3px; @page A4 landscape 3mm 4mm. app.js 0 cambios (baseline 2cf580d). ?v=7.61 x3 + cache v147. Test 16/16"
     }
   ],
   "ultima_fase": {

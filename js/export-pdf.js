@@ -161,19 +161,29 @@
     }
     // Inyección in situ de estilos de alto contraste en cabeceras de días y columna de horas (v7.33)
     if (clon.querySelectorAll) {
-      // v7.61 REFUERZO 2: visibilidad por fuerza bruta con display condicional por tag (THEAD/TR/TH) en cabeceras de dias
+      // v7.62: cabeceras de dias OSCURAS alto contraste con texto blanco nitido (display por tag THEAD/TR/TH)
       var headers = clon.querySelectorAll('table.tabla-semanal thead, table.tabla-semanal thead tr, table.tabla-semanal th, #tabla thead, #tabla thead tr, #tabla th, .grid-header, .header-dia');
       Array.prototype.forEach.call(headers, function(h) {
         if (h.style && h.style.setProperty) {
           h.style.setProperty('display', h.tagName === 'THEAD' ? 'table-header-group' : (h.tagName === 'TR' ? 'table-row' : 'table-cell'), 'important');
           h.style.setProperty('visibility', 'visible', 'important');
           h.style.setProperty('opacity', '1', 'important');
-          h.style.setProperty('color', '#0f172a', 'important');
-          h.style.setProperty('background-color', '#f1f5f9', 'important');
+          h.style.setProperty('color', '#ffffff', 'important');
+          h.style.setProperty('background-color', '#0f172a', 'important');
           h.style.setProperty('font-weight', 'bold', 'important');
-          h.style.setProperty('font-size', '9px', 'important');
+          h.style.setProperty('font-size', '10px', 'important');
           h.style.setProperty('text-align', 'center', 'important');
-          h.style.setProperty('border', '1px solid #cbd5e1', 'important');
+          h.style.setProperty('padding', '6px 4px', 'important');
+          h.style.setProperty('border', '1px solid #334155', 'important');
+        }
+      });
+      // v7.62: alargado vertical proporcional de la cuadricula (32px) para 1 sola pagina A4
+      var cells = clon.querySelectorAll('table.tabla-semanal td, #tabla td');
+      Array.prototype.forEach.call(cells, function(c) {
+        if (c.style && c.style.setProperty) {
+          c.style.setProperty('height', '32px', 'important');
+          c.style.setProperty('padding', '3px 4px', 'important');
+          c.style.setProperty('box-sizing', 'border-box', 'important');
         }
       });
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');

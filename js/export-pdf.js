@@ -296,6 +296,37 @@
       });
       if (contenedorSemanal.firstChild) contenedorSemanal.insertBefore(headerPDF, contenedorSemanal.firstChild);
       else contenedorSemanal.appendChild(headerPDF);
+      // v7.77: thead nativo como PRIMERA FILA con nombres COMPLETOS (LUNES..DOMINGO) - bordes alineados al cuerpo
+      var divsFlotantes77 = contenedorSemanal.querySelectorAll('.cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header');
+      Array.prototype.forEach.call(divsFlotantes77, function(el) {
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+      });
+      var tablaSem77 = contenedorSemanal.querySelector('table');
+      if (tablaSem77) {
+        var thead77 = tablaSem77.querySelector('thead');
+        var nombres77 = ['HORA', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
+        if (!thead77) {
+          thead77 = document.createElement('thead');
+          var tr77 = document.createElement('tr');
+          Array.prototype.forEach.call(nombres77, function(n) {
+            var th77 = document.createElement('th');
+            th77.textContent = n;
+            th77.style.cssText = 'background-color:#0f172a!important;color:#ffffff!important;font-weight:700!important;font-size:10px!important;padding:6px 2px!important;text-align:center!important;border:1px solid #cbd5e1!important;box-sizing:border-box!important;';
+            tr77.appendChild(th77);
+          });
+          thead77.appendChild(tr77);
+          if (tablaSem77.firstChild) tablaSem77.insertBefore(thead77, tablaSem77.firstChild);
+          else tablaSem77.appendChild(thead77);
+        } else {
+          var ths77 = thead77.querySelectorAll('tr th');
+          Array.prototype.forEach.call(ths77, function(thEl, i) {
+            if (i < 8) {
+              thEl.textContent = nombres77[i];
+              thEl.style.cssText = 'background-color:#0f172a!important;color:#ffffff!important;font-weight:700!important;font-size:10px!important;padding:6px 2px!important;text-align:center!important;border:1px solid #cbd5e1!important;box-sizing:border-box!important;';
+            }
+          });
+        }
+      }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {
         headerRow.style.setProperty('display', (headerRow.classList && headerRow.classList.contains('grid-header')) ? 'grid' : 'table-header-group', 'important');

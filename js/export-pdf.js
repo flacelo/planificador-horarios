@@ -296,26 +296,37 @@
       });
       if (contenedorSemanal.firstChild) contenedorSemanal.insertBefore(headerPDF, contenedorSemanal.firstChild);
       else contenedorSemanal.appendChild(headerPDF);
-      // v7.78: thead nativo con 8 th al 12.5% exacto, SIN inline styles (layout solo via CSS)
-      var divsFlotantes78 = contenedorSemanal.querySelectorAll('.cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header');
-      Array.prototype.forEach.call(divsFlotantes78, function(el) {
+      // v7.79: thead con 8 th independientes inyectados CELDA POR CELDA (setProperty important) - sin amontonamiento
+      var divsFlotantes79 = contenedorSemanal.querySelectorAll('.cabecera-semanal-pdf-forzada, .cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias, .grid-header-pdf, .pdf-dias-header');
+      Array.prototype.forEach.call(divsFlotantes79, function(el) {
         if (el && el.parentNode) el.parentNode.removeChild(el);
       });
-      var tablaSem78 = contenedorSemanal.querySelector('table');
-      if (tablaSem78) {
-        var oldThead78 = tablaSem78.querySelector('thead');
-        if (oldThead78 && oldThead78.parentNode) oldThead78.parentNode.removeChild(oldThead78);
-        var thead78 = document.createElement('thead');
-        var tr78 = document.createElement('tr');
-        var nombres78 = ['HORA', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
-        Array.prototype.forEach.call(nombres78, function(n) {
-          var th78 = document.createElement('th');
-          th78.textContent = n;
-          tr78.appendChild(th78);
+      var tablaClon = contenedorSemanal.querySelector('table');
+      if (tablaClon) {
+        var thead79 = tablaClon.querySelector('thead');
+        if (!thead79) {
+          thead79 = document.createElement('thead');
+          if (tablaClon.firstChild) tablaClon.insertBefore(thead79, tablaClon.firstChild);
+          else tablaClon.appendChild(thead79);
+        }
+        thead79.innerHTML = '';
+        var trHeader = document.createElement('tr');
+        var diasNombres = ['HORA', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
+        Array.prototype.forEach.call(diasNombres, function(nombre) {
+          var th79 = document.createElement('th');
+          th79.textContent = nombre;
+          th79.style.setProperty('width', '12.5%', 'important');
+          th79.style.setProperty('text-align', 'center', 'important');
+          th79.style.setProperty('background-color', '#0f172a', 'important');
+          th79.style.setProperty('color', '#ffffff', 'important');
+          th79.style.setProperty('font-size', '10px', 'important');
+          th79.style.setProperty('font-weight', '700', 'important');
+          th79.style.setProperty('padding', '6px 2px', 'important');
+          th79.style.setProperty('border', '1px solid #cbd5e1', 'important');
+          th79.style.setProperty('box-sizing', 'border-box', 'important');
+          trHeader.appendChild(th79);
         });
-        thead78.appendChild(tr78);
-        if (tablaSem78.firstChild) tablaSem78.insertBefore(thead78, tablaSem78.firstChild);
-        else tablaSem78.appendChild(thead78);
+        thead79.appendChild(trHeader);
       }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {

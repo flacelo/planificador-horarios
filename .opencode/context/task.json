@@ -2188,6 +2188,12 @@
       "version": "v7.66",
       "estado": "completada",
       "alcance": "Alineado exacto de la barra de dias del PDF: reemplaza bloque .pdf-dias-header v7.65. Esquina HORA ahora es celda independiente con bg #cbd5e1 y border #94a3b8; array de dias solo LUN-DOM (7 celdas) con bg #e2e8f0/border #cbd5e1; grid permanece 80px repeat(7,1fr) insertado al inicio del contenedor principal; elimina .pdf-dias-header previo (sin duplicados). Bloque th claros v7.64 y clon real intactos. app.js 0 cambios (baseline 2cf580d). ?v=7.66 x3 + cache v152. Build OK, test 10/10"
+    },
+    {
+      "fase": 181,
+      "version": "v7.67",
+      "estado": "completada",
+      "alcance": "Cabeceras HORA+LUN-DOM inyectadas DENTRO del thead de la tabla clonada (abandona barra .pdf-dias-header externa con CSS Grid). js/export-pdf.js: elimina .pdf-dias-header previo si existe; clon.querySelector(table); uso/crea thead (insertBefore en tabla); construye fila tr (bg #e2e8f0) con 8 th: columna 0 HORA (bg #cbd5e1, width 80px) y LUN-DOM (bg #e2e8f0, width auto); th con inline table-cell/visible/opacity 1/#0f172a/bold/11px/center/padding 6px 2px/border #cbd5e1 (todo important). Implementado con creacion ES5 (innerText) en lugar de template literal del prompt por compatibilidad con el minificador del build (mismo DOM resultante). Bloque th v7.64 conservado. app.js 0 cambios (baseline 2cf580d). ?v=7.67 x3 + cache v153. Build OK, test 11/11"
     }
   ],
   "ultima_fase": {

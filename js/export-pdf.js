@@ -194,25 +194,28 @@
           c.style.setProperty('box-sizing', 'border-box', 'important');
         }
       });
-      // v7.66: barra de dias alineada exacta (esquina HORA diferenciada + 7 celdas de dias)
-      var headerExistente = clon.querySelector('.pdf-dias-header');
-      if (headerExistente && headerExistente.parentNode) headerExistente.parentNode.removeChild(headerExistente);
-      var barraDias = document.createElement('div');
-      barraDias.className = 'pdf-dias-header';
-      barraDias.style.cssText = 'display:grid!important;grid-template-columns:80px repeat(7,1fr)!important;gap:4px!important;margin-bottom:6px!important;width:100%!important;box-sizing:border-box!important;';
-      var celdaHora = document.createElement('div');
-      celdaHora.innerText = 'HORA';
-      celdaHora.style.cssText = 'font-weight:bold!important;font-size:11px!important;text-align:center!important;background:#cbd5e1!important;color:#0f172a!important;padding:6px 2px!important;border:1px solid #94a3b8!important;border-radius:4px!important;';
-      barraDias.appendChild(celdaHora);
-      var dias = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
-      Array.prototype.forEach.call(dias, function(dia) {
-        var celda = document.createElement('div');
-        celda.innerText = dia;
-        celda.style.cssText = 'font-weight:bold!important;font-size:11px!important;text-align:center!important;background:#e2e8f0!important;color:#0f172a!important;padding:6px 2px!important;border:1px solid #cbd5e1!important;border-radius:4px!important;';
-        barraDias.appendChild(celda);
-      });
-      var contenedorPrincipal = clon.querySelector('.planify-pdf-page, #vista-semanal, .vista-semanal') || clon;
-      contenedorPrincipal.insertBefore(barraDias, contenedorPrincipal.firstChild);
+      // v7.67: cabeceras HORA+LUN-DOM inyectadas DENTRO del thead de la tabla clonada (evita desfases de CSS Grid externos)
+      var viejoHeader = clon.querySelector('.pdf-dias-header');
+      if (viejoHeader && viejoHeader.parentNode) viejoHeader.parentNode.removeChild(viejoHeader);
+      var tablaSemanal = clon.querySelector('table');
+      if (tablaSemanal) {
+        var thead = tablaSemanal.querySelector('thead');
+        if (!thead) {
+          thead = document.createElement('thead');
+          tablaSemanal.insertBefore(thead, tablaSemanal.firstChild);
+        }
+        var titulos = ['HORA', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
+        var fila = document.createElement('tr');
+        fila.style.cssText = 'background-color:#e2e8f0!important;';
+        Array.prototype.forEach.call(titulos, function(t, i) {
+          var th = document.createElement('th');
+          th.innerText = t;
+          th.style.cssText = 'display:table-cell!important;visibility:visible!important;opacity:1!important;color:#0f172a!important;background-color:' + (i === 0 ? '#cbd5e1' : '#e2e8f0') + '!important;font-weight:bold!important;font-size:11px!important;text-align:center!important;padding:6px 2px!important;border:1px solid #cbd5e1!important;width:' + (i === 0 ? '80px' : 'auto') + '!important;';
+          fila.appendChild(th);
+        });
+        thead.innerHTML = '';
+        thead.appendChild(fila);
+      }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {
         headerRow.style.setProperty('display', (headerRow.classList && headerRow.classList.contains('grid-header')) ? 'grid' : 'table-header-group', 'important');

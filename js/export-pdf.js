@@ -258,23 +258,25 @@
         });
         tablaCab.parentNode.insertBefore(cabecera, tablaCab);
       }
-      // v7.73: cabecera EXCLUSIVA HORA+LUN..DOM (abreviaturas) forzada en el thead de la tabla clonada - sin leyendas ni resumen
-      var tablaSemanal = clon.querySelector('table') || clon.querySelector('.tabla-semanal');
-      if (tablaSemanal) {
-        var oldThead = tablaSemanal.querySelector('thead');
-        if (oldThead && oldThead.parentNode) oldThead.parentNode.removeChild(oldThead);
-        var newThead = document.createElement('thead');
-        var newTr = document.createElement('tr');
-        newTr.style.cssText = 'background-color:#f1f5f9!important;border-bottom:2px solid #cbd5e1!important;';
-        var titulosCorto = ['HORA', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
-        Array.prototype.forEach.call(titulosCorto, function(t, i) {
-          var thCorto = document.createElement('th');
-          thCorto.textContent = t;
-          thCorto.style.cssText = 'color:#0f172a!important;font-weight:800!important;text-align:center!important;padding:6px!important;font-size:11px!important;' + (i === 0 ? 'width:10%!important;' : '');
-          newTr.appendChild(thCorto);
+      // v7.74: cabecera alineada con thead NATIVO (anchos 12%/12.5%) - elimina contenedores flotantes externos
+      var divViejo = clon.querySelector('.cabecera-pdf-dias, #cabecera-pdf-dias, .pdf-cabecera-dias');
+      if (divViejo && divViejo.parentNode) divViejo.parentNode.removeChild(divViejo);
+      var tablaSemana = clon.querySelector('table');
+      if (tablaSemana) {
+        var oldThead74 = tablaSemana.querySelector('thead');
+        if (oldThead74 && oldThead74.parentNode) oldThead74.parentNode.removeChild(oldThead74);
+        var newThead74 = document.createElement('thead');
+        var newTr74 = document.createElement('tr');
+        var titulos74 = ['HORA', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
+        var anchos74 = ['12%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%'];
+        Array.prototype.forEach.call(titulos74, function(t, i) {
+          var th74 = document.createElement('th');
+          th74.textContent = t;
+          th74.style.cssText = 'width:' + anchos74[i] + '!important;background:#f1f5f9!important;color:#0f172a!important;font-weight:800!important;text-align:center!important;padding:6px!important;border:1px solid #cbd5e1!important;font-size:10px!important;';
+          newTr74.appendChild(th74);
         });
-        newThead.appendChild(newTr);
-        tablaSemanal.insertBefore(newThead, tablaSemanal.firstChild);
+        newThead74.appendChild(newTr74);
+        tablaSemana.insertBefore(newThead74, tablaSemana.firstChild);
       }
       var headerRow = clon.querySelector('.grid-header, thead, .dias-header');
       if (headerRow && headerRow.style) {

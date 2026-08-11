@@ -2236,6 +2236,12 @@
       "version": "v7.75",
       "estado": "completada",
       "alcance": "Alineacion nativa de thead como PRIMERA fila de la tabla semanal PDF (anchos del cuerpo 10%/12.8%). js/export-pdf.js bloque v7.75: remueve thead previo; crea thead con tr inline bg #f1f5f9 y 8 th: HORA width 10%, LUN..DOM width 12.8% c/u, center, padding 6px, 10px, color #0f172a, bold, border #cbd5e1; insertBefore(tabla.firstChild). Sin divs flotantes (v7.74 elimino .cabecera-pdf-dias/.pdf-cabecera-dias; este bloque no crea contenedores externos). css/main.css v7.75: th print table-cell/visible/opacity 1 (append); thead/tr conserva table-header-group (regla v7.74) en lugar del table-cell que pedia el prompt para el thead (desviacion tecnica documentada: table-cell en thead romperia el layout de tabla; la intencion real = th alineados). table 100% fixed collapse (v7.74) intacta. Reemplaza bloque v7.74 (12%/12.5%). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 186 (usada) -> Fase 188. ?v=7.75 x3 + cache v161. Build OK, test 12/12"
+    },
+    {
+      "fase": 189,
+      "version": "v7.76",
+      "estado": "completada",
+      "alcance": "Cabecera FLEX forzada de 8 columnas adaptada a la estructura real de divs/grid. js/export-pdf.js bloque v7.76 (despues del v7.75): contenedor = clon.querySelector(#vista-semanal,.vista-semanal,.semanal-container)||clon; elimina .cabecera-pdf-dias/.grid-header-pdf/thead (incluye el thead creado por v7.75); crea div.cabecera-semanal-pdf-forzada (flex, 100%, #f1f5f9, border #cbd5e1, margin-bottom 2px) con 8 divs: HORA 12%, LUN..DOM 12.5%, center, 6px 2px, 10px, 800, #0f172a, border-right condicional; insertBefore al inicio. css/main.css v7.76 (append): @media print .cabecera-semanal-pdf-forzada flex/visible/opacity/100% + div block/visible/#0f172a. Cero cambios en vista web en vivo (solo clon). app.js 0 cambios (baseline 2cf580d). NOTA: prompt pidio Fase 187 (usada) -> Fase 189. ?v=7.76 x3 + cache v162. Build OK, test 11/11"
     }
   ],
   "ultima_fase": {

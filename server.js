@@ -329,7 +329,8 @@ http.createServer((req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '-1');
-  let filePath = req.url === '/' ? '/index.html' : req.url;
+  const pathname = new URL(req.url, 'http://localhost').pathname;
+  let filePath = pathname === '/' ? '/index.html' : pathname;
   filePath = path.join(__dirname, filePath);
   const ext = path.extname(filePath);
   fs.readFile(filePath, (err, data) => {

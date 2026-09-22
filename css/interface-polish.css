@@ -1,0 +1,184 @@
+/* PLANIFY interface polish: hierarchy, readability and responsive comfort. */
+:root{
+  --planify-ink:#172033;
+  --planify-muted:#60708a;
+  --planify-line:#dce5f1;
+  --planify-surface:#ffffff;
+  --planify-primary:#5b5bd6;
+  --planify-accent:#14b8a6;
+}
+
+.planify-trust-ready .app{isolation:isolate}
+.planify-trust-ready .app>#main-title{
+  margin:26px auto 6px!important;
+  letter-spacing:.045em!important;
+  text-shadow:0 8px 28px rgba(45,212,191,.13)!important;
+}
+.planify-trust-ready .app>.header-actions{
+  width:min(100% - 32px,860px)!important;
+  min-height:46px;
+  margin:0 auto 22px!important;
+  padding:5px;
+  border:1px solid rgba(148,163,184,.28);
+  border-radius:16px;
+  background:rgba(255,255,255,.66);
+  box-shadow:0 12px 30px rgba(15,23,42,.08);
+  backdrop-filter:blur(12px);
+}
+.planify-trust-ready .header-actions button,
+.planify-trust-ready .header-actions .icon-btn{
+  min-height:36px!important;
+  padding:8px 12px!important;
+  border-radius:11px!important;
+  box-shadow:none!important;
+  font-size:.76rem!important;
+  font-weight:780!important;
+  transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease!important;
+}
+.planify-trust-ready .header-actions button:hover,
+.planify-trust-ready .header-actions .icon-btn:hover{transform:translateY(-1px)!important}
+.planify-trust-ready #welcome-flow-open{
+  order:2;
+  border-color:rgba(20,184,166,.72)!important;
+  background:linear-gradient(135deg,#0f9f94,#31c7b5)!important;
+  color:#fff!important;
+  box-shadow:0 7px 17px rgba(20,184,166,.22)!important;
+}
+.planify-trust-ready #welcome-flow-open:hover{background:linear-gradient(135deg,#0d8f86,#20b7a7)!important}
+.planify-trust-ready #schedule-change-open{order:1;color:#4d46b9!important}
+.planify-trust-ready #planify-focus-open{order:3;color:#0f766e!important}
+.planify-trust-ready #tutorial-btn,.planify-trust-ready .header-actions .icon-btn{order:4}
+.planify-trust-ready .header-actions .icon-btn:last-child{order:5;width:38px;padding:7px!important}
+
+.trust-start-hub{
+  margin-bottom:22px!important;
+  padding:20px!important;
+  border-radius:24px!important;
+  box-shadow:0 20px 52px rgba(15,23,42,.09)!important;
+}
+.trust-start-heading{margin-bottom:14px!important}
+.trust-start-heading h2{font-size:clamp(1.12rem,2vw,1.52rem)!important;letter-spacing:-.025em}
+.trust-start-heading p{max-width:680px!important;font-size:.79rem!important}
+.trust-start-heading>button{flex:0 0 auto;box-shadow:0 5px 14px rgba(67,56,202,.08)}
+.trust-start-options{gap:12px!important}
+.trust-start-options>button{
+  min-height:124px!important;
+  padding:15px!important;
+  border-radius:15px!important;
+  box-shadow:0 2px 0 rgba(15,23,42,.02);
+}
+.trust-start-options>button:hover{box-shadow:0 14px 28px rgba(79,70,229,.14)!important}
+.trust-start-options>button>span{font-size:1.55rem!important}
+.trust-start-options strong{font-size:.86rem!important}
+.trust-start-options small{font-size:.69rem!important;line-height:1.42!important}
+.trust-start-options em{align-self:end}
+.trust-start-destinations{margin-top:13px!important;padding-top:13px;border-top:1px solid rgba(148,163,184,.2)}
+.trust-start-destinations>span{font-weight:700;color:#73839a}
+.trust-start-hub.is-compact{padding:14px 18px!important}
+.trust-start-hub.is-compact .trust-start-heading{margin:0!important}
+.trust-start-hub.is-compact .trust-start-heading h2{font-size:1.05rem!important}
+.trust-start-hub.is-compact .trust-start-heading p{display:none}
+
+.trust-friendly-guide{
+  min-height:68px;
+  padding:13px 16px!important;
+  border-radius:15px!important;
+  box-shadow:0 7px 22px rgba(15,23,42,.035);
+}
+.trust-friendly-guide>div:first-child>span{width:36px!important;height:36px!important}
+.trust-friendly-guide strong{font-size:.84rem!important}
+.trust-friendly-guide small{font-size:.69rem!important}
+.trust-friendly-guide button{padding:7px 10px!important;font-size:.65rem!important}
+.trust-friendly-guide button:first-child{border-color:#5b5bd6!important;background:rgba(91,91,214,.1)!important;color:#453cb6!important}
+
+.planify-trust-ready .bottom-nav{
+  gap:4px!important;
+  padding:6px!important;
+  border:1px solid rgba(148,163,184,.3)!important;
+  border-radius:17px!important;
+  box-shadow:0 14px 34px rgba(15,23,42,.18)!important;
+  backdrop-filter:blur(14px);
+}
+.planify-trust-ready .bottom-nav .tab-btn{
+  min-height:34px!important;
+  padding:7px 12px!important;
+  border-radius:11px!important;
+  font-size:.7rem!important;
+  font-weight:760!important;
+}
+.planify-trust-ready .bottom-nav .tab-btn.active,
+.planify-trust-ready .bottom-nav .tab-btn[aria-current="page"]{
+  box-shadow:0 5px 14px rgba(20,184,166,.22)!important;
+}
+
+.planify-trust-ready #side-panel{
+  background:linear-gradient(180deg,#fbfdff,#f4f7fb)!important;
+}
+.planify-trust-ready #side-panel .sp-container{padding:18px!important}
+.planify-trust-ready #side-panel .sp-header{padding-bottom:14px!important}
+.trust-panel-intro{margin:16px 0!important;padding:15px!important;border-radius:16px!important;box-shadow:0 8px 18px rgba(67,56,202,.06)}
+.trust-panel-intro>strong{font-size:1rem!important}
+.trust-panel-intro>p{font-size:.72rem!important}
+.trust-panel-intro button{min-height:48px!important;font-size:.62rem!important;transition:border-color .18s ease,transform .18s ease!important}
+.trust-panel-intro button:hover{border-color:#8b7ce7!important;transform:translateY(-1px)}
+.planify-trust-ready #side-panel .panel-tabs{position:sticky;top:0;z-index:2;padding:4px 0 9px;background:#f8fafc}
+.planify-trust-ready #side-panel .panel-tabs .tab-btn{min-height:39px!important;font-weight:760!important}
+.planify-trust-ready #side-panel .card-section{box-shadow:0 5px 15px rgba(15,23,42,.025)!important}
+
+body.dark .planify-trust-ready .app>.header-actions,
+body.tema-estelar:not(.light-mode) .planify-trust-ready .app>.header-actions{
+  background:rgba(15,26,45,.82)!important;
+  border-color:rgba(104,129,163,.48)!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.28)!important;
+}
+body.dark .planify-trust-ready #schedule-change-open,
+body.tema-estelar:not(.light-mode) .planify-trust-ready #schedule-change-open{color:#d7d4ff!important}
+body.dark .planify-trust-ready #planify-focus-open,
+body.tema-estelar:not(.light-mode) .planify-trust-ready #planify-focus-open{color:#98f0e4!important}
+body.dark .trust-start-destinations,
+body.tema-estelar:not(.light-mode) .trust-start-destinations{border-color:rgba(148,163,184,.22)!important}
+body.dark .trust-start-destinations>span,
+body.tema-estelar:not(.light-mode) .trust-start-destinations>span{color:#bdcadc!important}
+body.dark .trust-friendly-guide button:first-child,
+body.tema-estelar:not(.light-mode) .trust-friendly-guide button:first-child{background:rgba(129,140,248,.2)!important;color:#eeeefe!important;border-color:#818cf8!important}
+body.dark .planify-trust-ready #side-panel,
+body.tema-estelar:not(.light-mode) .planify-trust-ready #side-panel{background:linear-gradient(180deg,#101a2e,#111d31)!important;border-color:#354964!important}
+body.dark .planify-trust-ready #side-panel .panel-tabs,
+body.tema-estelar:not(.light-mode) .planify-trust-ready #side-panel .panel-tabs{background:#101a2e!important}
+
+@media (max-width:820px){
+  .planify-trust-ready .app>#main-title{margin-top:17px!important;font-size:1.55rem!important}
+  .planify-trust-ready .app>.header-actions{width:calc(100% - 20px)!important;gap:5px!important;margin-bottom:16px!important}
+  .planify-trust-ready .header-actions button,.planify-trust-ready .header-actions .icon-btn{flex:1 1 auto;padding:8px 9px!important;font-size:.68rem!important}
+  .planify-trust-ready #welcome-flow-open{flex:1 1 48%!important}
+  .trust-start-hub{width:calc(100% - 20px)!important;margin-bottom:16px!important}
+  .trust-start-hub.is-compact .trust-start-heading{align-items:flex-start!important;flex-direction:column!important}
+  .trust-start-hub.is-compact .trust-start-heading>button{width:100%}
+  .trust-friendly-guide{align-items:flex-start!important}
+  .planify-trust-ready #side-panel{
+    box-sizing:border-box!important;
+    width:94vw!important;
+    max-width:390px!important;
+    left:calc(-94vw - 8px)!important;
+    padding:18px 14px 54px!important;
+  }
+  .planify-trust-ready #side-panel.open{left:0!important}
+  .planify-trust-ready #cloud-btn{left:0!important;width:38px!important}
+  .planify-trust-ready #cloud-btn.open{left:calc(94vw - 38px)!important}
+  .planify-trust-ready #side-panel .sp-container{padding:14px!important}
+}
+@media (max-width:520px){
+  .planify-trust-ready .app>.header-actions{padding:4px!important;border-radius:14px!important}
+  .planify-trust-ready .header-actions button,.planify-trust-ready .header-actions .icon-btn{min-height:35px!important;font-size:.64rem!important}
+  .planify-trust-ready #schedule-change-open{display:none!important}
+  .trust-start-hub{padding:15px!important;border-radius:18px!important}
+  .trust-start-heading h2{font-size:1.07rem!important}
+  .trust-start-heading p{font-size:.72rem!important}
+  .trust-start-options>button{min-height:92px!important;padding:13px!important}
+  .trust-friendly-guide{gap:10px!important;padding:12px!important}
+  .trust-friendly-guide>div:last-child{gap:5px!important}
+  .trust-friendly-guide button{flex:1 1 46%;font-size:.62rem!important}
+  .planify-trust-ready .bottom-nav .tab-btn{padding:7px 10px!important;font-size:.66rem!important}
+  .trust-panel-intro>div{grid-template-columns:1fr!important}
+  .trust-panel-intro button{min-height:38px!important;text-align:left!important;padding:8px 10px!important}
+}

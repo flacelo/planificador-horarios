@@ -4,6 +4,15 @@ const path = require('path');
 const crypto = require('crypto');
 
 const PORT = 3000;
+// Las rutas administrativas solo se habilitan cuando el token existe en el
+// entorno del servidor. Nunca dejamos una credencial de demostración fija en
+// el código ni la exponemos al navegador.
+const ADMIN_TOKEN = process.env.PLANIFY_ADMIN_TOKEN || '';
+
+function validarTokenAdmin(token) {
+  return Boolean(ADMIN_TOKEN) && token === ADMIN_TOKEN;
+}
+
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -17,12 +26,12 @@ const MIME = {
 // Persistent mock stores
 var sesionesPorUsuario = {};
 var usuariosAdmin = [
-  { id: 1, nombre: 'Carlos López', correo: 'carlos@email.com', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
-  { id: 2, nombre: 'María García', correo: 'maria@email.com', licencia: 'Mensual', estado: 'Activo', ultimoAcceso: '2026-07-09' },
-  { id: 3, nombre: 'José Ramos', correo: 'jose@email.com', licencia: 'Demo', estado: 'Pendiente', ultimoAcceso: '2026-07-08' },
-  { id: 4, nombre: 'Ana Torres', correo: 'ana@email.com', licencia: 'Mensual', estado: 'Vencido', ultimoAcceso: '2026-06-15' },
-  { id: 5, nombre: 'Luis Fernández', correo: 'luis@email.com', licencia: 'Demo', estado: 'Activo', ultimoAcceso: '2026-07-10' },
-  { id: 6, nombre: 'Sofía Castillo', correo: 'sofia@email.com', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
+  { id: 1, nombre: 'Usuario Demo 1', correo: 'demo-1@example.invalid', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
+  { id: 2, nombre: 'Usuario Demo 2', correo: 'demo-2@example.invalid', licencia: 'Mensual', estado: 'Activo', ultimoAcceso: '2026-07-09' },
+  { id: 3, nombre: 'Usuario Demo 3', correo: 'demo-3@example.invalid', licencia: 'Demo', estado: 'Pendiente', ultimoAcceso: '2026-07-08' },
+  { id: 4, nombre: 'Usuario Demo 4', correo: 'demo-4@example.invalid', licencia: 'Mensual', estado: 'Vencido', ultimoAcceso: '2026-06-15' },
+  { id: 5, nombre: 'Usuario Demo 5', correo: 'demo-5@example.invalid', licencia: 'Demo', estado: 'Activo', ultimoAcceso: '2026-07-10' },
+  { id: 6, nombre: 'Usuario Demo 6', correo: 'demo-6@example.invalid', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
 ];
 var serialesLicencia = {};
 var sesionesPago = {};
@@ -123,7 +132,9 @@ http.createServer((req, res) => {
         }
         var token = crypto.randomBytes(24).toString('hex');
         var expira = new Date(Date.now() + 30 * 60 * 1000).toISOString();
-        console.log('[RECOVER] Email:', email, 'Token:', token, 'Expira:', expira);
+        // En producción este token debe enviarse mediante un proveedor de
+        // correo. Nunca se imprime en consola ni se devuelve en la respuesta.
+        console.log('[RECOVER] Solicitud recibida. Expira:', expira);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: true, message: 'Enlace enviado' }));
       } catch(e) {
@@ -139,7 +150,7 @@ http.createServer((req, res) => {
   if (req.method === 'GET' && req.url.startsWith('/api/admin/users')) {
     var params = new URL(req.url, 'http://localhost').searchParams;
     var token = params.get('token') || '';
-    if (token !== 'admin123') {
+    if (!validarTokenAdmin(token)) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: false, error: 'No autorizado' }));
       return;
@@ -156,7 +167,7 @@ http.createServer((req, res) => {
     req.on('end', function() {
       try {
         var data = JSON.parse(body);
-        if (data.token !== 'admin123') {
+        if (!validarTokenAdmin(data.token)) {
           res.writeHead(401, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ ok: false, error: 'No autorizado' }));
           return;

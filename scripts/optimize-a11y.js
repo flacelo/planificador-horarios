@@ -10,10 +10,16 @@ const files = {
 
 // ── Optimize HTML: ARIA, meta, SEO, headings ──
 function optimizeHTML(html) {
-  // 1) Meta description + keywords (after last existing meta)
+  // 1) Meta description + keywords (idempotente: cada build deja una sola
+  // copia y evita acumular etiquetas duplicadas en index.html).
+  const seoDescription = 'PLANIFY — Planificador de horarios inteligente. Organiza tus actividades académicas, laborales y personales con dashboard de cumplimiento, balance de vida y reportes semanales.';
+  const seoKeywords = 'planificador, horarios, productividad, gestión del tiempo, planner, organización, estudio, trabajo';
+  html = html.replace(/<meta\s+name=["']description["'][^>]*>/gi, '');
+  html = html.replace(/<meta\s+name=["']keywords["'][^>]*>/gi, '');
+  html = html.replace(/<meta\s+property=["']og:[^>]*>/gi, '');
   html = html.replace(
     '<meta name="mobile-web-app-capable" content="yes">',
-    '<meta name="mobile-web-app-capable" content="yes"><meta name="description" content="PLANIFY — Planificador de horarios inteligente. Organiza tus actividades académicas, laborales y personales con dashboard de cumplimiento, balance de vida y reportes semanales."><meta name="keywords" content="planificador, horarios, productividad, gestión del tiempo, planner, organización, estudio, trabajo">'
+    '<meta name="mobile-web-app-capable" content="yes"><meta name="description" content="' + seoDescription + '"><meta name="keywords" content="' + seoKeywords + '"><meta property="og:title" content="PLANIFY — Planificador de horarios"><meta property="og:description" content="Organiza tus estudios, trabajo, hábitos y proyectos en un solo lugar."><meta property="og:type" content="website"><meta property="og:url" content="https://planificador-horarios-dun.vercel.app/">'
   );
 
   // 2) ARIA: close buttons & icon-only buttons
@@ -90,6 +96,12 @@ function optimizeHTML(html) {
   html = html.replace('<button class="t-skip" onclick="cerrarTutorial()">Saltar</button>', '<button class="t-skip" onclick="cerrarTutorial()" aria-label="Saltar tutorial">Saltar</button>');
   html = html.replace('<button class="t-prev" onclick="pasoTutorial(-1)" style="display:none;" id="t-prev">← Anterior</button>', '<button class="t-prev" onclick="pasoTutorial(-1)" style="display:none;" id="t-prev" aria-label="Paso anterior">← Anterior</button>');
   html = html.replace('<button class="t-next" onclick="pasoTutorial(1)" id="t-next">Siguiente →</button>', '<button class="t-next" onclick="pasoTutorial(1)" id="t-next" aria-label="Paso siguiente">Siguiente →</button>');
+
+  // No publicar SDKs con identificadores de aplicación ficticios.
+  html = html.replace(/<script[^>]*connect\.facebook\.net[^>]*YOUR_FACEBOOK_APP_ID[^>]*><\/script>/gi, '');
+  html = html.replace(/<script[^>]*accounts\.google\.com\/gsi\/client[^>]*><\/script>/gi, '');
+  html = html.replace(/data-client_id=["']YOUR_GOOGLE_CLIENT_ID\.apps\.googleusercontent\.com["']/gi, 'data-client_id=""');
+  html = html.replace(/admin123/gi, 'credencial del servidor');
 
   return html;
 }

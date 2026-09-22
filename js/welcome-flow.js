@@ -1328,7 +1328,14 @@
         caffeineCutoff: state.caffeineCutoff,
         sleepChallenge: state.sleepChallenge,
         movementStyle: state.movementStyle,
-        movementMinutes: state.movementMinutes
+        movementMinutes: state.movementMinutes,
+        reminders: state.reminders,
+        waterEvery: state.waterEvery,
+        medicineName: state.medicineName,
+        medicineTime: state.medicineTime,
+        customReminder: state.customReminder,
+        customReminderTime: state.customReminderTime,
+        technique: state.technique
       }));
     } catch (error) {
       try {

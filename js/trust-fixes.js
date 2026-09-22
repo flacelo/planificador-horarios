@@ -146,6 +146,44 @@
     return hours ? (Math.round(hours * 10) / 10).toLocaleString("es-PE") + " h" : "0 h";
   }
 
+  function readFocusStats() {
+    try {
+      var stored = JSON.parse(localStorage.getItem("planify_focus_session_v1") || "null") || {};
+      return {
+        completedMinutes: Math.max(0, Number(stored.completedMinutes) || 0),
+        completedSessions: Math.max(0, Number(stored.completedSessions) || 0)
+      };
+    } catch (error) {
+      return { completedMinutes: 0, completedSessions: 0 };
+    }
+  }
+
+  function formatFocusMinutes(minutes) {
+    if (!minutes) return "0 min";
+    if (minutes < 60) return minutes + " min";
+    var hours = Math.floor(minutes / 60);
+    var remainder = minutes % 60;
+    return hours + " h" + (remainder ? " " + remainder + " min" : "");
+  }
+
+  function weeklyPulseMarkup(metrics, focusStats) {
+    var labels = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+    var bestIndex = -1;
+    var bestCompleted = 0;
+    metrics.completedByDay.forEach(function (count, index) {
+      if (count > bestCompleted) { bestCompleted = count; bestIndex = index; }
+    });
+    var focusBoost = Math.min(20, Number(focusStats.completedSessions || 0) * 4);
+    var rhythm = metrics.total ? Math.min(100, Math.round(metrics.percent * 0.8 + focusBoost)) : 0;
+    var growth = metrics.completed + Number(focusStats.completedSessions || 0);
+    var plant = growth >= 14 ? "🌳" : growth >= 7 ? "🌿" : growth >= 2 ? "🪴" : "🌱";
+    var growthText = growth >= 14 ? "Tu constancia ya tiene raíces" : growth >= 7 ? "Tu ritmo empieza a sostenerse" : growth >= 2 ? "Ya hay avances que cuidar" : "Una acción real inicia el crecimiento";
+    var bestText = bestIndex >= 0 ? labels[bestIndex] + " fue tu día más avanzado" : "Aún no hay un día con avances";
+    return '<section class="trust-week-pulse"><div class="trust-pulse-ring" style="--pulse:' + rhythm + '%"><strong>' + rhythm + '%</strong><span>RITMO</span></div>' +
+      '<div class="trust-pulse-copy"><span>LECTURA DE TU SEMANA</span><h3>' + (metrics.total ? "Tu ritmo se construye con acciones reales" : "Tu ritmo empezará con tu primer bloque") + '</h3><p>' + (metrics.total ? "El ritmo combina el cumplimiento de tu horario y las sesiones de enfoque terminadas. No es una calificación: es una señal para decidir qué ajustar." : "Cuando agregues actividades y marques avances, aquí verás una lectura simple de tu progreso.") + '</p><div class="trust-pulse-details"><span><b>' + metrics.completed + '</b> bloques hechos</span><span><b>' + focusStats.completedSessions + '</b> sesiones de enfoque</span><span>' + escapeHtml(bestText) + '</span></div></div>' +
+      '<div class="trust-pulse-garden"><span>' + plant + '</span><div><strong>Tu jardín de progreso</strong><small>' + escapeHtml(growthText) + '</small></div></div></section>';
+  }
+
   function dashboardCard(label, value, note, color) {
     return '<article class="trust-metric" style="--metric-color:' + color + '">' +
       '<span class="trust-metric-label">' + escapeHtml(label) + '</span>' +
@@ -176,7 +214,7 @@
     }).join("");
   }
 
-  function dashboardRecommendations(metrics, profile) {
+  function dashboardRecommendations(metrics, profile, focusStats) {
     var ideas = [];
     if (!metrics.total) ideas.push(["🌱", "Crea tu primera semana", "Elige una de las rutas guiadas y obtendrás una base que luego podrás editar.", "start"]);
     else if (metrics.percent < 35) ideas.push(["🎯", "Haz más pequeña la próxima acción", "Tu cumplimiento está por debajo de 35 %. Reduce un bloque o deja más margen entre compromisos.", "change"]);
@@ -186,11 +224,12 @@
     if (profile.sleepChallenge && profile.sleepChallenge !== "none") ideas.push(["🌙", "Cuida el cierre del día", "Reserva una rutina tranquila y busca orientación profesional si el problema de sueño persiste.", "preferences"]);
     if (profile.foodProfile && profile.foodProfile !== "none") ideas.push(["🍽️", "Hazlo personal y observable", "Conserva horarios regulares y registra qué alimentos toleras; evita cambiar una dieta clínica sin orientación profesional.", "preferences"]);
     if (Array.isArray(profile.ventures) && profile.ventures.length) ideas.push(["🚀", "Dale un siguiente paso a tu emprendimiento", "Reserva un avance concreto para " + (profile.ventures[0].name || "tu emprendimiento") + ", no solo tiempo genérico.", "change"]);
+    if (metrics.total && !focusStats.completedSessions) ideas.push(["⏱️", "Prueba una sesión de enfoque", "Elige un bloque pequeño y trabaja sin intentar resolver toda la semana de una vez.", "focus"]);
     return ideas.slice(0, 3);
   }
 
-  function recommendationMarkup(metrics, profile) {
-    return dashboardRecommendations(metrics, profile).map(function (idea) {
+  function recommendationMarkup(metrics, profile, focusStats) {
+    return dashboardRecommendations(metrics, profile, focusStats).map(function (idea) {
       return '<article class="trust-recommendation"><span>' + idea[0] + '</span><div><strong>' + escapeHtml(idea[1]) + '</strong><p>' + escapeHtml(idea[2]) + '</p></div><button type="button" data-dashboard-action="' + idea[3] + '">Aplicar</button></article>';
     }).join("");
   }
@@ -201,6 +240,7 @@
     if (existing) existing.remove();
     var metrics = calculateMetrics();
     var profile = readPersonalProfile();
+    var focusStats = readFocusStats();
     var name = String(profile.name || localStorage.getItem("planify_nombre") || "").trim().split(/\s+/)[0];
     var overlay = document.createElement("section");
     overlay.id = "planify-dashboard-safe";
@@ -210,17 +250,19 @@
     overlay.setAttribute("aria-label", "Dashboard de progreso");
     overlay.innerHTML = '<div class="trust-dashboard-inner"><header class="trust-dashboard-header"><div><span class="trust-dashboard-eyebrow">TU SEMANA, CON DATOS REALES</span><h2>' + escapeHtml(name ? "Hola, " + name : "Tu centro de progreso") + '</h2>' +
       '<p>Entiende qué estás cumpliendo, cómo repartes tu tiempo y cuál sería el siguiente ajuste más útil.</p></div><button type="button" id="trust-dashboard-close">✕ Volver al planificador</button></header>' +
+      weeklyPulseMarkup(metrics, focusStats) +
       '<div class="trust-metrics">' +
       dashboardCard("Cumplimiento semanal", metrics.percent + "%", metrics.total ? "Basado en actividades reales" : "Agrega actividades para comenzar", "#38bdf8") +
       dashboardCard("Tareas finalizadas", metrics.completed + " / " + metrics.total, metrics.total ? "Horario semanal actual" : "Aún no hay tareas", "#a855f7") +
       dashboardCard("Días completados", metrics.daysCompleted + " / " + metrics.plannedDayCount, "Días planificados con todo hecho", "#4ade80") +
       dashboardCard("Áreas planificadas", metrics.areaCount + " / 5", metrics.total ? "Variedad presente, sin inventar un puntaje" : "Aún no hay áreas", "#facc15") +
+      dashboardCard("Enfoque completado", formatFocusMinutes(focusStats.completedMinutes), focusStats.completedSessions ? focusStats.completedSessions + (focusStats.completedSessions === 1 ? " sesión terminada" : " sesiones terminadas") : "Inicia una sesión cuando quieras", "#fb7185") +
       '</div>' +
       (metrics.total ? "" : '<div class="trust-empty"><span>🌱</span><div><strong>Tu dashboard está listo para crecer contigo</strong><p>Crea o carga un horario y aquí aparecerá tu progreso real, sin datos de ejemplo.</p></div></div>') +
       '<div class="trust-dashboard-grid"><article class="trust-chart"><h3>Actividades por día</h3><div class="trust-bars">' + barsMarkup(metrics.byDay) + '</div></article>' +
       '<article class="trust-chart"><h3>Distribución por áreas</h3><div class="trust-categories">' + categoriesMarkup(metrics) + '</div></article></div>' +
-      '<section class="trust-dashboard-recommendations"><div><span>RECOMENDACIONES PERSONALIZADAS</span><h3>Lo siguiente que te conviene ajustar</h3><p>No son frases genéricas: parten de tu horario, tu cumplimiento y las preferencias que decidiste guardar.</p></div><div class="trust-recommendation-list">' + recommendationMarkup(metrics, profile) + '</div></section>' +
-      '<footer class="trust-dashboard-actions"><button type="button" data-dashboard-action="change">🪄 Pedir un cambio</button><button type="button" data-dashboard-action="preferences">⚙️ Revisar preferencias</button><small>Bienestar: PLANIFY ofrece orientación general y recordatorios. No diagnostica ni recomienda medicamentos, suplementos o dosis.</small></footer></div>';
+      '<section class="trust-dashboard-recommendations"><div><span>RECOMENDACIONES PERSONALIZADAS</span><h3>Lo siguiente que te conviene ajustar</h3><p>No son frases genéricas: parten de tu horario, tu cumplimiento y las preferencias que decidiste guardar.</p></div><div class="trust-recommendation-list">' + recommendationMarkup(metrics, profile, focusStats) + '</div></section>' +
+      '<footer class="trust-dashboard-actions"><button type="button" data-dashboard-action="focus">⏱️ Iniciar enfoque</button><button type="button" data-dashboard-action="change">🪄 Pedir un cambio</button><button type="button" data-dashboard-action="preferences">⚙️ Revisar preferencias</button><small>Bienestar: PLANIFY ofrece orientación general y recordatorios. No diagnostica ni recomienda medicamentos, suplementos o dosis.</small></footer></div>';
     document.body.appendChild(overlay);
     previousBodyOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -385,6 +427,114 @@
     anchor.parentNode.insertBefore(hub, anchor);
   }
 
+  function ensureFocusEntry() {
+    if (document.getElementById("planify-focus-open")) return;
+    var actions = document.querySelector(".header-actions");
+    if (!actions) return;
+    var button = document.createElement("button");
+    button.type = "button";
+    button.id = "planify-focus-open";
+    button.className = "trust-focus-entry";
+    button.innerHTML = "⏱️ <span>Enfoque</span>";
+    button.setAttribute("aria-label", "Abrir temporizador de enfoque");
+    actions.insertBefore(button, actions.firstChild);
+  }
+
+  function loadFocusExperience() {
+    if (!document.getElementById("planify-focus-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-focus-style";
+      style.rel = "stylesheet";
+      style.href = "css/focus-session.css?v=1";
+      document.head.appendChild(style);
+    }
+    if (!document.getElementById("planify-focus-script")) {
+      var script = document.createElement("script");
+      script.id = "planify-focus-script";
+      script.src = "js/focus-session.js?v=3";
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadReminderService() {
+    if (document.getElementById("planify-reminder-script")) return;
+    var script = document.createElement("script");
+    script.id = "planify-reminder-script";
+    script.src = "js/reminder-service.js?v=1";
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
+  function loadDayFlow() {
+    if (!document.getElementById("planify-day-flow-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-day-flow-style";
+      style.rel = "stylesheet";
+      style.href = "css/day-flow.css?v=1";
+      document.head.appendChild(style);
+    }
+    if (!document.getElementById("planify-day-flow-script")) {
+      var script = document.createElement("script");
+      script.id = "planify-day-flow-script";
+      script.src = "js/day-flow.js?v=2";
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadDashboardPolish() {
+    if (document.getElementById("planify-dashboard-polish")) return;
+    var style = document.createElement("link");
+    style.id = "planify-dashboard-polish";
+    style.rel = "stylesheet";
+    style.href = "css/dashboard-polish.css?v=1";
+    document.head.appendChild(style);
+  }
+
+  function loadInterfacePolish() {
+    if (document.getElementById("planify-interface-polish")) return;
+    var style = document.createElement("link");
+    style.id = "planify-interface-polish";
+    style.rel = "stylesheet";
+    style.href = "css/interface-polish.css?v=2";
+    document.head.appendChild(style);
+  }
+
+  function loadPwaExperience() {
+    if (!document.getElementById("planify-pwa-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-pwa-style";
+      style.rel = "stylesheet";
+      style.href = "css/pwa-experience.css?v=1";
+      document.head.appendChild(style);
+    }
+    if (!document.getElementById("planify-pwa-script")) {
+      var script = document.createElement("script");
+      script.id = "planify-pwa-script";
+      script.src = "js/pwa-experience.js?v=1";
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadMobileCoach() {
+    if (!document.getElementById("planify-mobile-coach-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-mobile-coach-style";
+      style.rel = "stylesheet";
+      style.href = "css/mobile-coach.css?v=1";
+      document.head.appendChild(style);
+    }
+    if (!document.getElementById("planify-mobile-coach-script")) {
+      var script = document.createElement("script");
+      script.id = "planify-mobile-coach-script";
+      script.src = "js/mobile-coach.js?v=2";
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }
+
   document.addEventListener("click", function (event) {
     var target = event.target;
     if (!(target instanceof Element)) return;
@@ -417,6 +567,7 @@
         if (window.PLANIFY_WELCOME && typeof window.PLANIFY_WELCOME.requestChange === "function") window.PLANIFY_WELCOME.requestChange();
         else { var changeButton = document.getElementById("schedule-change-open"); if (changeButton) changeButton.click(); }
       }
+      if (dashboardActionName === "focus" && window.PLANIFY_FOCUS && typeof window.PLANIFY_FOCUS.open === "function") window.PLANIFY_FOCUS.open();
       if (dashboardActionName === "preferences") openPanel("tab-perfil");
       return;
     }
@@ -431,6 +582,11 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       openTutorial();
+      return;
+    }
+    if (target.closest("#planify-focus-open")) {
+      event.preventDefault();
+      if (window.PLANIFY_FOCUS && typeof window.PLANIFY_FOCUS.open === "function") window.PLANIFY_FOCUS.open();
       return;
     }
     var trustAction = target.closest("[data-trust-action]");
@@ -483,7 +639,7 @@
     if (!document.getElementById("welcome-flow-script")) {
       var welcomeScript = document.createElement("script");
       welcomeScript.id = "welcome-flow-script";
-      welcomeScript.src = "js/welcome-flow.js?v=1.17";
+      welcomeScript.src = "js/welcome-flow.js?v=1.18";
       welcomeScript.defer = true;
       document.head.appendChild(welcomeScript);
     }
@@ -491,6 +647,14 @@
     ensurePanelExperience();
     ensureDashboardNav();
     ensureStartHub();
+    ensureFocusEntry();
+    loadFocusExperience();
+    loadReminderService();
+    loadInterfacePolish();
+    loadPwaExperience();
+    loadMobileCoach();
+    loadDayFlow();
+    loadDashboardPolish();
     window.setTimeout(ensurePersonalGuidance, 500);
     new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
@@ -505,6 +669,7 @@
         ensurePanelExperience();
         ensureDashboardNav();
         ensureStartHub();
+        ensureFocusEntry();
       }, 80);
     }).observe(document.body, { childList: true });
   }

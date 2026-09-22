@@ -1,4 +1,19 @@
 planificador-horarios-main.zip
 .env
+.env.*
+!.env.example
 node_modules/
+.vercel/
+
+# Archivos locales de trabajo y contexto del agente
+.opencode/agents/
+.opencode/context/
+.opencode/context/task.json
+.opencode/context/review_feedback.txt
+agents.md
+
+# Archivos de sistema y editor
+.DS_Store
+Thumbs.db
+.vscode/
 

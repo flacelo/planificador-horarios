@@ -16,10 +16,6 @@ const SRC_FILES = [
   'scripts/check-env.js'
 ];
 
-const ALLOWED = [
-  /admin123/,           // mock admin token
-];
-
 const SENSITIVE_PATTERNS = [
   /your-google-client-id/i,
   /your-apple-developer-token/i,
@@ -96,6 +92,10 @@ function scanBuiltFiles() {
       warn(rel + ': contiene placeholder your-apple-developer-token — reemplazar antes de deploy');
       clean = false;
     }
+    if (content.includes('YOUR_GOOGLE_CLIENT_ID') || content.includes('YOUR_FACEBOOK_APP_ID')) {
+      warn(rel + ': contiene un identificador de integración pendiente — configurar antes de deploy');
+      clean = false;
+    }
   }
   return clean;
 }
@@ -138,7 +138,7 @@ function run() {
 }
 
 function isAllowed(value) {
-  return ALLOWED.some(function(re) { return re.test(value); });
+  return false;
 }
 
 module.exports = { run };

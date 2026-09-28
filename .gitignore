@@ -3,6 +3,7 @@ planificador-horarios-main.zip
 .env.*
 !.env.example
 node_modules/
+dist/
 .vercel/
 
 # Archivos locales de trabajo y contexto del agente

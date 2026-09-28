@@ -1,0 +1,35 @@
+{
+  "backupFormat": "planify-backup",
+  "backupVersion": 3,
+  "tipo": "Semanal",
+  "dias": ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+  "filas": [{
+    "hora": "09:00 – 10:00",
+    "celdas": [
+      { "t": "Horario importado" }, { "t": "" }, { "t": "" }, { "t": "" }, { "t": "" }, { "t": "" }, { "t": "" }
+    ]
+  }],
+  "nombre": "Perfil importado v3",
+  "carrera": "Prueba",
+  "especialidad": "",
+  "ciclo": "",
+  "objetivo": "Comprobar fusión por fecha",
+  "header": "Copia v3 remota",
+  "diario": { "estadoV1": { "schemaVersion": 1, "activeDate": "", "days": {} }, "legacy": {} },
+  "cumplimiento": { "historialV1": {
+    "schemaVersion": 1,
+    "trackingStartedAt": "2026-09-20T12:00:00.000Z",
+    "days": {
+      "2026-09-21": {
+        "updatedAt": "2026-09-21T20:00:00.000Z",
+        "activities": { "remoto-lunes": false },
+        "snapshot": { "remoto-lunes": { "title": "Copia reemplaza el lunes en conflicto", "hours": 2 } }
+      },
+      "2026-09-22": {
+        "updatedAt": "2026-09-22T20:00:00.000Z",
+        "activities": { "remoto-martes": true },
+        "snapshot": { "remoto-martes": { "title": "Marca remota del martes", "hours": 1 } }
+      }
+    }
+  } }
+}

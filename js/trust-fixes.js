@@ -9,6 +9,9 @@
     "#dashboard-view"
   ];
   var previousBodyOverflow = "";
+  var previousHtmlOverflow = "";
+  var dashboardReturnFocus = null;
+  var dashboardSelectedWeekStart = null;
   var tutorialStep = 0;
 
   var TUTORIAL_STEPS = [
@@ -61,6 +64,11 @@
   }
 
   function rowDurationHours(rows, index, cell) {
+    var scheduleTime = window.PLANIFY_SCHEDULE_TIME;
+    if (scheduleTime && typeof scheduleTime.activityInterval === "function") {
+      var actual = scheduleTime.activityInterval(rows, index, cell, 60);
+      if (actual.ok) return actual.durationMinutes / 60;
+    }
     var label = String(rows[index] && rows[index].hora || "");
     var times = label.match(/\d{1,2}:\d{2}/g) || [];
     var start = timeToMinutes(times[0]);
@@ -87,10 +95,12 @@
     return "Otros";
   }
 
-  function calculateMetrics() {
+  function calculateMetrics(weekStart) {
     var schedule = readSchedule();
     var byDay = Array.from({ length: Math.max(7, schedule.dias.length || 0) }, function () { return 0; });
     var completedByDay = Array.from({ length: Math.max(7, schedule.dias.length || 0) }, function () { return 0; });
+    var history = window.PLANIFY_COMPLETION_HISTORY;
+    var dated = history && typeof history.weekStats === "function" ? history.weekStats(schedule, weekStart) : null;
     var categories = {};
     var total = 0;
     var completed = 0;
@@ -101,10 +111,6 @@
       cells.forEach(function (cell, dayIndex) {
         if (!isMeaningfulCell(cell)) return;
         total += 1;
-        if (cell.done || cell.completada) {
-          completed += 1;
-          completedByDay[dayIndex] = (completedByDay[dayIndex] || 0) + 1;
-        }
         byDay[dayIndex] = (byDay[dayIndex] || 0) + 1;
         var duration = rowDurationHours(schedule.filas, rowIndex, cell);
         hours += duration;
@@ -113,6 +119,7 @@
       });
     });
 
+    var plannedDayCount = byDay.slice(0, 7).filter(function (count) { return count > 0; }).length;
     var dominant = "Sin datos";
     var dominantHours = 0;
     Object.keys(categories).forEach(function (name) {
@@ -122,6 +129,11 @@
       }
     });
 
+    if (dated) {
+      completed = dated.completed;
+      byDay = dated.trackedByDay.slice();
+      completedByDay = dated.completedByDay.slice();
+    }
     var daysCompleted = byDay.reduce(function (count, dayTotal, index) {
       return count + (dayTotal > 0 && completedByDay[index] === dayTotal ? 1 : 0);
     }, 0);
@@ -129,12 +141,18 @@
     return {
       total: total,
       completed: completed,
-      percent: total ? Math.round(completed * 100 / total) : 0,
+      percent: dated ? dated.percent : 0,
+      trackedTotal: dated ? dated.trackedTotal : 0,
       hours: hours,
       byDay: byDay.slice(0, 7),
       completedByDay: completedByDay.slice(0, 7),
       daysCompleted: daysCompleted,
-      plannedDayCount: byDay.filter(function (count) { return count > 0; }).length,
+      recordedDayCount: dated ? dated.recordedDayCount : 0,
+      hasHistory: Boolean(dated && dated.hasHistory),
+      weekStart: dated ? dated.weekStart : weekStart || "",
+      datesByDay: dated ? dated.datesByDay : [],
+      recordedByDay: dated ? dated.recordedByDay : [],
+      plannedDayCount: plannedDayCount,
       areaCount: areaCount,
       categories: categories,
       dominant: dominant,
@@ -166,22 +184,20 @@
     return hours + " h" + (remainder ? " " + remainder + " min" : "");
   }
 
-  function weeklyPulseMarkup(metrics, focusStats) {
-    var labels = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-    var bestIndex = -1;
-    var bestCompleted = 0;
-    metrics.completedByDay.forEach(function (count, index) {
-      if (count > bestCompleted) { bestCompleted = count; bestIndex = index; }
-    });
-    var focusBoost = Math.min(20, Number(focusStats.completedSessions || 0) * 4);
-    var rhythm = metrics.total ? Math.min(100, Math.round(metrics.percent * 0.8 + focusBoost)) : 0;
-    var growth = metrics.completed + Number(focusStats.completedSessions || 0);
-    var plant = growth >= 14 ? "🌳" : growth >= 7 ? "🌿" : growth >= 2 ? "🪴" : "🌱";
-    var growthText = growth >= 14 ? "Tu constancia ya tiene raíces" : growth >= 7 ? "Tu ritmo empieza a sostenerse" : growth >= 2 ? "Ya hay avances que cuidar" : "Una acción real inicia el crecimiento";
-    var bestText = bestIndex >= 0 ? labels[bestIndex] + " fue tu día más avanzado" : "Aún no hay un día con avances";
-    return '<section class="trust-week-pulse"><div class="trust-pulse-ring" style="--pulse:' + rhythm + '%"><strong>' + rhythm + '%</strong><span>RITMO</span></div>' +
-      '<div class="trust-pulse-copy"><span>LECTURA DE TU SEMANA</span><h3>' + (metrics.total ? "Tu ritmo se construye con acciones reales" : "Tu ritmo empezará con tu primer bloque") + '</h3><p>' + (metrics.total ? "El ritmo combina el cumplimiento de tu horario y las sesiones de enfoque terminadas. No es una calificación: es una señal para decidir qué ajustar." : "Cuando agregues actividades y marques avances, aquí verás una lectura simple de tu progreso.") + '</p><div class="trust-pulse-details"><span><b>' + metrics.completed + '</b> bloques hechos</span><span><b>' + focusStats.completedSessions + '</b> sesiones de enfoque</span><span>' + escapeHtml(bestText) + '</span></div></div>' +
-      '<div class="trust-pulse-garden"><span>' + plant + '</span><div><strong>Tu jardín de progreso</strong><small>' + escapeHtml(growthText) + '</small></div></div></section>';
+  function dashboardLeadMarkup(metrics) {
+    var message = !metrics.hasHistory ? "Empieza a registrar cómo te fue esta semana." :
+      metrics.percent === 100 ? "Has marcado todos los bloques de tu horario." :
+      metrics.percent >= 50 ? "Ya marcaste más de la mitad de tu horario." :
+      metrics.percent > 0 ? "Cada bloque marcado cuenta. Sigue a tu ritmo." :
+      "Tu horario está preparado. Empieza por un bloque.";
+    var progressText = metrics.hasHistory ? metrics.completed + " de " + metrics.trackedTotal + " bloques marcados en fechas registradas" :
+      "Aún no hay marcas para estas fechas";
+    return '<section class="dashboard-calm-lead" aria-label="Avance del horario semanal"><div class="dashboard-calm-lead-copy">' +
+      '<span class="dashboard-calm-kicker">CUMPLIMIENTO DE ESTA SEMANA</span><h3>' + escapeHtml(message) + '</h3>' +
+      '<p>' + escapeHtml(progressText) + '</p>' +
+      '<div class="dashboard-calm-progress" role="progressbar" aria-label="Bloques marcados en el horario" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + metrics.percent + '"><span style="width:' + metrics.percent + '%"></span></div>' +
+      '<small class="dashboard-calm-history-note">' + (metrics.hasHistory ? "El avance corresponde solo a las fechas registradas; los datos anteriores no se inventaron." : "Las marcas antiguas no tenían una fecha asociada, así que no cuentan para este periodo.") + '</small></div>' +
+      '<div class="dashboard-calm-percent"><strong>' + (metrics.hasHistory ? metrics.percent + "%" : "—") + '</strong><span>' + (metrics.hasHistory ? "de los bloques registrados" : "sin datos para estas fechas") + '</span></div></section>';
   }
 
   function dashboardCard(label, value, note, color) {
@@ -190,14 +206,20 @@
       '<strong>' + escapeHtml(value) + '</strong><small>' + escapeHtml(note) + '</small></article>';
   }
 
-  function barsMarkup(values) {
+  function barsMarkup(values, completedValues, dates, recordedDays) {
     var labels = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"];
     var max = Math.max.apply(Math, values.concat([1]));
     return labels.map(function (label, index) {
       var count = values[index] || 0;
+      var completed = Math.min(count, completedValues[index] || 0);
       var height = count ? Math.max(12, Math.round(count * 100 / max)) : 3;
-      return '<div class="trust-bar-column" title="' + count + ' actividades"><span class="trust-bar-value">' + count + '</span>' +
-        '<span class="trust-bar" style="height:' + height + '%"></span><span class="trust-bar-label">' + label + '</span></div>';
+      var completion = count ? Math.round(completed * 100 / count) : 0;
+      var date = Array.isArray(dates) ? dates[index] : "";
+      var recorded = Array.isArray(recordedDays) && recordedDays[index];
+      return '<div class="trust-bar-column" role="img" aria-label="' + label + (date ? " " + date : "") + (recorded ? ': ' + completed + ' de ' + count + ' bloques registrados completados' : ': sin registro') + '" title="' + (recorded ? completed + ' de ' + count + ' bloques completados' : 'Sin registro para esta fecha') + '">' +
+        '<span class="trust-bar-value">' + (recorded ? completed + '/' + count : "—") + '</span>' +
+        '<span class="trust-bar" style="height:' + height + '%"><i class="trust-bar-completed" style="height:' + completion + '%"></i></span>' +
+        '<span class="trust-bar-label">' + label + '</span></div>';
     }).join("");
   }
 
@@ -217,7 +239,9 @@
   function dashboardRecommendations(metrics, profile, focusStats) {
     var ideas = [];
     if (!metrics.total) ideas.push(["🌱", "Crea tu primera semana", "Elige una de las rutas guiadas y obtendrás una base que luego podrás editar.", "start"]);
-    else if (metrics.percent < 35) ideas.push(["🎯", "Haz más pequeña la próxima acción", "Tu cumplimiento está por debajo de 35 %. Reduce un bloque o deja más margen entre compromisos.", "change"]);
+    else if (!metrics.hasHistory) ideas.push(["🎯", "Empieza a registrar tu avance", "Marca cada actividad al terminarla. PLANIFY la guardará en la fecha de la semana que estés planificando.", "change"]);
+    else if (!metrics.completed) ideas.push(["🎯", "Empieza por un bloque", "Tu horario está listo. Elige un bloque para comenzar y ajústalo si no encaja con tu día.", "change"]);
+    else if (metrics.percent < 35) ideas.push(["🎯", "Revisa lo que queda pendiente", "Compara tu horario con la semana que realmente tuviste y ajusta los bloques que no encajaron.", "change"]);
     else if (metrics.percent < 75) ideas.push(["↗", "Protege lo que ya funciona", "Hay avance real. Conserva tus mejores días y mueve solo lo que suele quedar pendiente.", "change"]);
     else ideas.push(["✨", "Tu sistema está funcionando", "Mantén la estructura y revisa una sola mejora para la próxima semana.", "change"]);
     if (metrics.areaCount < 3 && metrics.total) ideas.push(["⚖️", "Revisa el equilibrio", "Tu horario se concentra en pocas áreas. Decide si quieres proteger descanso, alimentación o movimiento.", "preferences"]);
@@ -228,52 +252,84 @@
     return ideas.slice(0, 3);
   }
 
-  function recommendationMarkup(metrics, profile, focusStats) {
-    return dashboardRecommendations(metrics, profile, focusStats).map(function (idea) {
-      return '<article class="trust-recommendation"><span>' + idea[0] + '</span><div><strong>' + escapeHtml(idea[1]) + '</strong><p>' + escapeHtml(idea[2]) + '</p></div><button type="button" data-dashboard-action="' + idea[3] + '">Aplicar</button></article>';
+  function recommendationMarkup(ideas) {
+    var labels = { start: "Crear horario", change: "Pedir un cambio", focus: "Iniciar enfoque", preferences: "Revisar perfil" };
+    return ideas.map(function (idea) {
+      return '<article class="dashboard-calm-idea"><span aria-hidden="true">' + idea[0] + '</span><div><strong>' + escapeHtml(idea[1]) + '</strong><p>' + escapeHtml(idea[2]) + '</p></div><button type="button" data-dashboard-action="' + idea[3] + '">' + labels[idea[3]] + '</button></article>';
     }).join("");
   }
 
+  function dashboardWeekLabel(weekStart) {
+    if (!weekStart || !window.PLANIFY_COMPLETION_HISTORY) return "Esta semana";
+    var endKey = window.PLANIFY_COMPLETION_HISTORY.addDays(weekStart, 6);
+    var start = new Date(weekStart + "T12:00:00");
+    var end = new Date(endKey + "T12:00:00");
+    var formatter = new Intl.DateTimeFormat("es-PE", { day: "numeric", month: "short", timeZone: "America/Lima" });
+    return "Semana del " + formatter.format(start) + " al " + formatter.format(end);
+  }
+
   function openDashboard() {
+    var activeElement = document.activeElement;
+    dashboardReturnFocus = activeElement && activeElement.closest && activeElement.closest("#planify-dashboard-safe") ? dashboardReturnFocus : activeElement;
     removeLegacyDashboards();
     var existing = document.getElementById("planify-dashboard-safe");
     if (existing) existing.remove();
-    var metrics = calculateMetrics();
+    var history = window.PLANIFY_COMPLETION_HISTORY;
+    var weekStart = dashboardSelectedWeekStart || (history ? history.getWeekStart() : "");
+    if (!dashboardSelectedWeekStart) dashboardSelectedWeekStart = weekStart;
+    var metrics = calculateMetrics(weekStart);
     var profile = readPersonalProfile();
     var focusStats = readFocusStats();
     var name = String(profile.name || localStorage.getItem("planify_nombre") || "").trim().split(/\s+/)[0];
     var overlay = document.createElement("section");
     overlay.id = "planify-dashboard-safe";
-    overlay.className = "trust-dashboard";
+    overlay.className = "trust-dashboard planify-dashboard-v2";
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.setAttribute("aria-label", "Dashboard de progreso");
-    overlay.innerHTML = '<div class="trust-dashboard-inner"><header class="trust-dashboard-header"><div><span class="trust-dashboard-eyebrow">TU SEMANA, CON DATOS REALES</span><h2>' + escapeHtml(name ? "Hola, " + name : "Tu centro de progreso") + '</h2>' +
-      '<p>Entiende qué estás cumpliendo, cómo repartes tu tiempo y cuál sería el siguiente ajuste más útil.</p></div><button type="button" id="trust-dashboard-close">✕ Volver al planificador</button></header>' +
-      weeklyPulseMarkup(metrics, focusStats) +
-      '<div class="trust-metrics">' +
-      dashboardCard("Cumplimiento semanal", metrics.percent + "%", metrics.total ? "Basado en actividades reales" : "Agrega actividades para comenzar", "#38bdf8") +
-      dashboardCard("Tareas finalizadas", metrics.completed + " / " + metrics.total, metrics.total ? "Horario semanal actual" : "Aún no hay tareas", "#a855f7") +
-      dashboardCard("Días completados", metrics.daysCompleted + " / " + metrics.plannedDayCount, "Días planificados con todo hecho", "#4ade80") +
-      dashboardCard("Áreas planificadas", metrics.areaCount + " / 5", metrics.total ? "Variedad presente, sin inventar un puntaje" : "Aún no hay áreas", "#facc15") +
-      dashboardCard("Enfoque completado", formatFocusMinutes(focusStats.completedMinutes), focusStats.completedSessions ? focusStats.completedSessions + (focusStats.completedSessions === 1 ? " sesión terminada" : " sesiones terminadas") : "Inicia una sesión cuando quieras", "#fb7185") +
+    var ideas = dashboardRecommendations(metrics, profile, focusStats);
+    var content = metrics.total ?
+      dashboardLeadMarkup(metrics) +
+      '<div class="dashboard-calm-stats">' +
+      dashboardCard("Tiempo planificado", formatHours(metrics.hours), "En los bloques de tu horario", "#76c9ad") +
+      dashboardCard("Días con plan", metrics.plannedDayCount + " / 7", "Días con bloques", "#82a9e8") +
+      dashboardCard("Enfoque realizado", formatFocusMinutes(focusStats.completedMinutes), focusStats.completedSessions + (focusStats.completedSessions === 1 ? " sesión terminada" : " sesiones terminadas"), "#d7a8dc") +
       '</div>' +
-      (metrics.total ? "" : '<div class="trust-empty"><span>🌱</span><div><strong>Tu dashboard está listo para crecer contigo</strong><p>Crea o carga un horario y aquí aparecerá tu progreso real, sin datos de ejemplo.</p></div></div>') +
-      '<div class="trust-dashboard-grid"><article class="trust-chart"><h3>Actividades por día</h3><div class="trust-bars">' + barsMarkup(metrics.byDay) + '</div></article>' +
-      '<article class="trust-chart"><h3>Distribución por áreas</h3><div class="trust-categories">' + categoriesMarkup(metrics) + '</div></article></div>' +
-      '<section class="trust-dashboard-recommendations"><div><span>RECOMENDACIONES PERSONALIZADAS</span><h3>Lo siguiente que te conviene ajustar</h3><p>No son frases genéricas: parten de tu horario, tu cumplimiento y las preferencias que decidiste guardar.</p></div><div class="trust-recommendation-list">' + recommendationMarkup(metrics, profile, focusStats) + '</div></section>' +
-      '<footer class="trust-dashboard-actions"><button type="button" data-dashboard-action="focus">⏱️ Iniciar enfoque</button><button type="button" data-dashboard-action="change">🪄 Pedir un cambio</button><button type="button" data-dashboard-action="preferences">⚙️ Revisar preferencias</button><small>Bienestar: PLANIFY ofrece orientación general y recordatorios. No diagnostica ni recomienda medicamentos, suplementos o dosis.</small></footer></div>';
+      '<section class="dashboard-calm-section"><div class="dashboard-calm-section-heading"><span class="dashboard-calm-kicker">MIRA TU SEMANA</span><h3>Cómo está distribuido tu plan</h3></div>' +
+      '<div class="trust-dashboard-grid"><article class="trust-chart"><h4>Bloques por día</h4><p class="dashboard-calm-chart-note">' + (metrics.hasHistory ? "Solo cuentan los días con seguimiento; los demás aparecen sin registro." : "Las marcas antiguas no tenían una fecha asociada.") + '</p><div class="trust-bars" role="group" aria-label="Bloques marcados por día de la semana">' + barsMarkup(metrics.byDay, metrics.completedByDay, metrics.datesByDay, metrics.recordedByDay) + '</div><div class="dashboard-calm-chart-legend"><span><i class="is-complete"></i>Hechos en esa fecha</span><span>— Sin registro</span></div></article>' +
+      '<article class="trust-chart"><h4>Tiempo por área</h4><div class="trust-categories">' + categoriesMarkup(metrics) + '</div></article></div></section>' +
+      '<section class="dashboard-calm-next"><div class="dashboard-calm-section-heading"><span class="dashboard-calm-kicker">UN PASO A LA VEZ</span><h3>Tu siguiente paso</h3></div>' + recommendationMarkup(ideas.slice(0, 1)) +
+      (ideas.length > 1 ? '<details class="dashboard-calm-more"><summary>Ver otras sugerencias</summary><div>' + recommendationMarkup(ideas.slice(1)) + '</div></details>' : "") + '</section>' :
+      '<section class="dashboard-calm-empty"><span class="dashboard-calm-empty-icon" aria-hidden="true">✦</span><div><span class="dashboard-calm-kicker">TU PUNTO DE PARTIDA</span><h3>Primero armemos una semana que se parezca a ti.</h3><p>Cuando tengas actividades, aquí verás tus avances y una sugerencia clara para ajustar tu plan.</p><button type="button" data-dashboard-action="start">Crear mi horario</button>' +
+      (focusStats.completedSessions ? '<small>Ya completaste ' + focusStats.completedSessions + (focusStats.completedSessions === 1 ? ' sesión' : ' sesiones') + ' de enfoque.</small>' : "") + '</div></section>';
+    overlay.innerHTML = '<div class="trust-dashboard-inner"><header class="trust-dashboard-header"><div><span class="trust-dashboard-eyebrow">TU PROGRESO, SIN COMPLICACIONES</span><h2>' + escapeHtml(name ? "Tu progreso, " + name : "Tu progreso") + '</h2>' +
+      '<p>Tu cumplimiento se guarda por fecha; la distribución de horas refleja el horario que tienes ahora.</p></div><button type="button" id="trust-dashboard-close">← Volver al planificador</button></header>' +
+      '<nav class="dashboard-view-nav" aria-label="Vistas del planificador"><button type="button" data-dashboard-view="diario">📝 <span>Diario</span></button><button type="button" data-dashboard-view="semanal">📅 <span>Semanal</span></button><button type="button" data-dashboard-view="mensual">📆 <span>Mensual</span></button><button type="button" data-dashboard-view="anual">🗓️ <span>Anual</span></button><button type="button" aria-current="page">📊 <span>Dashboard</span></button></nav>' +
+      (metrics.total ? '<nav class="dashboard-week-nav" aria-label="Elegir semana del Dashboard"><button type="button" data-dashboard-week-shift="-7" aria-label="Semana anterior">←</button><strong>' + escapeHtml(dashboardWeekLabel(metrics.weekStart)) + '</strong><button type="button" data-dashboard-week-shift="7" aria-label="Semana siguiente">→</button></nav>' : "") +
+      content + '<p class="dashboard-calm-disclaimer">PLANIFY muestra orientación general. Para decisiones de salud, consulta a un profesional.</p></div>';
     document.body.appendChild(overlay);
     previousBodyOverflow = document.body.style.overflow;
+    previousHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.documentElement.classList.add("planify-dashboard-open");
     document.getElementById("trust-dashboard-close").focus();
   }
+
+  window.__PLANIFY_REFRESH_DASHBOARD = function () {
+    if (document.getElementById("planify-dashboard-safe")) openDashboard();
+  };
 
   function closeDashboard() {
     var overlay = document.getElementById("planify-dashboard-safe");
     if (overlay) overlay.remove();
     removeLegacyDashboards();
     document.body.style.overflow = previousBodyOverflow;
+    document.documentElement.style.overflow = previousHtmlOverflow;
+    document.documentElement.classList.remove("planify-dashboard-open");
+    dashboardSelectedWeekStart = null;
+    if (dashboardReturnFocus && document.contains(dashboardReturnFocus) && typeof dashboardReturnFocus.focus === "function") dashboardReturnFocus.focus();
+    dashboardReturnFocus = null;
   }
 
   function renderTutorial() {
@@ -445,15 +501,44 @@
       var style = document.createElement("link");
       style.id = "planify-focus-style";
       style.rel = "stylesheet";
-      style.href = "css/focus-session.css?v=1";
+      style.href = "css/focus-session.css?v=2";
       document.head.appendChild(style);
     }
+    if (!document.getElementById("planify-focus-task-style")) {
+      var taskStyle = document.createElement("link");
+      taskStyle.id = "planify-focus-task-style";
+      taskStyle.rel = "stylesheet";
+      taskStyle.href = "css/focus-task.css?v=1";
+      document.head.appendChild(taskStyle);
+    }
+    if (!document.getElementById("planify-focus-breath-style")) {
+      var breathStyle = document.createElement("link");
+      breathStyle.id = "planify-focus-breath-style";
+      breathStyle.rel = "stylesheet";
+      breathStyle.href = "css/focus-breath.css?v=1";
+      document.head.appendChild(breathStyle);
+    }
     if (!document.getElementById("planify-focus-script")) {
-      var script = document.createElement("script");
-      script.id = "planify-focus-script";
-      script.src = "js/focus-session.js?v=3";
-      script.defer = true;
-      document.head.appendChild(script);
+      function loadFocusSession() {
+        if (document.getElementById("planify-focus-script")) return;
+        var focusScript = document.createElement("script");
+        focusScript.id = "planify-focus-script";
+        focusScript.src = "js/focus-session.js?v=4";
+        focusScript.async = false;
+        document.head.appendChild(focusScript);
+      }
+      if (window.PLANIFY_FOCUS_ACTIVITY_HISTORY) loadFocusSession();
+      else {
+        var historyScript = document.getElementById("planify-focus-activity-history-script") || document.createElement("script");
+        historyScript.addEventListener("load", loadFocusSession, { once: true });
+        historyScript.addEventListener("error", loadFocusSession, { once: true });
+        if (!historyScript.id) {
+          historyScript.id = "planify-focus-activity-history-script";
+          historyScript.src = "js/focus-activity-history.js?v=1";
+          historyScript.async = false;
+          document.head.appendChild(historyScript);
+        }
+      }
     }
   }
 
@@ -477,10 +562,56 @@
     if (!document.getElementById("planify-day-flow-script")) {
       var script = document.createElement("script");
       script.id = "planify-day-flow-script";
-      script.src = "js/day-flow.js?v=2";
+      script.src = "js/day-flow.js?v=3";
       script.defer = true;
       document.head.appendChild(script);
     }
+  }
+
+  function loadCompletionHistory(onReady) {
+    if (window.PLANIFY_COMPLETION_HISTORY) { if (onReady) onReady(); return; }
+    var existing = document.getElementById("planify-completion-history-script");
+    var script = existing || document.createElement("script");
+    if (onReady) script.addEventListener("load", onReady, { once: true });
+    if (!existing) {
+      script.id = "planify-completion-history-script";
+      script.src = "js/completion-history.js?v=3";
+      script.async = false;
+      script.onerror = function () { console.warn("PLANIFY: no se pudo cargar el historial por fecha."); };
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadScheduleTime(onReady) {
+    if (window.PLANIFY_SCHEDULE_TIME) { if (onReady) onReady(); return; }
+    var existing = document.getElementById("planify-schedule-time-script");
+    var script = existing || document.createElement("script");
+    if (onReady) {
+      script.addEventListener("load", onReady, { once: true });
+      script.addEventListener("error", onReady, { once: true });
+    }
+    if (!existing) {
+      script.id = "planify-schedule-time-script";
+      script.src = "js/schedule-time.js?v=1";
+      script.async = false;
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadVariableDuration() {
+    if (!document.getElementById("planify-variable-duration-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-variable-duration-style";
+      style.rel = "stylesheet";
+      style.href = "css/variable-duration.css?v=1";
+      document.head.appendChild(style);
+    }
+    if (document.getElementById("planify-variable-duration-script")) return;
+    var script = document.createElement("script");
+    script.id = "planify-variable-duration-script";
+    script.src = "js/variable-duration.js?v=1";
+    script.async = false;
+    document.head.appendChild(script);
   }
 
   function loadDashboardPolish() {
@@ -489,6 +620,15 @@
     style.id = "planify-dashboard-polish";
     style.rel = "stylesheet";
     style.href = "css/dashboard-polish.css?v=1";
+    document.head.appendChild(style);
+  }
+
+  function loadDashboardCalm() {
+    if (document.getElementById("planify-dashboard-calm")) return;
+    var style = document.createElement("link");
+    style.id = "planify-dashboard-calm";
+    style.rel = "stylesheet";
+    style.href = "css/dashboard-calm.css?v=5";
     document.head.appendChild(style);
   }
 
@@ -501,18 +641,138 @@
     document.head.appendChild(style);
   }
 
+  function loadBrandExperience() {
+    if (!document.getElementById("planify-brand-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-brand-style";
+      style.rel = "stylesheet";
+      style.href = "css/brand-system.css?v=5";
+      document.head.appendChild(style);
+    }
+    if (!document.getElementById("planify-brand-script")) {
+      var script = document.createElement("script");
+      script.id = "planify-brand-script";
+      script.src = "js/brand-home.js?v=5";
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadPanelRedesign() {
+    if (!document.getElementById("planify-panel-redesign-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-panel-redesign-style";
+      style.rel = "stylesheet";
+      style.href = "css/panel-redesign.css?v=15";
+      document.head.appendChild(style);
+    }
+    if (!document.getElementById("planify-panel-redesign-script")) {
+      var script = document.createElement("script");
+      script.id = "planify-panel-redesign-script";
+      script.src = "js/panel-redesign.js?v=11";
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadWeeklyCalm() {
+    if (!document.getElementById("planify-weekly-calm-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-weekly-calm-style";
+      style.rel = "stylesheet";
+      style.href = "css/weekly-calm.css?v=7";
+      document.head.appendChild(style);
+    }
+    if (!document.getElementById("planify-weekly-calm-script")) {
+      var script = document.createElement("script");
+      script.id = "planify-weekly-calm-script";
+      script.src = "js/weekly-calm.js?v=5";
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadMonthlyCalm() {
+    if (!document.getElementById("planify-monthly-calm-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-monthly-calm-style";
+      style.rel = "stylesheet";
+      style.href = "css/monthly-calm.css?v=8";
+      document.head.appendChild(style);
+    }
+    if (!document.getElementById("planify-monthly-calm-script")) {
+      var script = document.createElement("script");
+      script.id = "planify-monthly-calm-script";
+      script.src = "js/monthly-calm.js?v=2";
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadAnnualCalm() {
+    if (!document.getElementById("planify-annual-calm-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-annual-calm-style";
+      style.rel = "stylesheet";
+      style.href = "css/annual-calm.css?v=1";
+      document.head.appendChild(style);
+    }
+    if (!document.getElementById("planify-annual-calm-script")) {
+      var script = document.createElement("script");
+      script.id = "planify-annual-calm-script";
+      script.src = "js/annual-calm.js?v=1";
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadDailyCalm() {
+    if (!document.getElementById("planify-daily-calm-style")) {
+      var style = document.createElement("link");
+      style.id = "planify-daily-calm-style";
+      style.rel = "stylesheet";
+      style.href = "css/daily-calm.css?v=2";
+      document.head.appendChild(style);
+    }
+    if (!document.getElementById("planify-daily-calm-script")) {
+      var script = document.createElement("script");
+      script.id = "planify-daily-calm-script";
+      script.src = "js/daily-calm.js?v=2";
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadDailyPersistence() {
+    if (document.getElementById("planify-daily-persistence-script")) return;
+    var script = document.createElement("script");
+    script.id = "planify-daily-persistence-script";
+    script.src = "js/daily-persistence.js?v=1";
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
+  function loadDailyBackup() {
+    if (document.getElementById("planify-daily-backup-script")) return;
+    var script = document.createElement("script");
+    script.id = "planify-daily-backup-script";
+    script.src = "js/daily-backup.js?v=11";
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
   function loadPwaExperience() {
     if (!document.getElementById("planify-pwa-style")) {
       var style = document.createElement("link");
       style.id = "planify-pwa-style";
       style.rel = "stylesheet";
-      style.href = "css/pwa-experience.css?v=1";
+      style.href = "css/pwa-experience.css?v=2";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-pwa-script")) {
       var script = document.createElement("script");
       script.id = "planify-pwa-script";
-      script.src = "js/pwa-experience.js?v=1";
+      script.src = "js/pwa-experience.js?v=2";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -557,6 +817,25 @@
     var panelJump = target.closest("[data-panel-jump]");
     if (panelJump) { event.preventDefault(); activatePanelTab(panelJump.getAttribute("data-panel-jump")); return; }
     if (target.closest('[data-panel-action="close"]')) { event.preventDefault(); var panelOpener = document.getElementById("cloud-btn"); if (panelOpener) panelOpener.click(); return; }
+    var dashboardView = target.closest("[data-dashboard-view]");
+    if (dashboardView) {
+      event.preventDefault();
+      var viewName = dashboardView.getAttribute("data-dashboard-view");
+      closeDashboard();
+      var viewButton = document.querySelector('.bottom-nav [data-tab="' + viewName + '"]');
+      if (viewButton) viewButton.click();
+      return;
+    }
+    var dashboardWeekShift = target.closest("[data-dashboard-week-shift]");
+    if (dashboardWeekShift) {
+      event.preventDefault();
+      var history = window.PLANIFY_COMPLETION_HISTORY;
+      if (history) {
+        dashboardSelectedWeekStart = history.addDays(dashboardSelectedWeekStart || history.getWeekStart(), Number(dashboardWeekShift.getAttribute("data-dashboard-week-shift")));
+        openDashboard();
+      }
+      return;
+    }
     var dashboardAction = target.closest("[data-dashboard-action]");
     if (dashboardAction) {
       event.preventDefault();
@@ -621,6 +900,29 @@
   }, true);
 
   document.addEventListener("keydown", function (event) {
+    var dashboard = document.getElementById("planify-dashboard-safe");
+    if (dashboard && event.key === "Tab") {
+      var focusable = Array.prototype.slice.call(dashboard.querySelectorAll("a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex='-1'])"))
+        .filter(function (element) {
+          var closedDetails = element.closest("details:not([open])");
+          return !element.hidden && element.getAttribute("aria-hidden") !== "true" && element.getClientRects().length > 0 && (!closedDetails || element.tagName === "SUMMARY");
+        });
+      if (focusable.length) {
+        var first = focusable[0];
+        var last = focusable[focusable.length - 1];
+        if (event.shiftKey && (document.activeElement === first || !dashboard.contains(document.activeElement))) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && (document.activeElement === last || !dashboard.contains(document.activeElement))) {
+          event.preventDefault();
+          first.focus();
+        }
+      } else {
+        event.preventDefault();
+        document.getElementById("trust-dashboard-close").focus();
+      }
+      return;
+    }
     if (event.key !== "Escape") return;
     closeTutorial();
     closeDashboard();
@@ -633,13 +935,13 @@
       var welcomeStyle = document.createElement("link");
       welcomeStyle.id = "welcome-flow-style";
       welcomeStyle.rel = "stylesheet";
-      welcomeStyle.href = "css/welcome-flow.css?v=1.13";
+      welcomeStyle.href = "css/welcome-flow.css?v=1.16";
       document.head.appendChild(welcomeStyle);
     }
     if (!document.getElementById("welcome-flow-script")) {
       var welcomeScript = document.createElement("script");
       welcomeScript.id = "welcome-flow-script";
-      welcomeScript.src = "js/welcome-flow.js?v=1.18";
+      welcomeScript.src = "js/welcome-flow.js?v=1.23";
       welcomeScript.defer = true;
       document.head.appendChild(welcomeScript);
     }
@@ -653,8 +955,22 @@
     loadInterfacePolish();
     loadPwaExperience();
     loadMobileCoach();
-    loadDayFlow();
+    loadScheduleTime(function () {
+      loadCompletionHistory(function () {
+        loadDayFlow();
+        loadDailyBackup();
+      });
+      loadVariableDuration();
+    });
     loadDashboardPolish();
+    loadDashboardCalm();
+    loadBrandExperience();
+    loadPanelRedesign();
+    loadWeeklyCalm();
+    loadMonthlyCalm();
+    loadAnnualCalm();
+    loadDailyCalm();
+    loadDailyPersistence();
     window.setTimeout(ensurePersonalGuidance, 500);
     new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {

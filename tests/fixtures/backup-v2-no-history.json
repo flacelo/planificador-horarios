@@ -1,0 +1,19 @@
+{
+  "backupFormat": "planify-backup",
+  "backupVersion": 2,
+  "tipo": "Semanal",
+  "dias": ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+  "filas": [{
+    "hora": "11:00 – 12:00",
+    "celdas": [
+      { "t": "Horario antiguo v2" }, { "t": "" }, { "t": "" }, { "t": "" }, { "t": "" }, { "t": "" }, { "t": "" }
+    ]
+  }],
+  "nombre": "Perfil antiguo v2",
+  "carrera": "Prueba",
+  "especialidad": "",
+  "ciclo": "",
+  "objetivo": "No borrar historial local",
+  "header": "Copia v2",
+  "diario": { "estadoV1": { "schemaVersion": 1, "activeDate": "", "days": {} }, "legacy": {} }
+}

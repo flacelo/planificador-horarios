@@ -1,0 +1,56 @@
+#modal .planify-block-duration {
+  display: grid;
+  gap: 5px;
+  margin: 8px 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(85, 239, 196, 0.35);
+  border-radius: 10px;
+  background: rgba(85, 239, 196, 0.07);
+}
+
+#modal .planify-block-duration[hidden] {
+  display: none !important;
+}
+
+#modal .planify-block-duration > label {
+  margin: 0;
+  color: var(--brand-ink, #153a38);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+#modal .planify-block-duration-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#modal .planify-block-duration-input input {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border: 1px solid var(--brand-line, #c9ddd6);
+  border-radius: 8px;
+  background: var(--brand-surface, #fff);
+  color: var(--brand-ink, #153a38);
+  font: inherit;
+}
+
+#modal .planify-block-duration-input span,
+#modal .planify-block-duration small {
+  color: var(--brand-muted, #58746f);
+  font-size: 0.75rem;
+}
+
+#modal #planify-block-duration-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  #modal .planify-block-duration { margin: 6px 0; }
+}

@@ -1,5 +1,5 @@
 /* PLANIFY: caché pequeña y actualizable para que la app no se quede en una versión antigua. */
-const CACHE_NAME = "planify-shell-v1";
+const CACHE_NAME = "planify-shell-v14";
 const CORE_ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", event => {

@@ -1,0 +1,747 @@
+/* PLANIFY control panel: a calm, usable workspace on desktop and mobile. */
+.planify-panel-redesign-ready #side-panel {
+  left: -460px !important;
+  width: min(430px, 100vw) !important;
+  max-width: 100vw !important;
+  height: 100dvh !important;
+  padding: 0 !important;
+  background: #142630 !important;
+  color: #ecf8f4 !important;
+  border-right: 1px solid #36545a !important;
+  box-shadow: 22px 0 60px rgba(3, 18, 23, .38) !important;
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  scrollbar-color: #526a70 transparent;
+}
+.planify-panel-redesign-ready #side-panel.open { left: 0 !important; }
+.planify-panel-redesign-ready #side-panel .sp-container {
+  min-height: 100%;
+  padding: 0 24px 56px !important;
+  background: transparent !important;
+}
+.planify-panel-redesign-ready #side-panel .sp-header {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  min-height: 72px !important;
+  margin: 0 -24px 6px !important;
+  padding: 12px 24px !important;
+  border-bottom: 1px solid #36505a !important;
+  background: linear-gradient(115deg, rgba(23, 54, 58, .98), rgba(20, 38, 48, .98)) !important;
+  backdrop-filter: blur(14px);
+}
+.planify-panel-redesign-ready #side-panel .sp-title {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  color: #f2fbf8 !important;
+  font-size: 16px !important;
+  font-weight: 750;
+  line-height: 1.2;
+}
+.planify-panel-redesign-ready #side-panel .sp-title small {
+  display: block;
+  margin-top: 4px;
+  color: #a9c4c2;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+.planify-panel-redesign-ready #side-panel .panel-brand-mark {
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #5a7c78;
+  border-radius: 13px;
+  background: #26473f;
+  color: #9ef1c5;
+  font-size: 23px;
+}
+.planify-panel-redesign-ready #side-panel .trust-panel-close {
+  display: grid;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid #426168;
+  border-radius: 12px;
+  background: #203944;
+  color: #e8f7f3;
+  font-size: 22px;
+}
+.planify-panel-redesign-ready #side-panel .trust-panel-close:hover { background: #2e5358; }
+.planify-panel-redesign-ready #side-panel .trust-panel-intro {
+  display: none !important;
+}
+.planify-panel-redesign-ready #side-panel .trust-panel-intro .panel-intro-kicker {
+  color: #a9ebba;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+.planify-panel-redesign-ready #side-panel .trust-panel-intro strong {
+  position: relative;
+  z-index: 1;
+  margin-top: 7px;
+  color: #f8fff9;
+  font-size: 19px;
+  line-height: 1.18;
+}
+.planify-panel-redesign-ready #side-panel .trust-panel-intro p {
+  position: relative;
+  z-index: 1;
+  max-width: 300px;
+  margin: 8px 0 0;
+  color: #c7e0d9;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.planify-panel-redesign-ready #side-panel .panel-intro-flower {
+  position: absolute;
+  right: -7px;
+  bottom: -28px;
+  color: rgba(153, 236, 184, .13);
+  font-size: 110px;
+  line-height: 1;
+}
+.planify-panel-redesign-ready #side-panel .panel-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  position: sticky;
+  top: 72px;
+  z-index: 11;
+  gap: 6px !important;
+  margin: 0 0 16px !important;
+  padding: 8px 0 !important;
+  border: 0 !important;
+  background: #142630 !important;
+  box-shadow: none !important;
+}
+.planify-panel-redesign-ready #side-panel .panel-tabs .tab-btn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 7px 5px !important;
+  border: 1px solid #42616a !important;
+  border-radius: 13px !important;
+  background: #1d3540 !important;
+  color: #c8dedc !important;
+  font-family: inherit;
+  font-size: 12px !important;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+}
+.planify-panel-redesign-ready #side-panel .panel-tabs .tab-btn:hover { border-color: #8ad7b0 !important; }
+.planify-panel-redesign-ready #side-panel .panel-tabs .tab-btn.active {
+  border-color: #a5ebbd !important;
+  background: #a5ebbd !important;
+  color: #17342d !important;
+  box-shadow: 0 7px 22px rgba(132, 235, 175, .16);
+}
+.planify-panel-redesign-ready #side-panel .panel-tab-icon { font-size: 16px; font-weight: 500; }
+.planify-panel-redesign-ready #side-panel .panel-section-intro { margin-bottom: 13px; }
+.planify-panel-redesign-ready #side-panel .panel-section-intro {
+  padding: 4px 2px 6px;
+}
+.planify-panel-redesign-ready #side-panel .tab-content {
+  margin: 0 !important;
+  background: transparent !important;
+}
+.planify-panel-redesign-ready #side-panel .panel-section-intro > span {
+  color: #91dfad;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+.planify-panel-redesign-ready #side-panel .panel-section-intro h3 {
+  margin: 6px 0 3px;
+  color: #f2fbf8;
+  font-size: 23px;
+  line-height: 1.15;
+}
+.planify-panel-redesign-ready #side-panel .panel-section-intro p {
+  margin: 0;
+  color: #a9c4c2;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.planify-panel-redesign-ready #side-panel .card-section {
+  margin: 0 0 13px !important;
+  padding: 16px !important;
+  border: 1px solid #3d5963 !important;
+  border-radius: 18px !important;
+  background: #203641 !important;
+  box-shadow: none !important;
+}
+.planify-panel-redesign-ready #side-panel .card-section-title {
+  margin: 0 0 12px !important;
+  color: #f0f8f5 !important;
+  font-size: 14px !important;
+  font-weight: 750;
+}
+.planify-panel-redesign-ready #tab-perfil .card-section-title,
+.planify-panel-redesign-ready #side-panel .panel-language-card .config-label { display: none !important; }
+.planify-panel-redesign-ready #side-panel .panel-card-hint {
+  margin: -5px 0 13px;
+  color: #acc6c5;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.planify-panel-redesign-ready #side-panel .panel-save-hint {
+  margin: -4px 2px 13px;
+  color: #a9c4c2;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.planify-panel-redesign-ready #side-panel .panel-rebuild-hint {
+  margin: 10px 0 0;
+  color: #b9d2ce;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.planify-panel-redesign-ready #side-panel .panel-field-label,
+.planify-panel-redesign-ready #side-panel .panel-time-field label,
+.planify-panel-redesign-ready #side-panel .config-label {
+  display: block;
+  margin: 0 0 6px;
+  color: #d5e7e2 !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.planify-panel-redesign-ready #side-panel .custom-header,
+.planify-panel-redesign-ready #side-panel .info-row,
+.planify-panel-redesign-ready #side-panel .info-row .campo {
+  width: 100%;
+  max-width: none !important;
+  background: transparent !important;
+}
+.planify-panel-redesign-ready #side-panel .info-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  justify-items: stretch !important;
+  gap: 14px !important;
+  margin: 14px 0 0 !important;
+}
+.planify-panel-redesign-ready #side-panel .info-row .campo {
+  justify-self: stretch !important;
+  text-align: left !important;
+}
+.planify-panel-redesign-ready #side-panel .header-preview { margin-top: 5px; }
+.planify-panel-redesign-ready #side-panel .panel-field-label {
+  text-align: left !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+.planify-panel-redesign-ready #side-panel input:not([type="checkbox"]),
+.planify-panel-redesign-ready #side-panel select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid #5a727a !important;
+  border-radius: 10px !important;
+  background: #142a35 !important;
+  color: #f2fbf8 !important;
+  font-family: inherit;
+  font-size: 13px !important;
+  text-align: left;
+}
+.planify-panel-redesign-ready #side-panel input::placeholder { color: #9bb6b5 !important; opacity: 1; }
+.planify-panel-redesign-ready #side-panel .oculto { display: none !important; }
+.planify-panel-redesign-ready #side-panel .view-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+}
+.planify-panel-redesign-ready #side-panel .view-toggle button,
+.planify-panel-redesign-ready #side-panel .toolbar button,
+.planify-panel-redesign-ready #side-panel .config-actions button,
+.planify-panel-redesign-ready #side-panel .panel-apply-hours {
+  justify-content: center;
+  min-height: 45px;
+  padding: 10px 8px !important;
+  border: 1px solid #58747a !important;
+  border-radius: 10px !important;
+  background: #29434c !important;
+  color: #e7f7f1 !important;
+  font-family: inherit;
+  font-size: 12px !important;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
+}
+.planify-panel-redesign-ready #side-panel .view-toggle button.active {
+  border-color: #a5ebbd !important;
+  background: #a5ebbd !important;
+  color: #17342d !important;
+}
+.planify-panel-redesign-ready #side-panel .toolbar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+.planify-panel-redesign-ready #side-panel .interval-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px 9px;
+  margin: 0;
+}
+.planify-panel-redesign-ready #side-panel .panel-time-interval,
+.planify-panel-redesign-ready #side-panel .panel-apply-hours { grid-column: 1 / -1; }
+.planify-panel-redesign-ready #side-panel .panel-time-field { min-width: 0; }
+.planify-panel-redesign-ready #side-panel .panel-advanced {
+  margin-top: 15px;
+  border-top: 1px solid #47636b;
+}
+.planify-panel-redesign-ready #side-panel .panel-advanced summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 45px;
+  list-style: none;
+  color: #e2f4ed;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.planify-panel-redesign-ready #side-panel .panel-advanced summary::-webkit-details-marker { display: none; }
+.planify-panel-redesign-ready #side-panel .panel-advanced summary span {
+  margin-left: auto;
+  color: #a8c4bd;
+  font-size: 10px;
+  font-weight: 500;
+}
+.planify-panel-redesign-ready #side-panel .panel-advanced summary::after {
+  content: "+";
+  margin-left: 2px;
+  color: #a5ebbd;
+  font-size: 18px;
+}
+.planify-panel-redesign-ready #side-panel .panel-advanced[open] summary::after { content: "−"; }
+.planify-panel-redesign-ready #side-panel .panel-advanced .toolbar { margin-top: 12px; }
+.planify-panel-redesign-ready #side-panel .panel-apply-hours {
+  width: 100%;
+  border-color: #a5ebbd !important;
+  background: #a5ebbd !important;
+  color: #17342d !important;
+}
+html.planify-panel-redesign-ready #side-panel #tab-personalizar .panel-apply-hours {
+  min-height: 44px !important;
+  border-color: #a5ebbd !important;
+  background: #a5ebbd !important;
+  color: #17342d !important;
+}
+.planify-panel-redesign-ready #side-panel .sp-divider {
+  margin: 17px 0;
+  border-color: #47636b;
+}
+.planify-panel-redesign-ready #side-panel .sp-hint {
+  margin-top: 15px;
+  color: #b3cdcb !important;
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: left;
+}
+.planify-panel-redesign-ready #side-panel .config-row {
+  display: block !important;
+  width: 100% !important;
+}
+.planify-panel-redesign-ready #side-panel .sp-lang-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+.planify-panel-redesign-ready #side-panel .sp-lang-btn {
+  min-height: 44px;
+  border: 1px solid #58747a !important;
+  border-radius: 10px !important;
+  background: #29434c !important;
+  color: #e7f7f1 !important;
+}
+.planify-panel-redesign-ready #side-panel .sp-lang-btn.active {
+  border-color: #a5ebbd !important;
+  background: #a5ebbd !important;
+  color: #17342d !important;
+}
+.planify-panel-redesign-ready #side-panel .config-actions {
+  display: grid;
+  gap: 8px;
+}
+.planify-panel-redesign-ready #side-panel .config-actions button { width: 100%; margin: 0 !important; }
+.planify-panel-redesign-ready #side-panel .config-actions #btn-export-pdf {
+  border-color: #a5ebbd !important;
+  background: #a5ebbd !important;
+  color: #17342d !important;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup {
+  margin-top: 16px;
+  border-top: 1px solid #47636b;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup summary {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 64px;
+  padding: 10px 2px;
+  list-style: none;
+  cursor: pointer;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup summary::-webkit-details-marker { display: none; }
+.planify-panel-redesign-ready #side-panel .panel-backup summary::after {
+  content: "+";
+  margin-left: auto;
+  color: #a5ebbd;
+  font-size: 20px;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup[open] summary::after { content: "−"; }
+.planify-panel-redesign-ready #side-panel .panel-backup-icon {
+  display: grid;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #54776c;
+  border-radius: 11px;
+  background: #27473f;
+  color: #a5ebbd;
+  font-size: 19px;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup summary strong,
+.planify-panel-redesign-ready #side-panel .panel-backup summary small { display: block; }
+.planify-panel-redesign-ready #side-panel .panel-backup summary strong {
+  color: #eaf8f1;
+  font-size: 13px;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup summary small {
+  margin-top: 3px;
+  color: #acc6c5;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup-help,
+.planify-panel-redesign-ready #side-panel .panel-backup-message {
+  margin: 0 0 11px;
+  color: #b9d2ce;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup-actions button {
+  min-width: 0;
+  min-height: 44px;
+  margin: 0 !important;
+  padding: 9px 7px;
+  border: 1px solid #58747a !important;
+  border-radius: 10px !important;
+  background: #29434c !important;
+  color: #e7f7f1 !important;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup-actions button:hover {
+  border-color: #88cbaa !important;
+  background: #35584e !important;
+  color: #f2fff7 !important;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup-message {
+  margin-bottom: 0;
+  color: #b9d2ce;
+}
+.planify-panel-redesign-ready #side-panel .panel-backup-message.is-error { color: #ffb8ad; }
+.planify-panel-redesign-ready #side-panel .panel-previous-week {
+  display: grid;
+  gap: 7px;
+  margin: 12px 0;
+  padding: 13px;
+  border: 1px solid #47636b;
+  border-radius: 12px;
+  background: #1b3039;
+}
+.planify-panel-redesign-ready #side-panel .panel-previous-week strong { color: #eaf8f1; font-size: 12px; }
+.planify-panel-redesign-ready #side-panel .panel-previous-week p { margin: 0; color: #b9d2ce; font-size: 11px; line-height: 1.45; }
+.planify-panel-redesign-ready #side-panel .panel-previous-week button {
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid #77b99e;
+  border-radius: 9px;
+  background: #294b40;
+  color: #f0fff6;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.planify-panel-redesign-ready #side-panel .panel-previous-week button:disabled { opacity: .58; cursor: not-allowed; }
+.planify-panel-redesign-ready #side-panel .panel-previous-week button:focus-visible { outline: 3px solid #a5ebbd; outline-offset: 2px; }
+.panel-previous-week-confirm {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  width: min(430px, calc(100vw - 32px));
+  max-width: 100%;
+  margin: 0;
+  padding: 25px;
+  border: 1px solid #c7d2fe;
+  border-radius: 18px;
+  background: #fff;
+  color: #1e293b;
+  box-shadow: 0 28px 90px rgba(2,6,23,.35);
+  font: inherit;
+  box-sizing: border-box;
+}
+.panel-previous-week-confirm::backdrop { background: rgba(2,6,23,.68); backdrop-filter: blur(3px); }
+.panel-previous-week-confirm h2 { margin: 0; color: #312e81; font-size: 1.2rem; }
+.panel-previous-week-confirm p { margin: 12px 0 20px; color: #64748b; font-size: .86rem; line-height: 1.5; }
+.panel-previous-week-confirm > div { display: flex; justify-content: flex-end; gap: 9px; }
+.panel-previous-week-confirm button { min-height: 42px; padding: 9px 13px; border: 1px solid #cbd5e1; border-radius: 10px; background: #fff; color: #475569; font: inherit; font-size: .8rem; font-weight: 800; cursor: pointer; }
+.panel-previous-week-confirm button:last-child { border-color: #5b4ac3; background: #5b4ac3; color: #fff; }
+.panel-previous-week-confirm button:focus-visible { outline: 3px solid #a5b4fc; outline-offset: 2px; }
+.panel-previous-week-confirm button:disabled { opacity: .6; cursor: wait; }
+@media (max-width: 400px) { .panel-previous-week-confirm { padding: 21px; } .panel-previous-week-confirm > div { flex-direction: column-reverse; } .panel-previous-week-confirm button { width: 100%; } }
+.planify-panel-redesign-ready #side-panel .panel-backup summary:focus-visible,
+.planify-panel-redesign-ready #side-panel .panel-backup-actions button:focus-visible {
+  outline: 3px solid #a5ebbd !important;
+  outline-offset: 2px;
+}
+html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 13px;
+  padding: 16px;
+  border: 1px solid #3d5963;
+  border-radius: 17px;
+  background: #203641;
+  color: #f0f8f5;
+}
+html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card strong { color: #f0f8f5; }
+html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card small { color: #acc6c5; }
+html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card button {
+  min-height: 43px;
+  max-width: none !important;
+  padding: 8px 12px;
+  border: 1px solid #a5ebbd !important;
+  border-radius: 10px;
+  background: #a5ebbd !important;
+  color: #17342d !important;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+}
+.planify-panel-redesign-ready #side-panel button:hover { filter: brightness(1.1); }
+.planify-panel-redesign-ready #side-panel :is(button, input, select, summary):focus-visible,
+.planify-panel-redesign-ready #cloud-btn:focus-visible {
+  outline: 3px solid #a5ebbd !important;
+  outline-offset: 2px;
+}
+.planify-panel-redesign-ready #cloud-btn {
+  top: auto !important;
+  bottom: 19px !important;
+  left: 18px !important;
+  width: 48px !important;
+  height: 48px !important;
+  transform: none !important;
+  border: 1px solid #8bdab0 !important;
+  border-radius: 15px !important;
+  background: #1c463f !important;
+  color: #b3f2ca !important;
+  box-shadow: 0 8px 24px rgba(5, 29, 29, .28) !important;
+  font-size: 21px;
+  transition: opacity .18s ease, transform .18s ease !important;
+}
+.planify-panel-redesign-ready #cloud-btn:hover { transform: translateY(-2px) !important; }
+.planify-panel-redesign-ready body.panel-control-open #cloud-btn {
+  left: 18px !important;
+  opacity: 0;
+  pointer-events: none;
+}
+.planify-panel-redesign-ready #side-overlay.open { background: rgba(6, 24, 31, .58); }
+.planify-panel-redesign-ready body.tema-estelar #side-panel,
+.planify-panel-redesign-ready body.tema-estelar #side-panel .sp-container { background: #142630 !important; }
+.planify-panel-redesign-ready body.tema-estelar #side-panel .card-section {
+  background: #203641 !important;
+  border-color: #3d5963 !important;
+}
+.planify-panel-redesign-ready body.tema-estelar #side-panel .tab-content { background: transparent !important; }
+.planify-panel-redesign-ready body.tema-estelar #side-panel input:not([type="checkbox"]),
+.planify-panel-redesign-ready body.tema-estelar #side-panel select {
+  min-height: 44px !important;
+  background: #142a35 !important;
+  color: #f2fbf8 !important;
+  border-color: #5a727a !important;
+}
+
+/* The site uses tema-estelar for both appearances; tema-claro is the light override. */
+.planify-panel-redesign-ready body.tema-claro #side-panel {
+  background: #f5faf7 !important;
+  color: #213e3d !important;
+  border-color: #cbded5 !important;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel :is(button, input, select, summary):focus-visible {
+  outline-color: #176b50 !important;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .sp-container { background: #f5faf7 !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .sp-header {
+  background: linear-gradient(115deg, #e9f7ef, #f5faf7) !important;
+  border-color: #d5e5df !important;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-tabs { background: #f5faf7 !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .sp-title,
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-section-intro h3,
+.planify-panel-redesign-ready body.tema-claro #side-panel .card-section-title { color: #173c37 !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .sp-title small,
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-section-intro p,
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-card-hint { color: #566f6b !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-brand-mark {
+  background: #d9f4e5;
+  color: #227d61;
+  border-color: #afd9c4;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .trust-panel-close {
+  background: #fff;
+  color: #234a42;
+  border-color: #c8ddd3;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .trust-panel-intro {
+  background: linear-gradient(135deg, #dff6e7, #e8f5f4 80%);
+  border-color: #a9d9bb;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .trust-panel-intro .panel-intro-kicker { color: #297a5a; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .trust-panel-intro strong { color: #174537; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .trust-panel-intro p { color: #466b60; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .trust-panel-intro .panel-intro-flower { color: rgba(38, 139, 85, .12); }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-tabs .tab-btn,
+.planify-panel-redesign-ready body.tema-claro #side-panel .toolbar button,
+.planify-panel-redesign-ready body.tema-claro #side-panel .view-toggle button,
+.planify-panel-redesign-ready body.tema-claro #side-panel .config-actions button,
+.planify-panel-redesign-ready body.tema-claro #side-panel .sp-lang-btn {
+  background: #fff !important;
+  color: #35554f !important;
+  border-color: #cbded5 !important;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-tabs .tab-btn.active,
+.planify-panel-redesign-ready body.tema-claro #side-panel .view-toggle button.active,
+.planify-panel-redesign-ready body.tema-claro #side-panel .sp-lang-btn.active,
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-apply-hours,
+.planify-panel-redesign-ready body.tema-claro #side-panel .config-actions #btn-export-pdf {
+  background: #236d54 !important;
+  color: #fff !important;
+  border-color: #236d54 !important;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .card-section {
+  background: #fff !important;
+  border-color: #d5e4dd !important;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-field-label,
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-time-field label,
+.planify-panel-redesign-ready body.tema-claro #side-panel .config-label { color: #345951 !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel input:not([type="checkbox"]),
+.planify-panel-redesign-ready body.tema-claro #side-panel select {
+  background: #f8fcfa !important;
+  color: #1f4039 !important;
+  border-color: #c8dcd2 !important;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel input::placeholder { color: #697f79 !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .sp-hint { color: #657f78 !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-rebuild-hint { color: #5b756e; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-save-hint { color: #5b756e; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .planify-pwa-settings-card {
+  border-color: #d5e4dd;
+  background: #fff;
+  color: #173c37;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .planify-pwa-settings-card strong { color: #173c37; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .planify-pwa-settings-card small { color: #566f6b; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .planify-pwa-settings-card button {
+  border-color: #236d54 !important;
+  background: #236d54 !important;
+  color: #fff !important;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-advanced { border-color: #d5e4dd; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-advanced summary { color: #173c37; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-advanced summary span { color: #5d7770; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-advanced summary::after { color: #236d54; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-backup { border-color: #d5e4dd; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-backup-icon {
+  border-color: #b5d8c5;
+  background: #e5f5eb;
+  color: #236d54;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-backup summary strong { color: #173c37; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-backup summary small,
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-backup-help,
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-backup-message { color: #4b6c64; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-backup summary::after { color: #236d54; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-backup-actions button {
+  border-color: #cbded5 !important;
+  background: #fff !important;
+  color: #254d42 !important;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-backup-actions button:hover {
+  border-color: #8ccbac !important;
+  background: #e7f5ed !important;
+  color: #174537 !important;
+}
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-backup-message.is-error { color: #a83229; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-previous-week { border-color: #cbded5; background: #f3faf6; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-previous-week strong { color: #173c37; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-previous-week p { color: #4b6c64; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-previous-week button { border-color: #71b695; background: #e0f6e8; color: #174734; }
+.planify-panel-redesign-ready body.tema-claro #cloud-btn {
+  background: #236d54 !important;
+  color: #fff !important;
+}
+@media (max-width: 600px) {
+  .planify-panel-redesign-ready #side-panel {
+    left: -100vw !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-right: 0 !important;
+  }
+  .planify-panel-redesign-ready #side-panel.open { left: 0 !important; }
+  .planify-panel-redesign-ready #side-panel .sp-container { padding: 0 18px 44px !important; }
+  .planify-panel-redesign-ready #side-panel .sp-header {
+    min-height: 68px !important;
+    margin: 0 -18px 6px !important;
+    padding: 12px 18px !important;
+  }
+  .planify-panel-redesign-ready #side-panel .panel-tabs { top: 68px; margin-bottom: 14px !important; }
+  .planify-panel-redesign-ready #side-panel .panel-tab-icon { display: none; }
+  .planify-panel-redesign-ready #side-panel .panel-tabs .tab-btn { min-height: 44px; }
+  html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card { grid-template-columns: minmax(0, 1fr) !important; }
+  html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card button { width: 100% !important; }
+  .planify-panel-redesign-ready #side-panel .card-section { padding: 16px !important; }
+  .planify-panel-redesign-ready #cloud-btn { bottom: 14px !important; left: 12px !important; }
+}
+@media (max-width: 360px) {
+  .planify-panel-redesign-ready #side-panel .panel-backup-actions { grid-template-columns: minmax(0, 1fr); }
+}

@@ -3,6 +3,8 @@
 
   var DAYS = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"];
   var DAY_LABELS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+  var welcomeReturnFocus = null;
+  var applyingProposal = false;
   var ACTIVITY_CHOICES = [
     ["libre", "Tiempo libre"],
     ["estudio", "Estudio / enfoque"],
@@ -419,7 +421,7 @@
     return '<header class="welcome-flow-header"><div class="welcome-flow-progress" aria-label="Paso ' + (step + 1) + ' de ' + total + '">' +
       '<i style="width:' + ((step + 1) * 100 / total) + '%"></i></div><span class="welcome-flow-step">PASO ' + (step + 1) + ' DE ' + total + '</span>' +
       '<button type="button" class="welcome-flow-close" data-welcome-action="close" aria-label="Cerrar">×</button>' +
-      '<span class="welcome-flow-emoji">' + (["🧭", "🌱", "🗓️", "🔔", "🔎", "⚙️", "🏡", "✨"][step] || "✨") + '</span><h2 id="welcome-flow-title">' + title + '</h2>' +
+      '<span class="welcome-flow-emoji">' + (["🧭", "🌱", "🗓️", "🔔", "🔎", "⚙️", "🏡", "✨"][step] || "✨") + '</span><h2 id="welcome-flow-title" tabindex="-1">' + title + '</h2>' +
       '<p>' + subtitle + '</p></header>';
   }
 
@@ -1149,7 +1151,7 @@
     var focusDayCount = Math.min(state.weeklyFrequency, proposal.plannedDays.length);
     var quickActions = state.example ? "" : '<div class="welcome-flow-quick"><span>¿Qué te gustaría cambiar?</span><button type="button" data-welcome-action="more-focus">🎯 Más tiempo para mi prioridad</button><button type="button" data-welcome-action="more-rest">🌿 Más espacios libres</button><button type="button" data-welcome-action="balance">⚖️ Repartir mejor</button><button type="button" data-welcome-action="regenerate">🔄 Otra propuesta</button></div>';
     var footer = state.example ? '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="close">Cerrar ejemplo</button><button class="welcome-flow-primary" data-welcome-action="use-example">Crear el mío con estas preguntas →</button></footer>' :
-      '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="back">← Cambiar respuestas</button><button class="welcome-flow-secondary" data-welcome-action="toggle-edit">' + (state.editing ? "✓ Terminar edición" : "✏️ Editar detalles") + '</button><button class="welcome-flow-primary" data-welcome-action="apply">' + (replacing ? "Guardar copia y reemplazar" : "Usar este horario") + '</button></footer>';
+      '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="back">← Cambiar respuestas</button><button class="welcome-flow-secondary" data-welcome-action="toggle-edit">' + (state.editing ? "✓ Terminar edición" : "✏️ Editar detalles") + '</button><button class="welcome-flow-primary" data-welcome-action="apply">' + (replacing ? "Reemplazar horario" : "Usar este horario") + '</button></footer>';
     var weeklyMinutes = Math.min(state.weeklyFrequency, proposal.plannedDays.length) * Math.max(1, state.sessionsPerDay) * state.blockDuration;
     return renderHeader(proposalStep(), previewTitle, previewSubtitle) +
       '<div class="welcome-flow-preview-summary"><span>🎯 ' + escapeHtml(state.goal || priorityLabel(state.priority)) + '</span><span>🗓️ ' + activeLabels.map(escapeHtml).join(" · ") + '</span><span>⏱️ ' +
@@ -1161,7 +1163,7 @@
       '<div class="welcome-flow-influence"><strong>Así usamos tus respuestas</strong><span>Reservamos ' + state.sessionsPerDay + (state.sessionsPerDay === 1 ? ' momento' : ' momentos') + ' de ' + state.blockDuration + ' minutos en ' + focusDayCount + (focusDayCount === 1 ? ' día' : ' días') + ', preferentemente ' + ({ morning: "por la mañana", afternoon: "por la tarde", evening: "por la noche", variable: "en momentos variados" }[state.energyPeak] || "cuando tengas espacio") + '.</span><span>' + (state.freeMinutes ? "Dejamos los últimos " + state.freeMinutes + " minutos del día sin obligaciones." : "Dejamos los espacios restantes abiertos para que los decidas después.") + '</span>' + (state.projects.length ? '<span>Distribuimos ' + state.projects.length + (state.projects.length === 1 ? ' curso, proyecto o meta' : ' cursos, proyectos o metas') + ' según su frecuencia y momento preferido.</span>' : '') + (state.lifeDetailsUsed && state.snacksPerDay ? '<span>Reservamos ' + state.snacksPerDay + (state.snacksPerDay === 1 ? ' snack' : ' snacks') + ' y conservamos tu nota de alimentación como referencia personal.</span>' : '') + (state.lifeDetailsUsed && state.hydration ? '<span>Añadimos pausas de agua durante tus horas activas.</span>' : '') + (state.lifeDetailsUsed && state.caffeineCutoff !== "none" ? '<span>Marcamos el límite de cafeína que elegiste: ' + escapeHtml(state.caffeineCutoff) + '.</span>' : '') + (state.lifeDetailsUsed && state.movementStyle !== "none" ? '<span>Incluimos ' + escapeHtml(movementPlanLabel().toLowerCase()) + ' en espacios compatibles.</span>' : '') + (state.lifeDetailsUsed && state.sleepChallenge !== "none" ? '<span>Protegemos una rutina nocturna según lo que nos contaste sobre tu sueño.</span>' : '') + (proposal.plannedDays.indexOf(5) >= 0 ? '<span>Personalizamos el sábado: ' + escapeHtml(({recover:"recuperar energía",projects:"avanzar proyectos",social:"vida social",chores:"casa y diligencias",flexible:"mantenerlo flexible"}[state.saturdayStyle] || "a tu manera")) + '.</span>' : '') + (proposal.plannedDays.indexOf(6) >= 0 ? '<span>Personalizamos el domingo: ' + escapeHtml(({reset:"descansar",planning:"planificar la semana",family:"familia o amistades",prepare:"preparar la semana",free:"mantenerlo libre"}[state.sundayStyle] || "a tu manera")) + '.</span>' : '') + (state.lifeDetailsUsed ? '<span>Respetamos comidas, traslados y tu objetivo de dormir ' + state.sleepHours + ' horas desde las ' + state.bedtime + '.</span>' : state.wantMoreQuestions ? '<span>Omitiste los detalles de vida diaria; podrás añadirlos después.</span>' : '<span>Elegiste generar ahora; estas preferencias se pueden afinar después.</span>') + '</div>' +
       quickActions + (state.example ? "" : commandEditorMarkup("preview")) + previewSwitch + (state.previewMode === "weekly" && !state.editing ? weeklyView : dailyView) +
       '<p class="welcome-flow-repeat-note">' + (state.fixed.length ? 'Se respetaron ' + expandedFixed().length + ' apariciones de tus compromisos fijos. ' : '') + 'Después podrás ajustar cada día por separado desde tu horario semanal.</p>' +
-      (state.example ? '<p class="welcome-flow-safe-note">Puedes explorar este ejemplo con tranquilidad: no se guardará ni cambiará tus datos.</p>' : replacing ? '<div class="welcome-flow-warning"><strong>Ya tienes un horario semanal guardado.</strong><span>Si aplicas esta propuesta, lo reemplazaremos. Guardaremos antes una copia local recuperable.</span></div>' :
+      (state.example ? '<p class="welcome-flow-safe-note">Puedes explorar este ejemplo con tranquilidad: no se guardará ni cambiará tus datos.</p>' : replacing ? '<div class="welcome-flow-warning"><strong>Ya tienes un horario semanal guardado.</strong><span>Si aplicas esta propuesta, lo reemplazaremos. PLANIFY conservará una copia local que podrás restaurar desde Panel de control → Descargas.</span></div>' :
         '<p class="welcome-flow-safe-note">Todavía no se ha guardado nada. Tu horario solo cambia si eliges usar esta propuesta.</p>') +
       footer;
   }
@@ -1174,6 +1176,17 @@
     var overlay = document.getElementById("welcome-flow-overlay") || createOverlay();
     var previousCard = overlay.querySelector(".welcome-flow-card");
     var previousScroll = previousCard ? previousCard.scrollTop : 0;
+    var sameStep = overlay.dataset.welcomeStep === String(state.step);
+    var focused = overlay.contains(document.activeElement) ? document.activeElement : null;
+    var focusSelector = focused && focused.id ? "#" + CSS.escape(focused.id) : null;
+    if (!focusSelector && focused) {
+      ["data-welcome-mode", "data-welcome-action", "data-preview-mode", "data-preview-day"].some(function (name) {
+        var value = focused.getAttribute(name);
+        if (value === null) return false;
+        focusSelector = "[" + name + '="' + CSS.escape(value) + '"]';
+        return true;
+      });
+    }
     var content = state.step === 0 ? renderModeStep() :
       state.step === 1 ? renderCoreStep() :
       state.step === 2 && state.mode !== "quick" ? renderCommitmentsStep() :
@@ -1184,9 +1197,15 @@
     overlay.innerHTML = '<div class="welcome-flow-card">' +
       content +
       '</div>';
+    overlay.dataset.welcomeStep = String(state.step);
     var nextCard = overlay.querySelector(".welcome-flow-card");
-    if (nextCard && previousScroll) nextCard.scrollTop = previousScroll;
+    if (nextCard && previousScroll && sameStep) nextCard.scrollTop = previousScroll;
     syncReminderDetails();
+    if (focused) {
+      var nextFocus = sameStep && focusSelector ? overlay.querySelector(focusSelector) : null;
+      if (!nextFocus) nextFocus = overlay.querySelector("#welcome-flow-title");
+      if (nextFocus) nextFocus.focus({ preventScroll: true });
+    }
   }
 
   function syncReminderDetails() {
@@ -1200,6 +1219,8 @@
   }
 
   function open(preferredMode) {
+    var existingOverlay = document.getElementById("welcome-flow-overlay");
+    if (!existingOverlay || !existingOverlay.contains(document.activeElement)) welcomeReturnFocus = document.activeElement;
     state.step = 0;
     state.mode = ["manual", "guided", "detailed"].indexOf(preferredMode) >= 0 ? preferredMode : "guided";
     state.userName = localStorage.getItem("planify_nombre") || "";
@@ -1266,8 +1287,8 @@
     state.previewDay = 0;
     state.commandMessage = "";
     render();
-    var first = document.querySelector("#welcome-flow-overlay input:checked");
-    if (first) first.focus();
+    var title = document.getElementById("welcome-flow-title");
+    if (title) title.focus({ preventScroll: true });
   }
 
   function close(markDismissed) {
@@ -1276,9 +1297,24 @@
     if (markDismissed) {
       try { localStorage.setItem("planify_bienvenida_estado", "descartada"); } catch (error) {}
     }
+    var focusTarget = [welcomeReturnFocus, document.getElementById("welcome-flow-open"), document.querySelector('[data-brand-action="paths"]')].find(function (element) {
+      return element && element.isConnected && element !== document.body && element.getClientRects().length > 0;
+    });
+    if (focusTarget) focusTarget.focus({ preventScroll: true });
+    welcomeReturnFocus = null;
   }
 
-  function applyProposal() {
+  function dismissApplyConfirmation() {
+    var dialog = document.getElementById("welcome-flow-confirm");
+    if (dialog) {
+      dialog.close();
+      dialog.remove();
+    }
+    var applyButton = document.querySelector('#welcome-flow-overlay [data-welcome-action="apply"]');
+    if (applyButton) applyButton.focus({ preventScroll: true });
+  }
+
+  function requestApplyProposal() {
     if (state.example) return;
     readPreviewEdits();
     var validationError = validatePreviewBlocks();
@@ -1286,13 +1322,40 @@
       showPreviewError(validationError);
       return;
     }
-    if (!window.confirm("¿Quieres usar esta propuesta en tu horario semanal? Tu horario actual solo cambiará después de confirmar y guardaremos una copia antes.")) return;
+    if (document.getElementById("welcome-flow-confirm")) return;
+    var replacing = hasTasks(parseJson(localStorage.getItem("horario_data_semanal")));
+    var dialog = document.createElement("dialog");
+    dialog.id = "welcome-flow-confirm";
+    dialog.className = "welcome-flow-confirm";
+    dialog.setAttribute("aria-labelledby", "welcome-flow-confirm-title");
+    dialog.setAttribute("aria-describedby", "welcome-flow-confirm-description");
+    dialog.innerHTML = '<span class="welcome-flow-confirm-icon" aria-hidden="true">' + (replacing ? "↻" : "✓") + '</span>' +
+      '<h2 id="welcome-flow-confirm-title">' + (replacing ? "¿Reemplazar tu horario actual?" : "¿Usar este horario?") + '</h2>' +
+      '<p id="welcome-flow-confirm-description">' + (replacing ? "Tu horario actual será sustituido. PLANIFY conservará una copia local que podrás recuperar desde Descargas. Para guardarla fuera de este navegador, descarga también un respaldo." : "Esta propuesta se guardará como tu horario semanal. Podrás seguir editándola después.") + '</p>' +
+      '<div class="welcome-flow-confirm-actions"><button type="button" data-welcome-action="cancel-apply">Cancelar</button><button type="button" data-welcome-action="confirm-apply">' + (replacing ? "Reemplazar horario" : "Usar este horario") + '</button></div>';
+    document.getElementById("welcome-flow-overlay").appendChild(dialog);
+    dialog.addEventListener("cancel", function (event) { event.preventDefault(); dismissApplyConfirmation(); });
+    dialog.showModal();
+    dialog.querySelector('[data-welcome-action="cancel-apply"]').focus();
+  }
+
+  function applyProposal() {
+    if (applyingProposal || !document.getElementById("welcome-flow-confirm")) return;
+    applyingProposal = true;
+    var confirmButton = document.querySelector('#welcome-flow-confirm [data-welcome-action="confirm-apply"]');
+    if (confirmButton) confirmButton.disabled = true;
     var proposal = buildProposal();
     var weeklyKey = "horario_data_semanal";
     var previousWeekly = localStorage.getItem(weeklyKey);
     var previousType = localStorage.getItem("horario_planner_type");
     var profileKey = "planify_personalizacion_v1";
     var previousProfile = localStorage.getItem(profileKey);
+    var previousWelcomeState = localStorage.getItem("planify_bienvenida_estado");
+    var previousName = localStorage.getItem("planify_nombre");
+    var lastViewKey = "planify_ultima_vista_v1";
+    var previousLastView = localStorage.getItem(lastViewKey);
+    var appliedWelcomeKey = "planify_bienvenida_aplicada_pendiente_v1";
+    var previousAppliedWelcome = localStorage.getItem(appliedWelcomeKey);
     var backupKey = "planify_bienvenida_respaldo_" + Date.now();
     var backup = {
       savedAt: new Date().toISOString(),
@@ -1306,6 +1369,8 @@
       localStorage.setItem(weeklyKey, JSON.stringify({ dias: proposal.dias, filas: proposal.filas }));
       localStorage.setItem("horario_planner_type", "semanal");
       localStorage.setItem("planify_bienvenida_estado", "completada");
+      localStorage.setItem(lastViewKey, "semanal");
+      localStorage.setItem(appliedWelcomeKey, "1");
       if (state.userName) localStorage.setItem("planify_nombre", state.userName);
       localStorage.setItem(profileKey, JSON.stringify({
         name: state.userName,
@@ -1338,18 +1403,21 @@
         technique: state.technique
       }));
     } catch (error) {
-      try {
-        if (previousWeekly == null) localStorage.removeItem(weeklyKey);
-        else localStorage.setItem(weeklyKey, previousWeekly);
-        if (previousType == null) localStorage.removeItem("horario_planner_type");
-        else localStorage.setItem("horario_planner_type", previousType);
-        if (previousProfile == null) localStorage.removeItem(profileKey);
-        else localStorage.setItem(profileKey, previousProfile);
-        localStorage.removeItem(backupKey);
-      } catch (restoreError) {}
-      var overlay = document.getElementById("welcome-flow-overlay");
-      var warning = overlay && overlay.querySelector(".welcome-flow-warning");
-      if (warning) warning.textContent = "No se pudo guardar por falta de espacio en el navegador. Tus datos anteriores siguen intactos.";
+      var restored = true;
+      [[weeklyKey, previousWeekly], ["horario_planner_type", previousType],
+        ["planify_bienvenida_estado", previousWelcomeState], ["planify_nombre", previousName],
+        [profileKey, previousProfile], [lastViewKey, previousLastView],
+        [appliedWelcomeKey, previousAppliedWelcome], [backupKey, null]].forEach(function (entry) {
+        try {
+          if (entry[1] == null) localStorage.removeItem(entry[0]);
+          else localStorage.setItem(entry[0], entry[1]);
+          if (localStorage.getItem(entry[0]) !== entry[1]) restored = false;
+        } catch (restoreError) { restored = false; }
+      });
+      applyingProposal = false;
+      dismissApplyConfirmation();
+      showPreviewError(restored ? "No se pudo guardar. Tus datos anteriores siguen intactos; comprueba el espacio disponible e inténtalo otra vez." :
+        "No se pudo completar ni comprobar la restauración de todos los datos. No cierres esta página; revisa tu horario antes de volver a intentarlo.");
       return;
     }
 
@@ -1757,11 +1825,17 @@
         getDraftFromForm();
         if (state.step === 0) {
           if (state.mode === "manual") {
+            try {
+              localStorage.setItem("planify_bienvenida_estado", "completada");
+              if (state.userName) localStorage.setItem("planify_nombre", state.userName);
+            } catch (error) {}
             close(false);
             var emptyButton = Array.from(document.querySelectorAll("button")).find(function (button) { return /empezar vacío/i.test(button.textContent || ""); });
             if (emptyButton) emptyButton.click();
             if (typeof window.cambiarTab === "function") window.cambiarTab("semanal");
             else if (typeof window.cambiarVistaPlanify === "function") window.cambiarVistaPlanify("semanal");
+            var weeklyTab = document.querySelector('.bottom-nav [data-tab="semanal"]');
+            if (weeklyTab) weeklyTab.focus({ preventScroll: true });
             return;
           }
           state.step = 1;
@@ -1824,11 +1898,36 @@
         render();
         return;
       }
-      if (name === "apply") applyProposal();
+      if (name === "apply") requestApplyProposal();
+      if (name === "cancel-apply") dismissApplyConfirmation();
+      if (name === "confirm-apply") applyProposal();
     }, true);
 
     document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && document.getElementById("welcome-flow-overlay")) close(true);
+      var overlay = document.getElementById("welcome-flow-overlay");
+      if (!overlay || document.getElementById("schedule-change-overlay")) return;
+      if (document.getElementById("welcome-flow-confirm")) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close(true);
+      } else if (event.key === "Tab") {
+        var controls = Array.from(overlay.querySelectorAll("button, input, select, textarea, a[href], [tabindex]")).filter(function (control) {
+          return control.tabIndex >= 0 && !control.disabled && !control.closest('[hidden], [inert], [aria-hidden="true"]') && control.getClientRects().length > 0;
+        });
+        var first = controls[0];
+        var last = controls[controls.length - 1];
+        if (!first) return;
+        if (!overlay.contains(document.activeElement)) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus({ preventScroll: true });
+        } else if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus({ preventScroll: true });
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus({ preventScroll: true });
+        }
+      }
     });
 
     try {

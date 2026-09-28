@@ -1,0 +1,162 @@
+/* Annual goals: a calm, three-month rhythm without changing the saved data. */
+#vista-anual-metas.annual-calm-ready {
+  --annual-surface: #182a36;
+  --annual-card: #203441;
+  --annual-border: #385361;
+  --annual-text: #f1f8f7;
+  --annual-muted: #aec2c7;
+  --annual-accent: #79e1cb;
+  display: block;
+  padding: 0 0 100px !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--annual-text);
+}
+body.tema-claro #vista-anual-metas.annual-calm-ready,
+body.light-mode #vista-anual-metas.annual-calm-ready {
+  --annual-surface: #f4faf8;
+  --annual-card: #fff;
+  --annual-border: #d5e5e2;
+  --annual-text: #17333b;
+  --annual-muted: #526970;
+  --annual-accent: #087e73;
+}
+
+#vista-anual-metas.annual-calm-ready .encabezado-anual {
+  display: block;
+  margin: 0 0 18px;
+  padding: 25px clamp(20px, 3vw, 38px);
+  border: 1px solid var(--annual-border);
+  border-radius: 18px;
+  background: linear-gradient(115deg, #152d38, #1a3b40);
+}
+body.tema-claro #vista-anual-metas.annual-calm-ready .encabezado-anual,
+body.light-mode #vista-anual-metas.annual-calm-ready .encabezado-anual {
+  background: linear-gradient(115deg, #eff9f5, #e7f4f1);
+}
+#vista-anual-metas.annual-calm-ready .annual-calm-eyebrow {
+  display: block;
+  color: var(--annual-accent);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+#vista-anual-metas.annual-calm-ready .encabezado-anual h3 {
+  margin: 7px 0 5px !important;
+  color: var(--annual-text) !important;
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem) !important;
+  line-height: 1.15;
+}
+#vista-anual-metas.annual-calm-ready .encabezado-anual p {
+  max-width: 65ch;
+  margin: 0 !important;
+  color: var(--annual-muted) !important;
+  font-size: .9rem !important;
+  line-height: 1.5;
+  opacity: 1 !important;
+}
+#vista-anual-metas.annual-calm-ready .grid-12-meses {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin: 0 !important;
+}
+#vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos {
+  min-width: 0;
+  min-height: 158px;
+  padding: 15px !important;
+  border: 1px solid var(--annual-border) !important;
+  border-radius: 14px !important;
+  background: var(--annual-card) !important;
+  box-shadow: none !important;
+  transition: border-color .18s ease, background-color .18s ease;
+}
+#vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos:focus-within {
+  border-color: var(--annual-accent) !important;
+}
+#vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos.annual-calm-filled {
+  border-color: color-mix(in srgb, var(--annual-accent) 55%, var(--annual-border)) !important;
+}
+#vista-anual-metas.annual-calm-ready .annual-calm-quarter {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--annual-accent);
+  font-size: .67rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+#vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos h4 {
+  margin: 0 0 9px !important;
+  padding: 0 0 8px !important;
+  border-bottom: 1px solid var(--annual-border) !important;
+  color: var(--annual-text) !important;
+  font-size: .96rem !important;
+  font-weight: 750 !important;
+}
+#vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos textarea {
+  display: block;
+  width: 100% !important;
+  min-height: 70px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--annual-text) !important;
+  font: inherit !important;
+  font-size: .85rem !important;
+  line-height: 1.45;
+  resize: vertical !important;
+}
+#vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos textarea::placeholder {
+  color: var(--annual-muted);
+  opacity: .85;
+}
+#vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos textarea:focus-visible {
+  outline: 2px solid var(--annual-accent) !important;
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+#vista-anual-metas.annual-calm-ready .annual-calm-ideas {
+  margin: 15px 0 0;
+  border: 1px solid var(--annual-border);
+  border-radius: 13px;
+  background: var(--annual-surface);
+}
+#vista-anual-metas.annual-calm-ready .annual-calm-ideas > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 54px;
+  padding: 12px 18px;
+  list-style: none;
+  cursor: pointer;
+  color: var(--annual-text);
+}
+#vista-anual-metas.annual-calm-ready .annual-calm-ideas > summary::-webkit-details-marker { display: none; }
+#vista-anual-metas.annual-calm-ready .annual-calm-ideas > summary span { font-size: .84rem; font-weight: 700; }
+#vista-anual-metas.annual-calm-ready .annual-calm-ideas > summary small { color: var(--annual-muted); font-size: .72rem; }
+#vista-anual-metas.annual-calm-ready .annual-calm-ideas[open] > summary { border-bottom: 1px solid var(--annual-border); }
+#vista-anual-metas.annual-calm-ready .annual-calm-ideas .trust-personal-annual {
+  margin: 12px !important;
+  box-shadow: none !important;
+}
+#vista-anual-metas.annual-calm-ready .annual-calm-ideas > summary:focus-visible {
+  outline: 2px solid var(--annual-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 740px) {
+  #vista-anual-metas.annual-calm-ready .encabezado-anual { padding: 20px 64px 18px 18px; }
+  #vista-anual-metas.annual-calm-ready .grid-12-meses { grid-template-columns: minmax(0, 1fr) !important; gap: 9px !important; }
+  #vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos { min-height: 132px; }
+  #vista-anual-metas.annual-calm-ready .annual-calm-ideas > summary { flex-wrap: wrap; gap: 2px; }
+}
+
+@media print {
+  #vista-anual-metas.annual-calm-ready .annual-calm-eyebrow,
+  #vista-anual-metas.annual-calm-ready .annual-calm-quarter,
+  #vista-anual-metas.annual-calm-ready .annual-calm-ideas { display: none !important; }
+  #vista-anual-metas.annual-calm-ready { padding: 0 !important; }
+}

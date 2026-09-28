@@ -2,6 +2,7 @@
 (function () {
   "use strict";
   var deferredPrompt = null;
+  var guideReturnFocus = null;
   var isStandalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
   if (!isStandalone && window.navigator.standalone) isStandalone = true;
 
@@ -17,10 +18,34 @@
     modal.setAttribute("aria-modal", "true");
     modal.setAttribute("aria-labelledby", "planify-pwa-modal-title");
     document.body.appendChild(modal);
+    modal.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeGuide();
+      } else if (event.key === "Tab") {
+        var controls = Array.from(modal.querySelectorAll("button")).filter(function (control) { return !control.disabled && control.getClientRects().length > 0; });
+        var first = controls[0];
+        var last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus({ preventScroll: true });
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus({ preventScroll: true });
+        }
+      }
+    });
     return modal;
   }
 
   function openGuide() {
+    guideReturnFocus = document.activeElement;
+    var sidePanel = document.getElementById("side-panel");
+    if (sidePanel && sidePanel.classList.contains("open")) {
+      var closePanel = sidePanel.querySelector('[data-panel-action="close"]');
+      if (closePanel) closePanel.click();
+      guideReturnFocus = document.getElementById("cloud-btn");
+    }
     var modal = ensureModal();
     var promptAction = deferredPrompt ? '<button type="button" class="pwa-primary-action" data-pwa-action="install">📲 Instalar PLANIFY ahora</button>' : "";
     modal.innerHTML = '<div class="planify-pwa-dialog">' +
@@ -37,7 +62,13 @@
     if (close) close.focus();
   }
 
-  function closeGuide() { var modal = document.getElementById("planify-pwa-modal"); if (modal) modal.classList.remove("is-open"); }
+  function closeGuide() {
+    var modal = document.getElementById("planify-pwa-modal");
+    if (!modal || !modal.classList.contains("is-open")) return;
+    modal.classList.remove("is-open");
+    if (guideReturnFocus && guideReturnFocus.isConnected) guideReturnFocus.focus({ preventScroll: true });
+    guideReturnFocus = null;
+  }
   function refreshEntryPoints() {
     document.querySelectorAll("[data-pwa-entry-label]").forEach(function (entry) { entry.textContent = installLabel(); });
     document.querySelectorAll("[data-pwa-status]").forEach(function (element) {

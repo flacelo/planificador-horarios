@@ -140,6 +140,23 @@
     clon.style.setProperty('overflow', 'visible', 'important');
     clon.classList.add('planify-print-view', 'planify-print-' + opcion.tipo);
 
+    if (opcion.tipo === 'diaria') {
+      var fechaSeleccionada = clon.querySelector('#planner-date, input[type="date"]');
+      var resumenDeHoy = clon.querySelector('.planify-day-flow');
+      var ahora = new Date();
+      var fechaLocalActual = [
+        ahora.getFullYear(),
+        String(ahora.getMonth() + 1).padStart(2, '0'),
+        String(ahora.getDate()).padStart(2, '0')
+      ].join('-');
+
+      // This card is calculated from the real current day, not the selected diary date.
+      // Keep historical/future daily exports scoped to their selected date.
+      if (resumenDeHoy && fechaSeleccionada && fechaSeleccionada.value && fechaSeleccionada.value !== fechaLocalActual) {
+        resumenDeHoy.parentNode.removeChild(resumenDeHoy);
+      }
+    }
+
     if (opcion.tipo === 'semanal') {
       var tablaSemanal = clon.querySelector('#view-table');
       var dashboardSemanal = clon.querySelector('#view-dashboard');
@@ -173,17 +190,29 @@
 
   function cerrarModal() {
     var overlay = document.getElementById('modal-export-pdf-overlay');
-    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    if (overlay && overlay.parentNode) {
+      overlay.parentNode.removeChild(overlay);
+      var trigger = document.getElementById('cloud-btn');
+      if (trigger) trigger.focus({ preventScroll: true });
+    }
   }
 
   function abrirModal() {
     cerrarModal();
+    var sidePanel = document.getElementById('side-panel');
+    if (sidePanel && sidePanel.classList.contains('open')) {
+      var closePanel = sidePanel.querySelector('[data-panel-action="close"]');
+      if (closePanel) closePanel.click();
+    }
     var activa = opcionActiva();
     var overlay = document.createElement('div');
     overlay.id = 'modal-export-pdf-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.58);z-index:99998;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;';
     var panel = document.createElement('div');
     panel.id = 'modal-export-pdf';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('aria-label', 'Exportar a PDF');
     panel.style.cssText = 'background:#fff;border-radius:16px;padding:24px 26px;width:min(420px,92vw);box-shadow:0 20px 60px rgba(15,23,42,.35);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#0f172a;';
     panel.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><strong style="font-size:17px;">📄 Exportar a PDF</strong><button type="button" data-planify-cerrar="1" aria-label="Cerrar" style="border:0;background:none;font-size:20px;cursor:pointer;color:#64748b;">✕</button></div><div style="font-size:12.5px;color:#64748b;margin-bottom:14px;">Selecciona las vistas. Cada una ocupará una página, en orden cronológico.</div>';
 
@@ -215,8 +244,27 @@
     panel.appendChild(generar);
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+    var closeButton = panel.querySelector('[data-planify-cerrar]');
+    if (closeButton) closeButton.focus({ preventScroll: true });
     overlay.addEventListener('click', function(evento) {
       if (evento.target === overlay || (evento.target.closest && evento.target.closest('[data-planify-cerrar]'))) cerrarModal();
+    });
+    overlay.addEventListener('keydown', function(evento) {
+      if (evento.key === 'Escape') {
+        evento.preventDefault();
+        cerrarModal();
+      } else if (evento.key === 'Tab') {
+        var controls = Array.from(panel.querySelectorAll('button, input')).filter(function(control) { return !control.disabled; });
+        var first = controls[0];
+        var last = controls[controls.length - 1];
+        if (evento.shiftKey && document.activeElement === first) {
+          evento.preventDefault();
+          last.focus({ preventScroll: true });
+        } else if (!evento.shiftKey && document.activeElement === last) {
+          evento.preventDefault();
+          first.focus({ preventScroll: true });
+        }
+      }
     });
   }
 
@@ -262,6 +310,7 @@
       'body#planify-pdf-document .planify-export-mensual .cal-dia-nombre{padding:2mm 1mm!important;background:#0f172a!important;color:#fff!important;border:1px solid #94a3b8!important;font-size:9px!important;font-weight:800!important;text-align:center!important}',
       'body#planify-pdf-document .planify-export-mensual .cal-dia,body#planify-pdf-document .planify-export-mensual .month-cell{min-height:18mm!important;padding:1.5mm!important;background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important;font-size:8.5px!important;overflow:hidden!important}',
       'body#planify-pdf-document .planify-export-anual .encabezado-anual{display:none!important}',
+      'body#planify-pdf-document .planify-export-anual .annual-calm-quarter,body#planify-pdf-document .planify-export-anual .annual-calm-ideas{display:none!important}',
       'body#planify-pdf-document .planify-export-anual .grid-12-meses{display:grid!important;grid-template-columns:repeat(4,1fr)!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:2.5mm!important;width:100%!important;height:158mm!important;overflow:hidden!important}',
       'body#planify-pdf-document .planify-export-anual .grid-12-meses>*{min-height:0!important;margin:0!important;padding:2mm!important;background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important;border-radius:5px!important;box-shadow:none!important;font-size:8.5px!important;overflow:hidden!important}',
       '@media print{body#planify-pdf-document .planify-export-page{break-after:page!important;page-break-after:always!important}body#planify-pdf-document .planify-export-page:last-child{break-after:auto!important;page-break-after:auto!important}}'

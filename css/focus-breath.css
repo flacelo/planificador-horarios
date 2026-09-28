@@ -1,0 +1,76 @@
+.planify-focus-breath {
+  margin-top: 14px;
+  padding: 15px;
+  border: 1px solid rgba(94, 234, 212, .25);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, .28);
+}
+
+.planify-focus-breath-layout {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+}
+
+.planify-focus-breath-visual {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border: 1px solid rgba(94, 234, 212, .45);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(45, 212, 191, .32), rgba(15, 23, 42, .12) 70%);
+  color: #a7f3d0;
+  font-size: 1.35rem;
+  transform: scale(.82);
+}
+
+.planify-focus-breath.is-active .planify-focus-breath-visual {
+  animation: planifyBreathPulse 10s ease-in-out infinite;
+}
+
+.planify-focus-breath-copy { min-width: 0; }
+.planify-focus-breath-copy strong { display: block; color: #ecfeff; font-size: .84rem; }
+.planify-focus-breath-copy p { margin: 4px 0; color: #99f6e4; font-size: .82rem; font-weight: 800; }
+.planify-focus-breath-copy small { display: block; color: #bfdbfe; font-size: .69rem; line-height: 1.45; }
+.planify-focus-breath-clock { display: inline-block; margin-top: 6px; color: #f8fafc; font-size: .8rem; font-variant-numeric: tabular-nums; font-weight: 800; }
+
+.planify-focus-breath-actions { display: grid; margin-top: 12px; }
+.planify-focus-breath-actions button {
+  min-height: 43px;
+  padding: 10px 12px;
+  border: 1px solid rgba(94, 234, 212, .42);
+  border-radius: 11px;
+  background: rgba(45, 212, 191, .13);
+  color: #ccfbf1;
+  font: 700 .78rem/1.2 Inter, system-ui, sans-serif;
+  cursor: pointer;
+}
+.planify-focus-breath-actions button:hover { background: rgba(45, 212, 191, .23); }
+.planify-focus-breath-actions button:focus-visible { outline: 3px solid #a7f3d0; outline-offset: 2px; }
+.planify-focus-breath-actions button[hidden] { display: none !important; }
+
+@keyframes planifyBreathPulse {
+  0%, 100% { transform: scale(.82); }
+  40% { transform: scale(1); }
+}
+
+body.tema-claro .planify-focus-breath { border-color: #99f6e4; background: #f0fdfa; }
+body.tema-claro .planify-focus-breath-visual { border-color: #5eead4; background: radial-gradient(circle, #a7f3d0, #f0fdfa 72%); color: #0f766e; }
+body.tema-claro .planify-focus-breath-copy strong { color: #172554; }
+body.tema-claro .planify-focus-breath-copy p { color: #0f766e; }
+body.tema-claro .planify-focus-breath-copy small { color: #475569; }
+body.tema-claro .planify-focus-breath-clock { color: #0f172a; }
+body.tema-claro .planify-focus-breath-actions button { border-color: #5eead4; background: #ccfbf1; color: #115e59; }
+body.tema-claro .planify-focus-breath-actions button:focus-visible { outline-color: #0f766e; }
+
+@media (max-width: 620px) {
+  .planify-focus-breath { padding: 13px; }
+  .planify-focus-breath-layout { grid-template-columns: 56px minmax(0, 1fr); gap: 10px; }
+  .planify-focus-breath-visual { width: 52px; height: 52px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .planify-focus-breath.is-active .planify-focus-breath-visual { animation: none !important; transform: none; }
+}

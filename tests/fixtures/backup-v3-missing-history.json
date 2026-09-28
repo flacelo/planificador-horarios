@@ -1,0 +1,8 @@
+{
+  "backupFormat": "planify-backup",
+  "backupVersion": 3,
+  "tipo": "Semanal",
+  "dias": ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+  "filas": [{ "hora": "07:00 – 08:00", "celdas": [{ "t": "No debe importarse" }, { "t": "" }, { "t": "" }, { "t": "" }, { "t": "" }, { "t": "" }, { "t": "" }] }],
+  "diario": { "estadoV1": { "schemaVersion": 1, "activeDate": "", "days": {} }, "legacy": {} }
+}

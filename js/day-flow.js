@@ -23,7 +23,19 @@
     return { key: STORAGE_KEYS[0], value: { dias: [], filas: [] } };
   }
 
-  function getDayIndex(date) { return (date.getDay() + 6) % 7; }
+  function getDateKey(date) {
+    var history = window.PLANIFY_COMPLETION_HISTORY;
+    return history ? history.localDateKey(date) : date.toLocaleDateString("en-CA", { timeZone: "America/Lima" });
+  }
+
+  function getDayIndex(dateKey, days) {
+    var date = new Date(dateKey + "T12:00:00Z");
+    if (isNaN(date.getTime())) return -1;
+    var weekday = (date.getUTCDay() + 6) % 7;
+    var names = Array.isArray(days) ? days : [];
+    var history = window.PLANIFY_COMPLETION_HISTORY;
+    return history ? names.findIndex(function (name, index) { return history.weekdayIndex(name, index) === weekday; }) : weekday;
+  }
 
   function minutesFromText(value) {
     var match = String(value || "").match(/(\d{1,2}):(\d{2})/);
@@ -61,28 +73,37 @@
 
   function getTodayItems(now) {
     now = now || new Date();
+    var history = window.PLANIFY_COMPLETION_HISTORY;
     var stored = readSchedule();
+    if (history) stored.value = history.ensureActivityIds();
     var rows = stored.value.filas || [];
-    var dayIndex = getDayIndex(now);
+    var today = getDateKey(now);
+    var dayIndex = getDayIndex(today, stored.value.dias);
     var items = [];
     rows.forEach(function (row, index) {
       var cell = Array.isArray(row.celdas) ? row.celdas[dayIndex] : null;
       if (!isMeaningful(cell)) return;
-      var start = minutesFromText(row.hora);
+      var timing = window.PLANIFY_SCHEDULE_TIME && window.PLANIFY_SCHEDULE_TIME.activityInterval(rows, index, cell, 60);
+      var start = timing && timing.ok ? timing.start : minutesFromText(row.hora);
+      var end = timing && timing.ok ? timing.end : null;
       if (start == null) return;
-      var labelTimes = String(row.hora || "").match(/\d{1,2}:\d{2}/g) || [];
-      var end = labelTimes.length > 1 ? minutesFromText(labelTimes[1]) : null;
       if (end == null) {
-        var next = rows[index + 1] && minutesFromText(rows[index + 1].hora);
-        end = next != null && next > start ? next : start + 60 * Math.max(1, Number(cell.rowspan) || 1);
+        var labelTimes = String(row.hora || "").match(/\d{1,2}:\d{2}/g) || [];
+        end = labelTimes.length > 1 ? minutesFromText(labelTimes[1]) : null;
+        if (end == null) {
+          var next = rows[index + 1] && minutesFromText(rows[index + 1].hora);
+          end = next != null && next > start ? next : start + 60 * Math.max(1, Number(cell.rowspan) || 1);
+        }
+        if (end <= start) end += 1440;
       }
-      if (end <= start) end += 1440;
       items.push({
         start: start,
         end: end,
         title: titleFor(cell),
         category: categoryFor(cell),
-        done: Boolean(cell.done || cell.completada),
+        activityId: String(cell.planifyActivityId || ""),
+        dateKey: today,
+        done: Boolean(history && cell.planifyActivityId && history.isDone(today, cell.planifyActivityId)),
         row: index,
         day: dayIndex,
         storage: stored
@@ -112,7 +133,7 @@
     if (activity) {
       if (current) detail = "Termina a las " + formatTime(activity.end) + " · quedan " + durationLabel(Math.max(1, activity.end - currentMinutes));
       else detail = "Empieza a las " + formatTime(activity.start) + " · " + durationLabel(Math.max(0, activity.start - currentMinutes));
-      action = '<button type="button" class="day-flow-primary" data-day-flow-action="focus">⏱️ Enfocarme</button>' +
+      action = '<button type="button" class="day-flow-primary" data-day-flow-action="focus" data-focus-activity-id="' + escapeHtml(activity.activityId) + '" data-focus-date-key="' + escapeHtml(activity.dateKey) + '" data-focus-title="' + escapeHtml(activity.title) + '">⏱️ Enfocarme</button>' +
         '<button type="button" class="day-flow-secondary" data-day-flow-action="schedule">Ver horario</button>' +
         (current ? '<button type="button" class="day-flow-check" data-day-flow-action="complete" data-row="' + activity.row + '">✓ Hecho</button>' : "");
     } else if (items.length) {
@@ -155,13 +176,15 @@
 
   function markCurrentComplete(rowIndex) {
     var stored = readSchedule();
-    var dayIndex = getDayIndex(new Date());
+    var history = window.PLANIFY_COMPLETION_HISTORY;
+    if (history) stored.value = history.ensureActivityIds();
+    var today = getDateKey(new Date());
+    var dayIndex = getDayIndex(today, stored.value.dias);
     var row = stored.value.filas && stored.value.filas[Number(rowIndex)];
     var cell = row && Array.isArray(row.celdas) && row.celdas[dayIndex];
-    if (!cell) return;
-    cell.done = true;
-    cell.completada = true;
-    try { localStorage.setItem(stored.key, JSON.stringify(stored.value)); } catch (error) {}
+    if (!cell || !history) return;
+    history.ensureActivityIds();
+    if (!cell.planifyActivityId || !history.set(today, cell.planifyActivityId, true)) return;
     if (typeof window.renderizar === "function") {
       try { window.renderizar(); } catch (error) {}
     }
@@ -173,7 +196,13 @@
     if (!button) return;
     event.preventDefault();
     var action = button.getAttribute("data-day-flow-action");
-    if (action === "focus" && window.PLANIFY_FOCUS && typeof window.PLANIFY_FOCUS.open === "function") window.PLANIFY_FOCUS.open();
+    if (action === "focus" && window.PLANIFY_FOCUS && typeof window.PLANIFY_FOCUS.open === "function") {
+      var activityId = button.getAttribute("data-focus-activity-id") || "";
+      var dateKey = button.getAttribute("data-focus-date-key") || "";
+      var title = button.getAttribute("data-focus-title") || "";
+      if (activityId && dateKey) window.PLANIFY_FOCUS.open({ activityId: activityId, dateKey: dateKey, title: title });
+      else window.PLANIFY_FOCUS.open();
+    }
     if (action === "schedule" && typeof window.cambiarTab === "function") window.cambiarTab("semanal");
     if (action === "create" && window.PLANIFY_WELCOME && typeof window.PLANIFY_WELCOME.open === "function") window.PLANIFY_WELCOME.open("guided");
     if (action === "goal") {

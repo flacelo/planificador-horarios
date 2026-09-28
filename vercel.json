@@ -1,10 +1,7 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": ".",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
+  "outputDirectory": "dist",
   "headers": [
     {
       "source": "/sw.js",

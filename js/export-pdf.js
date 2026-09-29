@@ -147,20 +147,44 @@
     var tablaNueva = tabla.cloneNode(false);
     tablaNueva.classList.add('planify-export-weekday-table');
     var filaGlobal = 0;
-    var celdaDiaAnterior = null;
     Array.prototype.slice.call(tabla.children).forEach(function (grupo) {
       if (!grupo.rows) return;
       var grupoNuevo = grupo.cloneNode(false);
-      Array.prototype.slice.call(grupo.rows).forEach(function (fila) {
+      var filasGrupo = Array.prototype.slice.call(grupo.rows);
+      for (var indiceGrupo = 0; indiceGrupo < filasGrupo.length;) {
+        var fila = filasGrupo[indiceGrupo];
         var hora = matriz[filaGlobal] && matriz[filaGlobal][0];
         var celdaDia = matriz[filaGlobal] && matriz[filaGlobal][dayIndex + 1];
+        var claveDia = celdaDia ? String(celdaDia.className || "") + "|" + String(celdaDia.textContent || "").replace(/\s+/g, " ").trim() : "libre|";
+        var rangoInicial = hora && (String(hora.textContent || "").match(/\d{2}:\d{2}/g) || []);
+        var horaFinal = rangoInicial && rangoInicial[1];
+        var cantidadFilas = 1;
+        if (rangoInicial && rangoInicial.length === 2) {
+          while (indiceGrupo + cantidadFilas < filasGrupo.length) {
+            var siguienteHora = matriz[filaGlobal + cantidadFilas] && matriz[filaGlobal + cantidadFilas][0];
+            var siguienteDia = matriz[filaGlobal + cantidadFilas] && matriz[filaGlobal + cantidadFilas][dayIndex + 1];
+            var siguienteRango = siguienteHora && (String(siguienteHora.textContent || "").match(/\d{2}:\d{2}/g) || []);
+            var siguienteClave = siguienteDia ? String(siguienteDia.className || "") + "|" + String(siguienteDia.textContent || "").replace(/\s+/g, " ").trim() : "libre|";
+            if (!siguienteRango || siguienteRango.length !== 2 || siguienteRango[0] !== horaFinal || siguienteClave !== claveDia) break;
+            horaFinal = siguienteRango[1];
+            cantidadFilas += 1;
+          }
+        }
         var filaNueva = fila.cloneNode(false);
-        if (hora) filaNueva.appendChild(hora.cloneNode(true));
-        if (celdaDia && celdaDia !== celdaDiaAnterior) filaNueva.appendChild(celdaDia.cloneNode(true));
-        if (celdaDia) celdaDiaAnterior = celdaDia;
+        if (hora) {
+          var horaNueva = hora.cloneNode(true);
+          if (rangoInicial && rangoInicial.length === 2) horaNueva.textContent = rangoInicial[0] + " – " + horaFinal;
+          filaNueva.appendChild(horaNueva);
+        }
+        if (celdaDia) {
+          var celdaDiaNueva = celdaDia.cloneNode(true);
+          celdaDiaNueva.rowSpan = 1;
+          filaNueva.appendChild(celdaDiaNueva);
+        }
         grupoNuevo.appendChild(filaNueva);
-        filaGlobal += 1;
-      });
+        indiceGrupo += cantidadFilas;
+        filaGlobal += cantidadFilas;
+      }
       tablaNueva.appendChild(grupoNuevo);
     });
     return tablaNueva;
@@ -354,9 +378,16 @@
       'body#planify-pdf-document .planify-export-semanal td{height:auto!important;min-height:0!important;padding:1mm!important;background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important;font-size:9.5px!important;line-height:1.15!important;text-align:center!important;vertical-align:middle!important;white-space:normal!important;word-break:break-word!important}',
       'body#planify-pdf-document .planify-export-semanal td:first-child{width:11%!important;background:#f1f5f9!important;color:#0f172a!important;font-weight:700!important}',
       'body#planify-pdf-document .planify-export-semanal-dia{page:planify-weekday!important;width:194mm!important;height:281mm!important;min-height:281mm!important;max-height:281mm!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia{display:block!important;height:auto!important;max-height:none!important;overflow:visible!important;break-inside:auto!important;page-break-inside:auto!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia .planify-export-header{min-height:16mm!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia .planify-export-viewport{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia .planify-export-fit{height:auto!important;overflow:visible!important;transform:none!important}',
       'body#planify-pdf-document .planify-export-semanal-dia .planify-export-viewport{overflow:visible!important}',
       'body#planify-pdf-document .planify-export-semanal-dia .table-wrap{width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important}',
       'body#planify-pdf-document .planify-export-semanal-dia table{width:100%!important;table-layout:fixed!important;border-collapse:collapse!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia thead{display:table-header-group!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia tr{break-inside:avoid!important;page-break-inside:avoid!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia .planify-export-footer{display:none!important}',
       'body#planify-pdf-document .planify-export-semanal-dia th{padding:3mm!important;background:#0f172a!important;color:#fff!important;border:1px solid #64748b!important;font-size:13px!important;text-align:center!important}',
       'body#planify-pdf-document .planify-export-semanal-dia td{height:auto!important;padding:2.5mm!important;background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important;font-size:12px!important;line-height:1.3!important;text-align:center!important;vertical-align:middle!important;white-space:normal!important;word-break:break-word!important}',
       'body#planify-pdf-document .planify-export-semanal-dia td:first-child{width:27%!important;background:#f1f5f9!important;font-weight:700!important}',
@@ -379,6 +410,12 @@
       var viewport = pagina.querySelector('.planify-export-viewport');
       var contenido = pagina.querySelector('.planify-export-fit');
       if (!viewport || !contenido) return;
+      if (pagina.classList.contains('planify-export-semanal-dia')) {
+        contenido.style.transform = 'none';
+        contenido.style.width = '100%';
+        contenido.removeAttribute('data-planify-scale');
+        return;
+      }
       contenido.style.transform = 'none';
       contenido.style.width = '100%';
       var ancho = Math.max(contenido.scrollWidth, 1);
@@ -408,7 +445,9 @@
     var iframe = document.createElement('iframe');
     iframe.id = 'planify-pdf-frame';
     iframe.title = 'Vista previa de exportación PDF';
-    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none;';
+    // The print document must have a realistic layout viewport before measuring
+    // widths/heights. A 1px frame made mobile Chrome scale the whole table down.
+    iframe.style.cssText = 'position:fixed;left:-12000px;top:0;width:1200px;height:1600px;border:0;opacity:1;pointer-events:none;z-index:-1;';
     document.body.appendChild(iframe);
     var doc = iframe.contentWindow.document;
     doc.open();

@@ -850,17 +850,8 @@
     };
     var goalText = state.goal || (state.priority === "balance" ? balancedByOccupation[state.occupation] || balancedByOccupation.other : focus.text);
     if (state.priority === "procrastination" && !state.goal) goalText = "Elegir una tarea pendiente y empezar por el siguiente paso";
-    var focusDays = activeDays.slice(0, Math.max(1, Math.min(activeDays.length, Number(state.weeklyFrequency) || activeDays.length)));
+    var focusDays = state.priority === "procrastination" && !state.goal ? [] : activeDays.slice(0, Math.max(1, Math.min(activeDays.length, Number(state.weeklyFrequency) || activeDays.length)));
     var targetMinutesPerDay = selectedDuration * Math.max(1, Number(state.sessionsPerDay) || 1);
-    var activityTemplates = {
-      study: { text: "Estudio y práctica", category: "estudio" },
-      work: { text: "Trabajo o proyecto", category: "clase" },
-      exercise: { text: movementPlanLabel(), category: "flexible" },
-      home: { text: "Tareas de casa", category: "rutina" },
-      family: { text: "Tiempo con familia o amistades", category: "flexible" },
-      creative: { text: "Hobby o actividad creativa", category: "flexible" },
-      free: { text: "Tiempo libre", category: "desconexion" }
-    };
     activeDays.forEach(function (day) {
       var dayStart = dayBounds[day].start;
       var dayEnd = dayBounds[day].end;
@@ -877,18 +868,6 @@
         protectedFreeStart = Math.min(protectedFreeStart, desiredBedtime - extraWindDown);
       }
       var placed = 0;
-      var breakfastPlaced = false;
-      var lunchPlaced = false;
-      var dinnerPlaced = false;
-      var snacksPlaced = 0;
-      var commutePlaced = 0;
-      var activityPointer = 0;
-      var movementBlocksRemaining = state.activities.indexOf("exercise") >= 0 && state.movementStyle !== "none" ? Math.max(1, Math.ceil(Number(state.movementMinutes || 10) / selectedDuration)) : 0;
-      var focusBlocksSinceBreak = 0;
-      var needsShortBreak = false;
-      var likesAdded = false;
-      var weekendPlaced = false;
-      var windDownPlaced = false;
       var projectQueue = [];
       allProjects.forEach(function (project) {
         var chosenDays = Array.isArray(project.days) && project.days.length ? project.days : activeDays.slice(0, Math.max(1, Math.min(activeDays.length, Number(project.sessions) || 1)));
@@ -913,85 +892,16 @@
         if (fixed) {
           text = fixed.title;
           category = fixed.type === "course" || fixed.type === "practice" || /clase|estudio|curso/i.test(text) ? "estudio" : fixed.type === "work" || /trabajo|reuni|empresa|informe/i.test(text) ? "clase" : "rutina";
-          needsShortBreak = false;
-          focusBlocksSinceBreak = 0;
         } else if (manual) {
           text = manual.text;
           category = manual.category;
-          needsShortBreak = false;
-          focusBlocksSinceBreak = 0;
-        } else if (fullGeneratedSlot && slotStart === dayStart) {
-          var morningPrep = {
-            study: "Prepararme para estudiar",
-            work: "Prepararme para trabajar",
-            both: "Prepararme para estudiar y trabajar",
-            home: "Preparar el día en casa",
-            other: "Aseo y preparación para mi día"
-          };
-          text = state.occupation === "other" && state.occupationOther ? "Preparar mi día · " + state.occupationOther : morningPrep[state.occupation] || morningPrep.other;
-          if (state.lifeDetailsUsed) text += " · después de " + state.sleepHours + " h de sueño";
-          category = "rutina";
-          needsShortBreak = false;
-          focusBlocksSinceBreak = 0;
-        } else if (fullGeneratedSlot && state.meals.indexOf("breakfast") >= 0 && !breakfastPlaced && slotStart >= dayStart + 45 && slotStart < dayStart + 150) {
-          text = "Desayuno y plan del día";
-          category = "comida";
-          breakfastPlaced = true;
-          needsShortBreak = false;
-          focusBlocksSinceBreak = 0;
-        } else if (fullGeneratedSlot && state.commuteMinutes > commutePlaced && breakfastPlaced && slotStart < 12 * 60) {
-          text = "Traslado o preparación";
-          category = "rutina";
-          commutePlaced += Math.max(5, slotEnd - slotStart);
-          needsShortBreak = false;
-        } else if (fullGeneratedSlot && snacksPlaced < Number(state.snacksPerDay) && ((snacksPlaced === 0 && slotStart >= 10 * 60 && slotStart < 12 * 60) || (snacksPlaced === 1 && slotStart >= 16 * 60 && slotStart < 18 * 60))) {
-          text = state.foodProfile === "none" ? "Snack y pausa" : "Snack elegido por ti · registrar tolerancia";
-          category = "comida";
-          snacksPlaced += 1;
-          needsShortBreak = false;
-          focusBlocksSinceBreak = 0;
-        } else if (fullGeneratedSlot && state.meals.indexOf("lunch") >= 0 && !lunchPlaced && (Math.floor(slotStart / 60) === 12 || Math.floor(slotStart / 60) === 13)) {
-          text = "Almuerzo y descanso";
-          category = "comida";
-          lunchPlaced = true;
-          needsShortBreak = false;
-          focusBlocksSinceBreak = 0;
-        } else if (fullGeneratedSlot && state.meals.indexOf("dinner") >= 0 && !dinnerPlaced && Math.floor(slotStart / 60) >= 19 && slotStart < 21 * 60) {
-          text = "Cena y pausa";
-          category = "comida";
-          dinnerPlaced = true;
-          needsShortBreak = false;
-          focusBlocksSinceBreak = 0;
-        } else if (fullGeneratedSlot && day >= 5 && !weekendPlaced && slotStart >= Math.max(dayStart + 120, 10 * 60) && slotStart < protectedFreeStart) {
-          var weekendChoices = day === 5 ? {
-            recover: ["Mañana tranquila y recuperación", "desconexion"], projects: ["Avanzar un proyecto pendiente", "flexible"], social: ["Familia, amistades o salir", "flexible"], chores: ["Casa, compras y diligencias", "rutina"], flexible: ["Espacio abierto para decidir", "desconexion"]
-          } : {
-            reset: ["Descansar y recargar energía", "desconexion"], planning: ["Preparar y planificar la semana", "rutina"], family: ["Tiempo con familia o amistades", "flexible"], prepare: ["Preparar comidas, ropa o materiales", "rutina"], free: ["Domingo libre", "desconexion"]
-          };
-          var weekendChoice = weekendChoices[day === 5 ? state.saturdayStyle : state.sundayStyle] || ["Tiempo personal", "desconexion"];
-          text = weekendChoice[0];
-          category = weekendChoice[1];
-          weekendPlaced = true;
         } else if (fullGeneratedSlot && slotStart >= protectedFreeStart) {
-          if (!windDownPlaced && state.sleepChallenge !== "none" && slotStart >= Math.max(protectedFreeStart, desiredBedtime - 90)) {
-            text = "Rutina nocturna · bajar luces y pantallas";
-            windDownPlaced = true;
-          } else text = "Tiempo libre protegido";
+          text = "Tiempo libre protegido";
           category = "desconexion";
-          needsShortBreak = false;
-          focusBlocksSinceBreak = 0;
-        } else if (fullGeneratedSlot && ((state.breakStyle === "often" && needsShortBreak) || (state.breakStyle === "balanced" && focusBlocksSinceBreak >= 2))) {
-          var isActivePause = state.movementStyle === "activebreaks" || state.movementStyle === "unsure";
-          text = isActivePause ? movementPlanLabel() : "Pausa breve · estirar y despejarme";
-          category = isActivePause ? "flexible" : "desconexion";
-          needsShortBreak = false;
-          focusBlocksSinceBreak = 0;
         } else if (fullGeneratedSlot && projectQueue.length && slotStart >= focusStart && (projectQueue[0].preferred === "any" || projectQueue[0].preferred === "morning" && slotStart < 12 * 60 || projectQueue[0].preferred === "afternoon" && slotStart >= 12 * 60 && slotStart < 18 * 60 || projectQueue[0].preferred === "evening" && slotStart >= 18 * 60)) {
           var plannedProject = projectQueue.shift();
           text = plannedProject.title;
           category = plannedProject.type === "course" ? "estudio" : plannedProject.type === "personal" ? "flexible" : "clase";
-          focusBlocksSinceBreak += 1;
-          needsShortBreak = true;
         } else if (fullGeneratedSlot && placed < focusTargetMinutes && slotStart >= focusStart) {
           text = goalText;
           if (state.mode === "detailed" && state.priority === "study" && state.reminders.study && state.technique !== "custom") {
@@ -999,24 +909,7 @@
           }
           category = focus.category;
           placed += slotEnd - slotStart;
-          focusBlocksSinceBreak += 1;
-          needsShortBreak = true;
           reminder = state.mode === "detailed" && ((state.priority === "study" && state.reminders.study) || (state.priority === "work" && state.reminders.work) || (state.priority === "balance" && (state.reminders.study || state.reminders.work)));
-        } else if (fullGeneratedSlot && state.mode === "detailed" && state.likes && !likesAdded && Math.floor(slotStart / 60) >= 17) {
-          text = "Recargar energía · " + state.likes;
-          category = "flexible";
-          likesAdded = true;
-        } else if (fullGeneratedSlot && state.activities.length && state.breakStyle !== "flexible" && activityPointer < state.activities.length) {
-          var orderedActivities = state.activities.slice();
-          if (state.variant % 2) orderedActivities.reverse();
-          var activityKey = orderedActivities[activityPointer];
-          var activity = activityTemplates[activityKey];
-          if (activity && !(activityKey === "exercise" && state.movementStyle === "none")) { text = activity.text; category = activity.category; }
-          if (activityKey === "exercise" && movementBlocksRemaining > 1) movementBlocksRemaining -= 1;
-          else activityPointer += 1;
-        } else if (fullGeneratedSlot && rowIndex === rows.length - 1 && state.breakStyle !== "flexible") {
-          text = "Bajar el ritmo y prepararme para descansar";
-          category = "desconexion";
         }
         var remindersInSlot = reminderTimes.filter(function (entry) { return entry.day === day && entry.at >= slotStart && entry.at < slotEnd; });
         if ((fullGeneratedSlot || fixed) && remindersInSlot.length) {
@@ -1132,11 +1025,12 @@
       }
       var reminder = Boolean(cell && cell.reminder);
       var reminderLabel = reminder ? '<span class="welcome-flow-reminder-badge" title="' + escapeHtml(cell && cell.reminderLabel || "Este bloque puede activar un recordatorio") + '">🔔</span>' : "";
+      var editButton = '<button type="button" class="welcome-flow-row-edit" data-week-edit-day data-preview-day="' + previewDay + '" aria-label="Editar ' + escapeHtml(text || "tiempo disponible") + ', ' + blockStart + ' a ' + blockEnd + '">✎ Editar</button>';
       var choices = ACTIVITY_CHOICES.map(function (choice) {
         return '<option value="' + choice[0] + '" ' + (category === choice[0] ? "selected" : "") + '>' + choice[1] + '</option>';
       }).join("");
       if (!state.editing) {
-        return '<li class="welcome-flow-simple-row"><span>' + blockStart + ' – ' + blockEnd + '</span><i class="welcome-flow-category-dot welcome-flow-category-' + escapeHtml(category) + '"></i><strong>' + escapeHtml(text || "Tiempo libre") + reminderLabel + '</strong></li>';
+        return '<li class="welcome-flow-simple-row"><span>' + blockStart + ' – ' + blockEnd + '</span><i class="welcome-flow-category-dot welcome-flow-category-' + escapeHtml(category) + '"></i><strong>' + escapeHtml(text || "Tiempo disponible") + reminderLabel + '</strong>' + editButton + '</li>';
       }
       return '<li><div class="welcome-flow-edit-times"><label>Inicio<select data-welcome-edit-start data-welcome-index="' + rowIndex + '">' + blockTimeOptions(blockStart, false, previewDay) + '</select></label>' +
         '<label>Fin<select data-welcome-edit-end data-welcome-index="' + rowIndex + '">' + blockTimeOptions(blockEnd, true, previewDay) + '</select></label></div>' +
@@ -1165,24 +1059,24 @@
     var previewSwitch = '<div class="welcome-flow-view-switch" aria-label="Cambiar vista"><button type="button" data-preview-mode="daily" class="' + (state.previewMode === "daily" ? "is-selected" : "") + '">☀️ Vista diaria</button><button type="button" data-preview-mode="weekly" class="' + (state.previewMode === "weekly" ? "is-selected" : "") + '">📅 Vista semanal</button></div>';
     var specialtyName = specialtyLabel();
     var dailyCompanion = state.editing ? "" : '<section class="welcome-flow-daily-companion"><div class="welcome-flow-companion-intro"><span>☀</span><div><strong>Tu día también tendrá un espacio personal</strong><small>No será solo una lista: podrás registrar cómo llegas, tu intención y cómo terminó el día.</small></div></div><div class="welcome-flow-companion-grid"><article><small>¿Cómo llegas hoy?</small><div class="welcome-flow-moods" aria-label="Ejemplo de estados de ánimo"><button type="button">○ Tranquilo</button><button type="button">△ Cansado</button><button type="button">◇ Motivado</button></div></article><article><small>Intención principal</small><strong>' + escapeHtml(state.goal || priorityLabel(state.priority)) + '</strong><span>' + escapeHtml(specialtyName ? "Enfoque adaptado a " + specialtyName : "Adaptado a tu ocupación") + '</span></article><article><small>Mini balance del día</small><span>Meta principal · energía · productividad</span><span>Agradecimiento · notas · cuidado personal</span></article></div></section>';
-    var dailyView = '<div class="welcome-flow-day-tabs">' + dayTabs + '</div>' + dailyCompanion + '<div class="welcome-flow-preview"><div class="welcome-flow-preview-head"><strong>' + (state.editing ? "Edita " : "Vista de ") + DAY_LABELS[previewDay] + '</strong><span>' + ((state.dayTimes[previewDay] || {}).start || state.start) + ' – ' + ((state.dayTimes[previewDay] || {}).end || state.end) + '</span></div>' + (state.editing ? '<p class="welcome-flow-edit-help">La propuesta usa bloques de ' + state.blockDuration + ' minutos. Aquí puedes ajustar sus bordes con precisión de 5 minutos, dejarlos libres o añadir una pausa.</p>' : '<p class="welcome-flow-simple-help">Los periodos seguidos con la misma actividad se muestran como un solo bloque, con inicio y fin claros.</p>') + '<ul>' + sampleDay + '</ul></div>';
+    var dailyView = '<div class="welcome-flow-day-tabs">' + dayTabs + '</div>' + dailyCompanion + '<div class="welcome-flow-preview"><div class="welcome-flow-preview-head"><strong>' + (state.editing ? "Edita " : "Vista de ") + DAY_LABELS[previewDay] + '</strong><span>' + ((state.dayTimes[previewDay] || {}).start || state.start) + ' – ' + ((state.dayTimes[previewDay] || {}).end || state.end) + '</span></div>' + (state.editing ? '<p class="welcome-flow-edit-help">Los ' + state.blockDuration + ' min son el tamaño del bloque que elegiste, no una estimación del tiempo real de la actividad. Ajusta inicio y fin a tu experiencia, déjalo disponible o añade una pausa.</p>' : '<p class="welcome-flow-simple-help">Los periodos seguidos con la misma actividad se muestran como un solo bloque. Los espacios disponibles no tienen actividades ni duración asumidas.</p>') + '<ul>' + sampleDay + '</ul></div>';
     var weeklyView = '<div class="welcome-flow-weekly-wrap"><table class="welcome-flow-weekly"><thead><tr><th>Hora</th>' + DAYS.map(function (day) { return '<th>' + day.slice(0, 3) + '</th>'; }).join("") + '</tr></thead><tbody>' + weeklyRows + '</tbody></table></div>';
     var replacing = hasTasks(parseJson(localStorage.getItem("horario_data_semanal")));
     var previewTitle = state.example ? "Así podría quedar un horario hecho para ti" : (firstName() ? firstName() + ", tu primera propuesta está lista" : "Tu primera propuesta está lista");
     var previewSubtitle = state.example ? "Este ejemplo es solo una demostración y no modificará tu horario." : "Lo armamos con tus respuestas. Puedes usarlo así o hacer ajustes rápidos.";
-    var focusDayCount = Math.min(state.weeklyFrequency, proposal.plannedDays.length);
+    var focusDayCount = state.priority === "procrastination" && !state.goal ? 0 : Math.min(state.weeklyFrequency, proposal.plannedDays.length);
     var quickActions = state.example ? "" : '<div class="welcome-flow-quick"><span>¿Qué te gustaría cambiar?</span><button type="button" data-welcome-action="more-focus">🎯 Más tiempo para mi prioridad</button><button type="button" data-welcome-action="more-rest">🌿 Más espacios libres</button><button type="button" data-welcome-action="balance">⚖️ Repartir mejor</button><button type="button" data-welcome-action="regenerate">🔄 Otra propuesta</button></div>';
     var footer = state.example ? '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="close">Cerrar ejemplo</button><button class="welcome-flow-primary" data-welcome-action="use-example">Crear el mío con estas preguntas →</button></footer>' :
       '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="back">← Cambiar respuestas</button><button class="welcome-flow-secondary" data-welcome-action="toggle-edit">' + (state.editing ? "✓ Terminar edición" : "✏️ Editar detalles") + '</button><button class="welcome-flow-primary" data-welcome-action="apply">' + (replacing ? "Reemplazar horario" : "Usar este horario") + '</button></footer>';
-    var weeklyMinutes = Math.min(state.weeklyFrequency, proposal.plannedDays.length) * Math.max(1, state.sessionsPerDay) * state.blockDuration;
+    var weeklyMinutes = focusDayCount * Math.max(1, state.sessionsPerDay) * state.blockDuration;
     return renderHeader(proposalStep(), previewTitle, previewSubtitle) +
       '<div class="welcome-flow-preview-summary"><span>🎯 ' + escapeHtml(state.goal || priorityLabel(state.priority)) + '</span><span>🗓️ ' + activeLabels.map(escapeHtml).join(" · ") + '</span><span>⏱️ ' +
-      Math.floor(weeklyMinutes / 60) + ' h ' + (weeklyMinutes % 60) + ' min semanales para tu resultado</span><span>🧱 Bloques de ' + state.blockDuration + ' min</span>' +
+      Math.floor(weeklyMinutes / 60) + ' h ' + (weeklyMinutes % 60) + ' min reservados para tu resultado</span><span>🧱 Bloque elegido: ' + state.blockDuration + ' min (editable; no predice cuánto tardas)</span>' +
       (state.mode === "detailed" && Object.keys(state.reminders).some(function (key) { return state.reminders[key]; }) ? '<span>🔔 Recordatorios: ' + Object.keys(state.reminders).filter(function (key) { return state.reminders[key]; }).length + '</span>' : '') +
       (state.lifeDetailsUsed && state.snacksPerDay ? '<span>☕ ' + state.snacksPerDay + (state.snacksPerDay === 1 ? ' snack reservado' : ' snacks reservados') + '</span>' : '') +
       (state.lifeDetailsUsed && state.hydration ? '<span>◌ Pausas de agua</span>' : '') +
       (state.mode === "detailed" && state.reminders.study && state.priority === "study" ? '<span>🧠 Técnica: ' + (state.technique === "deep" ? "Enfoque 50/10" : state.technique === "pomodoro" ? "Pomodoro 25/5" : "A tu ritmo") + '</span>' : '') + '</div>' +
-      '<div class="welcome-flow-influence"><strong>Así usamos tus respuestas</strong><span>Reservamos ' + state.sessionsPerDay + (state.sessionsPerDay === 1 ? ' momento' : ' momentos') + ' de ' + state.blockDuration + ' minutos en ' + focusDayCount + (focusDayCount === 1 ? ' día' : ' días') + ', preferentemente ' + ({ morning: "por la mañana", afternoon: "por la tarde", evening: "por la noche", variable: "en momentos variados" }[state.energyPeak] || "cuando tengas espacio") + '.</span><span>' + (state.freeMinutes ? "Dejamos los últimos " + state.freeMinutes + " minutos del día sin obligaciones." : "Dejamos los espacios restantes abiertos para que los decidas después.") + '</span>' + (state.projects.length ? '<span>Distribuimos ' + state.projects.length + (state.projects.length === 1 ? ' curso, proyecto o meta' : ' cursos, proyectos o metas') + ' según su frecuencia y momento preferido.</span>' : '') + (state.lifeDetailsUsed && state.snacksPerDay ? '<span>Reservamos ' + state.snacksPerDay + (state.snacksPerDay === 1 ? ' snack' : ' snacks') + ' y conservamos tu nota de alimentación como referencia personal.</span>' : '') + (state.lifeDetailsUsed && state.hydration ? '<span>Añadimos pausas de agua durante tus horas activas.</span>' : '') + (state.lifeDetailsUsed && state.caffeineCutoff !== "none" ? '<span>Marcamos el límite de cafeína que elegiste: ' + escapeHtml(state.caffeineCutoff) + '.</span>' : '') + (state.lifeDetailsUsed && state.movementStyle !== "none" ? '<span>Incluimos ' + escapeHtml(movementPlanLabel().toLowerCase()) + ' en espacios compatibles.</span>' : '') + (state.lifeDetailsUsed && state.sleepChallenge !== "none" ? '<span>Protegemos una rutina nocturna según lo que nos contaste sobre tu sueño.</span>' : '') + (proposal.plannedDays.indexOf(5) >= 0 ? '<span>Personalizamos el sábado: ' + escapeHtml(({recover:"recuperar energía",projects:"avanzar proyectos",social:"vida social",chores:"casa y diligencias",flexible:"mantenerlo flexible"}[state.saturdayStyle] || "a tu manera")) + '.</span>' : '') + (proposal.plannedDays.indexOf(6) >= 0 ? '<span>Personalizamos el domingo: ' + escapeHtml(({reset:"descansar",planning:"planificar la semana",family:"familia o amistades",prepare:"preparar la semana",free:"mantenerlo libre"}[state.sundayStyle] || "a tu manera")) + '.</span>' : '') + (state.lifeDetailsUsed ? '<span>Respetamos comidas, traslados y tu objetivo de dormir ' + state.sleepHours + ' horas desde las ' + state.bedtime + '.</span>' : state.wantMoreQuestions ? '<span>Omitiste los detalles de vida diaria; podrás añadirlos después.</span>' : '<span>Elegiste generar ahora; estas preferencias se pueden afinar después.</span>') + '</div>' +
+      '<div class="welcome-flow-influence"><strong>Así usamos tus respuestas</strong>' + (focusDayCount ? '<span>Reservamos ' + state.sessionsPerDay + (state.sessionsPerDay === 1 ? ' momento' : ' momentos') + ' de ' + state.blockDuration + ' minutos en ' + focusDayCount + (focusDayCount === 1 ? ' día' : ' días') + ', preferentemente ' + ({ morning: "por la mañana", afternoon: "por la tarde", evening: "por la noche", variable: "en momentos variados" }[state.energyPeak] || "cuando tengas espacio") + '.</span>' : state.priority === "procrastination" && !state.goal ? '<span>No fijamos una hora para la procrastinación: no necesitas adivinar cuándo ocurre. Dejamos espacios disponibles para que decidas el siguiente paso cuando aparezca una tarea pendiente.</span>' : '') + '<span>' + (state.freeMinutes ? "Dejamos los últimos " + state.freeMinutes + " minutos del día sin obligaciones." : "Los demás espacios quedan disponibles; no les asignamos actividades ni tiempos que no indicaste.") + '</span>' + (state.projects.length ? '<span>Distribuimos ' + state.projects.length + (state.projects.length === 1 ? ' curso, proyecto o meta' : ' cursos, proyectos o metas') + ' según su frecuencia y momento preferido.</span>' : '') + (state.lifeDetailsUsed && state.caffeineCutoff !== "none" ? '<span>Marcamos el límite de cafeína que elegiste: ' + escapeHtml(state.caffeineCutoff) + '.</span>' : '') + (state.lifeDetailsUsed ? '<span>Las comidas, pausas, traslados y actividades generales quedan disponibles hasta que indiques en qué momento y cuánto tiempo quieres reservar.</span>' : state.wantMoreQuestions ? '<span>Omitiste los detalles de vida diaria; podrás añadirlos después.</span>' : '<span>Elegiste generar ahora; estas preferencias se pueden afinar después.</span>') + '</div>' +
       quickActions + (state.example ? "" : commandEditorMarkup("preview")) + previewSwitch + (state.previewMode === "weekly" && !state.editing ? weeklyView : dailyView) +
       '<p class="welcome-flow-repeat-note">' + (state.fixed.length ? 'Se respetaron ' + expandedFixed().length + ' apariciones de tus compromisos fijos. ' : '') + 'Después podrás ajustar cada día por separado desde tu horario semanal.</p>' +
       (state.example ? '<p class="welcome-flow-safe-note">Puedes explorar este ejemplo con tranquilidad: no se guardará ni cambiará tus datos.</p>' : replacing ? '<div class="welcome-flow-warning"><strong>Ya tienes un horario semanal guardado.</strong><span>Si aplicas esta propuesta, lo reemplazaremos. PLANIFY conservará una copia local que podrás restaurar desde Panel de control → Descargas.</span></div>' :

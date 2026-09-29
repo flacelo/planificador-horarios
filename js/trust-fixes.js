@@ -935,13 +935,13 @@
       var welcomeStyle = document.createElement("link");
       welcomeStyle.id = "welcome-flow-style";
       welcomeStyle.rel = "stylesheet";
-      welcomeStyle.href = "css/welcome-flow.css?v=1.16";
+      welcomeStyle.href = "css/welcome-flow.css?v=1.17";
       document.head.appendChild(welcomeStyle);
     }
     if (!document.getElementById("welcome-flow-script")) {
       var welcomeScript = document.createElement("script");
       welcomeScript.id = "welcome-flow-script";
-      welcomeScript.src = "js/welcome-flow.js?v=1.23";
+      welcomeScript.src = "js/welcome-flow.js?v=1.24";
       welcomeScript.defer = true;
       document.head.appendChild(welcomeScript);
     }

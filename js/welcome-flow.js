@@ -118,7 +118,9 @@
     var result = [];
     state.fixed.forEach(function (item) {
       fixedDays(item).forEach(function (day) {
-        result.push(Object.assign({}, item, { day: day, title: item.dayTitles && item.dayTitles[day] || item.title }));
+        var dayTasks = item.dayTasks && Array.isArray(item.dayTasks[day]) ? item.dayTasks[day].filter(Boolean) : [];
+        var dayTitle = dayTasks.length ? dayTasks.join(" · ") : item.dayTitles && item.dayTitles[day] || item.title;
+        result.push(Object.assign({}, item, { day: day, title: dayTitle }));
       });
     });
     return result;
@@ -358,16 +360,18 @@
         var index = Number(input.getAttribute("data-fixed-title"));
         var fixedDayInputs = overlay.querySelectorAll('[data-fixed-day="' + index + '"]:checked');
         var fixedSelectedDays = Array.from(fixedDayInputs).map(function (dayInput) { return Number(dayInput.value); });
-        var dayTitles = {};
-        overlay.querySelectorAll('[data-fixed-day-title="' + index + '"]').forEach(function (dayTitle) {
-          var title = scheduleText(dayTitle.value, 100);
-          if (title) dayTitles[dayTitle.getAttribute("data-fixed-title-day")] = title;
+        var dayTasks = {};
+        overlay.querySelectorAll('[data-fixed-day-task="' + index + '"]').forEach(function (taskInput) {
+          var day = taskInput.getAttribute("data-fixed-title-day");
+          var taskIndex = Number(taskInput.getAttribute("data-fixed-task-index"));
+          dayTasks[day] = dayTasks[day] || [];
+          dayTasks[day][taskIndex] = scheduleText(taskInput.value, 100);
         });
         return {
           title: scheduleText(input.value, 70),
           type: (overlay.querySelector('[data-fixed-type="' + index + '"]') || {}).value || "fixed",
           days: fixedSelectedDays,
-          dayTitles: dayTitles,
+          dayTasks: dayTasks,
           day: fixedSelectedDays.length ? fixedSelectedDays[0] : 0,
           start: (overlay.querySelector('[data-fixed-start="' + index + '"]') || {}).value || "09:00",
           end: (overlay.querySelector('[data-fixed-end="' + index + '"]') || {}).value || "10:00"
@@ -504,7 +508,10 @@
       var itemDays = fixedDays(item);
       var fixedType = item.type || "fixed";
       var dayTaskFields = fixedType === "work" ? itemDays.map(function (dayIndex) {
-        return '<label>¿Qué sueles hacer el ' + DAY_LABELS[dayIndex] + '? <span class="welcome-flow-optional">(opcional)</span><input data-fixed-day-title="' + index + '" data-fixed-title-day="' + dayIndex + '" maxlength="100" value="' + escapeHtml(item.dayTitles && item.dayTitles[dayIndex] || "") + '" placeholder="Ej.: revisar áreas, inspecciones, informes, reuniones"></label>';
+        var tasks = Array.isArray(item.dayTasks && item.dayTasks[dayIndex]) ? item.dayTasks[dayIndex] : item.dayTitles && item.dayTitles[dayIndex] ? [item.dayTitles[dayIndex]] : [""];
+        return '<fieldset class="welcome-flow-workday-tasks" style="grid-column:1/-1;display:grid;gap:7px;margin:0;padding:10px;border:1px solid #dbe3f0;border-radius:10px"><legend>¿Qué sueles hacer el ' + DAY_LABELS[dayIndex] + '? <span class="welcome-flow-optional">(opcional)</span></legend>' + tasks.map(function (task, taskIndex) {
+          return '<label><span class="sr-only">Actividad ' + (taskIndex + 1) + '</span><input data-fixed-day-task="' + index + '" data-fixed-title-day="' + dayIndex + '" data-fixed-task-index="' + taskIndex + '" maxlength="100" value="' + escapeHtml(task || "") + '" placeholder="Ej.: inspecciones, informes, reuniones"></label>';
+        }).join("") + '<button type="button" style="min-height:38px;padding:8px 10px;border:1px dashed #a5b4fc;border-radius:9px;background:#f5f3ff;color:#4338ca;font-weight:750" data-welcome-action="add-workday-task" data-fixed-index="' + index + '" data-fixed-day-index="' + dayIndex + '">＋ Añadir otra actividad</button><small>Escribe cada tarea por separado; puedes añadir más de una para este mismo día.</small></fieldset>';
       }).join("") : "";
       return '<div class="welcome-flow-fixed-row" data-fixed-row="' + index + '"><div class="welcome-flow-time-grid"><label>Nombre del bloque fijo<input data-fixed-title="' + index + '" maxlength="70" value="' + escapeHtml(item.title) + '" placeholder="' + (fixedType === "work" ? "Ej.: Turno de trabajo" : contextExamples) + '"></label><label>¿Qué tipo de compromiso es?<select data-fixed-type="' + index + '">' + typeOptions.map(function (option) { return '<option value="' + option[0] + '" ' + (fixedType === option[0] ? "selected" : "") + '>' + option[1] + '</option>'; }).join("") + '</select></label></div>' +
         '<fieldset class="welcome-flow-fixed-days"><legend>¿Qué días ocurre exactamente?</legend><div class="welcome-flow-mini-days">' + DAY_LABELS.map(function (day, dayIndex) { return '<label><input type="checkbox" data-fixed-day="' + index + '" value="' + dayIndex + '" ' + (itemDays.indexOf(dayIndex) >= 0 ? "checked" : "") + '><span>' + day.slice(0, 3) + '</span></label>'; }).join("") + '</div><small>Marca únicamente los días en que se repite. Si el jueves no tienes que ir, déjalo sin marcar.</small></fieldset>' + dayTaskFields +
@@ -1150,7 +1157,9 @@
         var reminder = cell && cell.reminder ? '<span class="welcome-flow-reminder-badge" title="' + escapeHtml(cell.reminderLabel || "Recordatorio") + '">🔔</span>' : "";
         var span = Math.max(1, Number(cell && cell.rowspan) || 1);
         for (var offset = 1; offset < span; offset += 1) weeklySkipped[day + "_" + (rowIndex + offset)] = true;
-        return '<td rowspan="' + span + '" class="welcome-week-cell welcome-flow-category-' + escapeHtml(cell && cell.c || "libre") + (active ? "" : " is-free-day") + (span > 1 ? " is-merged" : "") + '"><span>' + escapeHtml(text) + reminder + '</span></td>';
+        var cellContent = '<span>' + escapeHtml(text) + reminder + '</span>';
+        if (active) cellContent = '<button type="button" class="welcome-week-edit" style="display:grid;place-items:center;gap:4px;width:100%;min-height:48px;padding:6px;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer" data-week-edit-day data-preview-day="' + day + '" aria-label="Editar horario del ' + DAY_LABELS[day] + ': ' + escapeHtml(text) + '">' + cellContent + '<small style="color:#4f46e5;font-size:.62rem;font-weight:800">✎ Editar este día</small></button>';
+        return '<td rowspan="' + span + '" class="welcome-week-cell welcome-flow-category-' + escapeHtml(cell && cell.c || "libre") + (active ? "" : " is-free-day") + (span > 1 ? " is-merged" : "") + '">' + cellContent + '</td>';
       }).join("") + '</tr>';
     }).join("");
     var previewSwitch = '<div class="welcome-flow-view-switch" aria-label="Cambiar vista"><button type="button" data-preview-mode="daily" class="' + (state.previewMode === "daily" ? "is-selected" : "") + '">☀️ Vista diaria</button><button type="button" data-preview-mode="weekly" class="' + (state.previewMode === "weekly" ? "is-selected" : "") + '">📅 Vista semanal</button></div>';
@@ -1542,7 +1551,7 @@
         event.preventDefault();
         state.previewDay = Number(previewDay.getAttribute("data-preview-day"));
         state.previewMode = "daily";
-        state.editing = false;
+        state.editing = previewDay.hasAttribute("data-week-edit-day");
         render();
         return;
       }
@@ -1645,7 +1654,7 @@
         getDraftFromForm();
         var fixedStart = state.start;
         var fixedEnd = minutesToTime(Math.min(timeToMinutes(state.end), timeToMinutes(state.start) + 60));
-        state.fixed.push({ title: "", type: "fixed", days: [state.days[0] || 0], day: state.days[0] || 0, start: fixedStart, end: fixedEnd });
+        state.fixed.push({ title: "", type: "fixed", days: [], day: 0, start: fixedStart, end: fixedEnd });
         render();
         var newTitle = document.querySelector("[data-fixed-title='" + (state.fixed.length - 1) + "']");
         if (newTitle) newTitle.focus();
@@ -1657,10 +1666,25 @@
         var titles = { course: state.career === "medicine" ? "Curso o práctica" : "Curso o clase", practice: state.career === "medicine" ? "Práctica clínica o guardia" : "Laboratorio o práctica", work: "Turno de trabajo" };
         var templateStart = template === "work" ? "08:00" : "09:00";
         var templateEnd = template === "work" ? "13:00" : "10:00";
-        state.fixed.push({ title: titles[template] || "", type: template, days: [state.days[0] || 0], day: state.days[0] || 0, start: templateStart, end: templateEnd });
+        state.fixed.push({ title: titles[template] || "", type: template, days: [], day: 0, start: templateStart, end: templateEnd });
         render();
         var templateTitle = document.querySelector("[data-fixed-title='" + (state.fixed.length - 1) + "']");
         if (templateTitle) { templateTitle.focus(); templateTitle.select(); }
+        return;
+      }
+      if (name === "add-workday-task") {
+        getDraftFromForm();
+        var fixedIndex = Number(action.getAttribute("data-fixed-index"));
+        var dayIndex = Number(action.getAttribute("data-fixed-day-index"));
+        var fixedItem = state.fixed[fixedIndex];
+        if (!fixedItem) return;
+        fixedItem.dayTasks = fixedItem.dayTasks || {};
+        fixedItem.dayTasks[dayIndex] = Array.isArray(fixedItem.dayTasks[dayIndex]) ? fixedItem.dayTasks[dayIndex] : fixedItem.dayTitles && fixedItem.dayTitles[dayIndex] ? [fixedItem.dayTitles[dayIndex]] : [""];
+        fixedItem.dayTasks[dayIndex].push("");
+        render();
+        var newTaskIndex = fixedItem.dayTasks[dayIndex].length - 1;
+        var newTask = document.querySelector('[data-fixed-day-task="' + fixedIndex + '"][data-fixed-title-day="' + dayIndex + '"][data-fixed-task-index="' + newTaskIndex + '"]');
+        if (newTask) newTask.focus();
         return;
       }
       if (name === "remove-fixed") {
@@ -1870,6 +1894,12 @@
           }
           state.step = state.mode === "quick" ? decisionStep() : 2;
         } else if (state.step === 2 && state.mode === "detailed") {
+          var detailedUnassigned = state.fixed.some(function (item) { return item.title && !fixedDays(item).length; });
+          if (detailedUnassigned) {
+            var detailedRows = document.querySelector(".welcome-flow-fixed-row");
+            if (detailedRows) detailedRows.insertAdjacentHTML("afterend", '<span class="welcome-flow-error">Elige los días de cada turno o compromiso fijo antes de seguir.</span>');
+            return;
+          }
           var detailedWorks = hasRole("work");
           var detailedHasWork = state.fixed.some(function (item) { return item.title && (item.type === "work" || /trabaj|turno|oficina|empresa/i.test(item.title)); });
           if (detailedWorks && state.jobPattern !== "flexible" && !detailedHasWork) {
@@ -1879,6 +1909,12 @@
           }
           state.step = 3;
         } else if (state.step === 2 && state.mode === "guided") {
+          var guidedUnassigned = state.fixed.some(function (item) { return item.title && !fixedDays(item).length; });
+          if (guidedUnassigned) {
+            var guidedRows = document.querySelector(".welcome-flow-fixed-row");
+            if (guidedRows) guidedRows.insertAdjacentHTML("afterend", '<span class="welcome-flow-error">Elige los días de cada turno o compromiso fijo antes de seguir.</span>');
+            return;
+          }
           var guidedWorks = hasRole("work");
           var guidedHasWork = state.fixed.some(function (item) { return item.title && (item.type === "work" || /trabaj|turno|oficina|empresa/i.test(item.title)); });
           if (guidedWorks && state.jobPattern !== "flexible" && !guidedHasWork) {

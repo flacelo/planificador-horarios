@@ -128,6 +128,44 @@
     if (control.parentNode) control.parentNode.replaceChild(reemplazo, control);
   }
 
+  function construirTablaDeUnDia(tabla, dayIndex) {
+    if (!tabla || !tabla.rows || !tabla.rows.length) return null;
+    var filas = Array.prototype.slice.call(tabla.rows);
+    var matriz = filas.map(function () { return []; });
+    filas.forEach(function (fila, filaIndex) {
+      var columna = 0;
+      Array.prototype.slice.call(fila.cells).forEach(function (celda) {
+        while (matriz[filaIndex][columna]) columna += 1;
+        var columnas = Math.max(1, Number(celda.colSpan) || 1);
+        var filasOcupadas = Math.max(1, Number(celda.rowSpan) || 1);
+        for (var r = filaIndex; r < Math.min(filas.length, filaIndex + filasOcupadas); r += 1) {
+          for (var c = columna; c < columna + columnas; c += 1) matriz[r][c] = celda;
+        }
+        columna += columnas;
+      });
+    });
+    var tablaNueva = tabla.cloneNode(false);
+    tablaNueva.classList.add('planify-export-weekday-table');
+    var filaGlobal = 0;
+    var celdaDiaAnterior = null;
+    Array.prototype.slice.call(tabla.children).forEach(function (grupo) {
+      if (!grupo.rows) return;
+      var grupoNuevo = grupo.cloneNode(false);
+      Array.prototype.slice.call(grupo.rows).forEach(function (fila) {
+        var hora = matriz[filaGlobal] && matriz[filaGlobal][0];
+        var celdaDia = matriz[filaGlobal] && matriz[filaGlobal][dayIndex + 1];
+        var filaNueva = fila.cloneNode(false);
+        if (hora) filaNueva.appendChild(hora.cloneNode(true));
+        if (celdaDia && celdaDia !== celdaDiaAnterior) filaNueva.appendChild(celdaDia.cloneNode(true));
+        if (celdaDia) celdaDiaAnterior = celdaDia;
+        grupoNuevo.appendChild(filaNueva);
+        filaGlobal += 1;
+      });
+      tablaNueva.appendChild(grupoNuevo);
+    });
+    return tablaNueva;
+  }
+
   function prepararClon(elemento, opcion) {
     var clon = elemento.cloneNode(true);
     clon.removeAttribute('hidden');
@@ -162,6 +200,11 @@
       var dashboardSemanal = clon.querySelector('#view-dashboard');
       if (tablaSemanal) tablaSemanal.style.setProperty('display', 'block', 'important');
       if (dashboardSemanal && dashboardSemanal.parentNode) dashboardSemanal.parentNode.removeChild(dashboardSemanal);
+      if (tablaSemanal && Number.isInteger(opcion.weekDay)) {
+        var tablaCompleta = tablaSemanal.querySelector('table');
+        var tablaDia = construirTablaDeUnDia(tablaCompleta, opcion.weekDay);
+        if (tablaCompleta && tablaDia) tablaCompleta.parentNode.replaceChild(tablaDia, tablaCompleta);
+      }
     }
 
     Array.prototype.forEach.call(clon.querySelectorAll(SELECTORES_LIMPIEZA), function(nodo) {
@@ -181,9 +224,11 @@
     var elemento = elementoDeOpcion(opcion);
     if (!elemento) return null;
     var subtitulo = subtituloDeVista(opcion, elemento);
-    return '<section class="planify-export-page planify-export-' + opcion.tipo + '" data-planify-page="' + opcion.id + '">' +
+    var pageClass = 'planify-export-page planify-export-' + opcion.tipo + (Number.isInteger(opcion.weekDay) ? ' planify-export-semanal-dia' : '');
+    var pageSubtitle = Number.isInteger(opcion.weekDay) ? 'Vista semanal completa · ' + ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'][opcion.weekDay] + ' · ' + subtitulo : subtitulo;
+    return '<section class="' + pageClass + '" data-planify-page="' + opcion.id + '">' +
       '<header class="planify-export-header"><div class="planify-export-brand">PLANIFY</div>' +
-      '<h1>' + escaparHTML(opcion.label) + '</h1><p>' + escaparHTML(subtitulo) + '</p></header>' +
+      '<h1>' + escaparHTML(opcion.label) + '</h1><p>' + escaparHTML(pageSubtitle) + '</p></header>' +
       '<div class="planify-export-viewport"><div class="planify-export-fit">' + prepararClon(elemento, opcion) + '</div></div>' +
       '<footer class="planify-export-footer">Planificador de horarios</footer></section>';
   }
@@ -221,7 +266,7 @@
       fila.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 12px;margin-bottom:8px;border:1px solid #e2e8f0;border-radius:10px;cursor:pointer;font-size:14px;';
       var checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
-      checkbox.checked = opcion.id === activa.id;
+      checkbox.checked = opcion.id === activa.id || (activa.id === 'vista-diaria' && opcion.id === 'vista-semanal');
       checkbox.setAttribute('data-planify-vista', opcion.id);
       checkbox.style.cssText = 'width:17px;height:17px;accent-color:#6a1b9a;cursor:pointer;';
       fila.appendChild(checkbox);
@@ -242,6 +287,10 @@
     generar.textContent = 'Generar y descargar PDF';
     generar.style.cssText = 'width:100%;margin-top:12px;padding:12px;border:0;border-radius:10px;background:linear-gradient(135deg,#7b1fa2,#4a148c);color:#fff;font-size:14.5px;font-weight:600;cursor:pointer;';
     panel.appendChild(generar);
+    var ayudaMovil = document.createElement('p');
+    ayudaMovil.style.cssText = 'margin:9px 0 0;color:#64748b;font-size:11.5px;line-height:1.45;';
+    ayudaMovil.textContent = 'La semana completa se divide por días para que puedas ampliar cada página en el visor del celular.';
+    panel.appendChild(ayudaMovil);
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
     var closeButton = panel.querySelector('[data-planify-cerrar]');
@@ -271,6 +320,7 @@
   function estilosDocumento() {
     return [
       '@page { size: A4 landscape; margin: 6mm; }',
+      '@page planify-weekday { size: A4 portrait; margin: 8mm; }',
       'html,body{margin:0!important;padding:0!important;background:#fff!important;color:#0f172a!important;width:auto!important;height:auto!important;overflow:visible!important}',
       'body#planify-pdf-document{font-family:Inter,"Segoe UI",Arial,sans-serif!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}',
       'body#planify-pdf-document .planify-export-page{width:285mm!important;height:196mm!important;min-height:196mm!important;max-height:196mm!important;margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;box-sizing:border-box!important;break-before:auto!important;page-break-before:auto!important;break-after:page!important;page-break-after:always!important;background:#fff!important}',
@@ -303,6 +353,13 @@
       'body#planify-pdf-document .planify-export-semanal th{padding:2mm 1mm!important;background:#0f172a!important;color:#fff!important;border:1px solid #64748b!important;font-size:10.5px!important;line-height:1.1!important;font-weight:800!important;text-align:center!important}',
       'body#planify-pdf-document .planify-export-semanal td{height:auto!important;min-height:0!important;padding:1mm!important;background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important;font-size:9.5px!important;line-height:1.15!important;text-align:center!important;vertical-align:middle!important;white-space:normal!important;word-break:break-word!important}',
       'body#planify-pdf-document .planify-export-semanal td:first-child{width:11%!important;background:#f1f5f9!important;color:#0f172a!important;font-weight:700!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia{page:planify-weekday!important;width:194mm!important;height:281mm!important;min-height:281mm!important;max-height:281mm!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia .planify-export-viewport{overflow:visible!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia .table-wrap{width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia table{width:100%!important;table-layout:fixed!important;border-collapse:collapse!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia th{padding:3mm!important;background:#0f172a!important;color:#fff!important;border:1px solid #64748b!important;font-size:13px!important;text-align:center!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia td{height:auto!important;padding:2.5mm!important;background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important;font-size:12px!important;line-height:1.3!important;text-align:center!important;vertical-align:middle!important;white-space:normal!important;word-break:break-word!important}',
+      'body#planify-pdf-document .planify-export-semanal-dia td:first-child{width:27%!important;background:#f1f5f9!important;font-weight:700!important}',
       'body#planify-pdf-document .planify-export-semanal .leyenda{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;gap:1.5mm 3mm!important;margin:2mm 0 0!important;padding:1mm!important;color:#334155!important;font-size:7.8px!important}',
       'body#planify-pdf-document .planify-export-mensual .cal-container{width:100%!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;background:#fff!important;box-shadow:none!important}',
       'body#planify-pdf-document .planify-export-mensual .cal-header{display:none!important}',
@@ -388,6 +445,24 @@
     return seleccionadas;
   }
 
+  function construirPaginasSeleccionadas(opciones) {
+    var dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    var paginas = [];
+    opciones.forEach(function (opcion) {
+      if (opcion.id !== 'vista-semanal') {
+        var pagina = construirPagina(opcion);
+        if (pagina) paginas.push(pagina);
+        return;
+      }
+      dias.forEach(function (dia, weekDay) {
+        var opcionDia = Object.assign({}, opcion, { id: opcion.id + '-' + (weekDay + 1), weekDay: weekDay });
+        var paginaDia = construirPagina(opcionDia);
+        if (paginaDia) paginas.push(paginaDia);
+      });
+    });
+    return paginas;
+  }
+
   function generarPDF() {
     var seleccionadas = seleccionDelModal();
     var mensaje = document.getElementById('planify-pdf-mensaje');
@@ -396,8 +471,8 @@
       mensaje.style.display = 'block';
       return;
     }
-    var paginas = OPCIONES.filter(function(opcion) { return seleccionadas.indexOf(opcion.id) !== -1; })
-      .map(construirPagina).filter(Boolean);
+    var opciones = OPCIONES.filter(function(opcion) { return seleccionadas.indexOf(opcion.id) !== -1; });
+    var paginas = construirPaginasSeleccionadas(opciones);
     if (!paginas.length) {
       mensaje.textContent = 'No se encontró contenido disponible para imprimir.';
       mensaje.style.display = 'block';
@@ -408,8 +483,8 @@
   }
 
   window.exportarVistaAPDF = function() {
-    var pagina = construirPagina(opcionActiva());
-    if (pagina) imprimirPaginas([pagina]);
+    var paginas = construirPaginasSeleccionadas([opcionActiva()]);
+    if (paginas.length) imprimirPaginas(paginas);
   };
 
   document.addEventListener('DOMContentLoaded', function() {

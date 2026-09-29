@@ -5,6 +5,7 @@
   var tickId = null;
   var breathTickId = null;
   var breathPause = { active: false, endsAt: null };
+  var focusModalHistoryActive = false;
   var BREATH_PAUSE_SECONDS = 60;
   var defaults = {
     phase: "focus",
@@ -419,6 +420,12 @@
     var modal = document.getElementById("planify-focus-modal");
     stopBreathing("", false, true);
     if (modal) modal.remove();
+    if (focusModalHistoryActive) {
+      focusModalHistoryActive = false;
+      if (window.history && window.history.state && window.history.state.planifyFocusModal) {
+        window.history.back();
+      }
+    }
   }
 
   function updateClockOnly() {
@@ -514,6 +521,12 @@
     overlay.id = "planify-focus-modal";
     overlay.className = "planify-focus-overlay";
     document.body.appendChild(overlay);
+    if (!focusModalHistoryActive && window.history && window.history.pushState) {
+      var previousHistoryState = window.history.state;
+      var modalHistoryState = previousHistoryState && typeof previousHistoryState === "object" ? Object.assign({}, previousHistoryState, { planifyFocusModal: true }) : { planifyFocusModal: true, planifyPreviousHistoryState: previousHistoryState };
+      window.history.pushState(modalHistoryState, "", window.location.href);
+      focusModalHistoryActive = true;
+    }
     render();
     var closeButton = overlay.querySelector("[data-focus-action='close']");
     if (closeButton) closeButton.focus();
@@ -572,6 +585,14 @@
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && document.getElementById("planify-focus-modal")) close();
+  });
+
+  window.addEventListener("popstate", function () {
+    if (!document.getElementById("planify-focus-modal")) return;
+    focusModalHistoryActive = false;
+    stopBreathing("", false, true);
+    var modal = document.getElementById("planify-focus-modal");
+    if (modal) modal.remove();
   });
 
   document.addEventListener("visibilitychange", function () {

@@ -118,7 +118,7 @@
     var result = [];
     state.fixed.forEach(function (item) {
       fixedDays(item).forEach(function (day) {
-        result.push(Object.assign({}, item, { day: day }));
+        result.push(Object.assign({}, item, { day: day, title: item.dayTitles && item.dayTitles[day] || item.title }));
       });
     });
     return result;
@@ -358,10 +358,16 @@
         var index = Number(input.getAttribute("data-fixed-title"));
         var fixedDayInputs = overlay.querySelectorAll('[data-fixed-day="' + index + '"]:checked');
         var fixedSelectedDays = Array.from(fixedDayInputs).map(function (dayInput) { return Number(dayInput.value); });
+        var dayTitles = {};
+        overlay.querySelectorAll('[data-fixed-day-title="' + index + '"]').forEach(function (dayTitle) {
+          var title = scheduleText(dayTitle.value, 100);
+          if (title) dayTitles[dayTitle.getAttribute("data-fixed-title-day")] = title;
+        });
         return {
           title: scheduleText(input.value, 70),
           type: (overlay.querySelector('[data-fixed-type="' + index + '"]') || {}).value || "fixed",
           days: fixedSelectedDays,
+          dayTitles: dayTitles,
           day: fixedSelectedDays.length ? fixedSelectedDays[0] : 0,
           start: (overlay.querySelector('[data-fixed-start="' + index + '"]') || {}).value || "09:00",
           end: (overlay.querySelector('[data-fixed-end="' + index + '"]') || {}).value || "10:00"
@@ -441,13 +447,14 @@
   }
 
   function renderCoreStep() {
-    var priorities = [["study", "📚", "Avanzar en mis estudios o formación"], ["work", "💼", "Sacar adelante trabajo, clientes o proyectos"], ["balance", "⚖️", "Cumplir mis responsabilidades sin descuidarme"], ["personal", "🌿", "Ser constante con un objetivo o hábito personal"]];
+    var priorities = [["study", "📚", "Avanzar en mis estudios o formación"], ["work", "💼", "Sacar adelante trabajo, clientes o proyectos"], ["balance", "⚖️", "Cumplir mis responsabilidades sin descuidarme"], ["personal", "🌿", "Ser constante con un objetivo o hábito personal"], ["procrastination", "🧩", "Empezar lo que suelo postergar"]];
     var occupations = [["study", "Estudio o me estoy formando"], ["work", "Tengo uno o más trabajos"], ["entrepreneur", "Tengo uno o más emprendimientos"], ["home", "Hogar / cuidados"], ["other", "También hago otra cosa"]];
     var priorityHelp = {
       study: "Reservaremos primero espacios tranquilos para estudiar o aprender.",
       work: "Daremos prioridad a tus tareas, proyectos o trabajo importante.",
       balance: "Repartiremos el tiempo entre obligaciones, avance personal y descanso.",
-      personal: "Protegeremos primero tus hábitos, bienestar y proyectos personales."
+      personal: "Protegeremos primero tus hábitos, bienestar y proyectos personales.",
+      procrastination: "Buscaremos un primer paso pequeño en espacios disponibles, sin pedirte que adivines cuándo procrastinas."
     };
     var dayOptions = DAY_LABELS.map(function (day, index) {
       return '<label class="welcome-flow-day"><input type="checkbox" name="welcome-day" value="' + index + '" ' +
@@ -495,8 +502,12 @@
     var contextExamples = state.career === "medicine" ? "Ej.: Anatomía, práctica clínica o guardia" : state.career === "engineering" ? "Ej.: Cálculo, laboratorio o taller" : works ? "Ej.: trabajo, turno, reunión o cliente" : "Ej.: clase, cita o compromiso familiar";
     var fixedMarkup = state.fixed.map(function (item, index) {
       var itemDays = fixedDays(item);
-      return '<div class="welcome-flow-fixed-row" data-fixed-row="' + index + '"><div class="welcome-flow-time-grid"><label>¿Qué actividad no puedes mover?<input data-fixed-title="' + index + '" maxlength="70" value="' + escapeHtml(item.title) + '" placeholder="' + contextExamples + '"></label><label>¿Qué tipo de compromiso es?<select data-fixed-type="' + index + '">' + typeOptions.map(function (option) { return '<option value="' + option[0] + '" ' + (item.type === option[0] ? "selected" : "") + '>' + option[1] + '</option>'; }).join("") + '</select></label></div>' +
-        '<fieldset class="welcome-flow-fixed-days"><legend>¿Qué días ocurre exactamente?</legend><div class="welcome-flow-mini-days">' + DAY_LABELS.map(function (day, dayIndex) { return '<label><input type="checkbox" data-fixed-day="' + index + '" value="' + dayIndex + '" ' + (itemDays.indexOf(dayIndex) >= 0 ? "checked" : "") + '><span>' + day.slice(0, 3) + '</span></label>'; }).join("") + '</div><small>Marca únicamente los días en que se repite. Si el jueves no tienes que ir, déjalo sin marcar.</small></fieldset>' +
+      var fixedType = item.type || "fixed";
+      var dayTaskFields = fixedType === "work" ? itemDays.map(function (dayIndex) {
+        return '<label>¿Qué sueles hacer el ' + DAY_LABELS[dayIndex] + '? <span class="welcome-flow-optional">(opcional)</span><input data-fixed-day-title="' + index + '" data-fixed-title-day="' + dayIndex + '" maxlength="100" value="' + escapeHtml(item.dayTitles && item.dayTitles[dayIndex] || "") + '" placeholder="Ej.: revisar áreas, inspecciones, informes, reuniones"></label>';
+      }).join("") : "";
+      return '<div class="welcome-flow-fixed-row" data-fixed-row="' + index + '"><div class="welcome-flow-time-grid"><label>Nombre del bloque fijo<input data-fixed-title="' + index + '" maxlength="70" value="' + escapeHtml(item.title) + '" placeholder="' + (fixedType === "work" ? "Ej.: Turno de trabajo" : contextExamples) + '"></label><label>¿Qué tipo de compromiso es?<select data-fixed-type="' + index + '">' + typeOptions.map(function (option) { return '<option value="' + option[0] + '" ' + (fixedType === option[0] ? "selected" : "") + '>' + option[1] + '</option>'; }).join("") + '</select></label></div>' +
+        '<fieldset class="welcome-flow-fixed-days"><legend>¿Qué días ocurre exactamente?</legend><div class="welcome-flow-mini-days">' + DAY_LABELS.map(function (day, dayIndex) { return '<label><input type="checkbox" data-fixed-day="' + index + '" value="' + dayIndex + '" ' + (itemDays.indexOf(dayIndex) >= 0 ? "checked" : "") + '><span>' + day.slice(0, 3) + '</span></label>'; }).join("") + '</div><small>Marca únicamente los días en que se repite. Si el jueves no tienes que ir, déjalo sin marcar.</small></fieldset>' + dayTaskFields +
         '<div class="welcome-flow-time-grid"><label>Desde<select data-fixed-start="' + index + '">' + blockTimeOptions(item.start, false) + '</select></label><label>Hasta<select data-fixed-end="' + index + '">' + blockTimeOptions(item.end, true) + '</select></label></div>' +
         '<button type="button" class="welcome-flow-remove-fixed" data-welcome-action="remove-fixed" data-fixed-index="' + index + '" aria-label="Quitar actividad">Quitar</button></div>';
     }).join("");
@@ -819,7 +830,8 @@
       study: { text: "Estudio o aprendizaje", category: "estudio" },
       work: { text: "Trabajo o proyecto", category: "clase" },
       balance: { text: "Avance en una prioridad", category: "flexible" },
-      personal: { text: "Hábito o proyecto personal", category: "flexible" }
+      personal: { text: "Hábito o proyecto personal", category: "flexible" },
+      procrastination: { text: "Empezar una tarea que suelo postergar", category: "flexible" }
     };
     var focus = priorities[state.priority] || priorities.study;
     var balancedByOccupation = {
@@ -830,6 +842,7 @@
       other: "Mis actividades y tiempo personal"
     };
     var goalText = state.goal || (state.priority === "balance" ? balancedByOccupation[state.occupation] || balancedByOccupation.other : focus.text);
+    if (state.priority === "procrastination" && !state.goal) goalText = "Elegir una tarea pendiente y empezar por el siguiente paso";
     var focusDays = activeDays.slice(0, Math.max(1, Math.min(activeDays.length, Number(state.weeklyFrequency) || activeDays.length)));
     var targetMinutesPerDay = selectedDuration * Math.max(1, Number(state.sessionsPerDay) || 1);
     var activityTemplates = {
@@ -1449,6 +1462,11 @@
       saveRowEdit(index);
     });
     document.addEventListener("change", function (event) {
+      if (event.target.matches && (event.target.matches("[data-fixed-day]") || event.target.matches("[data-fixed-type]"))) {
+        getDraftFromForm();
+        render();
+        return;
+      }
       if (event.target instanceof HTMLInputElement && event.target.matches("input[name='welcome-role']")) {
         getDraftFromForm();
         render();
@@ -1456,7 +1474,7 @@
       }
       if (event.target instanceof HTMLInputElement && event.target.matches("input[name='welcome-priority']")) {
         getDraftFromForm();
-        var priorityDescriptions = { study: "Reservaremos primero espacios tranquilos para estudiar o aprender.", work: "Daremos prioridad a tus tareas, proyectos o trabajo importante.", balance: "Repartiremos el tiempo entre obligaciones, avance personal y descanso.", personal: "Protegeremos primero tus hábitos, bienestar y proyectos personales." };
+        var priorityDescriptions = { study: "Reservaremos primero espacios tranquilos para estudiar o aprender.", work: "Daremos prioridad a tus tareas, proyectos o trabajo importante.", balance: "Repartiremos el tiempo entre obligaciones, avance personal y descanso.", personal: "Protegeremos primero tus hábitos, bienestar y proyectos personales.", procrastination: "Buscaremos un primer paso pequeño en espacios disponibles, sin pedirte que adivines cuándo procrastinas." };
         var priorityFeedback = document.querySelector("[data-priority-feedback]");
         if (priorityFeedback) priorityFeedback.textContent = "✨ " + priorityDescriptions[state.priority];
         return;
@@ -1636,7 +1654,7 @@
       if (name === "add-fixed-template") {
         getDraftFromForm();
         var template = action.getAttribute("data-fixed-template") || "fixed";
-        var titles = { course: state.career === "medicine" ? "Curso o práctica" : "Curso o clase", practice: state.career === "medicine" ? "Práctica clínica o guardia" : "Laboratorio o práctica", work: state.jobRole ? "Trabajo · " + scheduleText(state.jobRole, 45) : "Trabajo o turno" };
+        var titles = { course: state.career === "medicine" ? "Curso o práctica" : "Curso o clase", practice: state.career === "medicine" ? "Práctica clínica o guardia" : "Laboratorio o práctica", work: "Turno de trabajo" };
         var templateStart = template === "work" ? "08:00" : "09:00";
         var templateEnd = template === "work" ? "13:00" : "10:00";
         state.fixed.push({ title: titles[template] || "", type: template, days: [state.days[0] || 0], day: state.days[0] || 0, start: templateStart, end: templateEnd });

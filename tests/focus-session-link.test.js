@@ -21,6 +21,7 @@ function harness(storage = new MemoryStorage()) {
   const elements = new Map();
   const listeners = {};
   const intervals = new Map();
+  const historyStates = [{ app: "state" }];
   let nextId = 0;
   let nextIntervalId = 0;
   let now = Date.now();
@@ -102,6 +103,13 @@ function harness(storage = new MemoryStorage()) {
     setInterval(callback) { const id = ++nextIntervalId; intervals.set(id, callback); return id; },
     clearInterval(id) { intervals.delete(id); },
     setTimeout() {},
+    location: { href: "https://planify.test/" },
+    history: {
+      get state() { return historyStates[historyStates.length - 1]; },
+      pushState(value) { historyStates.push(value); },
+      back() { if (historyStates.length > 1) historyStates.pop(); (listeners["window:popstate"] || []).forEach((handler) => handler()); }
+    },
+    addEventListener(type, handler) { (listeners["window:" + type] ||= []).push(handler); },
     dispatchEvent() {}
   };
   const context = { window, document, localStorage: storage, Element: ElementStub, HTMLSelectElement: ElementStub, Intl, Date: TestDate, Math, Number, String, Object, Array, JSON, Promise, RegExp, isNaN };
@@ -120,7 +128,8 @@ function harness(storage = new MemoryStorage()) {
       const target = elements.get("planify-focus-modal");
       (listeners.click || []).forEach((handler) => handler({ target, preventDefault() {} }));
     },
-    pressEscape() { (listeners.keydown || []).forEach((handler) => handler({ key: "Escape" })); },
+    pressEscape() { (listeners.keydown || []).forEach((handler) => handler({ key: "Escape", preventDefault() {} })); },
+    pressBack() { window.history.back(); },
     advance(ms) { now += ms; },
     runIntervals() { Array.from(intervals.values()).forEach((callback) => callback()); },
     finishNow() { assert.ok(intervals.size, "starting focus should create a timer"); now += 60 * 60 * 1000; Array.from(intervals.values())[0](); }
@@ -148,6 +157,19 @@ test("la tarjeta contextual identifica actividad y fecha, registra al completar 
     sessions: 1, minutes: 25, title: activity.title
   });
   assert.equal(globalState.completedSessions, 1);
+});
+
+test("cerrar el temporizador restaura el historial y Atrás cierra el modal sin salir de la página", () => {
+  const app = harness();
+  app.open();
+  assert.equal(app.elements.has("planify-focus-modal"), true);
+  app.pressBack();
+  assert.equal(app.elements.has("planify-focus-modal"), false);
+
+  app.open();
+  app.click("close");
+  assert.equal(app.elements.has("planify-focus-modal"), false);
+  assert.equal(app.context.window.history.state.app, "state");
 });
 
 test("pausar conserva la actividad; abrir otra durante la sesión no la reasigna", () => {

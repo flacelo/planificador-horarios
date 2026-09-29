@@ -905,7 +905,7 @@
         var reminderLabels = [];
         if (fixed) {
           text = fixed.title;
-          category = /clase|estudio|curso/i.test(text) ? "estudio" : /trabajo|reuni|empresa|informe/i.test(text) ? "clase" : "rutina";
+          category = fixed.type === "course" || fixed.type === "practice" || /clase|estudio|curso/i.test(text) ? "estudio" : fixed.type === "work" || /trabajo|reuni|empresa|informe/i.test(text) ? "clase" : "rutina";
           needsShortBreak = false;
           focusBlocksSinceBreak = 0;
         } else if (manual) {

@@ -143,11 +143,11 @@
           moveHandle = document.createElement("button");
           moveHandle.type = "button";
           moveHandle.className = "weekly-calm-move-handle";
-          moveHandle.textContent = "Acciones";
-          moveHandle.title = "Mover, alargar, acortar, unir o dividir este bloque";
+          moveHandle.textContent = "⋯";
+          moveHandle.title = "Opciones: toca para mover, ajustar duración o dividir; arrastra ⋯ para mover.";
           cell.appendChild(moveHandle);
         }
-        if (moveHandle) moveHandle.setAttribute("aria-label", "Acciones de " + activity + " en " + day + (time ? ", " + time : ""));
+        if (moveHandle) moveHandle.setAttribute("aria-label", "Opciones de " + activity + " en " + day + (time ? ", " + time : ""));
         cell.tabIndex = 0;
         var action = cell.classList.contains("merged-cell") ? " Toca o pulsa Enter para editar el bloque unido." :
           empty ? " Toca para añadir una actividad." : " Toca para editarla.";
@@ -323,6 +323,18 @@
       var hint = tableView.querySelector(".weekly-calm-scroll-hint");
       if (hint) hint.textContent = message;
     }
+    function moveHandleAtPointer(event) {
+      var target = event.target instanceof Element ? event.target : event.target && event.target.parentElement;
+      if (!target) return null;
+      var handle = target.closest(".weekly-calm-move-handle");
+      if (handle) return handle;
+      var cell = target.closest("#tabla td.celda[data-fi][data-ci]");
+      var candidate = cell && cell.querySelector(".weekly-calm-move-handle");
+      if (!candidate) return null;
+      var bounds = candidate.getBoundingClientRect();
+      return event.clientX >= bounds.left && event.clientX <= bounds.right &&
+        event.clientY >= bounds.top && event.clientY <= bounds.bottom ? candidate : null;
+    }
     function activityTiming(cell) {
       if (!cell || typeof filas === "undefined") return null;
       var row = Number(cell.dataset.fi);
@@ -390,38 +402,7 @@
       move.cell.classList.remove("weekly-cell-moving");
       if (move.target) move.target.classList.remove("weekly-drop-target");
       if (cancelled) {
-        setMoveHint("Movimiento cancelado. Toca «Acciones» para elegir una opción.");
-        return;
-      }
-      var target = targetCellAtPoint(event);
-      if (!target) {
-        setMoveHint("No encontré una celda de destino. El horario quedó igual.");
-        return;
-      }
-      var time = window.PLANIFY_SCHEDULE_TIME;
-      if (!time || typeof time.moveActivity !== "function" || typeof filas === "undefined" || typeof dias === "undefined") {
-        setMoveHint("No se pudo mover el bloque. El horario quedó igual.");
-        return;
-      }
-      var result = time.moveActivity({ dias: dias, filas: filas }, move.day, move.row, Number(target.dataset.ci), Number(target.dataset.fi), scheduleFallback());
-      if (!result.ok) {
-        setMoveHint(result.error || "No se pudo mover el bloque. El horario quedó igual.");
-        return;
-      }
-      if (!result.changed) {
-        setMoveHint("El bloque ya estaba en esa hora.");
-        return;
-      }
-      persistRows(result.schedule.filas, "Listo: “" + move.text + "” quedó en " + formatVisibleTime(result.start) + "–" + formatVisibleTime(result.end) + ". Puedes deshacerlo.");
-    }
-    function finishMove(event, cancelled) {
-      if (!activeMove || event.pointerId !== activeMove.pointerId) return;
-      var move = activeMove;
-      activeMove = null;
-      move.cell.classList.remove("weekly-cell-moving");
-      if (move.target) move.target.classList.remove("weekly-drop-target");
-      if (cancelled) {
-        setMoveHint("Movimiento cancelado. Toca una actividad para escribir o usa ⠿ para moverla.");
+        setMoveHint("Movimiento cancelado. Toca una actividad para escribir o usa «Opciones» para moverla.");
         return;
       }
       var target = targetCellAtPoint(event);
@@ -458,7 +439,7 @@
       }
     }
     table.addEventListener("pointerdown", function (event) {
-      var handle = event.target.closest(".weekly-calm-move-handle");
+      var handle = moveHandleAtPointer(event);
       if (!handle || event.button !== 0 || typeof filas === "undefined") return;
       var cell = handle.closest("#tabla td.celda[data-fi][data-ci]");
       if (!cell) return;
@@ -493,9 +474,39 @@
       var range = row && String(row.hora || "").match(/\d{1,2}:\d{2}/g) || [];
       setMoveHint(range.length ? "Nueva hora de inicio: " + formatVisibleTime(range[0]) + ". Si hay un cruce, el bloque no se moverá." : "Suelta en la fila donde quieres que empiece.");
     });
-    document.addEventListener("pointerup", function (event) { if (activeMove) finishMove(event, false); pendingMove = null; });
+    document.addEventListener("pointerup", function (event) {
+      if (activeMove) {
+        finishMove(event, false);
+        pendingMove = null;
+        return;
+      }
+      if (pendingMove && event.pointerId === pendingMove.pointerId) {
+        var tap = pendingMove;
+        pendingMove = null;
+        suppressHandleClick = true;
+        window.setTimeout(function () { suppressHandleClick = false; }, 0);
+        showCellActions(tap.cell, tap.handle);
+        return;
+      }
+      pendingMove = null;
+    });
     document.addEventListener("pointercancel", function (event) { if (activeMove) finishMove(event, true); pendingMove = null; });
     table.addEventListener("click", function (event) {
+      if (suppressHandleClick) {
+        var suppressedCell = event.target instanceof Element ? event.target.closest("#tabla td.celda[data-fi][data-ci]") : null;
+        if (suppressedCell) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+      }
+      var handle = moveHandleAtPointer(event);
+      if (handle) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!suppressHandleClick) showCellActions(handle.closest("#tabla td.celda[data-fi][data-ci]"), handle);
+        return;
+      }
       var cell = event.target.closest("#tabla td.celda[data-fi][data-ci]");
       if (moveSelection && cell && !event.target.closest(".done-check,button,a,input")) {
         event.preventDefault();
@@ -569,7 +580,7 @@
 
     var hint = document.createElement("p");
     hint.className = "weekly-calm-scroll-hint";
-    hint.textContent = "Toca una actividad para escribir. Pulsa «Acciones» para moverla o cambiar su duración; los bloques con el mismo nombre, seguidos, se unen solos.";
+    hint.textContent = "Toca el nombre para editar. Pulsa ⋯ para ver opciones o arrástralo para mover el bloque.";
     tableView.insertBefore(hint, table);
     undoButton = document.createElement("button");
     undoButton.type = "button";
@@ -596,14 +607,6 @@
     document.addEventListener("click", function (event) {
       var target = event.target instanceof Element ? event.target : null;
       if (!target) return;
-      var handle = target.closest(".weekly-calm-move-handle");
-      if (handle) {
-        if (suppressHandleClick) { event.preventDefault(); return; }
-        event.preventDefault();
-        var cell = handle.closest("#tabla td.celda[data-fi][data-ci]");
-        showCellActions(cell, handle);
-        return;
-      }
       var actionButton = target.closest("[data-weekly-cell-action]");
       if (actionButton && actionMenu && actionMenu.contains(actionButton)) {
         event.preventDefault();

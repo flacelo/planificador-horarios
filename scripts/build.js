@@ -16,8 +16,9 @@ const STATIC_ASSETS = [
   'css/weekly-calm.css', 'css/welcome-flow.css',
   'js/annual-calm.js', 'js/app.js', 'js/brand-home.js', 'js/completion-history.js',
   'js/daily-backup.js', 'js/daily-calm.js', 'js/daily-persistence.js', 'js/day-flow.js',
-  'js/export-pdf.js', 'js/focus-activity-history.js', 'js/focus-session.js', 'js/mobile-coach.js',
-  'js/monthly-calm.js', 'js/panel-redesign.js', 'js/pwa-experience.js', 'js/reminder-service.js',
+  'js/export-pdf.js', 'js/focus-activity-history.js', 'js/focus-session.js', 'js/honest-report.js',
+  'js/local-data-gate.js', 'js/mobile-coach.js', 'js/monthly-calm.js', 'js/panel-redesign.js',
+  'js/pwa-experience.js', 'js/reminder-service.js',
   'js/schedule-time.js', 'js/trust-fixes.js', 'js/variable-duration.js', 'js/weekly-calm.js',
   'js/welcome-flow.js'
 ];

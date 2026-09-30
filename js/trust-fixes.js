@@ -562,7 +562,7 @@
     if (!document.getElementById("planify-day-flow-script")) {
       var script = document.createElement("script");
       script.id = "planify-day-flow-script";
-      script.src = "js/day-flow.js?v=3";
+      script.src = "js/day-flow.js?v=4";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -592,7 +592,7 @@
     }
     if (!existing) {
       script.id = "planify-schedule-time-script";
-      script.src = "js/schedule-time.js?v=1";
+      script.src = "js/schedule-time.js?v=3";
       script.async = false;
       document.head.appendChild(script);
     }
@@ -680,13 +680,13 @@
       var style = document.createElement("link");
       style.id = "planify-weekly-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/weekly-calm.css?v=7";
+      style.href = "css/weekly-calm.css?v=10";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-weekly-calm-script")) {
       var script = document.createElement("script");
       script.id = "planify-weekly-calm-script";
-      script.src = "js/weekly-calm.js?v=5";
+      script.src = "js/weekly-calm.js?v=8";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -935,13 +935,13 @@
       var welcomeStyle = document.createElement("link");
       welcomeStyle.id = "welcome-flow-style";
       welcomeStyle.rel = "stylesheet";
-      welcomeStyle.href = "css/welcome-flow.css?v=1.17";
+      welcomeStyle.href = "css/welcome-flow.css?v=1.19";
       document.head.appendChild(welcomeStyle);
     }
     if (!document.getElementById("welcome-flow-script")) {
       var welcomeScript = document.createElement("script");
       welcomeScript.id = "welcome-flow-script";
-      welcomeScript.src = "js/welcome-flow.js?v=1.24";
+      welcomeScript.src = "js/welcome-flow.js?v=1.26";
       welcomeScript.defer = true;
       document.head.appendChild(welcomeScript);
     }

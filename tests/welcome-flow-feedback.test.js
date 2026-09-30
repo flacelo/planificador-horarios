@@ -5,6 +5,8 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const welcome = fs.readFileSync(require.resolve("../js/welcome-flow.js"), "utf8");
 const pdf = fs.readFileSync(require.resolve("../js/export-pdf.js"), "utf8");
+const weekly = fs.readFileSync(require.resolve("../js/weekly-calm.js"), "utf8");
+const daily = fs.readFileSync(require.resolve("../js/day-flow.js"), "utf8");
 
 test("cada turno permite agregar varias tareas por día sin preseleccionar lunes", () => {
   assert.match(welcome, /data-fixed-day-task/);
@@ -14,12 +16,42 @@ test("cada turno permite agregar varias tareas por día sin preseleccionar lunes
   assert.match(welcome, /Elige los días de cada turno o compromiso fijo/);
 });
 
-test("cada celda semanal permite abrir la edición del día seleccionado", () => {
-  assert.match(welcome, /data-week-edit-day/);
-  assert.match(welcome, /state\.editing = previewDay\.hasAttribute\("data-week-edit-day"\)/);
-  assert.match(welcome, /class="welcome-flow-row-edit" data-week-edit-day/);
-  assert.match(welcome, /no una estimación del tiempo real/);
-  assert.match(welcome, /Tiempo disponible/);
+test("la propuesta diaria y semanal se editan directamente, sin el botón ni la ventana grande", () => {
+  assert.match(welcome, /data-day-inline-edit/);
+  assert.match(welcome, /data-week-inline-edit/);
+  assert.match(welcome, /data-week-handle="move"/);
+  assert.match(welcome, /data-week-handle="start"/);
+  assert.match(welcome, /data-week-handle="end"/);
+  assert.match(weekly, /beginInlineEdit\(cell\)/);
+  assert.match(weekly, /mergeMatchingActivities\(dayIndex\)/);
+  assert.match(weekly, /weekly-calm-move-handle/);
+  assert.match(weekly, /time\.moveActivity\(/);
+  assert.doesNotMatch(weekly, /window\.abrirModal\(/);
+  assert.doesNotMatch(welcome, /class="welcome-flow-row-edit"/);
+});
+
+test("las horas se muestran en formato de 12 horas, con almacenamiento compatible de 24 horas", () => {
+  assert.match(welcome, /function formatClock\(value\)/);
+  assert.match(welcome, /hour % 12 \|\| 12/);
+  assert.match(welcome, /a\. m\.|p\. m\./);
+  assert.match(welcome, /var value = String\(hour\)\.padStart\(2, "0"\)/);
+  assert.match(welcome, /value="' \+ value/);
+  assert.match(welcome, /6:00 p\. m\./);
+  assert.match(weekly, /formatVisibleTime\(canonical\)/);
+  assert.match(weekly, /parseVisibleRange\(input\.value\)/);
+  assert.match(daily, /formatTime12\(minutes\)/);
+});
+
+test("la guía distingue no consumir cafeína y aclara traslados y preparación", () => {
+  assert.match(welcome, /\["no-caffeine","No consumo cafeína"\]/);
+  assert.match(welcome, /trayecto de ida desde casa/);
+  assert.match(welcome, /al trabajo o a la universidad/);
+  assert.match(welcome, /welcome-preparation/);
+  assert.match(welcome, /únicamente el tiempo que elegiste para prepararte y\/o ir desde casa/);
+  assert.match(welcome, /Traslado · Casa → trabajo o estudios/);
+  assert.match(welcome, /No inventamos el trayecto de regreso/);
+  assert.match(welcome, /\/\^\\d\{2\}:\\d\{2\}\$\//);
+  assert.match(welcome, /commuteMinutes: state\.commuteMinutes/);
 });
 
 test("el PDF semanal coloca los siete días en una sola hoja apaisada", () => {
@@ -42,7 +74,7 @@ test("las duraciones genéricas no se presentan como actividades observadas", ()
   assert.match(welcome, /de enfoque incluidos en la propuesta/);
   assert.match(welcome, /no predice cuánto tardas/);
   assert.match(welcome, /No fijamos una hora para la procrastinación/);
-  assert.match(welcome, /Las comidas, pausas, traslados y actividades generales quedan disponibles/);
+  assert.match(welcome, /Los demás espacios quedan disponibles; no les asignamos actividades ni tiempos que no indicaste/);
   assert.doesNotMatch(welcome, /text = "Prepararme para estudiar"/);
   assert.doesNotMatch(welcome, /text = "Desayuno y plan del día"/);
   assert.doesNotMatch(welcome, /text = "Pausa breve · estirar y despejarme"/);
@@ -60,10 +92,26 @@ test("la propuesta puede pulirse antes de guardarla con reglas locales y sin adi
   assert.doesNotMatch(welcome, /fetch\s*\(|XMLHttpRequest|https:\/\/api\./);
 });
 
-test("la bienvenida ya no pide un resultado abstracto ni adivinar cuántos días perseguirlo", () => {
-  assert.match(welcome, /¿Qué te gustaría que el plan ayude a avanzar esta semana\?/);
+test("la bienvenida ofrece estudio y trabajo y usa preguntas concretas, no metas duplicadas ni jerga", () => {
+  assert.match(welcome, /welcome-role-combined/);
+  assert.match(welcome, /Estudio y trabajo/);
+  assert.match(welcome, /¿Qué tareas sueles hacer en él\?/);
+  assert.match(welcome, /¿Qué actividades concretas quieres ver en tu horario\?/);
+  assert.match(welcome, /¿Cuántos días por semana quieres reservarle\?/);
+  assert.doesNotMatch(welcome, /cadencia/i);
+  assert.doesNotMatch(welcome, /¿Qué te gustaría que el plan ayude a avanzar esta semana\?/);
   assert.doesNotMatch(welcome, /¿Qué resultado te haría sentir que esta semana valió la pena\?/);
   assert.doesNotMatch(welcome, /¿En cuántos días de esta semana quieres avanzar este resultado\?/);
   assert.doesNotMatch(welcome, /#welcome-frequency/);
   assert.doesNotMatch(welcome, /#welcome-sessions-per-day/);
+});
+
+test("los tiempos elegidos permiten minutos personalizados y las duraciones de proyectos son exactas", () => {
+  assert.match(welcome, /input id="' \+ id \+ '" type="number" inputmode="numeric"/);
+  assert.match(welcome, /¿Cuánto tardas en el trayecto de ida desde casa\?/);
+  assert.match(welcome, /¿Cuánto tiempo quieres reservar para prepararte antes de salir\?/);
+  assert.match(welcome, /Minutos que quieres reservar cada día/);
+  assert.match(welcome, /projectBlocks\.push\(\{ day: Number\(day\), start: candidate, end: candidate \+ projectDuration/);
+  assert.match(welcome, /bloques no encontraron espacio/);
+  assert.doesNotMatch(welcome, /Math\.ceil\(Number\(project\.duration/);
 });

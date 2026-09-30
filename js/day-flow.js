@@ -44,9 +44,10 @@
 
   function formatTime(minutes) {
     if (minutes == null) return "";
+    if (window.PLANIFY_SCHEDULE_TIME && typeof window.PLANIFY_SCHEDULE_TIME.formatTime12 === "function") return window.PLANIFY_SCHEDULE_TIME.formatTime12(minutes);
     var hour = Math.floor((minutes % 1440) / 60);
     var minute = minutes % 60;
-    return String(hour).padStart(2, "0") + ":" + String(minute).padStart(2, "0");
+    return (hour % 12 || 12) + ":" + String(minute).padStart(2, "0") + (hour < 12 ? " a. m." : " p. m.") + (minutes >= 1440 ? " (+1 día)" : "");
   }
 
   function titleFor(cell) {

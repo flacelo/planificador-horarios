@@ -6,7 +6,13 @@
   --brand-mint: #74e3c0;
   --brand-violet: #6454bb;
   --brand-line: #dce5e8;
+  --brand-surface: #fbfdfb;
+  --brand-surface-soft: #eff7f4;
   --brand-radius: 24px;
+  --brand-radius-control: 13px;
+  --brand-shadow-card: 0 12px 40px rgba(16, 33, 46, .08);
+  --brand-focus-ring: 0 0 0 3px rgba(19, 111, 105, .22);
+  --brand-motion: 160ms ease;
 }
 
 .planify-brand-ready body {
@@ -103,7 +109,7 @@
   min-height: 40px !important;
   padding: 9px 14px !important;
   border: 1px solid rgba(203, 223, 225, .23) !important;
-  border-radius: 12px !important;
+  border-radius: var(--brand-radius-control) !important;
   background: rgba(35, 54, 67, .8) !important;
   color: #ecf8f5 !important;
   font-size: .78rem !important;
@@ -181,7 +187,7 @@
 .brand-hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
 .brand-hero-actions button {
   display: inline-flex; align-items: center; justify-content: center; gap: 16px;
-  min-height: 48px; padding: 11px 18px; border-radius: 13px;
+  min-height: 48px; padding: 11px 18px; border-radius: var(--brand-radius-control);
   font: 700 .89rem 'Outfit', sans-serif; cursor: pointer;
   transition: transform .18s ease, background .18s ease, border-color .18s ease;
 }
@@ -225,8 +231,8 @@
   width: min(1280px, calc(100% - 40px)) !important;
   margin-bottom: 22px !important; padding: 27px !important;
   border: 1px solid #dfe8e7 !important; border-radius: var(--brand-radius) !important;
-  background: #fbfdfb !important; color: var(--brand-ink) !important;
-  box-shadow: 0 12px 40px rgba(16, 33, 46, .08) !important;
+  background: var(--brand-surface) !important; color: var(--brand-ink) !important;
+  box-shadow: var(--brand-shadow-card) !important;
 }
 .planify-brand-ready .trust-start-heading { margin-bottom: 18px !important; }
 .planify-brand-ready .trust-start-heading span { color: #46877c !important; font-size: .68rem !important; letter-spacing: .14em !important; }
@@ -238,9 +244,18 @@
   border: 1px solid #dbe6e5 !important; border-radius: 17px !important;
   background: #fff !important; color: var(--brand-ink) !important;
   box-shadow: 0 3px 13px rgba(28, 53, 68, .035) !important;
+  transition: transform var(--brand-motion), border-color var(--brand-motion), box-shadow var(--brand-motion) !important;
 }
-.planify-brand-ready .trust-start-options > button.is-recommended { background: #ecf7f2 !important; border-color: #82cdb7 !important; }
-.planify-brand-ready .trust-start-options > button:hover { border-color: #57bda2 !important; box-shadow: 0 13px 30px rgba(24, 102, 86, .11) !important; }
+.planify-brand-ready .trust-start-options > button.is-recommended { background: var(--brand-surface-soft) !important; border-color: #82cdb7 !important; }
+.planify-brand-ready .trust-start-options > button:hover { transform: translateY(-2px); border-color: #57bda2 !important; box-shadow: 0 13px 30px rgba(24, 102, 86, .11) !important; }
+.planify-brand-ready .brand-site-header button:focus-visible,
+.planify-brand-ready .brand-hero-actions button:focus-visible,
+.planify-brand-ready .trust-start-hub button:focus-visible,
+.planify-brand-ready .bottom-nav [data-tab]:focus-visible {
+  outline: 2px solid var(--brand-teal) !important;
+  outline-offset: 3px !important;
+  box-shadow: var(--brand-focus-ring) !important;
+}
 .planify-brand-ready .trust-start-options strong { color: #1b3440 !important; font-size: .92rem !important; }
 .planify-brand-ready .trust-start-options small { color: #5e7180 !important; font-size: .75rem !important; }
 .planify-brand-ready .trust-start-options em { color: #197565 !important; font-size: .71rem !important; }

@@ -3,10 +3,31 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const html = fs.readFileSync(require.resolve("../index.html"), "utf8");
 const welcome = fs.readFileSync(require.resolve("../js/welcome-flow.js"), "utf8");
 const pdf = fs.readFileSync(require.resolve("../js/export-pdf.js"), "utf8");
 const weekly = fs.readFileSync(require.resolve("../js/weekly-calm.js"), "utf8");
 const daily = fs.readFileSync(require.resolve("../js/day-flow.js"), "utf8");
+const brandStyles = fs.readFileSync(require.resolve("../css/brand-system.css"), "utf8");
+const weeklyStyles = fs.readFileSync(require.resolve("../css/weekly-calm.css"), "utf8");
+
+test("el tema personal se conserva y la interfaz mantiene controles claros y accesibles", () => {
+  assert.doesNotMatch(html, /localStorage\.setItem\("horario_tema","estelar"\)/);
+  assert.match(weekly, /moveHandle\.textContent = "⋯"/);
+  assert.match(weekly, /toca para mover, ajustar duración o dividir/i);
+  assert.match(weekly, /function moveHandleAtPointer\(event\)/);
+  assert.match(weekly, /candidate\.getBoundingClientRect\(\)/);
+  assert.match(weekly, /showCellActions\(tap\.cell, tap\.handle\)/);
+  assert.match(weekly, /if \(suppressedCell\) \{[\s\S]*?event\.stopPropagation\(\)/);
+  assert.match(weekly, /function finishMove\(event, cancelled\)[\s\S]*?activeMove = null;\s*suppressHandleClick = true/);
+  assert.match(weekly, /event\.stopPropagation\(\);\s*if \(!suppressHandleClick\) showCellActions/);
+  assert.match(weeklyStyles, /min-height: 44px/);
+  assert.match(weeklyStyles, /\.weekly-calm-move-handle\s*\{\s*width: 44px;\s*height: 44px;/);
+  assert.match(weeklyStyles, /\.weekly-calm-move-handle::before/);
+  assert.match(brandStyles, /--brand-focus-ring:/);
+  assert.match(brandStyles, /button:focus-visible/);
+  assert.match(brandStyles, /transition: transform var\(--brand-motion\)/);
+});
 
 test("cada turno permite agregar varias tareas por día sin preseleccionar lunes", () => {
   assert.match(welcome, /data-fixed-day-task/);

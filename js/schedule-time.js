@@ -36,6 +36,27 @@
     return minutesLabel(start) + " – " + minutesLabel(end);
   }
 
+  function formatTime12(value, options) {
+    var minutes = typeof value === "number" ? value : parseTime(value);
+    if (minutes == null) return String(value || "");
+    options = options || {};
+    var normalized = ((minutes % 1440) + 1440) % 1440;
+    var hour = Math.floor(normalized / 60);
+    var minute = normalized % 60;
+    var nextDay = Boolean(options.nextDay) || minutes >= 1440;
+    return (hour % 12 || 12) + ":" + String(minute).padStart(2, "0") + (hour < 12 ? " a. m." : " p. m.") + (nextDay ? " (+1 día)" : "");
+  }
+
+  function formatRange12(value) {
+    var matches = String(value || "").match(/(?:^|\D)(\d{1,2}:\d{2})(?!\d)/g) || [];
+    if (matches.length === 1) return formatTime12(matches[0]);
+    if (matches.length !== 2) return String(value || "");
+    var start = parseTime(matches[0]);
+    var end = parseTime(matches[1]);
+    if (start == null || end == null) return String(value || "");
+    return formatTime12(start) + " – " + formatTime12(end, { nextDay: end === 1440 || end <= start });
+  }
+
   function intervalsFor(rows, fallbackMinutes) {
     rows = Array.isArray(rows) ? rows : [];
     fallbackMinutes = Number.isInteger(Number(fallbackMinutes)) && Number(fallbackMinutes) > 0 ? Number(fallbackMinutes) : 60;
@@ -199,8 +220,8 @@
     if (!clean.dias.length || !rows.length || dayIndex < 0 || dayIndex >= clean.dias.length || rowIndex < 0 || rowIndex >= rows.length) {
       return { ok: false, error: "No se encontró el bloque que quieres editar." };
     }
-    if (!Number.isInteger(durationMinutes) || durationMinutes < 5 || durationMinutes > 720 || durationMinutes % 5 !== 0) {
-      return { ok: false, error: "Elige una duración entre 5 y 720 minutos, en incrementos de 5." };
+    if (!Number.isInteger(durationMinutes) || durationMinutes < 5 || durationMinutes > 720) {
+      return { ok: false, error: "Elige una duración entera entre 5 y 720 minutos." };
     }
     var timeline = intervalsFor(rows, fallbackMinutes);
     if (!timeline.ok) return timeline;
@@ -248,13 +269,92 @@
     return { ok: true, schedule: { dias: clean.dias, filas: refined.filas }, start: start, end: end, durationMinutes: durationMinutes, changed: true };
   }
 
+  function splitActivity(schedule, dayIndex, rowIndex, fallbackMinutes) {
+    var clean = cloneSchedule(schedule);
+    var rows = clean.filas;
+    if (!clean.dias.length || !rows.length || dayIndex < 0 || dayIndex >= clean.dias.length || rowIndex < 0 || rowIndex >= rows.length) {
+      return { ok: false, error: "No se encontró el bloque que quieres dividir." };
+    }
+    var cell = rows[rowIndex].celdas[dayIndex];
+    if (!isMeaningful(cell)) return { ok: false, error: "Selecciona un bloque con actividad para dividir." };
+    var timing = activityInterval(rows, rowIndex, cell, fallbackMinutes);
+    if (!timing.ok) return timing;
+    if (timing.span < 2) return { ok: true, schedule: clean, changed: false, span: 1 };
+    for (var offset = 0; offset < timing.span; offset += 1) {
+      var part = cloneCell(cell);
+      part.rowspan = 1;
+      if (offset > 0) {
+        delete part.planifyActivityId;
+        part.done = false;
+        part.reminder = false;
+        delete part.reminderLabel;
+      }
+      rows[rowIndex + offset].celdas[dayIndex] = part;
+    }
+    return { ok: true, schedule: clean, changed: true, start: timing.start, end: timing.end, span: timing.span };
+  }
+
+  function moveActivity(schedule, sourceDay, sourceRow, targetDay, targetRow, fallbackMinutes) {
+    var clean = cloneSchedule(schedule);
+    var rows = clean.filas;
+    if (!clean.dias.length || !rows.length || sourceDay < 0 || sourceDay >= clean.dias.length ||
+        targetDay < 0 || targetDay >= clean.dias.length || sourceRow < 0 || sourceRow >= rows.length ||
+        targetRow < 0 || targetRow >= rows.length) {
+      return { ok: false, error: "No encontré el bloque o el destino del movimiento." };
+    }
+    var timeline = intervalsFor(rows, fallbackMinutes);
+    if (!timeline.ok) return timeline;
+    var sourceCell = rows[sourceRow].celdas[sourceDay];
+    var sourceRange = activityInterval(rows, sourceRow, sourceCell, fallbackMinutes);
+    if (!sourceRange.ok || !isMeaningful(sourceCell)) return { ok: false, error: "Selecciona una actividad para mover." };
+    var activities = collectActivities(clean, timeline.intervals);
+    if (!activities.ok) return activities;
+    var own = activities.byDay[sourceDay].find(function (activity) { return activity.rowIndex === sourceRow; });
+    if (!own) return { ok: false, error: "No pude determinar la duración de esa actividad." };
+
+    var start = timeline.intervals[targetRow].start;
+    var end = start + sourceRange.durationMinutes;
+    var lastTime = timeline.intervals[timeline.intervals.length - 1].end;
+    if (end > lastTime) return { ok: false, error: "Ese bloque quedaría fuera del final del horario." };
+    if (sourceDay === targetDay && start === sourceRange.start) {
+      return { ok: true, schedule: clean, start: start, end: end, durationMinutes: sourceRange.durationMinutes, changed: false };
+    }
+    var conflict = activities.byDay[targetDay].find(function (activity) {
+      return activity !== own && activity.start < end && activity.end > start;
+    });
+    if (conflict) return { ok: false, error: "Ese espacio coincide con «" + String(conflict.cell.t || "otra actividad") + "». No moví el bloque." };
+
+    var movedCell = cloneCell(sourceCell);
+    rows.forEach(function (row, index) {
+      var interval = timeline.intervals[index];
+      if (interval.start < sourceRange.end && interval.end > sourceRange.start) {
+        row.celdas[sourceDay] = emptyCell(row.celdas[sourceDay]);
+      }
+    });
+    rows[targetRow].celdas[targetDay] = Object.assign(emptyCell(rows[targetRow].celdas[targetDay]), movedCell, { rowspan: 1 });
+    var resized = setDuration(clean, targetDay, targetRow, sourceRange.durationMinutes, fallbackMinutes);
+    if (!resized.ok) return resized;
+    return {
+      ok: true,
+      schedule: resized.schedule,
+      start: resized.start,
+      end: resized.end,
+      durationMinutes: sourceRange.durationMinutes,
+      changed: true
+    };
+  }
+
   return {
     parseTime: parseTime,
+    formatTime12: formatTime12,
+    formatRange12: formatRange12,
     parseRange: parseRange,
     rangeLabel: rangeLabel,
     intervalsFor: intervalsFor,
     isMeaningful: isMeaningful,
     activityInterval: activityInterval,
-    setDuration: setDuration
+    setDuration: setDuration,
+    splitActivity: splitActivity,
+    moveActivity: moveActivity
   };
 });

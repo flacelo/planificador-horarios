@@ -48,8 +48,7 @@
 #welcome-flow-title:focus{outline:none}
 .welcome-flow-confirm{position:fixed;top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:min(420px,calc(100vw - 32px));max-width:100%;margin:0;padding:26px;border:1px solid #c7d2fe;border-radius:20px;background:#fff;color:#1e293b;box-shadow:0 28px 90px rgba(2,6,23,.35);font:inherit;text-align:center;box-sizing:border-box}.welcome-flow-confirm::backdrop{background:rgba(2,6,23,.68);backdrop-filter:blur(3px)}.welcome-flow-confirm-icon{display:grid;width:44px;height:44px;margin:0 auto 12px;place-items:center;border-radius:15px;background:#eef2ff;color:#5b4ac3;font-size:1.5rem;font-weight:800}.welcome-flow-confirm h2{margin:0;color:#312e81;font-size:1.25rem}.welcome-flow-confirm p{margin:10px 0 20px;color:#64748b;font-size:.86rem;line-height:1.5}.welcome-flow-confirm-actions{display:flex;justify-content:flex-end;gap:9px}.welcome-flow-confirm-actions button{min-height:42px;padding:9px 13px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#475569;font:inherit;font-size:.8rem;font-weight:800;cursor:pointer}.welcome-flow-confirm-actions button:last-child{border-color:#5b4ac3;background:#5b4ac3;color:#fff}.welcome-flow-confirm-actions button:focus-visible{outline:3px solid #a5b4fc;outline-offset:2px}.welcome-flow-confirm-actions button:disabled{opacity:.6;cursor:wait}@media(max-width:400px){.welcome-flow-confirm{padding:21px}.welcome-flow-confirm-actions{flex-direction:column-reverse}.welcome-flow-confirm-actions button{width:100%}}
 @media(max-width:600px){.welcome-flow-time-grid{grid-template-columns:minmax(0,1fr)}.welcome-flow-time-grid label{min-width:0}.welcome-flow-fixed-row>.welcome-flow-time-grid{grid-template-columns:minmax(0,1fr)}}
-.welcome-flow-row-edit{min-height:36px;padding:6px 9px;border:1px solid #c7d2fe;border-radius:9px;background:#f5f3ff;color:#5142b7;font:inherit;font-size:.7rem;font-weight:800;white-space:nowrap;cursor:pointer}.welcome-flow-row-edit:focus-visible{outline:3px solid #a5b4fc;outline-offset:2px}
-@media(max-width:600px){.welcome-flow-preview li.welcome-flow-simple-row{grid-template-columns:72px 8px minmax(0,1fr) auto;gap:6px}.welcome-flow-row-edit{min-height:40px;padding:5px 7px;font-size:.66rem}}
+@media(max-width:600px){.welcome-flow-preview li.welcome-flow-simple-row{grid-template-columns:72px 8px minmax(0,1fr) auto;gap:6px}}
 
 .welcome-flow-refine{border-color:#99f6e4;background:linear-gradient(135deg,#f0fdfa,#eff6ff)}
 .welcome-flow-refine textarea{display:block;width:100%;min-height:76px;margin-top:9px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#0f172a;font:inherit;font-size:.8rem;line-height:1.4;resize:vertical;box-sizing:border-box}
@@ -59,3 +58,34 @@
 .welcome-flow-refine-undo{margin:8px 0 0 6px;border-color:#99f6e4;color:#0f766e}
 .welcome-flow-refine textarea:focus-visible,.welcome-flow-refine button:focus-visible{outline:3px solid #5eead4;outline-offset:2px}
 @media(max-width:600px){.welcome-flow-refine-apply{width:100%}.welcome-flow-refine-suggestions button{flex:1 1 auto}}
+
+.welcome-flow-minute-field{display:grid;align-content:start;gap:7px;min-width:0;color:#334155;font-size:.78rem;font-weight:800}
+.welcome-flow-minute-input-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+.welcome-flow-minute-input-wrap input{min-width:0!important}
+.welcome-flow-minute-input-wrap span{color:#64748b;font-size:.72rem;font-weight:700;white-space:nowrap}
+.welcome-flow-minute-choices{display:flex;flex-wrap:wrap;gap:6px}
+.welcome-flow-minute-choice{min-height:36px;padding:6px 9px;border:1px solid #cbd5e1;border-radius:999px;background:#fff;color:#475569;font:inherit;font-size:.68rem;font-weight:750;cursor:pointer}
+.welcome-flow-minute-choice[aria-pressed="true"]{border-color:#6d5dd3;background:#f5f3ff;color:#4338ca;box-shadow:0 0 0 2px rgba(109,93,211,.1)}
+.welcome-flow-minute-choice:focus-visible{outline:3px solid #a5b4fc;outline-offset:2px}
+.welcome-flow-minute-error:empty{display:none}
+.welcome-flow-minute-error:not(:empty){color:#be123c;font-size:.7rem;font-weight:700}
+.welcome-flow-minute-field input[aria-invalid="true"]{border-color:#e11d48!important;box-shadow:0 0 0 2px rgba(225,29,72,.12)}
+.welcome-flow-project-settings .welcome-flow-minute-field{grid-column:1/-1}
+.welcome-flow-role-pills .welcome-flow-combined-role span{border-color:#99f6e4;background:#f0fdfa;color:#115e59;font-weight:850}
+.welcome-flow-role-pills .welcome-flow-combined-role input:checked+span{border-color:#0f766e;background:#0f766e;color:#fff}
+.welcome-flow-role-pills .welcome-flow-combined-role input:focus-visible+span{outline:3px solid #5eead4;outline-offset:2px}
+@media(max-width:600px){.welcome-flow-minute-field{font-size:.76rem}.welcome-flow-minute-choice{min-height:40px}.welcome-flow-project-settings .welcome-flow-minute-field{grid-column:1}}
+
+.welcome-flow-inline-activity,.welcome-flow-week-inline-activity{min-width:0;width:100%;padding:6px 4px;border:1px solid transparent;border-radius:7px;background:transparent;color:inherit;font:inherit;font-size:.78rem;font-weight:750;box-sizing:border-box}
+.welcome-flow-inline-activity:hover,.welcome-flow-week-inline-activity:hover{border-color:#cbd5e1;background:rgba(255,255,255,.72)}
+.welcome-flow-inline-activity:focus,.welcome-flow-week-inline-activity:focus{outline:2px solid #14b8a6;border-color:#14b8a6;background:#fff;color:#0f172a}
+.welcome-flow-week-cell-content{position:relative;display:grid;align-items:center;min-height:34px}
+.welcome-flow-week-inline-activity{text-align:center;font-size:.65rem;line-height:1.25}
+.welcome-flow-week-handles{display:flex;justify-content:center;gap:2px;margin-top:2px}
+.welcome-flow-week-handles button{min-width:42px;min-height:30px;padding:2px 6px;border:1px solid rgba(15,118,110,.32);border-radius:7px;background:rgba(255,255,255,.8);color:#0f766e;font:inherit;font-size:.68rem;font-weight:850;white-space:nowrap;touch-action:none;cursor:grab}
+.welcome-flow-week-handles button:active{cursor:grabbing;background:#ccfbf1}
+.welcome-flow-week-handles button:focus-visible{outline:2px solid #0f766e;outline-offset:1px}
+.welcome-flow-weekly td.is-dragging{opacity:.55}
+.welcome-flow-weekly-drag-status{position:sticky;bottom:0;min-height:18px;margin:0;padding:3px 8px;background:rgba(240,253,250,.96);color:#0f766e;font-size:.65rem;font-weight:800}
+.welcome-flow-week-fixed{display:block;margin-top:3px;color:#64748b;font-size:.58rem}
+@media(max-width:600px){.welcome-flow-inline-activity{padding:5px 2px;font-size:.73rem}.welcome-flow-week-handles button{min-width:40px;min-height:32px}}

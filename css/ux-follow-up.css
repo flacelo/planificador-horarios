@@ -1,0 +1,139 @@
+/* Small-screen and viewport fixes for controls discussed during guided testing. */
+.planify-focus-overlay {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.planify-focus-card {
+  box-sizing: border-box;
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.trust-tutorial-overlay {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgba(2, 6, 23, .42);
+  backdrop-filter: none;
+}
+.trust-tutorial-card {
+  box-sizing: border-box;
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.trust-tutorial-where {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 11px 13px;
+  border: 1px solid #99f6e4;
+  border-radius: 12px;
+  background: #f0fdfa;
+  text-align: left;
+}
+.trust-tutorial-where span {
+  color: #0f766e;
+  font-size: .68rem;
+  font-weight: 850;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.trust-tutorial-where strong {
+  color: #134e4a;
+  font-size: .84rem;
+  line-height: 1.4;
+}
+.trust-tutorial-highlight {
+  position: relative !important;
+  z-index: 10000002 !important;
+  outline: 4px solid #2dd4bf !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 0 0 7px rgba(45, 212, 191, .24), 0 0 22px rgba(45, 212, 191, .82) !important;
+}
+
+.welcome-flow-weekly-mobile-view { display: none; }
+.welcome-flow-weekly-action-status:empty { display: none; }
+.welcome-flow-weekly-action-panel {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 10px;
+  padding: 13px;
+  border: 1px solid #99f6e4;
+  border-radius: 14px;
+  background: #f0fdfa;
+  color: #134e4a;
+}
+.welcome-flow-weekly-action-panel strong,
+.welcome-flow-weekly-action-panel small { display: block; }
+.welcome-flow-weekly-action-panel strong { font-size: .86rem; line-height: 1.4; overflow-wrap: anywhere; }
+.welcome-flow-weekly-action-panel small { color: #426b6c; font-size: .74rem; line-height: 1.5; }
+.welcome-flow-weekly-action-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.welcome-flow-weekly-action-panel button {
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #99d7cd;
+  border-radius: 10px;
+  background: #fff;
+  color: #115e59;
+  font: inherit;
+  font-size: .76rem;
+  font-weight: 800;
+  line-height: 1.3;
+  white-space: normal;
+  cursor: pointer;
+}
+.welcome-flow-weekly-action-panel button:hover,
+.welcome-flow-weekly-action-panel button:focus-visible { outline: 2px solid #14b8a6; outline-offset: 2px; background: #ccfbf1; }
+.welcome-flow-weekly-action-panel .welcome-flow-week-action-cancel { justify-self: end; min-height: 40px; border-color: #d1dbe8; color: #475569; }
+.welcome-flow-week-handles { margin-top: 5px; }
+.welcome-flow-week-adjust {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: min(100%, 76px);
+  min-width: 56px;
+  min-height: 40px;
+  padding: 5px;
+  border: 1px solid #91d7c8;
+  border-radius: 9px;
+  background: rgba(255,255,255,.92);
+  color: #0f766e;
+  font: inherit;
+  font-size: .66rem;
+  font-weight: 850;
+  white-space: nowrap;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.welcome-flow-week-adjust:focus-visible { outline: 3px solid #14b8a6; outline-offset: 2px; }
+.welcome-flow-weekly-mobile-actions { display: none; }
+
+@media (max-width: 600px) {
+  .planify-focus-overlay { place-items: end center; padding: 12px; }
+  .planify-focus-card { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); padding: 24px 18px; border-radius: 20px; }
+  .trust-tutorial-overlay { place-items: center; padding: 12px; }
+  .trust-tutorial-card { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); padding: 25px 18px 20px; border-radius: 17px; }
+  .trust-tutorial-text { min-height: 0; }
+  .welcome-flow-weekly-desktop { display: none; }
+  .welcome-flow-weekly-mobile-view { display: grid; gap: 6px; }
+  .welcome-flow-weekly-mobile-view .welcome-flow-day-tabs { padding: 2px 0 8px; }
+  .welcome-flow-weekly-mobile-view .welcome-flow-preview ul { max-height: min(44dvh, 360px); overflow: auto; overscroll-behavior: contain; padding: 4px 10px; }
+  .welcome-flow-weekly-mobile-view .welcome-flow-preview li.welcome-flow-weekly-day-row { grid-template-columns: minmax(86px, auto) 8px minmax(0, 1fr); align-items: center; gap: 7px; padding: 8px 0; }
+  .welcome-flow-weekly-day-activity { min-width: 0; display: grid; gap: 5px; }
+  .welcome-flow-weekly-mobile-view .welcome-flow-inline-activity { min-height: 40px; padding: 7px 8px; border-color: #d8e3ef; background: #fff; font-size: .8rem; }
+  .welcome-flow-weekly-mobile-view .welcome-flow-inline-activity::placeholder { color: #8290a2; }
+  .welcome-flow-weekly-mobile-actions { display: block; }
+  .welcome-flow-weekly-mobile-actions button { width: 100%; min-height: 44px; padding: 8px 10px; border: 1px solid #83d1c2; border-radius: 10px; background: #ecfdf8; color: #0f766e; font: inherit; font-size: .74rem; font-weight: 850; text-align: left; touch-action: manipulation; }
+  .welcome-flow-weekly-action-choices { grid-template-columns: 1fr; }
+  .welcome-flow-weekly-action-panel button { width: 100%; min-height: 46px; text-align: left; }
+  .welcome-flow-weekly-action-panel .welcome-flow-week-action-cancel { justify-self: stretch; text-align: center; }
+}

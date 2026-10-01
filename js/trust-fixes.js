@@ -14,12 +14,20 @@
   var dashboardSelectedWeekStart = null;
   var tutorialStep = 0;
 
+  if (!document.querySelector("link[data-planify-follow-up]")) {
+    var followUpStyles = document.createElement("link");
+    followUpStyles.rel = "stylesheet";
+    followUpStyles.href = "css/ux-follow-up.css?v=1";
+    followUpStyles.dataset.planifyFollowUp = "true";
+    document.head.appendChild(followUpStyles);
+  }
+
   var TUTORIAL_STEPS = [
-    { icon: "👋", title: "Bienvenido a PLANIFY", text: "Aquí puedes organizar tu día, tu semana, tu mes y tu año sin perder de vista lo que realmente quieres lograr." },
-    { icon: "🗓️", title: "Construye tu horario", text: "En Semanal puedes tocar cualquier celda para añadir una actividad. También puedes cargar un modelo y adaptarlo a tu rutina." },
-    { icon: "✅", title: "Marca tus avances", text: "Completa las actividades conforme las realices. El resumen y el dashboard usarán esos datos reales para mostrar tu progreso." },
-    { icon: "📊", title: "Revisa tu equilibrio", text: "El Dashboard te muestra cuánto has completado, tus horas planificadas y cómo distribuyes tu tiempo entre tus áreas de vida." },
-    { icon: "📱", title: "Úsalo donde quieras", text: "PLANIFY funciona en computadora y celular. Tus cambios se guardan automáticamente en este navegador y puedes exportarlos desde Ajustes." }
+    { icon: "👋", title: "Vuelve a esta guía cuando quieras", text: "El tutorial está disponible desde el encabezado. Cada paso señala un control concreto de PLANIFY.", target: "#tutorial-btn", where: "Botón 📖 Tutorial, en el encabezado." },
+    { icon: "🗓️", title: "Abre tu semana", text: "Toca Semanal en la barra inferior. Allí puedes revisar los días y escribir una actividad directamente en una celda.", target: ".bottom-nav [data-tab='semanal']", where: "Semanal, en la barra fija inferior." },
+    { icon: "✍️", title: "Escribe en el horario", text: "En la tabla semanal, pulsa una celda y escribe. Para cambiar el texto, vuelve a tocarlo; no necesitas abrir una ventana de edición.", target: "#tabla tbody td", where: "Cualquier celda de actividad dentro de la cuadrícula semanal." },
+    { icon: "📝", title: "Organiza también tu día", text: "Diario/Notas está en la misma barra inferior. Toca ese botón para escribir tus notas y revisar tu día.", target: ".bottom-nav [data-tab='diario']", where: "Diario/Notas, en la barra fija inferior." },
+    { icon: "⚙️", title: "Ajustes y exportación", text: "Abre el engranaje para entrar al Panel de control. En la pestaña Ajustes encontrarás las opciones para descargar tu horario.", target: "#cloud-btn", where: "Botón ⚙️ flotante del Panel de control." }
   ];
 
   function escapeHtml(value) {
@@ -336,9 +344,19 @@
     var step = TUTORIAL_STEPS[tutorialStep];
     var overlay = document.getElementById("planify-tutorial-safe");
     if (!overlay) return;
+    document.querySelectorAll(".trust-tutorial-highlight").forEach(function (target) { target.classList.remove("trust-tutorial-highlight"); });
+    if (tutorialStep === 2 && typeof window.cambiarTab === "function") window.cambiarTab("semanal");
+    var target = null;
+    try { target = document.querySelector(step.target); } catch (error) {}
+    if (target && target.getClientRects().length) {
+      target.classList.add("trust-tutorial-highlight");
+      var bounds = target.getBoundingClientRect();
+      if (bounds.top < 0 || bounds.bottom > window.innerHeight) target.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
     overlay.querySelector(".trust-tutorial-icon").textContent = step.icon;
     overlay.querySelector(".trust-tutorial-title").textContent = step.title;
     overlay.querySelector(".trust-tutorial-text").textContent = step.text;
+    overlay.querySelector(".trust-tutorial-where strong").textContent = step.where;
     overlay.querySelector(".trust-tutorial-counter").textContent = (tutorialStep + 1) + " de " + TUTORIAL_STEPS.length;
     overlay.querySelector(".trust-tutorial-progress i").style.width = ((tutorialStep + 1) * 100 / TUTORIAL_STEPS.length) + "%";
     overlay.querySelector("#trust-tutorial-back").hidden = tutorialStep === 0;
@@ -357,7 +375,7 @@
     overlay.setAttribute("aria-label", "Tutorial de PLANIFY");
     overlay.innerHTML = '<div class="trust-tutorial-card"><button type="button" id="trust-tutorial-close" class="trust-tutorial-close" aria-label="Cerrar tutorial">×</button>' +
       '<div class="trust-tutorial-counter"></div><div class="trust-tutorial-progress"><i></i></div><div class="trust-tutorial-icon"></div>' +
-      '<h2 class="trust-tutorial-title"></h2><p class="trust-tutorial-text"></p><footer><button type="button" id="trust-tutorial-back" class="trust-secondary">← Atrás</button>' +
+      '<h2 class="trust-tutorial-title"></h2><p class="trust-tutorial-text"></p><div class="trust-tutorial-where"><span>📍 Dónde pulsar</span><strong></strong></div><footer><button type="button" id="trust-tutorial-back" class="trust-secondary">← Atrás</button>' +
       '<button type="button" id="trust-tutorial-next" class="trust-primary">Siguiente →</button></footer></div>';
     document.body.appendChild(overlay);
     renderTutorial();
@@ -367,6 +385,7 @@
   function closeTutorial() {
     var overlay = document.getElementById("planify-tutorial-safe");
     if (overlay) overlay.remove();
+    document.querySelectorAll(".trust-tutorial-highlight").forEach(function (target) { target.classList.remove("trust-tutorial-highlight"); });
   }
 
   function isDashboardTrigger(target) {

@@ -352,7 +352,10 @@ test("los textos siguen planify_idioma y el CSS ofrece foco visible y alternativ
   assert.match(app.elements.get("planify-focus-breath-stop").textContent, /Stop pause/);
 
   const css = fs.readFileSync(require.resolve("../css/focus-breath.css"), "utf8");
+  const modalCss = fs.readFileSync(require.resolve("../css/ux-follow-up.css"), "utf8");
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
   assert.match(css, /animation:\s*none\s*!important/);
   assert.match(css, /:focus-visible/);
+  assert.match(modalCss, /\.planify-focus-card\s*\{[^}]*max-height:\s*calc\(100dvh - 40px\)[^}]*overflow-y:\s*auto/s);
+  assert.match(modalCss, /\.planify-focus-card\s*\{[^}]*max-height:\s*calc\(100dvh - 24px\)/s);
 });

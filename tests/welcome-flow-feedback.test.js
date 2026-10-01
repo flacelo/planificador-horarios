@@ -8,6 +8,7 @@ const welcome = fs.readFileSync(require.resolve("../js/welcome-flow.js"), "utf8"
 const pdf = fs.readFileSync(require.resolve("../js/export-pdf.js"), "utf8");
 const weekly = fs.readFileSync(require.resolve("../js/weekly-calm.js"), "utf8");
 const daily = fs.readFileSync(require.resolve("../js/day-flow.js"), "utf8");
+const polishStyles = fs.readFileSync(require.resolve("../css/ux-follow-up.css"), "utf8");
 const brandStyles = fs.readFileSync(require.resolve("../css/brand-system.css"), "utf8");
 const weeklyStyles = fs.readFileSync(require.resolve("../css/weekly-calm.css"), "utf8");
 
@@ -37,12 +38,23 @@ test("cada turno permite agregar varias tareas por día sin preseleccionar lunes
   assert.match(welcome, /Elige los días de cada turno o compromiso fijo/);
 });
 
-test("la propuesta diaria y semanal se editan directamente, sin el botón ni la ventana grande", () => {
+test("la propuesta se edita directamente y el horario semanal usa acciones guiadas y una lista legible en móvil", () => {
   assert.match(welcome, /data-day-inline-edit/);
   assert.match(welcome, /data-week-inline-edit/);
-  assert.match(welcome, /data-week-handle="move"/);
-  assert.match(welcome, /data-week-handle="start"/);
-  assert.match(welcome, /data-week-handle="end"/);
+  assert.match(welcome, /data-week-action-trigger/);
+  assert.match(welcome, /data-week-action-choice="move"/);
+  assert.match(welcome, /data-week-action-choice="start"/);
+  assert.match(welcome, /data-week-action-choice="end"/);
+  assert.match(welcome, /Paso 2 de 2 · Elige la fila/);
+  assert.match(welcome, /data-weekly-preview-day/);
+  assert.match(welcome, /en celular elige un día para leer cada bloque sin recortes/);
+  assert.match(welcome, /status\.scrollIntoView\(\{ block: "nearest", behavior: "smooth" \}\)/);
+  assert.match(welcome, /welcome-flow-weekly-action-status" role="region"/);
+  assert.doesNotMatch(welcome, /data-week-handle=/);
+  assert.doesNotMatch(welcome, /weeklyDrag|weekRowAtPoint|suppressWeekHandleClickUntil/);
+  assert.match(polishStyles, /welcome-flow-weekly-mobile-view \{ display: none; \}/);
+  assert.match(polishStyles, /welcome-flow-weekly-mobile-view \{ display: grid;/);
+  assert.match(polishStyles, /min-height: 46px/);
   assert.match(weekly, /beginInlineEdit\(cell\)/);
   assert.match(weekly, /mergeMatchingActivities\(dayIndex\)/);
   assert.match(weekly, /weekly-calm-move-handle/);

@@ -12,7 +12,7 @@ const STATIC_ASSETS = [
   'css/dashboard-polish.css', 'css/dashboard.css', 'css/day-flow.css', 'css/focus-breath.css',
   'css/focus-session.css', 'css/focus-task.css', 'css/grid.css', 'css/interface-polish.css',
   'css/main.css', 'css/mobile-coach.css', 'css/monthly-calm.css', 'css/panel-redesign.css',
-  'css/panel.css', 'css/pwa-experience.css', 'css/trust-fixes.css', 'css/variable-duration.css',
+  'css/panel.css', 'css/pwa-experience.css', 'css/trust-fixes.css', 'css/ux-follow-up.css', 'css/variable-duration.css',
   'css/weekly-calm.css', 'css/welcome-flow.css',
   'js/annual-calm.js', 'js/app.js', 'js/brand-home.js', 'js/completion-history.js',
   'js/daily-backup.js', 'js/daily-calm.js', 'js/daily-persistence.js', 'js/day-flow.js',

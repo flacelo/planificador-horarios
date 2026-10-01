@@ -115,6 +115,43 @@
   cursor: pointer;
 }
 .welcome-flow-week-adjust:focus-visible { outline: 3px solid #14b8a6; outline-offset: 2px; }
+.welcome-flow-weekly th.welcome-flow-weekly-day-heading { position: relative; padding-right: 27px; }
+.welcome-flow-column-resize {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 28px;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid rgba(255,255,255,.28);
+  background: rgba(255,255,255,.1);
+  color: #a7f3d0;
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 900;
+  cursor: col-resize;
+  touch-action: none;
+}
+.welcome-flow-column-resize:hover,
+.welcome-flow-column-resize:focus-visible { background: rgba(45,212,191,.3); outline: 2px solid #5eead4; outline-offset: -2px; }
+.welcome-flow-weekly td[data-week-cell] { position: relative; padding-bottom: 31px; }
+.welcome-flow-duration-resize {
+  width: 38px;
+  min-height: 28px;
+  padding: 1px 6px;
+  border: 1px solid #78cbbb;
+  border-radius: 8px;
+  background: #fff;
+  color: #0f766e;
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 900;
+  cursor: ns-resize;
+  touch-action: none;
+}
+.welcome-flow-duration-resize:hover,
+.welcome-flow-duration-resize:focus-visible,
+.welcome-flow-duration-resize.is-resizing { background: #ccfbf1; outline: 2px solid #14b8a6; outline-offset: 1px; }
+.welcome-flow-weekly-day-heading:focus-within .welcome-flow-column-resize { background: rgba(45,212,191,.3); }
 .welcome-flow-weekly-mobile-actions { display: none; }
 
 @media (max-width: 600px) {

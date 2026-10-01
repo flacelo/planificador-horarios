@@ -38,6 +38,11 @@ test("cada turno permite agregar varias tareas por día sin preseleccionar lunes
   assert.match(welcome, /Elige los días de cada turno o compromiso fijo/);
 });
 
+test("un navegador sin datos previos abre la bienvenida inicial automáticamente", () => {
+  assert.match(welcome, /if \(!alreadyStarted && !hasExistingPlan\(\)\)/);
+  assert.match(welcome, /if \(!document\.getElementById\("welcome-flow-overlay"\)\) open\(\)/);
+});
+
 test("la propuesta se edita directamente y el horario semanal usa acciones guiadas y una lista legible en móvil", () => {
   assert.match(welcome, /data-day-inline-edit/);
   assert.match(welcome, /data-week-inline-edit/);

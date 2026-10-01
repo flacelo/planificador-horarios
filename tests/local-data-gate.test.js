@@ -28,7 +28,7 @@ class MemoryStorage {
 
 function runGate(initial = {}, options = {}) {
   const localStorage = new MemoryStorage(initial, options.quota);
-  const sessionStorage = new MemoryStorage();
+  const sessionStorage = new MemoryStorage(options.session || {});
   const classes = new Set();
   const appended = [];
   const elements = [];
@@ -109,7 +109,55 @@ test("oculta un horario anterior hasta que el usuario decide si es suyo", () => 
   };
   app.elements[0].handlers.click({ target: { closest() { return continueButton; } } });
   assert.equal(app.classes.has("planify-data-gate-active"), false);
-  assert.equal(app.sessionStorage.getItem("planify_local_data_choice_v1"), "continue");
+  assert.equal(app.sessionStorage.getItem("planify_local_data_choice_v1"), null);
+
+  const nextVisit = runGate(Object.fromEntries(app.localStorage.values), {
+    session: Object.fromEntries(app.sessionStorage.values)
+  });
+  assert.equal(nextVisit.classes.has("planify-data-gate-active"), true);
+  assert.doesNotMatch(nextVisit.elements[0].innerHTML, /Turno privado/);
+});
+
+test("una confirmación antigua de esta pestaña no muestra el plan automáticamente", () => {
+  const app = runGate({
+    horario_data_semanal: JSON.stringify({ filas: [{ celdas: [{ t: "Plan de otra persona" }] }] })
+  }, {
+    session: { planify_local_data_choice_v1: "continue" }
+  });
+
+  assert.equal(app.classes.has("planify-data-gate-active"), true);
+  assert.equal(app.sessionStorage.getItem("planify_local_data_choice_v1"), null);
+  assert.doesNotMatch(app.elements[0].innerHTML, /Plan de otra persona/);
+});
+
+test("empezar en blanco consume solo el salto de recarga y la siguiente visita vuelve a proteger la copia", () => {
+  const app = runGate({
+    horario_data_semanal: JSON.stringify({ filas: [{ celdas: [{ t: "Horario de prueba" }] }] }),
+    planify_nombre: "Persona anterior"
+  });
+  const freshButton = {
+    getAttribute(name) { return name === "data-action" ? "fresh" : null; }
+  };
+  app.elements[0].handlers.click({ target: { closest() { return freshButton; } } });
+
+  assert.equal(app.reloads(), 1);
+  assert.ok(Array.from(app.localStorage.values.keys()).some((key) => key.startsWith("planify_local_data_archive_v1:")));
+  assert.equal(app.localStorage.getItem("horario_data_semanal"), null);
+  assert.equal(app.localStorage.getItem("planify_nombre"), null);
+  assert.equal(app.sessionStorage.getItem("planify_local_data_choice_v1"), "fresh");
+
+  const afterFreshReload = runGate(Object.fromEntries(app.localStorage.values), {
+    session: Object.fromEntries(app.sessionStorage.values)
+  });
+  assert.equal(afterFreshReload.classes.has("planify-data-gate-active"), false);
+  assert.equal(afterFreshReload.sessionStorage.getItem("planify_local_data_choice_v1"), null);
+
+  const nextVisit = runGate(Object.fromEntries(afterFreshReload.localStorage.values), {
+    session: Object.fromEntries(afterFreshReload.sessionStorage.values)
+  });
+  assert.equal(nextVisit.classes.has("planify-data-gate-active"), true);
+  assert.match(nextVisit.elements[0].innerHTML, /Hay una copia anterior/);
+  assert.doesNotMatch(nextVisit.elements[0].innerHTML, /Horario de prueba|Persona anterior/);
 });
 
 test("detecta y protege también historiales y ajustes del horario, no solo sus celdas", () => {

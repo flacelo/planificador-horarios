@@ -151,8 +151,7 @@
     return { ok: true };
   }
 
-  function unlock(choice) {
-    try { sessionStorage.setItem(SESSION_KEY, choice); } catch (error) { /* This choice still applies to this open page. */ }
+  function unlock() {
     document.documentElement.classList.remove("planify-data-gate-active");
     var gate = document.getElementById("planify-local-data-gate");
     if (gate) gate.remove();
@@ -221,7 +220,7 @@
       var action = button.getAttribute("data-action");
       var status = gate.querySelector(".local-data-error");
       if (action === "continue" || action === "blank") {
-        unlock(action);
+        unlock();
         return;
       }
       if (action === "fresh") {
@@ -248,7 +247,7 @@
           if (status) status.textContent = rollback && rollback.message || "No encontré la copia para restaurar.";
           return;
         }
-        unlock("restore");
+        unlock();
         return;
       }
       if (action === "restore" && latestArchive) {
@@ -257,7 +256,7 @@
           if (status) status.textContent = restored.message;
           return;
         }
-        unlock("restore");
+        unlock();
       }
     });
     gate.addEventListener("keydown", function (event) {
@@ -288,7 +287,14 @@
   if (window.__PLANIFY_PRIVACY_TEST__) window.__PLANIFY_PRIVACY_TEST_HOOKS__ = testHooks();
   var sessionChoice = "";
   try { sessionChoice = sessionStorage.getItem(SESSION_KEY) || ""; } catch (error) { /* Continue with a decision gate if storage is unavailable. */ }
-  if (sessionChoice) return;
+  if (sessionChoice) {
+    var consumedFreshChoice = false;
+    try {
+      sessionStorage.removeItem(SESSION_KEY);
+      consumedFreshChoice = sessionStorage.getItem(SESSION_KEY) === null;
+    } catch (error) { /* A stale choice must never bypass the gate. */ }
+    if (sessionChoice === "fresh" && consumedFreshChoice) return;
+  }
 
   var currentData;
   var savedArchives;

@@ -175,6 +175,50 @@ test("empezar en blanco consume solo el salto de recarga y la siguiente visita v
   assert.doesNotMatch(nextVisit.elements[0].innerHTML, /Horario de prueba|Persona anterior/);
 });
 
+test("una copia archivada vacía se conserva sin bloquear a una persona nueva", () => {
+  const archiveKey = "planify_local_data_archive_v1:old-empty";
+  const emptyArchive = {
+    version: 1,
+    savedAt: "2026-09-20T12:00:00.000Z",
+    values: {
+      horario_inicio: "07:00",
+      horario_fin: "23:00",
+      horario_intervalo: "60",
+      horario_data_semanal: JSON.stringify({ dias: ["LUNES"], filas: [{ celdas: [{ t: "", c: "libre" }] }] })
+    }
+  };
+  const app = runGate({ [archiveKey]: JSON.stringify(emptyArchive) });
+
+  assert.equal(app.classes.has("planify-data-gate-active"), false);
+  assert.equal(app.elements.length, 0);
+  assert.equal(app.localStorage.getItem(archiveKey), JSON.stringify(emptyArchive));
+  assert.equal(app.hooks.archives().length, 0);
+});
+
+test("al ignorar una copia archivada vacía, conserva el aviso para una copia real más antigua", () => {
+  const emptyKey = "planify_local_data_archive_v1:empty-newer";
+  const realKey = "planify_local_data_archive_v1:real-older";
+  const emptyArchive = {
+    version: 1,
+    savedAt: "2026-09-30T12:00:00.000Z",
+    values: { horario_inicio: "07:00", horario_data_semanal: JSON.stringify({ filas: [] }) }
+  };
+  const realArchive = {
+    version: 1,
+    savedAt: "2026-09-20T12:00:00.000Z",
+    values: { horario_data_semanal: JSON.stringify({ filas: [{ celdas: [{ t: "Turno real" }] }] }) }
+  };
+  const app = runGate({
+    [emptyKey]: JSON.stringify(emptyArchive),
+    [realKey]: JSON.stringify(realArchive)
+  });
+
+  assert.equal(app.classes.has("planify-data-gate-active"), true);
+  assert.equal(app.hooks.archives().length, 1);
+  assert.equal(app.hooks.archives()[0].key, realKey);
+  assert.match(app.elements[0].innerHTML, /Hay una copia anterior/);
+});
+
 test("detecta y protege también historiales y ajustes del horario, no solo sus celdas", () => {
   const app = runGate({
     planify_cumplimiento_historial_v1: JSON.stringify({

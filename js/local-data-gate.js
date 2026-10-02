@@ -80,6 +80,12 @@
     return false;
   }
 
+  function archiveHasPersonalContent(values) {
+    return Object.keys(values).some(function (key) {
+      return isPersonalKey(key) && hasSavedContent(key, values[key]);
+    });
+  }
+
   function personalKeysWithData() {
     var keys = storageKeys(localStorage).filter(isPersonalKey);
     return keys.filter(function (key) {
@@ -93,7 +99,8 @@
     }).map(function (key) {
       try {
         var value = JSON.parse(localStorage.getItem(key) || "null");
-        if (value && value.version === 1 && value.values && typeof value.values === "object") {
+        if (value && value.version === 1 && value.values && typeof value.values === "object" &&
+            archiveHasPersonalContent(value.values)) {
           return { key: key, savedAt: value.savedAt || "", values: value.values };
         }
       } catch (error) { /* Ignore an unreadable archive without touching it. */ }

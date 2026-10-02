@@ -1039,6 +1039,59 @@
     if (status) status.innerHTML = message ? '<span role="status" aria-live="polite">' + escapeHtml(message) + '</span>' : "";
   }
 
+  function weeklyQuickActions(canJoinBefore, canJoinAfter, canShorten) {
+    var buttons = [];
+    if (canJoinBefore) buttons.push('<button type="button" data-week-quick="before" aria-label="Unir con el espacio anterior del mismo día">Unir ↑</button>');
+    if (canJoinAfter) buttons.push('<button type="button" data-week-quick="after" aria-label="Unir con el espacio siguiente del mismo día">Unir ↓</button>');
+    if (canShorten) buttons.push('<button type="button" data-week-quick="shorten" aria-label="Acortar este bloque y liberar el último espacio">Acortar</button>');
+    return buttons.length ? '<div class="welcome-flow-week-quick-actions" aria-label="Ajustar duración del bloque">' + buttons.join("") + '</div>' : "";
+  }
+
+  function canJoinWeeklyNeighbor(proposal, day, rowIndex, span, direction) {
+    var neighborIndex = direction === "before" ? rowIndex - 1 : rowIndex + span;
+    var neighbor = proposal.filas[neighborIndex];
+    var bounds = proposal.dayBounds[day];
+    if (!neighbor || !bounds) return false;
+    var times = String(neighbor.hora || "").match(/\d{2}:\d{2}/g) || [];
+    if (times.length !== 2 || timeToMinutes(times[0]) < bounds.start || timeToMinutes(times[1]) > bounds.end) return false;
+    var cell = neighbor.celdas && neighbor.celdas[day];
+    return !cell || Number(cell.rowspan) !== 0 && !String(cell.t || "").trim();
+  }
+
+  function adjustWeeklyCellByOne(cell, direction) {
+    if (!cell || cell.getAttribute("data-week-fixed") === "true") return;
+    var input = cell.querySelector("[data-week-inline-edit],[data-day-inline-edit]");
+    var text = String(input ? input.value : cell.getAttribute("data-week-text") || "").trim();
+    if (!text) { showWeeklyResizeFeedback("Escribe primero una actividad para poder unirla."); return; }
+    var source = {
+      start: timeToMinutes(cell.getAttribute("data-week-start")),
+      end: timeToMinutes(cell.getAttribute("data-week-end")),
+      text: text,
+      category: cell.getAttribute("data-week-category") || "clase"
+    };
+    var boundaries = weeklyTimeBoundaries();
+    var edge = direction === "before" ? source.start : source.end;
+    var index = boundaries.indexOf(edge);
+    var next = boundaries[index + (direction === "before" || direction === "shorten" ? -1 : 1)];
+    if (index < 0 || next == null || direction === "shorten" && next <= source.start) {
+      showWeeklyResizeFeedback("Llegaste al límite de este bloque; el horario no cambió.");
+      return;
+    }
+    var nextStart = direction === "before" ? next : source.start;
+    var nextEnd = direction === "before" ? source.end : next;
+    var day = Number(cell.getAttribute("data-week-day"));
+    var viewSelector = cell.closest(".welcome-flow-weekly-mobile-view") ? ".welcome-flow-weekly-mobile-view" : ".welcome-flow-weekly-desktop";
+    var error = placeWeeklyRange(day, source, nextStart, nextEnd);
+    showWeeklyResizeFeedback(error || (direction === "shorten" ? "Bloque acortado; el espacio final quedó libre." : state.example ? "Celdas unidas en el ejemplo; no se guardará." : "Celdas unidas en un solo bloque. Puedes deshacer el cambio antes de guardar."));
+    if (!error) {
+      var updated = Array.prototype.slice.call(document.querySelectorAll(viewSelector + ' [data-week-cell][data-week-day="' + day + '"][data-week-start="' + minutesToTime(nextStart) + '"]')).find(function (candidate) {
+        return candidate.getClientRects().length > 0;
+      });
+      var button = updated && (updated.querySelector('[data-week-quick="' + direction + '"]') || updated.querySelector("[data-week-quick]"));
+      if (button) button.focus({ preventScroll: true });
+    }
+  }
+
   function setPreviewColumnWidth(day, requestedWidth) {
     var index = Number(day);
     if (!Number.isInteger(index) || index < 0 || index >= DAYS.length) return 0;
@@ -1474,6 +1527,9 @@
       });
       var weekCellAttributes = ' data-week-cell data-week-day="' + previewDay + '" data-week-index="' + rowIndex + '" data-week-span="' + span + '" data-week-start="' + blockStart + '" data-week-end="' + blockEnd + '" data-week-category="' + escapeHtml(category) + '" data-week-text="' + escapeHtml(text) + '" data-week-fixed="' + (isFixedBlock ? "true" : "false") + '"';
       var mobileAction = isFixedBlock ? '<small class="welcome-flow-week-fixed">Compromiso fijo</small>' : text ? '<span class="welcome-flow-resize-grip is-start" data-week-resize="start" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="' + timeToMinutes(blockStart) + '" aria-valuetext="' + formatClock(blockStart) + '" aria-label="Ajustar inicio de ' + escapeHtml(text) + '"></span><span class="welcome-flow-resize-grip is-end" data-week-resize="end" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="' + timeToMinutes(blockEnd) + '" aria-valuetext="' + formatClock(blockEnd) + '" aria-label="Ajustar fin de ' + escapeHtml(text) + '; arrastra para alargar, acortar o unir con la misma actividad"></span>' : "";
+      if (text && !isFixedBlock) mobileAction += weeklyQuickActions(
+        canJoinWeeklyNeighbor(proposal, previewDay, rowIndex, span, "before"),
+        canJoinWeeklyNeighbor(proposal, previewDay, rowIndex, span, "after"), span > 1);
       var inlineText = '<textarea rows="1" class="welcome-flow-inline-activity" data-day-inline-edit data-inline-day="' + previewDay + '" data-inline-index="' + rowIndex + '" data-inline-span="' + span + '" data-inline-category="' + escapeHtml(category) + '" aria-label="Editar actividad del ' + DAY_LABELS[previewDay] + ', ' + formatClock(blockStart) + ' a ' + formatClock(blockEnd) + '" placeholder="Escribe aquí o deja el espacio libre">' + escapeHtml(text) + '</textarea>';
       return '<li class="welcome-flow-simple-row welcome-flow-weekly-day-row"' + weekCellAttributes + '><span>' + formatClock(blockStart) + ' – ' + formatClock(blockEnd) + '</span><i class="welcome-flow-category-dot welcome-flow-category-' + escapeHtml(category) + '"></i><div class="welcome-flow-weekly-day-activity">' + inlineText + reminderLabel + mobileAction + '</div></li>';
     }).join("");
@@ -1485,7 +1541,7 @@
     }).join("");
     var weeklySkipped = {};
     var defaultWeekWidth = Math.max(700, Math.min(1400, (window.innerWidth || 1024) - 48));
-    var defaultDayWidth = Math.round((defaultWeekWidth - 88) / DAYS.length);
+    var defaultDayWidth = Math.max(132, Math.round((defaultWeekWidth - 88) / DAYS.length));
     var dayColumnWidths = DAYS.map(function (_, day) {
       var width = Number(state.previewColumnWidths[day]);
       if (!Number.isFinite(width)) width = defaultDayWidth;
@@ -1515,8 +1571,11 @@
         var isFixed = active && expandedFixed().some(function (fixed) {
           return Number(fixed.day) === day && timeToMinutes(cellStart) < timeToMinutes(fixed.end) && timeToMinutes(cellEnd) > timeToMinutes(fixed.start);
         });
+        var quickActions = text && !isFixed ? weeklyQuickActions(
+          canJoinWeeklyNeighbor(proposal, day, rowIndex, span, "before"),
+          canJoinWeeklyNeighbor(proposal, day, rowIndex, span, "after"), span > 1) : "";
         var cellContent = active ? '<div class="welcome-flow-week-cell-content"><textarea rows="1" class="welcome-flow-week-inline-activity" data-week-inline-edit data-inline-day="' + day + '" data-inline-index="' + rowIndex + '" data-inline-span="' + span + '" data-inline-category="' + escapeHtml(category) + '" aria-label="Actividad del ' + DAY_LABELS[day] + ', ' + formatClock(cellStart) + ' a ' + formatClock(cellEnd) + '" placeholder="Añadir actividad">' + escapeHtml(text) + '</textarea>' + reminder +
-          (text && !isFixed ? '<span class="welcome-flow-resize-grip is-start" data-week-resize="start" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="' + timeToMinutes(cellStart) + '" aria-valuetext="' + formatClock(cellStart) + '" aria-label="Ajustar inicio de ' + escapeHtml(text) + '"></span><span class="welcome-flow-resize-grip is-end" data-week-resize="end" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="' + timeToMinutes(cellEnd) + '" aria-valuetext="' + formatClock(cellEnd) + '" aria-label="Ajustar fin de ' + escapeHtml(text) + '; arrastra para alargar, acortar o unir con la misma actividad"></span>' : isFixed ? '<small class="welcome-flow-week-fixed">Compromiso fijo</small>' : '') + '</div>' : '<span>—</span>';
+          (text && !isFixed ? '<span class="welcome-flow-resize-grip is-start" data-week-resize="start" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="' + timeToMinutes(cellStart) + '" aria-valuetext="' + formatClock(cellStart) + '" aria-label="Ajustar inicio de ' + escapeHtml(text) + '"></span><span class="welcome-flow-resize-grip is-end" data-week-resize="end" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="' + timeToMinutes(cellEnd) + '" aria-valuetext="' + formatClock(cellEnd) + '" aria-label="Ajustar fin de ' + escapeHtml(text) + '; arrastra para alargar, acortar o unir con la misma actividad"></span>' : isFixed ? '<small class="welcome-flow-week-fixed">Compromiso fijo</small>' : '') + quickActions + '</div>' : '<span>—</span>';
         return '<td rowspan="' + span + '" class="welcome-week-cell welcome-flow-category-' + escapeHtml(category) + (active ? "" : " is-free-day") + (span > 1 ? " is-merged" : "") + '"' + (active ? ' data-week-cell data-week-day="' + day + '" data-week-index="' + rowIndex + '" data-week-span="' + span + '" data-week-start="' + cellStart + '" data-week-end="' + cellEnd + '" data-week-category="' + escapeHtml(category) + '" data-week-text="' + escapeHtml(text) + '" data-week-fixed="' + (isFixed ? "true" : "false") + '"' : '') + '>' + cellContent + '</td>';
       }).join("") + '</tr>';
     }).join("");
@@ -1524,7 +1583,7 @@
     var specialtyName = specialtyLabel();
     var dailyCompanion = state.editing ? "" : '<section class="welcome-flow-daily-companion"><div class="welcome-flow-companion-intro"><span>☀</span><div><strong>Tu día también tendrá un espacio personal</strong><small>No será solo una lista: podrás registrar cómo llegas, tu intención y cómo terminó el día.</small></div></div><div class="welcome-flow-companion-grid"><article><small>¿Cómo llegas hoy?</small><div class="welcome-flow-moods" aria-label="Ejemplo de estados de ánimo"><button type="button">○ Tranquilo</button><button type="button">△ Cansado</button><button type="button">◇ Motivado</button></div></article><article><small>Intención principal</small><strong>' + escapeHtml(state.goal || (state.projects.length ? "Tus proyectos declarados" : "Tus compromisos y espacios disponibles")) + '</strong><span>' + escapeHtml(specialtyName ? "Enfoque adaptado a " + specialtyName : "Adaptado a tu ocupación") + '</span></article><article><small>Mini balance del día</small><span>Meta principal · energía · productividad</span><span>Agradecimiento · notas · cuidado personal</span></article></div></section>';
     var dailyView = '<div class="welcome-flow-day-tabs">' + dayTabs + '</div>' + dailyCompanion + '<div class="welcome-flow-preview"><div class="welcome-flow-preview-head"><strong>Vista de ' + DAY_LABELS[previewDay] + '</strong><span>' + formatClockRange(minutesToTime(previewStart) + " – " + minutesToTime(previewEnd)) + '</span></div><p class="welcome-flow-simple-help">Toca cualquier actividad para escribir directamente. Si dejas el campo vacío, ese espacio queda libre.</p><ul>' + sampleDay + '</ul></div>';
-    var weeklyView = '<p class="welcome-flow-simple-help">Escribe directamente en cada actividad. Arrastra la pequeña línea del borde superior o inferior para alargar o acortar; al extenderla sobre un espacio libre, se une en un bloque. Si escribes la misma actividad en dos espacios contiguos, también se unirán. En la tabla completa, arrastra el borde derecho del nombre del día para ensancharlo. Suelta para confirmar; Escape cancela.</p><div class="welcome-flow-weekly-action-status" role="status" aria-live="polite"></div><div class="welcome-flow-weekly-desktop"><div class="welcome-flow-weekly-wrap"><table class="welcome-flow-weekly" style="width:' + weeklyTableWidth + 'px;min-width:' + weeklyTableWidth + 'px">' + weeklyColGroup + '<thead><tr><th>Hora</th>' + weeklyHeaders + '</tr></thead><tbody>' + weeklyRows + '</tbody></table></div></div><div class="welcome-flow-weekly-mobile-view"><div class="welcome-flow-day-tabs" aria-label="Elegir día de la semana">' + weeklyDayTabs + '</div><div class="welcome-flow-preview"><div class="welcome-flow-preview-head"><strong>Vista de ' + DAY_LABELS[previewDay] + '</strong><span>' + formatClockRange(minutesToTime(previewStart) + " – " + minutesToTime(previewEnd)) + '</span></div><ul>' + sampleDay + '</ul></div></div>';
+    var weeklyView = '<p class="welcome-flow-simple-help">Escribe una actividad y pulsa «Unir ↑» o «Unir ↓» para sumar un espacio libre del mismo día. «Acortar» libera el último tramo. Las actividades iguales y seguidas se unen solas. <span class="welcome-flow-desktop-tip">También puedes arrastrar los bordes; el borde derecho del nombre del día cambia su ancho.</span></p><div class="welcome-flow-weekly-action-status" role="status" aria-live="polite"></div><div class="welcome-flow-weekly-desktop"><div class="welcome-flow-weekly-wrap"><table class="welcome-flow-weekly" style="width:' + weeklyTableWidth + 'px;min-width:' + weeklyTableWidth + 'px">' + weeklyColGroup + '<thead><tr><th>Hora</th>' + weeklyHeaders + '</tr></thead><tbody>' + weeklyRows + '</tbody></table></div></div><div class="welcome-flow-weekly-mobile-view"><div class="welcome-flow-day-tabs" aria-label="Elegir día de la semana">' + weeklyDayTabs + '</div><div class="welcome-flow-preview"><div class="welcome-flow-preview-head"><strong>Vista de ' + DAY_LABELS[previewDay] + '</strong><span>' + formatClockRange(minutesToTime(previewStart) + " – " + minutesToTime(previewEnd)) + '</span></div><ul>' + sampleDay + '</ul></div></div>';
     var replacing = hasTasks(parseJson(localStorage.getItem("horario_data_semanal")));
     var previewTitle = state.example ? "Así podría quedar un horario hecho para ti" : (firstName() ? firstName() + ", tu primera propuesta está lista" : "Tu primera propuesta está lista");
     var previewSubtitle = state.example ? "Este ejemplo es solo una demostración y no modificará tu horario." : "Esta es una propuesta editable. Puedes pulir la semana completa aquí, antes de guardarla.";
@@ -1558,6 +1617,11 @@
     var overlay = document.getElementById("welcome-flow-overlay") || createOverlay();
     var previousCard = overlay.querySelector(".welcome-flow-card");
     var previousScroll = previousCard ? previousCard.scrollTop : 0;
+    var previousWeeklyWrap = previousCard && previousCard.querySelector(".welcome-flow-weekly-wrap");
+    var previousWeeklyLeft = previousWeeklyWrap ? previousWeeklyWrap.scrollLeft : 0;
+    var previousWeeklyTop = previousWeeklyWrap ? previousWeeklyWrap.scrollTop : 0;
+    var previousMobileList = previousCard && previousCard.querySelector(".welcome-flow-weekly-mobile-view .welcome-flow-preview ul");
+    var previousMobileTop = previousMobileList ? previousMobileList.scrollTop : 0;
     var sameStep = overlay.dataset.welcomeStep === String(state.step);
     var focused = overlay.contains(document.activeElement) ? document.activeElement : null;
     var focusSelector = focused && focused.id ? "#" + CSS.escape(focused.id) : null;
@@ -1582,6 +1646,10 @@
     overlay.dataset.welcomeStep = String(state.step);
     var nextCard = overlay.querySelector(".welcome-flow-card");
     if (nextCard && previousScroll && sameStep) nextCard.scrollTop = previousScroll;
+    var nextWeeklyWrap = nextCard && nextCard.querySelector(".welcome-flow-weekly-wrap");
+    if (nextWeeklyWrap && sameStep) { nextWeeklyWrap.scrollLeft = previousWeeklyLeft; nextWeeklyWrap.scrollTop = previousWeeklyTop; }
+    var nextMobileList = nextCard && nextCard.querySelector(".welcome-flow-weekly-mobile-view .welcome-flow-preview ul");
+    if (nextMobileList && sameStep) nextMobileList.scrollTop = previousMobileTop;
     syncReminderDetails();
     overlay.querySelectorAll("textarea[data-week-inline-edit],textarea[data-day-inline-edit]").forEach(function (field) {
       field.style.height = "auto";
@@ -1995,7 +2063,7 @@
     document.addEventListener("change", function (event) {
       if ((event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) && event.target.matches("[data-day-inline-edit],[data-week-inline-edit]")) {
         saveInlineActivity(event.target);
-        render();
+        window.setTimeout(render, 0);
         return;
       }
       if (event.target.matches && (event.target.matches("[data-fixed-day]") || event.target.matches("[data-fixed-type]"))) {
@@ -2082,6 +2150,12 @@
         state.commandDraft = suggestion.getAttribute("data-welcome-command") || "";
         var commandField = document.querySelector("#welcome-change-command");
         if (commandField) { commandField.value = state.commandDraft; commandField.focus(); }
+        return;
+      }
+      var quickAction = target.closest("[data-week-quick]");
+      if (quickAction) {
+        event.preventDefault();
+        adjustWeeklyCellByOne(quickAction.closest("[data-week-cell]"), quickAction.getAttribute("data-week-quick"));
         return;
       }
       var minuteChoice = target.closest("[data-minute-choice]");

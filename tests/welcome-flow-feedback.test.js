@@ -63,7 +63,7 @@ test("la propuesta se edita directamente y el horario semanal usa acciones guiad
   assert.match(welcome, /grip\.getAttribute\("data-week-resize"\)/);
   assert.ok(welcome.indexOf('class="welcome-flow-weekly-action-status"') < welcome.indexOf('class="welcome-flow-weekly-desktop"'));
   assert.match(welcome, /data-weekly-preview-day/);
-  assert.match(welcome, /Si escribes la misma actividad en dos espacios contiguos, también se unirán/);
+  assert.match(welcome, /Las actividades iguales y seguidas se unen solas/);
   assert.match(welcome, /welcome-flow-weekly-action-status" role="status"/);
   assert.doesNotMatch(welcome, /data-week-handle=/);
   assert.doesNotMatch(welcome, /weeklyDrag|weekRowAtPoint|suppressWeekHandleClickUntil/);

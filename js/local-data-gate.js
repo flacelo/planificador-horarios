@@ -169,6 +169,7 @@
   }
 
   function addStyles() {
+    if (document.getElementById("planify-local-data-gate-styles")) return;
     var style = document.createElement("style");
     style.id = "planify-local-data-gate-styles";
     style.textContent =
@@ -192,8 +193,28 @@
       "body.tema-claro #planify-local-data-gate p{color:#526970}" +
       "body.tema-claro #planify-local-data-gate .local-data-note{border-color:#d5e5e2;background:#f4faf8;color:#526970}" +
       "body.tema-claro #planify-local-data-gate button[data-action='fresh'],body.tema-claro #planify-local-data-gate button[data-action='blank']{background:#f2f7f5;color:#24464a;border-color:#cbded9}" +
+      "#planify-archive-recovery{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:12px 14px;border:1px solid #8bd9c4;border-radius:13px;background:#eafff7;color:#174e4b;font:600 14px/1.4 'Outfit','Inter',system-ui,sans-serif}" +
+      "#planify-archive-recovery button{min-height:44px;padding:8px 12px;border:1px solid #419988;border-radius:9px;background:#fff;color:#14695e;font-family:inherit;font-size:13px;font-weight:700;line-height:1.3;cursor:pointer}" +
+      "#planify-archive-recovery button:focus-visible{outline:3px solid #0d9488;outline-offset:2px}" +
+      "@media(max-width:600px){#planify-archive-recovery{align-items:stretch;flex-direction:column}#planify-archive-recovery button{width:100%}}" +
       "@media(prefers-reduced-motion:reduce){#planify-local-data-gate *{scroll-behavior:auto!important;transition:none!important}}";
     document.head.appendChild(style);
+  }
+
+  function renderArchiveRecovery() {
+    addStyles();
+    var notice = document.createElement("aside");
+    notice.id = "planify-archive-recovery";
+    notice.setAttribute("aria-label", "Recuperar un horario anterior");
+    notice.innerHTML = '<span>¿Buscas un horario anterior guardado en este navegador?</span>' +
+      '<button type="button">Recuperar una copia</button>';
+    var hub = document.querySelector && document.querySelector(".trust-start-hub");
+    (hub || document.body).appendChild(notice);
+    notice.addEventListener("click", function (event) {
+      if (!event.target.closest("button")) return;
+      try { renderGate(personalKeysWithData(), archives()); }
+      catch (error) { /* Keep the recovery notice if storage is unavailable. */ }
+    });
   }
 
   function renderGate(currentKeys, savedArchives) {
@@ -267,7 +288,7 @@
           if (status) status.textContent = restored.message;
           return;
         }
-        unlock();
+        window.location.reload();
       }
     });
     gate.addEventListener("keydown", function (event) {
@@ -315,5 +336,6 @@
   } catch (error) {
     return;
   }
-  if (currentData.length || savedArchives.length) renderGate(currentData, savedArchives);
+  if (currentData.length) renderGate(currentData, savedArchives);
+  else if (savedArchives.length) renderArchiveRecovery();
 })();

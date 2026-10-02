@@ -145,7 +145,7 @@ test("una confirmación antigua de esta pestaña no muestra el plan automáticam
   assert.doesNotMatch(app.elements[0].innerHTML, /Plan de otra persona/);
 });
 
-test("empezar en blanco consume solo el salto de recarga y la siguiente visita vuelve a proteger la copia", () => {
+test("empezar en blanco conserva la copia sin bloquear las visitas siguientes", () => {
   const app = runGate({
     horario_data_semanal: JSON.stringify({ filas: [{ celdas: [{ t: "Horario de prueba" }] }] }),
     planify_nombre: "Persona anterior"
@@ -170,9 +170,21 @@ test("empezar en blanco consume solo el salto de recarga y la siguiente visita v
   const nextVisit = runGate(Object.fromEntries(afterFreshReload.localStorage.values), {
     session: Object.fromEntries(afterFreshReload.sessionStorage.values)
   });
-  assert.equal(nextVisit.classes.has("planify-data-gate-active"), true);
-  assert.match(nextVisit.elements[0].innerHTML, /Hay una copia anterior/);
+  assert.equal(nextVisit.classes.has("planify-data-gate-active"), false);
+  assert.equal(nextVisit.elements[0].id, "planify-archive-recovery");
+  assert.match(nextVisit.elements[0].innerHTML, /Recuperar una copia/);
   assert.doesNotMatch(nextVisit.elements[0].innerHTML, /Horario de prueba|Persona anterior/);
+
+  nextVisit.elements[0].handlers.click({ target: { closest() { return {}; } } });
+  assert.equal(nextVisit.classes.has("planify-data-gate-active"), true);
+  assert.match(nextVisit.elements[1].innerHTML, /Hay una copia anterior/);
+  const restoreButton = { getAttribute(name) { return name === "data-action" ? "restore" : null; } };
+  nextVisit.elements[1].handlers.click({ target: { closest() { return restoreButton; } } });
+  assert.equal(nextVisit.reloads(), 1);
+  assert.match(nextVisit.localStorage.getItem("horario_data_semanal"), /Horario de prueba/);
+  const restoredVisit = runGate(Object.fromEntries(nextVisit.localStorage.values));
+  assert.equal(restoredVisit.classes.has("planify-data-gate-active"), true);
+  assert.doesNotMatch(restoredVisit.elements[0].innerHTML, /Horario de prueba/);
 });
 
 test("una copia archivada vacía se conserva sin bloquear a una persona nueva", () => {
@@ -195,7 +207,7 @@ test("una copia archivada vacía se conserva sin bloquear a una persona nueva", 
   assert.equal(app.hooks.archives().length, 0);
 });
 
-test("al ignorar una copia archivada vacía, conserva el aviso para una copia real más antigua", () => {
+test("la opción de recuperación elige la copia real más reciente e ignora una copia vacía posterior", () => {
   const emptyKey = "planify_local_data_archive_v1:empty-newer";
   const realKey = "planify_local_data_archive_v1:real-older";
   const emptyArchive = {
@@ -213,10 +225,11 @@ test("al ignorar una copia archivada vacía, conserva el aviso para una copia re
     [realKey]: JSON.stringify(realArchive)
   });
 
-  assert.equal(app.classes.has("planify-data-gate-active"), true);
+  assert.equal(app.classes.has("planify-data-gate-active"), false);
   assert.equal(app.hooks.archives().length, 1);
   assert.equal(app.hooks.archives()[0].key, realKey);
-  assert.match(app.elements[0].innerHTML, /Hay una copia anterior/);
+  assert.equal(app.elements[0].id, "planify-archive-recovery");
+  assert.doesNotMatch(app.elements[0].innerHTML, /Turno real/);
 });
 
 test("detecta y protege también historiales y ajustes del horario, no solo sus celdas", () => {
@@ -247,8 +260,8 @@ test("detecta y protege también historiales y ajustes del horario, no solo sus 
   const freshStart = app.hooks.createArchive();
   assert.equal(freshStart.ok, true);
   const reopened = runGate(Object.fromEntries(app.localStorage.values));
-  assert.equal(reopened.classes.has("planify-data-gate-active"), true);
-  assert.match(reopened.elements[0].innerHTML, /Hay una copia anterior/);
+  assert.equal(reopened.classes.has("planify-data-gate-active"), false);
+  assert.equal(reopened.elements[0].id, "planify-archive-recovery");
 });
 
 test("archiva y restaura datos Planify sin tocar preferencias ni datos de otros sitios", () => {

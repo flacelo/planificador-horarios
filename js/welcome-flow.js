@@ -981,8 +981,8 @@
 
     var requestConflict = state.manualRequests.find(function (item) {
       var overlapsSource = Number(item.day) === sourceDay && Number(item.start) === source.start && Number(item.end) === source.end;
-      var sameActivity = targetDay === sourceDay && String(item.text || "").trim() === String(source.text || "").trim() && String(item.category || "") === String(source.category || "");
-      return !overlapsSource && Number(item.day) === targetDay && nextStart < Number(item.end) && nextEnd > Number(item.start) && !sameActivity;
+      var sameActivity = targetDay === sourceDay && String(item.text || "").trim() === String(source.text || "").trim();
+      return !overlapsSource && Boolean(String(item.text || "").trim()) && Number(item.day) === targetDay && nextStart < Number(item.end) && nextEnd > Number(item.start) && !sameActivity;
     });
     if (requestConflict) return "Ese espacio ya tiene un cambio manual. Elige otro horario para no reemplazarlo.";
 
@@ -996,7 +996,7 @@
       var lastTimes = lastRow && String(lastRow.hora || "").match(/\d{2}:\d{2}/g) || rowTimes;
       var cellEnd = timeToMinutes(lastTimes[1] || rowTimes[1]);
       var isSource = targetDay === sourceDay && cellStart === source.start && cellEnd === source.end;
-      var sameActivity = targetDay === sourceDay && String(cell.t || "").trim() === String(source.text || "").trim() && String(cell.c || "") === String(source.category || "");
+      var sameActivity = targetDay === sourceDay && String(cell.t || "").trim() === String(source.text || "").trim();
       return !isSource && cellStart < nextEnd && cellEnd > nextStart && !sameActivity;
     });
     if (occupied) return "Ese horario ya tiene otra actividad. Elige un espacio libre para mover el bloque.";
@@ -1012,8 +1012,9 @@
     });
     state.manualRequests = state.manualRequests.filter(function (item) {
       var isSource = Number(item.day) === sourceDay && Number(item.start) === source.start && Number(item.end) === source.end;
-      var sameMergedActivity = targetDay === sourceDay && Number(item.day) === targetDay && String(item.text || "").trim() === String(source.text || "").trim() && String(item.category || "") === String(source.category || "") && Number(item.start) < nextEnd && Number(item.end) > nextStart;
-      return !isSource && !sameMergedActivity;
+      var overlapsTarget = Number(item.day) === targetDay && Number(item.start) < nextEnd && Number(item.end) > nextStart;
+      var sameMergedActivity = targetDay === sourceDay && overlapsTarget && String(item.text || "").trim() === String(source.text || "").trim();
+      return !isSource && !sameMergedActivity && !(overlapsTarget && !String(item.text || "").trim());
     });
     var moving = targetDay !== sourceDay || nextEnd - nextStart === source.end - source.start && nextStart !== source.start;
     if (targetDay !== sourceDay) {
@@ -1047,6 +1048,8 @@
     if (!table) return width;
     var column = table.querySelector('col[data-week-column="' + index + '"]');
     if (column) column.style.width = width + "px";
+    var grip = table.querySelector('th[data-week-column-resize="' + index + '"] [data-week-width-grip]');
+    if (grip) grip.setAttribute("aria-valuenow", String(width));
     var total = 88 + DAYS.reduce(function (sum, _, columnIndex) {
       return sum + (Number(state.previewColumnWidths[columnIndex]) || 84);
     }, 0);
@@ -1055,26 +1058,39 @@
     return width;
   }
 
-  function weekRowAtY(table, clientY) {
-    if (!table) return null;
-    var rows = Array.prototype.slice.call(table.querySelectorAll("tbody tr[data-week-row-index]"));
-    var mobileRows = false;
-    if (!rows.length) {
-      rows = Array.prototype.slice.call(table.querySelectorAll("li[data-week-cell]"));
-      mobileRows = true;
+  function weeklyTimeBoundaries() {
+    return Array.from(new Set(buildProposal().filas.reduce(function (list, row) {
+      var times = String(row.hora || "").match(/\d{2}:\d{2}/g) || [];
+      return list.concat(times.map(timeToMinutes));
+    }, []))).sort(function (a, b) { return a - b; });
+  }
+
+  function weeklyBoundaryAtPointer(drag, clientY) {
+    if (!drag.boundaries.length) return null;
+    if (drag.table && drag.table.matches("table")) {
+      var rows = Array.prototype.slice.call(drag.table.querySelectorAll("tbody tr[data-week-row-index]"));
+      var candidates = [];
+      rows.forEach(function (row) {
+        var rect = row.getBoundingClientRect();
+        var start = row.getAttribute("data-week-row-start");
+        var end = row.getAttribute("data-week-row-end");
+        if (start) candidates.push({ y: rect.top, time: timeToMinutes(start) });
+        if (end) candidates.push({ y: rect.bottom, time: timeToMinutes(end) });
+      });
+      if (!candidates.length) return null;
+      if (clientY < candidates[0].y - 28 || clientY > candidates[candidates.length - 1].y + 28) return null;
+      var nearest = candidates.reduce(function (best, candidate) {
+        return Math.abs(candidate.y - clientY) < Math.abs(best.y - clientY) ? candidate : best;
+      });
+      return nearest.time;
     }
-    if (!rows.length) return null;
-    if (clientY < rows[0].getBoundingClientRect().top || clientY > rows[rows.length - 1].getBoundingClientRect().bottom) return null;
-    var row = rows.find(function (candidate) {
-      var bounds = candidate.getBoundingClientRect();
-      return clientY >= bounds.top && clientY <= bounds.bottom;
-    });
-    if (!row) return null;
-    var start = row.getAttribute(mobileRows ? "data-week-start" : "data-week-row-start") || "";
-    var end = row.getAttribute(mobileRows ? "data-week-end" : "data-week-row-end") || "";
-    return /^\d{2}:\d{2}$/.test(start) && /^\d{2}:\d{2}$/.test(end)
-      ? { start: timeToMinutes(start), end: timeToMinutes(end), row: row }
-      : null;
+    // La vista de un día agrupa bloques; sus <li> no equivalen a intervalos de tiempo.
+    // Un paso táctil corresponde al siguiente límite real de la propuesta.
+    var origin = drag.side === "start" ? drag.source.start : drag.source.end;
+    var index = drag.boundaries.indexOf(origin);
+    if (index < 0) return null;
+    var offset = Math.round((clientY - drag.startY) / 44);
+    return drag.boundaries[Math.max(0, Math.min(drag.boundaries.length - 1, index + offset))];
   }
 
   function movementPlanLabel() {
@@ -1102,7 +1118,7 @@
         var span = 1;
         while (index + span < rows.length) {
           var next = rows[index + span].celdas[day];
-          if (!next || next.rowspan === 0 || next.t !== first.t || next.c !== first.c) break;
+          if (!next || next.rowspan === 0 || next.t !== first.t) break;
           first.reminder = Boolean(first.reminder || next.reminder);
           if (next.reminderLabel && (!first.reminderLabel || first.reminderLabel.indexOf(next.reminderLabel) < 0)) first.reminderLabel = [first.reminderLabel, next.reminderLabel].filter(Boolean).join(" · ");
           span += 1;
@@ -1457,8 +1473,8 @@
         return Number(fixed.day) === previewDay && timeToMinutes(blockStart) < timeToMinutes(fixed.end) && timeToMinutes(blockEnd) > timeToMinutes(fixed.start);
       });
       var weekCellAttributes = ' data-week-cell data-week-day="' + previewDay + '" data-week-index="' + rowIndex + '" data-week-span="' + span + '" data-week-start="' + blockStart + '" data-week-end="' + blockEnd + '" data-week-category="' + escapeHtml(category) + '" data-week-text="' + escapeHtml(text) + '" data-week-fixed="' + (isFixedBlock ? "true" : "false") + '"';
-      var mobileAction = isFixedBlock ? '<small class="welcome-flow-week-fixed">Compromiso fijo</small>' : "";
-      var inlineText = '<input class="welcome-flow-inline-activity" data-day-inline-edit data-inline-day="' + previewDay + '" data-inline-index="' + rowIndex + '" data-inline-span="' + span + '" data-inline-category="' + escapeHtml(category) + '" aria-label="Editar actividad del ' + DAY_LABELS[previewDay] + ', ' + formatClock(blockStart) + ' a ' + formatClock(blockEnd) + '" value="' + escapeHtml(text) + '" placeholder="Escribe aquí o deja el espacio libre">';
+      var mobileAction = isFixedBlock ? '<small class="welcome-flow-week-fixed">Compromiso fijo</small>' : text ? '<span class="welcome-flow-resize-grip is-start" data-week-resize="start" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="' + timeToMinutes(blockStart) + '" aria-valuetext="' + formatClock(blockStart) + '" aria-label="Ajustar inicio de ' + escapeHtml(text) + '"></span><span class="welcome-flow-resize-grip is-end" data-week-resize="end" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="' + timeToMinutes(blockEnd) + '" aria-valuetext="' + formatClock(blockEnd) + '" aria-label="Ajustar fin de ' + escapeHtml(text) + '; arrastra para alargar, acortar o unir con la misma actividad"></span>' : "";
+      var inlineText = '<textarea rows="1" class="welcome-flow-inline-activity" data-day-inline-edit data-inline-day="' + previewDay + '" data-inline-index="' + rowIndex + '" data-inline-span="' + span + '" data-inline-category="' + escapeHtml(category) + '" aria-label="Editar actividad del ' + DAY_LABELS[previewDay] + ', ' + formatClock(blockStart) + ' a ' + formatClock(blockEnd) + '" placeholder="Escribe aquí o deja el espacio libre">' + escapeHtml(text) + '</textarea>';
       return '<li class="welcome-flow-simple-row welcome-flow-weekly-day-row"' + weekCellAttributes + '><span>' + formatClock(blockStart) + ' – ' + formatClock(blockEnd) + '</span><i class="welcome-flow-category-dot welcome-flow-category-' + escapeHtml(category) + '"></i><div class="welcome-flow-weekly-day-activity">' + inlineText + reminderLabel + mobileAction + '</div></li>';
     }).join("");
     var dayTabs = proposal.plannedDays.map(function (day) {
@@ -1480,7 +1496,7 @@
     var weeklyTableWidth = 88 + dayColumnWidths.reduce(function (sum, width) { return sum + width; }, 0);
     var weeklyColGroup = '<colgroup><col style="width:88px">' + dayColumnWidths.map(function (width, day) { return '<col data-week-column="' + day + '" style="width:' + width + 'px">'; }).join("") + '</colgroup>';
     var weeklyHeaders = DAYS.map(function (day, dayIndex) {
-      return '<th class="welcome-flow-weekly-day-heading" data-week-column-resize="' + dayIndex + '" tabindex="0" aria-label="Columna ' + DAY_LABELS[dayIndex] + '. Arrastra el borde derecho para ensanchar; usa flechas izquierda y derecha.">' + day.slice(0, 3) + '</th>';
+      return '<th class="welcome-flow-weekly-day-heading" data-week-column-resize="' + dayIndex + '">' + day.slice(0, 3) + '<span class="welcome-flow-column-grip" data-week-width-grip role="separator" tabindex="0" aria-orientation="vertical" aria-valuemin="84" aria-valuemax="320" aria-valuenow="' + dayColumnWidths[dayIndex] + '" aria-label="Ancho de ' + DAY_LABELS[dayIndex] + '. Arrastra a un lado o usa flechas izquierda y derecha."></span></th>';
     }).join("");
     var weeklyRows = proposal.filas.map(function (row, rowIndex) {
       var rowTimes = String(row.hora || "").match(/\d{2}:\d{2}/g) || [];
@@ -1499,16 +1515,16 @@
         var isFixed = active && expandedFixed().some(function (fixed) {
           return Number(fixed.day) === day && timeToMinutes(cellStart) < timeToMinutes(fixed.end) && timeToMinutes(cellEnd) > timeToMinutes(fixed.start);
         });
-        var cellContent = active ? '<div class="welcome-flow-week-cell-content"><input class="welcome-flow-week-inline-activity" data-week-inline-edit data-inline-day="' + day + '" data-inline-index="' + rowIndex + '" data-inline-span="' + span + '" data-inline-category="' + escapeHtml(category) + '" aria-label="Actividad del ' + DAY_LABELS[day] + ', ' + formatClock(cellStart) + ' a ' + formatClock(cellEnd) + '" value="' + escapeHtml(text) + '" placeholder="Añadir actividad">' + reminder +
-          (text && !isFixed ? '<small class="welcome-flow-week-resize-hint" aria-hidden="true">Arrastra borde superior o inferior para ajustar tiempo</small>' : isFixed ? '<small class="welcome-flow-week-fixed">Compromiso fijo</small>' : '') + '</div>' : '<span>—</span>';
-        return '<td rowspan="' + span + '" class="welcome-week-cell welcome-flow-category-' + escapeHtml(category) + (active ? "" : " is-free-day") + (span > 1 ? " is-merged" : "") + '"' + (active ? ' data-week-cell data-week-day="' + day + '" data-week-index="' + rowIndex + '" data-week-span="' + span + '" data-week-start="' + cellStart + '" data-week-end="' + cellEnd + '" data-week-category="' + escapeHtml(category) + '" data-week-text="' + escapeHtml(text) + '" data-week-fixed="' + (isFixed ? "true" : "false") + '" tabindex="0" aria-label="' + escapeHtml(DAY_LABELS[day] + ", " + formatClock(cellStart) + " a " + formatClock(cellEnd) + (text ? ": " + text : ": libre") + (isFixed ? ". Compromiso fijo, no editable." : ". Arrastra el borde superior o inferior para ajustar duración; usa Alt más flechas para teclado.")) + '"' : '') + '>' + cellContent + '</td>';
+        var cellContent = active ? '<div class="welcome-flow-week-cell-content"><textarea rows="1" class="welcome-flow-week-inline-activity" data-week-inline-edit data-inline-day="' + day + '" data-inline-index="' + rowIndex + '" data-inline-span="' + span + '" data-inline-category="' + escapeHtml(category) + '" aria-label="Actividad del ' + DAY_LABELS[day] + ', ' + formatClock(cellStart) + ' a ' + formatClock(cellEnd) + '" placeholder="Añadir actividad">' + escapeHtml(text) + '</textarea>' + reminder +
+          (text && !isFixed ? '<span class="welcome-flow-resize-grip is-start" data-week-resize="start" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="' + timeToMinutes(cellStart) + '" aria-valuetext="' + formatClock(cellStart) + '" aria-label="Ajustar inicio de ' + escapeHtml(text) + '"></span><span class="welcome-flow-resize-grip is-end" data-week-resize="end" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="' + timeToMinutes(cellEnd) + '" aria-valuetext="' + formatClock(cellEnd) + '" aria-label="Ajustar fin de ' + escapeHtml(text) + '; arrastra para alargar, acortar o unir con la misma actividad"></span>' : isFixed ? '<small class="welcome-flow-week-fixed">Compromiso fijo</small>' : '') + '</div>' : '<span>—</span>';
+        return '<td rowspan="' + span + '" class="welcome-week-cell welcome-flow-category-' + escapeHtml(category) + (active ? "" : " is-free-day") + (span > 1 ? " is-merged" : "") + '"' + (active ? ' data-week-cell data-week-day="' + day + '" data-week-index="' + rowIndex + '" data-week-span="' + span + '" data-week-start="' + cellStart + '" data-week-end="' + cellEnd + '" data-week-category="' + escapeHtml(category) + '" data-week-text="' + escapeHtml(text) + '" data-week-fixed="' + (isFixed ? "true" : "false") + '"' : '') + '>' + cellContent + '</td>';
       }).join("") + '</tr>';
     }).join("");
     var previewSwitch = '<div class="welcome-flow-view-switch" aria-label="Cambiar vista"><button type="button" data-preview-mode="daily" class="' + (state.previewMode === "daily" ? "is-selected" : "") + '">☀️ Vista diaria</button><button type="button" data-preview-mode="weekly" class="' + (state.previewMode === "weekly" ? "is-selected" : "") + '">📅 Vista semanal</button></div>';
     var specialtyName = specialtyLabel();
     var dailyCompanion = state.editing ? "" : '<section class="welcome-flow-daily-companion"><div class="welcome-flow-companion-intro"><span>☀</span><div><strong>Tu día también tendrá un espacio personal</strong><small>No será solo una lista: podrás registrar cómo llegas, tu intención y cómo terminó el día.</small></div></div><div class="welcome-flow-companion-grid"><article><small>¿Cómo llegas hoy?</small><div class="welcome-flow-moods" aria-label="Ejemplo de estados de ánimo"><button type="button">○ Tranquilo</button><button type="button">△ Cansado</button><button type="button">◇ Motivado</button></div></article><article><small>Intención principal</small><strong>' + escapeHtml(state.goal || (state.projects.length ? "Tus proyectos declarados" : "Tus compromisos y espacios disponibles")) + '</strong><span>' + escapeHtml(specialtyName ? "Enfoque adaptado a " + specialtyName : "Adaptado a tu ocupación") + '</span></article><article><small>Mini balance del día</small><span>Meta principal · energía · productividad</span><span>Agradecimiento · notas · cuidado personal</span></article></div></section>';
     var dailyView = '<div class="welcome-flow-day-tabs">' + dayTabs + '</div>' + dailyCompanion + '<div class="welcome-flow-preview"><div class="welcome-flow-preview-head"><strong>Vista de ' + DAY_LABELS[previewDay] + '</strong><span>' + formatClockRange(minutesToTime(previewStart) + " – " + minutesToTime(previewEnd)) + '</span></div><p class="welcome-flow-simple-help">Toca cualquier actividad para escribir directamente. Si dejas el campo vacío, ese espacio queda libre.</p><ul>' + sampleDay + '</ul></div>';
-    var weeklyView = '<p class="welcome-flow-simple-help">Escribe en cualquier actividad. Para ensanchar un día, arrastra el borde derecho de su encabezado. Para alargar o acortar un bloque, arrastra su borde superior o inferior; si lo extiendes sobre la misma actividad contigua, se unirá en una sola celda. Suelta para confirmar. En celular puedes elegir un día y ajustar desde el borde de cada bloque.</p><div class="welcome-flow-weekly-action-status" role="status" aria-live="polite"></div><div class="welcome-flow-weekly-desktop"><div class="welcome-flow-weekly-wrap"><table class="welcome-flow-weekly" style="width:' + weeklyTableWidth + 'px;min-width:' + weeklyTableWidth + 'px">' + weeklyColGroup + '<thead><tr><th>Hora</th>' + weeklyHeaders + '</tr></thead><tbody>' + weeklyRows + '</tbody></table></div></div><div class="welcome-flow-weekly-mobile-view"><div class="welcome-flow-day-tabs" aria-label="Elegir día de la semana">' + weeklyDayTabs + '</div><div class="welcome-flow-preview"><div class="welcome-flow-preview-head"><strong>Vista de ' + DAY_LABELS[previewDay] + '</strong><span>' + formatClockRange(minutesToTime(previewStart) + " – " + minutesToTime(previewEnd)) + '</span></div><ul>' + sampleDay + '</ul></div></div>';
+    var weeklyView = '<p class="welcome-flow-simple-help">Escribe directamente en cada actividad. Arrastra la pequeña línea del borde superior o inferior para alargar o acortar; al extenderla sobre un espacio libre, se une en un bloque. Si escribes la misma actividad en dos espacios contiguos, también se unirán. En la tabla completa, arrastra el borde derecho del nombre del día para ensancharlo. Suelta para confirmar; Escape cancela.</p><div class="welcome-flow-weekly-action-status" role="status" aria-live="polite"></div><div class="welcome-flow-weekly-desktop"><div class="welcome-flow-weekly-wrap"><table class="welcome-flow-weekly" style="width:' + weeklyTableWidth + 'px;min-width:' + weeklyTableWidth + 'px">' + weeklyColGroup + '<thead><tr><th>Hora</th>' + weeklyHeaders + '</tr></thead><tbody>' + weeklyRows + '</tbody></table></div></div><div class="welcome-flow-weekly-mobile-view"><div class="welcome-flow-day-tabs" aria-label="Elegir día de la semana">' + weeklyDayTabs + '</div><div class="welcome-flow-preview"><div class="welcome-flow-preview-head"><strong>Vista de ' + DAY_LABELS[previewDay] + '</strong><span>' + formatClockRange(minutesToTime(previewStart) + " – " + minutesToTime(previewEnd)) + '</span></div><ul>' + sampleDay + '</ul></div></div>';
     var replacing = hasTasks(parseJson(localStorage.getItem("horario_data_semanal")));
     var previewTitle = state.example ? "Así podría quedar un horario hecho para ti" : (firstName() ? firstName() + ", tu primera propuesta está lista" : "Tu primera propuesta está lista");
     var previewSubtitle = state.example ? "Este ejemplo es solo una demostración y no modificará tu horario." : "Esta es una propuesta editable. Puedes pulir la semana completa aquí, antes de guardarla.";
@@ -1567,6 +1583,10 @@
     var nextCard = overlay.querySelector(".welcome-flow-card");
     if (nextCard && previousScroll && sameStep) nextCard.scrollTop = previousScroll;
     syncReminderDetails();
+    overlay.querySelectorAll("textarea[data-week-inline-edit],textarea[data-day-inline-edit]").forEach(function (field) {
+      field.style.height = "auto";
+      field.style.height = Math.max(32, field.scrollHeight) + "px";
+    });
     if (focused) {
       var nextFocus = sameStep && focusSelector ? overlay.querySelector(focusSelector) : null;
       if (!nextFocus) nextFocus = overlay.querySelector("#welcome-flow-title");
@@ -1817,8 +1837,12 @@
     }
     document.addEventListener("input", function (event) {
       var input = event.target;
-      if (input instanceof HTMLInputElement && input.matches("[data-day-inline-edit],[data-week-inline-edit]")) {
+      if ((input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) && input.matches("[data-day-inline-edit],[data-week-inline-edit]")) {
         saveInlineActivity(input);
+        if (input instanceof HTMLTextAreaElement) {
+          input.style.height = "auto";
+          input.style.height = Math.max(32, input.scrollHeight) + "px";
+        }
         return;
       }
       if (!(input instanceof HTMLInputElement) || !input.matches("[data-welcome-edit-text]")) return;
@@ -1829,32 +1853,30 @@
       if (event.button !== 0 || !document.getElementById("welcome-flow-overlay")) return;
       var target = event.target instanceof Element ? event.target : null;
       if (!target) return;
-      var header = target.closest("th[data-week-column-resize]");
+      var widthGrip = target.closest("[data-week-width-grip]");
+      var header = widthGrip && widthGrip.closest("th[data-week-column-resize]");
       if (header) {
-        var headerBounds = header.getBoundingClientRect();
-        if (event.clientX < headerBounds.right - 22) return;
         var columnDay = Number(header.getAttribute("data-week-column-resize"));
         var table = header.closest("table");
         var startWidth = Number(state.previewColumnWidths[columnDay]) || 84;
         if (!table || !Number.isInteger(columnDay)) return;
-        weeklyResizeDrag = { kind: "column", pointerId: event.pointerId, day: columnDay, startX: event.clientX, startWidth: startWidth, element: header, table: table, moved: false };
-        try { header.setPointerCapture(event.pointerId); } catch (error) {}
+        weeklyResizeDrag = { kind: "column", pointerId: event.pointerId, day: columnDay, startX: event.clientX, startWidth: startWidth, element: widthGrip, table: table, moved: false };
+        try { widthGrip.setPointerCapture(event.pointerId); } catch (error) {}
         event.preventDefault();
         return;
       }
-      var cell = target.closest("[data-week-cell]");
+      var grip = target.closest("[data-week-resize]");
+      var cell = grip && grip.closest("[data-week-cell]");
       if (!cell || cell.getAttribute("data-week-fixed") === "true" || !String(cell.getAttribute("data-week-text") || "").trim()) return;
-      var bounds = cell.getBoundingClientRect();
-      var side = event.clientY <= bounds.top + 16 ? "start" : event.clientY >= bounds.bottom - 20 ? "end" : "";
-      if (!side) return;
+      var side = grip.getAttribute("data-week-resize");
       var source = {
         start: timeToMinutes(cell.getAttribute("data-week-start")),
         end: timeToMinutes(cell.getAttribute("data-week-end")),
         text: cell.getAttribute("data-week-text") || "",
         category: cell.getAttribute("data-week-category") || "clase"
       };
-      weeklyResizeDrag = { kind: "duration", side: side, pointerId: event.pointerId, day: Number(cell.getAttribute("data-week-day")), startX: event.clientX, startY: event.clientY, nextStart: source.start, nextEnd: source.end, source: source, element: cell, table: cell.closest("table") || cell.closest("ul"), moved: false, validTarget: false };
-      try { cell.setPointerCapture(event.pointerId); } catch (error) {}
+      weeklyResizeDrag = { kind: "duration", side: side, pointerId: event.pointerId, day: Number(cell.getAttribute("data-week-day")), startX: event.clientX, startY: event.clientY, nextStart: source.start, nextEnd: source.end, source: source, element: cell, grip: grip, table: cell.closest("table") || cell.closest("ul"), boundaries: weeklyTimeBoundaries(), moved: false, validTarget: false };
+      try { grip.setPointerCapture(event.pointerId); } catch (error) {}
       cell.classList.add("is-resizing");
       event.preventDefault();
     }, true);
@@ -1870,22 +1892,35 @@
         setPreviewColumnWidth(drag.day, drag.startWidth + deltaX);
         return;
       }
-      var targetRow = weekRowAtY(drag.table, event.clientY);
-      if (!targetRow) {
+      var boundary = weeklyBoundaryAtPointer(drag, event.clientY);
+      if (boundary == null) {
         drag.validTarget = false;
-        showWeeklyResizeFeedback("Mantén el arrastre dentro del horario; todavía no se cambió nada.");
+        showWeeklyResizeFeedback("No hay un límite horario válido aquí. No se cambió nada.");
         return;
       }
-      drag.validTarget = true;
-      if (drag.side === "start") drag.nextStart = targetRow.start;
-      else drag.nextEnd = targetRow.end;
-      showWeeklyResizeFeedback("Vista previa: " + formatClock(drag.nextStart) + " – " + formatClock(drag.nextEnd) + ". Suelta para confirmar o presiona Escape para cancelar.");
+      drag.validTarget = boundary > (drag.side === "start" ? 0 : drag.source.start) && boundary < (drag.side === "start" ? drag.source.end : 1441);
+      if (drag.side === "start") drag.nextStart = boundary;
+      else drag.nextEnd = boundary;
+      var readout = drag.element.querySelector(".welcome-flow-resize-readout");
+      if (!readout) {
+        readout = document.createElement("span");
+        readout.className = "welcome-flow-resize-readout";
+        drag.element.appendChild(readout);
+      }
+      readout.textContent = formatClock(drag.nextStart) + " – " + formatClock(drag.nextEnd);
+      drag.element.classList.toggle("is-resize-invalid", !drag.validTarget);
+      showWeeklyResizeFeedback(drag.validTarget ? "Vista previa: " + readout.textContent + ". Suelta para confirmar." : "El inicio debe ir antes del fin. No se cambiará el horario.");
     }, true);
     function finishWeeklyResize(event, cancelled) {
       var drag = weeklyResizeDrag;
       if (!drag || event.pointerId !== drag.pointerId) return;
       weeklyResizeDrag = null;
       if (drag.element) drag.element.classList.remove("is-resizing");
+      if (drag.element) drag.element.classList.remove("is-resize-invalid");
+      if (drag.element) {
+        var readout = drag.element.querySelector(".welcome-flow-resize-readout");
+        if (readout) readout.remove();
+      }
       if (cancelled) {
         if (drag.kind === "column") setPreviewColumnWidth(drag.day, drag.startWidth);
         showWeeklyResizeFeedback("Ajuste cancelado; el horario quedó igual.");
@@ -1903,7 +1938,7 @@
         return;
       }
       if (drag.nextEnd <= drag.nextStart || drag.nextStart === drag.source.start && drag.nextEnd === drag.source.end) {
-        showWeeklyResizeFeedback(drag.nextEnd <= drag.nextStart ? "El límite debe quedar después del inicio. No cambié el horario." : "No cambió el horario.");
+        showWeeklyResizeFeedback(drag.nextEnd <= drag.nextStart ? "El límite debe quedar después del inicio. No cambié el horario." : "Mueve la línea un poco más, hasta el siguiente intervalo horario. El bloque sigue igual.");
         return;
       }
       var error = placeWeeklyRange(drag.day, drag.source, drag.nextStart, drag.nextEnd);
@@ -1911,6 +1946,7 @@
     }
     document.addEventListener("pointerup", function (event) { finishWeeklyResize(event, false); }, true);
     document.addEventListener("pointercancel", function (event) { finishWeeklyResize(event, true); }, true);
+    document.addEventListener("lostpointercapture", function (event) { finishWeeklyResize(event, true); }, true);
     document.addEventListener("keydown", function (event) {
       var target = event.target instanceof Element ? event.target : null;
       if (!target) return;
@@ -1918,12 +1954,17 @@
         var drag = weeklyResizeDrag;
         weeklyResizeDrag = null;
         if (drag.element) drag.element.classList.remove("is-resizing");
+        if (drag.element) drag.element.classList.remove("is-resize-invalid");
+        if (drag.element) {
+          var readout = drag.element.querySelector(".welcome-flow-resize-readout");
+          if (readout) readout.remove();
+        }
         if (drag.kind === "column") setPreviewColumnWidth(drag.day, drag.startWidth);
         showWeeklyResizeFeedback("Ajuste cancelado; el horario quedó igual.");
         event.preventDefault();
         return;
       }
-      var header = target.closest("th[data-week-column-resize]");
+      var header = target.matches("[data-week-width-grip]") ? target.closest("th[data-week-column-resize]") : null;
       if (header && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
         event.preventDefault();
         var day = Number(header.getAttribute("data-week-column-resize"));
@@ -1932,14 +1973,15 @@
         showWeeklyResizeFeedback("Ancho de " + DAY_LABELS[day] + ": " + width + " px. El cambio solo afecta la vista.");
         return;
       }
-      var cell = target.closest("[data-week-cell]");
-      if (!cell || cell.getAttribute("data-week-fixed") === "true" || !event.altKey || (event.key !== "ArrowUp" && event.key !== "ArrowDown")) return;
+      var grip = target.closest("[data-week-resize]");
+      var cell = grip && grip.closest("[data-week-cell]");
+      if (!cell || cell.getAttribute("data-week-fixed") === "true" || (event.key !== "ArrowUp" && event.key !== "ArrowDown")) return;
       event.preventDefault();
       var proposal = buildProposal();
       var times = proposal.filas.map(function (row) { return (String(row.hora || "").match(/\d{2}:\d{2}/g) || []).map(timeToMinutes); }).filter(function (pair) { return pair.length === 2; });
       var boundaries = Array.from(new Set(times.reduce(function (list, pair) { return list.concat(pair); }, []))).sort(function (a, b) { return a - b; });
       var source = { start: timeToMinutes(cell.getAttribute("data-week-start")), end: timeToMinutes(cell.getAttribute("data-week-end")), text: cell.getAttribute("data-week-text") || "", category: cell.getAttribute("data-week-category") || "clase" };
-      var side = event.shiftKey ? "start" : "end";
+      var side = grip.getAttribute("data-week-resize");
       var current = side === "start" ? source.start : source.end;
       var index = boundaries.indexOf(current);
       var step = event.key === "ArrowDown" ? 1 : -1;
@@ -1951,7 +1993,7 @@
       showWeeklyResizeFeedback(error || state.commandMessage);
     }, true);
     document.addEventListener("change", function (event) {
-      if (event.target instanceof HTMLInputElement && event.target.matches("[data-day-inline-edit],[data-week-inline-edit]")) {
+      if ((event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) && event.target.matches("[data-day-inline-edit],[data-week-inline-edit]")) {
         saveInlineActivity(event.target);
         render();
         return;

@@ -6,8 +6,12 @@
   var ARCHIVE_PREFIX = "planify_local_data_archive_v1:";
   var PERSONAL_KEYS = new Set(["report_email"]);
   var PREFERENCE_KEYS = new Set([
-    "horario_dark_mode", "horario_paleta", "horario_proteccion", "horario_tema", "horario_tipografia",
-    "planify_fuente_seleccionada", "planify_idioma", "planify_mobile_coach_hidden", "planify_theme"
+    "horario_dark_mode", "horario_fin", "horario_inicio", "horario_intervalo",
+    "horario_paleta", "horario_planner_type", "horario_proteccion", "horario_tema",
+    "horario_tipografia", "horario_tour_visto", "horario_tutorial_visto",
+    "planify_bienvenida_estado", "planify_fuente_seleccionada", "planify_idioma",
+    "planify_mobile_coach_hidden", "planify_theme", "planify_tipo_planificador",
+    "planify_ultima_vista_v1", "planify_vista_activa"
   ]);
   var SCHEDULE_KEYS = new Set(["horario_completo", "horario_datos"]);
   var NON_CONTENT_FIELDS = new Set(["schemaVersion", "version", "trackingStartedAt", "updatedAt", "revision"]);

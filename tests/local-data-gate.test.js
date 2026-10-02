@@ -87,6 +87,21 @@ test("no bloquea un plan vacío y no confunde preferencias con datos personales"
   assert.equal(app.elements.length, 0);
 });
 
+test("una primera visita recargada no confunde ajustes automáticos con un plan ajeno", () => {
+  const app = runGate({
+    horario_intervalo: "60",
+    horario_inicio: "07:00",
+    horario_fin: "23:00",
+    horario_planner_type: "semanal",
+    planify_tipo_planificador: "semanal",
+    planify_ultima_vista_v1: "diario",
+    planify_bienvenida_estado: "descartada",
+    horario_data_semanal: JSON.stringify({ dias: ["LUNES"], filas: [{ hora: "07:00", celdas: [{ t: "", c: "libre" }] }] })
+  });
+  assert.equal(app.classes.has("planify-data-gate-active"), false);
+  assert.equal(app.elements.length, 0);
+});
+
 test("el protector se carga antes de que app.js lea el almacenamiento", () => {
   const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.0"');
   const appIndex = indexHtml.indexOf('src="js/app.js?v=9.7"');
@@ -179,7 +194,7 @@ test("detecta y protege también historiales y ajustes del horario, no solo sus 
   assert.equal(archived.ok, true);
   assert.equal(app.localStorage.getItem("planify_cumplimiento_historial_v1"), null);
   assert.equal(app.localStorage.getItem("planify_focus_activity_v1"), null);
-  assert.equal(app.localStorage.getItem("horario_inicio"), null);
+  assert.equal(app.localStorage.getItem("horario_inicio"), "06:30");
   assert.equal(app.localStorage.getItem("horario_tema"), "estelar");
   assert.equal(app.localStorage.getItem("planify_idioma"), "es");
   assert.equal(app.hooks.restoreArchive(archived.archiveKey).ok, true);

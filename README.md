@@ -55,7 +55,7 @@ El resultado queda en `dist/`. El build no debe reescribir los archivos fuente y
 
 La versión principal se publica en [planificador-horarios-dun.vercel.app](https://planificador-horarios-dun.vercel.app/) desde la rama `main`. `vercel.json` construye y sirve únicamente `dist/`; las ramas de trabajo pueden generar vistas previas con otras direcciones. Si acabas de entrar, comienza por la bienvenida. Si ya utilizaste PLANIFY en ese mismo navegador, tus datos locales pueden seguir allí.
 
-Consulta el [roadmap](ROADMAP.md) para conocer el estado del producto y [las ideas futuras](TODO.md) para posibles mejoras. El repositorio es público, pero todavía no tiene una licencia de reutilización del código definida; la decisión corresponde a su titular.
+Consulta el [roadmap](ROADMAP.md) para conocer el estado del producto y [las ideas futuras](TODO.md) para posibles mejoras. El código propio de PLANIFY se publica bajo la [licencia MIT](LICENSE). Las bibliotecas y tipografías cargadas desde servicios externos conservan sus propias licencias; no están incluidas en esta concesión.
 
 ## Estructura principal
 

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Planificador de Horarios — App web progresiva para gestionar horarios académicos y laborales",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "node server.js",
     "test": "node --test tests/*.test.js",

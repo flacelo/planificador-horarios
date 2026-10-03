@@ -307,9 +307,9 @@ http.createServer((req, res) => {
         moneda: 'PEN',
         serial: serial,
         expiracion: expInfo.fecha,
-        emisor: 'PLANIFY',
+        emisor: 'PLANIFY · demostración',
         ruc: '',
-        sello: 'EJEMPLO-' + new Date().getFullYear()
+        sello: 'EJEMPLO · NO VÁLIDO COMO COMPROBANTE'
       }
     };
     res.writeHead(200, { 'Content-Type': 'application/json' });

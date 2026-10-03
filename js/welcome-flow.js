@@ -1001,6 +1001,22 @@
     });
     if (occupied) return "Ese horario ya tiene otra actividad. Elige un espacio libre para mover el bloque.";
 
+    var previousRequest = state.manualRequests.find(function (item) {
+      return Number(item.day) === sourceDay && Number(item.start) === source.start && Number(item.end) === source.end && Boolean(String(item.text || "").trim());
+    });
+    var focusCreditMinutes = previousRequest ? Math.max(0, Number(previousRequest.focusCreditMinutes) || 0) : proposal.filas.reduce(function (total, row, index) {
+      var times = String(row.hora || "").match(/\d{2}:\d{2}/g) || [];
+      if (times.length !== 2 || timeToMinutes(times[0]) < source.start || timeToMinutes(times[1]) > source.end) return total;
+      return total + (Number(proposal.focusCredits[sourceDay + "_" + index]) || 0);
+    }, 0);
+    var replacedProjectIds = previousRequest && Array.isArray(previousRequest.replacedProjectIds) ? previousRequest.replacedProjectIds.slice() : [];
+    proposal.filas.forEach(function (row, index) {
+      var times = String(row.hora || "").match(/\d{2}:\d{2}/g) || [];
+      if (times.length !== 2 || timeToMinutes(times[0]) < source.start || timeToMinutes(times[1]) > source.end) return;
+      var projectId = proposal.projectOrigins[sourceDay + "_" + index];
+      if (projectId && replacedProjectIds.indexOf(projectId) < 0) replacedProjectIds.push(projectId);
+    });
+
     rememberFeedbackRevision();
     proposal.filas.forEach(function (row, index) {
       var rowTimes = String(row.hora || "").match(/\d{2}:\d{2}/g) || [];
@@ -1018,14 +1034,14 @@
     });
     var moving = targetDay !== sourceDay || nextEnd - nextStart === source.end - source.start && nextStart !== source.start;
     if (targetDay !== sourceDay) {
-      state.manualRequests.push({ day: sourceDay, start: source.start, end: source.end, text: "", category: "libre" });
+      state.manualRequests.push({ day: sourceDay, start: source.start, end: source.end, text: "", category: "libre", focusCreditMinutes: focusCreditMinutes });
     } else if (!moving) {
       if (nextStart > source.start) state.manualRequests.push({ day: sourceDay, start: source.start, end: nextStart, text: "", category: "libre" });
       if (nextEnd < source.end) state.manualRequests.push({ day: sourceDay, start: nextEnd, end: source.end, text: "", category: "libre" });
     } else {
       state.manualRequests.push({ day: sourceDay, start: source.start, end: source.end, text: "", category: "libre" });
     }
-    state.manualRequests.push({ day: targetDay, start: nextStart, end: nextEnd, text: source.text, category: source.category });
+    state.manualRequests.push({ day: targetDay, start: nextStart, end: nextEnd, text: source.text, category: source.category, focusCreditMinutes: targetDay === sourceDay ? focusCreditMinutes : 0, replacedProjectIds: replacedProjectIds });
     state.previewDay = targetDay;
     state.previewMode = "weekly";
     state.commandMessage = "Listo: el bloque quedó de " + formatClock(nextStart) + " a " + formatClock(nextEnd) + ". Revisa la propuesta; aún no se ha guardado.";
@@ -1277,12 +1293,14 @@
     });
     var projectBlocks = [];
     var unplacedProjectBlocks = [];
-    allProjects.forEach(function (project) {
+    allProjects.forEach(function (project, projectIndex) {
       var projectDays = Array.isArray(project.days) && project.days.length ? project.days : distributeDays(planningDays, project.sessions);
       var projectDuration = Number(project.duration || selectedDuration);
       if (!Number.isInteger(projectDuration) || projectDuration < 5 || projectDuration > 480) projectDuration = selectedDuration;
-      projectDays.forEach(function (day) {
+      projectDays.forEach(function (day, sessionIndex) {
         if (activeDays.indexOf(Number(day)) < 0) return;
+        var originId = projectIndex + ":" + Number(day) + ":" + sessionIndex;
+        if (state.manualRequests.some(function (item) { return Array.isArray(item.replacedProjectIds) && item.replacedProjectIds.indexOf(originId) >= 0; })) return;
         var bounds = dayBounds[day];
         var dayEnd = bounds.end;
         if (state.freeMinutes) dayEnd = Math.min(dayEnd, bounds.end - Number(state.freeMinutes));
@@ -1309,7 +1327,7 @@
             return Number(item.day) === Number(day) && candidate < item.end && candidate + projectDuration > item.start;
           });
           if (overlapsFixed || overlapsManual || overlapsCommute || overlapsProject) continue;
-          projectBlocks.push({ day: Number(day), start: candidate, end: candidate + projectDuration, project: project });
+          projectBlocks.push({ day: Number(day), start: candidate, end: candidate + projectDuration, project: project, originId: originId });
           edges.push(candidate, candidate + projectDuration);
           placedProject = true;
           break;
@@ -1319,6 +1337,8 @@
     });
     edges = Array.from(new Set(edges)).filter(function (edge) { return edge >= startMinutes && edge <= endMinutes; }).sort(function (a, b) { return a - b; });
     var rows = [];
+    var focusCredits = {};
+    var projectOrigins = {};
     for (var edgeIndex = 0; edgeIndex < edges.length - 1; edgeIndex += 1) {
       rows.push({ hora: minutesToTime(edges[edgeIndex]) + " – " + minutesToTime(edges[edgeIndex + 1]), celdas: DAYS.map(function () { return { t: "", c: "libre", done: false, reminder: false, rowspan: 1 }; }) });
     }
@@ -1353,7 +1373,10 @@
       var dayStart = dayBounds[day].start;
       var dayEnd = dayBounds[day].end;
       var focusDayIndex = focusDays.indexOf(day);
-      var focusTargetMinutes = focusDayIndex < 0 ? 0 : targetMinutesPerDay;
+      var creditedMinutes = state.manualRequests.reduce(function (total, item) {
+        return Number(item.day) === day ? total + Math.max(0, Number(item.focusCreditMinutes) || 0) : total;
+      }, 0);
+      var focusTargetMinutes = focusDayIndex < 0 ? 0 : Math.max(0, targetMinutesPerDay - creditedMinutes);
       var focusStart = state.energyPeak === "afternoon" ? Math.max(dayStart, 13 * 60) : state.energyPeak === "evening" ? Math.max(dayStart, 17 * 60) : dayStart;
       if (state.energyPeak === "variable") focusStart = dayStart + (activeDays.indexOf(day) % 2 ? selectedDuration * 2 : selectedDuration);
       if (state.startStyle === "gentle") focusStart += selectedDuration;
@@ -1393,6 +1416,7 @@
         } else if (projectBlock) {
           text = projectBlock.project.title;
           category = projectBlock.project.type === "course" ? "estudio" : projectBlock.project.type === "personal" ? "flexible" : "clase";
+          projectOrigins[day + "_" + rowIndex] = projectBlock.originId;
         } else if (fullGeneratedSlot && slotStart >= protectedFreeStart) {
           text = "Tiempo libre protegido";
           category = "desconexion";
@@ -1403,6 +1427,7 @@
           }
           category = focus.category;
           placed += slotEnd - slotStart;
+          focusCredits[day + "_" + rowIndex] = slotEnd - slotStart;
           reminder = state.mode === "detailed" && ((state.priority === "study" && state.reminders.study) || (state.priority === "work" && state.reminders.work) || (state.priority === "balance" && (state.reminders.study || state.reminders.work)));
         }
         var remindersInSlot = reminderTimes.filter(function (entry) { return entry.day === day && entry.at >= slotStart && entry.at < slotEnd; });
@@ -1423,7 +1448,7 @@
       });
     });
     mergeConsecutiveCells(rows);
-    return { dias: DAYS.slice(), filas: rows, plannedDays: activeDays, focusDays: focusDays, dayBounds: dayBounds, commuteBlocks: commuteBlocks, commuteOmittedDays: commuteOmittedDays, unplacedProjectBlocks: unplacedProjectBlocks };
+    return { dias: DAYS.slice(), filas: rows, focusCredits: focusCredits, projectOrigins: projectOrigins, plannedDays: activeDays, focusDays: focusDays, dayBounds: dayBounds, commuteBlocks: commuteBlocks, commuteOmittedDays: commuteOmittedDays, unplacedProjectBlocks: unplacedProjectBlocks };
   }
 
   function validatePreviewBlocks() {

@@ -2,43 +2,28 @@
 
 ## Estado actual
 
-PLANIFY es un prototipo funcional en evolución. El foco inmediato es dejar el proyecto seguro, documentado y listo para seguir creciendo sin perder claridad.
+PLANIFY es un prototipo público que organiza horarios con reglas y guarda la información en el navegador. Las funciones simuladas no deben interpretarse como servicios conectados.
 
-## Fase 1 — Proyecto profesional
+## Disponible
 
-- [x] Reconectar y revisar el repositorio local.
-- [x] Documentar el proyecto y su demo.
-- [x] Añadir reglas básicas de privacidad y seguridad.
-- [ ] Revisar y retirar archivos internos antes de publicar la siguiente versión.
-- [ ] Añadir capturas oficiales y política de privacidad.
+- Bienvenida guiada y propuesta semanal editable antes de guardarla.
+- Vistas diaria, semanal, mensual y anual; diario y dashboard.
+- Temporizador de enfoque, pausas y recordatorios sujetos a las capacidades del navegador.
+- Respaldo local, importación y exportación de horarios.
+- Compilación estática para Vercel, sin publicar el servidor de demostración ni los respaldos personales.
 
-## Fase 2 — Diseño funcional
+## En mejora
 
-- [ ] Definir el flujo de bienvenida y perfiles.
-- [ ] Diseñar enfoque, hábitos, recordatorios y bienestar.
-- [ ] Definir el modelo de datos y los límites de las recomendaciones.
+- Hacer más predecible la edición de bloques: un cambio en una celda debe conservar intacto el resto de la propuesta.
+- Comprobar la experiencia completa en teléfonos Android y iPhone reales, incluidas exportación, impresión e instalación.
+- Mejorar contraste, navegación por teclado y explicación de los límites de las sugerencias.
+- Mantener la documentación y las capturas de ejemplo sincronizadas con la versión publicada.
 
-## Fase 3 — MVP de productividad
+## Posibles etapas futuras
 
-- [ ] Temporizador de enfoque y descansos.
-- [ ] Hábitos y recordatorios conectados al horario.
-- [ ] Rachas y progreso visual.
+- Evaluar sincronización entre dispositivos solo con un diseño explícito de cuentas, seguridad y privacidad.
+- Ampliar estadísticas y personalización sin presentar duraciones estimadas como hechos.
+- Evaluar funciones sin conexión y notificaciones según el soporte real de cada navegador.
 
-## Fase 4 — Dashboard y gamificación
-
-- [ ] Métricas de cumplimiento más útiles.
-- [ ] Recomendaciones basadas en el comportamiento.
-- [ ] Sistema visual propio de progreso.
-
-## Fase 5 — Experiencia móvil
-
-- [ ] Mejorar instalación como aplicación.
-- [ ] Añadir notificaciones compatibles con móvil.
-- [ ] Revisar funcionamiento básico sin conexión.
-
-## Fase 6 — Bienestar avanzado
-
-- [ ] Registro manual del sueño y descanso.
-- [ ] Meditación y pausas activas.
-- [ ] Evaluar integraciones con dispositivos, sin prometer mediciones médicas.
+Estas etapas son ideas de trabajo, no funciones prometidas ni plazos de entrega.
 

@@ -1,6 +1,6 @@
 # Seguridad
 
-PLANIFY todavía es un proyecto en desarrollo. Antes de usarlo con usuarios reales deben completarse una autenticación de producción, almacenamiento seguro de datos, política de privacidad y revisión de permisos.
+PLANIFY todavía es un prototipo en desarrollo. La versión pública no ofrece cuentas ni almacenamiento remoto de horarios: los datos se guardan en el navegador. En dispositivos compartidos, otra persona con acceso al mismo perfil del navegador podría acceder al almacenamiento local. Una futura versión con cuentas o sincronización necesitaría un diseño de autenticación, almacenamiento seguro, privacidad y revisión de permisos antes de publicarse.
 
 ## Reportar un problema
 

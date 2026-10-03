@@ -1,6 +1,8 @@
 # PLANIFY
 
-Planificador personal para organizar horarios, actividades, hábitos, metas y tiempo de enfoque. Esta versión es un prototipo web de uso local; no es un servicio comercial ni ofrece sincronización de cuenta en la nube.
+Planificador personal para organizar horarios, actividades, hábitos, metas y tiempo de enfoque. Puedes [probar PLANIFY en Vercel](https://planificador-horarios-dun.vercel.app/). Es un prototipo web gratuito: funciona sin cuenta y guarda el plan en el navegador que estés usando, sin sincronización entre dispositivos.
+
+Las propuestas de horario se generan mediante reglas basadas en las respuestas de cada persona. La aplicación no integra un modelo de IA generativa ni necesita una API de pago para crear el horario.
 
 ## Funciones disponibles
 
@@ -51,7 +53,9 @@ El resultado queda en `dist/`. El build no debe reescribir los archivos fuente y
 
 ## Publicación
 
-La configuración de Vercel apunta a `dist/`, pero esta preparación local no publica ni comprueba el estado remoto de ninguna URL. La presencia de una URL histórica en conversaciones o configuraciones no confirma que corresponda a la versión actual.
+La versión principal se publica en [planificador-horarios-dun.vercel.app](https://planificador-horarios-dun.vercel.app/) desde la rama `main`. `vercel.json` construye y sirve únicamente `dist/`; las ramas de trabajo pueden generar vistas previas con otras direcciones. Si acabas de entrar, comienza por la bienvenida. Si ya utilizaste PLANIFY en ese mismo navegador, tus datos locales pueden seguir allí.
+
+Consulta el [roadmap](ROADMAP.md) para conocer el estado del producto y [las ideas futuras](TODO.md) para posibles mejoras. El repositorio es público, pero todavía no tiene una licencia de reutilización del código definida; la decisión corresponde a su titular.
 
 ## Estructura principal
 

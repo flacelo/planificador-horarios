@@ -307,9 +307,9 @@ http.createServer((req, res) => {
         moneda: 'PEN',
         serial: serial,
         expiracion: expInfo.fecha,
-        emisor: 'Potencia Tech E.I.R.L.',
-        ruc: '20606789341',
-        sello: 'PTECH-OK-' + new Date().getFullYear()
+        emisor: 'PLANIFY · demostración',
+        ruc: '',
+        sello: 'EJEMPLO · NO VÁLIDO COMO COMPROBANTE'
       }
     };
     res.writeHead(200, { 'Content-Type': 'application/json' });

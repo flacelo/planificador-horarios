@@ -21,6 +21,7 @@
   var state = {
     step: 0,
     mode: "guided",
+    startedFromHub: false,
     userName: "",
     priority: "study",
     roles: ["study"],
@@ -378,6 +379,8 @@
     if (state.step === proposalStep()) readPreviewEdits();
     var userName = overlay.querySelector("#welcome-name");
     if (userName) state.userName = scheduleText(userName.value, 50);
+    var quickGoal = overlay.querySelector("#welcome-quick-goal");
+    if (quickGoal) state.goal = scheduleText(quickGoal.value, 160);
     if (overlay.querySelector("input[name='welcome-role']")) {
       state.roles = Array.from(overlay.querySelectorAll("input[name='welcome-role']:checked")).map(function (input) { return input.value; });
       syncOccupationFromRoles();
@@ -540,9 +543,11 @@
   }
 
   function renderHeader(step, title, subtitle) {
-    var total = totalSteps();
-    return '<header class="welcome-flow-header"><div class="welcome-flow-progress" aria-label="Paso ' + (step + 1) + ' de ' + total + '">' +
-      '<i style="width:' + ((step + 1) * 100 / total) + '%"></i></div><span class="welcome-flow-step">PASO ' + (step + 1) + ' DE ' + total + '</span>' +
+    var skippedChoice = state.startedFromHub ? 1 : 0;
+    var total = totalSteps() - skippedChoice;
+    var current = step + 1 - skippedChoice;
+    return '<header class="welcome-flow-header"><div class="welcome-flow-progress" aria-label="Paso ' + current + ' de ' + total + '">' +
+      '<i style="width:' + (current * 100 / total) + '%"></i></div><span class="welcome-flow-step">PASO ' + current + ' DE ' + total + '</span>' +
       '<button type="button" class="welcome-flow-close" data-welcome-action="close" aria-label="Cerrar">×</button>' +
       '<span class="welcome-flow-emoji">' + (["🧭", "🌱", "🗓️", "🔔", "🔎", "⚙️", "🏡", "✨"][step] || "✨") + '</span><h2 id="welcome-flow-title" tabindex="-1">' + title + '</h2>' +
       '<p>' + subtitle + '</p></header>';
@@ -551,10 +556,11 @@
   function renderModeStep() {
     var modes = [
       ["manual", "✍️", "Quiero planificar por mi cuenta", "Irás directo al planificador vacío con todas las herramientas para construir y editar tu horario.", "Control total · puedes pedir ayuda después"],
-      ["guided", "🧩", "Ayúdame paso a paso", "Responderás preguntas esenciales y recibirás una propuesta editable que podrás retocar tú o con el asistente.", "5–7 min · recomendado"],
-      ["detailed", "✨", "Quiero una propuesta casi lista", "Conoceremos tus estudios, trabajos, emprendimientos, energía, bienestar y recordatorios.", "8–12 min · mayor personalización"]
+      ["quick", "🧩", "Crear mi horario rápido", "Elige tus días y horas; después podrás revisar y editar una propuesta inicial.", "Solo lo esencial · recomendado"],
+      ["guided", "🗓️", "Ayúdame paso a paso", "Incluye tus compromisos fijos y recibe una propuesta editable.", "Más detalle"],
+      ["detailed", "✨", "Personalizar a fondo", "Incluye estudios, trabajos, emprendimientos, energía, bienestar y recordatorios.", "Más preguntas"]
     ];
-    return renderHeader(0, "¿Cómo te gustaría crear tu horario?", "Elige una ruta clara. En las tres podrás editar a mano, pedir cambios al asistente y revisar tu avance en el Dashboard.") +
+    return renderHeader(0, "¿Cómo te gustaría crear tu horario?", "Elige la ayuda que prefieras. Todas las rutas terminan en un horario editable.") +
       '<div class="welcome-flow-fields welcome-flow-name"><label>¿Cómo te gustaría que te llamemos? <span class="welcome-flow-optional">(nombre o apodo)</span><input id="welcome-name" maxlength="50" value="' + escapeHtml(state.userName) + '" placeholder="Ej.: Flavio"></label></div>' +
       '<div class="welcome-flow-options welcome-flow-modes">' + modes.map(function (mode) {
         return '<button type="button" class="welcome-flow-mode ' + (state.mode === mode[0] ? "is-selected" : "") + '" data-welcome-mode="' + mode[0] + '" aria-pressed="' + (state.mode === mode[0] ? "true" : "false") + '"><span>' + mode[1] + '</span><span><strong>' + mode[2] + '</strong><small>' + mode[3] + '</small><em>' + mode[4] + '</em></span><i>✓</i></button>';
@@ -573,9 +579,9 @@
       var times = state.dayTimes[day] || {};
       return '<div class="welcome-flow-day-time"><strong>' + DAY_LABELS[day] + '</strong><label>Desde<select data-day-time="' + day + '" data-day-start>' + timeOptions(times.start || state.start) + '</select></label><label>Hasta<select data-day-time="' + day + '" data-day-end>' + timeOptions(times.end || state.end) + '</select></label></div>';
     }).join("");
-    var studies = hasRole("study");
-    var works = hasRole("work");
-    var entrepreneurs = hasRole("entrepreneur");
+    var studies = hasRole("study") && state.mode !== "quick";
+    var works = hasRole("work") && state.mode !== "quick";
+    var entrepreneurs = hasRole("entrepreneur") && state.mode !== "quick";
     var ventureMarkup = state.ventures.map(function (venture, index) {
       return '<div class="welcome-flow-venture-row"><label>Nombre del emprendimiento<input data-venture-name="' + index + '" value="' + escapeHtml(venture.name) + '" placeholder="Ej.: tienda en línea, consultoría, marca personal"></label><label>¿Qué tareas sueles hacer en él? <span class="welcome-flow-optional">(opcional)</span><textarea data-venture-details="' + index + '" rows="2" placeholder="Ej.: responder pedidos, crear contenido o revisar ventas">' + escapeHtml(venture.details) + '</textarea><small class="welcome-flow-field-help">Escribe actividades concretas, no una meta general. Las añadiremos a tu lista para que decidas cuándo hacerlas.</small></label><button type="button" data-welcome-action="remove-venture" data-venture-index="' + index + '">Quitar</button></div>';
     }).join("");
@@ -585,14 +591,15 @@
     var studyContextOptions = state.career === "medicine" ? [["theory","Cursos y exámenes teóricos"],["practice","Prácticas clínicas"],["rotation","Rotaciones o guardias"],["mixed","Una combinación de todo"]] : state.career === "engineering" ? [["classes","Cursos y ejercicios"],["labs","Laboratorios o talleres"],["projects","Proyectos y entregables"],["mixed","Una combinación de todo"]] : [["classes","Clases y evaluaciones"],["practice","Prácticas o actividades aplicadas"],["projects","Proyectos y entregables"],["mixed","Una combinación de todo"]];
     if (!studyContextOptions.some(function (item) { return item[0] === state.studyContext; })) state.studyContext = studyContextOptions[0][0];
     var combinedRoles = hasRole("study") && hasRole("work");
-    return renderHeader(1, named("cuéntanos qué ocupa tu vida ahora"), "No asumiremos que todos viven igual: las siguientes preguntas cambiarán según lo que elijas.") +
-      '<div class="welcome-flow-fields"><fieldset><legend>¿Qué cosas forman parte de tu vida actualmente?</legend><small class="welcome-flow-field-help">Puedes marcar varias: por ejemplo, estudiar, trabajar y llevar dos emprendimientos al mismo tiempo.</small><div class="welcome-flow-choice-pills welcome-flow-role-pills">' +
+    return renderHeader(1, named("cuéntanos qué ocupa tu vida ahora"), state.mode === "quick" ? "Escribe una actividad concreta y elige tus días y horas. Podrás cambiar la propuesta después." : "Las preguntas se adaptan a las actividades que elijas.") +
+      '<div class="welcome-flow-fields"><label class="welcome-flow-core-name">Tu nombre o apodo <span class="welcome-flow-optional">(opcional)</span><input id="welcome-name" maxlength="50" value="' + escapeHtml(state.userName) + '" placeholder="¿Cómo te gustaría que te llamemos?"></label><fieldset><legend>¿Qué cosas forman parte de tu vida actualmente?</legend><small class="welcome-flow-field-help">Puedes marcar varias: por ejemplo, estudiar, trabajar y llevar dos emprendimientos al mismo tiempo.</small><div class="welcome-flow-choice-pills welcome-flow-role-pills">' +
       '<label class="welcome-flow-combined-role"><input type="checkbox" name="welcome-role-combined" ' + (combinedRoles ? "checked" : "") + '><span>Estudio y trabajo</span></label>' +
       occupations.map(function (item) { return '<label><input type="checkbox" name="welcome-role" value="' + item[0] + '" ' + (state.roles.indexOf(item[0]) >= 0 ? "checked" : "") + '><span>' + item[1] + '</span></label>'; }).join("") +
       '</div><label class="welcome-flow-reveal" data-occupation-other ' + (hasRole("other") ? "" : "hidden") + '>Cuéntanos con libertad qué más forma parte de tu rutina<textarea id="welcome-occupation-other" rows="3" placeholder="Ej.: trabajo por turnos, cuido a mis hijos y apoyo un negocio familiar">' + escapeHtml(state.occupationOther) + '</textarea></label></fieldset>' +
       (studies ? '<label>¿Qué estudias o en qué área te estás formando?<select id="welcome-career">' + careerLabels.map(function (item) { return '<option value="' + item[0] + '" ' + (state.career === item[0] ? "selected" : "") + '>' + item[1] + '</option>'; }).join("") + '</select></label>' + (state.career === "other" ? '<label>Escribe tu carrera o especialidad<input id="welcome-career-other" maxlength="70" value="' + escapeHtml(state.careerOther) + '" placeholder="Ej.: Arquitectura"></label>' : '<label>' + (state.career === "engineering" ? "¿Qué ingeniería estudias?" : state.career === "medicine" ? "¿Qué carrera o área de salud estudias?" : "¿Cuál es tu especialidad?") + '<select id="welcome-specialty">' + specialtyOptions.map(function (item) { return '<option value="' + item[0] + '" ' + (state.specialty === item[0] ? "selected" : "") + '>' + item[1] + '</option>'; }).join("") + '</select></label>' + (state.specialty === "other" ? '<label>Escribe tu especialidad<input id="welcome-specialty-other" maxlength="70" value="' + escapeHtml(state.specialtyOther) + '" placeholder="Ej.: Ingeniería de Seguridad Industrial"></label>' : '')) + '<fieldset><legend>' + (state.career === "medicine" ? "¿Qué ocupa más tu etapa de formación ahora?" : state.career === "engineering" ? "¿Qué tipo de trabajo académico ocupa más tu semana?" : "¿Qué tipo de actividad académica ocupa más tu semana?") + '</legend><div class="welcome-flow-choice-pills">' + studyContextOptions.map(function (item) { return '<label><input type="radio" name="welcome-study-context" value="' + item[0] + '" ' + (state.studyContext === item[0] ? "checked" : "") + '><span>' + item[1] + '</span></label>'; }).join("") + '</div></fieldset>' : '') +
       (works ? '<label>Cuéntanos a qué te dedicas en tu trabajo o trabajos <span class="welcome-flow-optional">(sin límite breve)</span><textarea id="welcome-job-role" rows="3" placeholder="Ej.: por las mañanas soy asistente contable y dos noches por semana atiendo clientes por mi cuenta">' + escapeHtml(state.jobRole) + '</textarea><small class="welcome-flow-field-help">Puedes escribir varios cargos, lugares o responsabilidades. Lo usaremos para distinguir tus bloques laborales y tus recomendaciones.</small></label><fieldset><legend>¿Tus horarios de trabajo suelen ser…?</legend><div class="welcome-flow-choice-pills">' + [["fixed","Mayormente fijos"],["variable","Cambian por día o turno"],["flexible","Yo decido cuándo trabajar"]].map(function (item) { return '<label><input type="radio" name="welcome-job-pattern" value="' + item[0] + '" ' + (state.jobPattern === item[0] ? "checked" : "") + '><span>' + item[1] + '</span></label>'; }).join("") + '</div></fieldset>' : '') +
       (entrepreneurs ? '<section class="welcome-flow-question-group welcome-flow-ventures"><div class="welcome-flow-group-heading"><strong>Tus emprendimientos</strong><small>Añade tantos como necesites. Más adelante elegirás cuánto tiempo y qué días dedicar a cada uno.</small></div>' + ventureMarkup + '<button type="button" class="welcome-flow-add-fixed" data-welcome-action="add-venture">＋ Añadir emprendimiento</button></section>' : '') +
+      (state.mode === "quick" ? '<label class="welcome-flow-quick-goal">¿Qué actividad quieres incluir primero?<input id="welcome-quick-goal" maxlength="160" required value="' + escapeHtml(state.goal) + '" placeholder="Ej.: estudiar inglés o avanzar mi proyecto"><small class="welcome-flow-field-help">Reservaremos un bloque para esta actividad en cada día activo. Podrás moverlo o borrarlo antes de guardar.</small></label>' : '') +
       '<fieldset><legend>¿Qué días quieres organizar?</legend><div class="welcome-flow-days">' + dayOptions + '</div><small class="welcome-flow-field-help">Los días marcados se planificarán. Los que dicen “Libre” quedarán sin actividades; también puedes activar sábado o domingo.</small><button type="button" class="welcome-flow-customize-days" data-welcome-action="toggle-day-times">' + (state.showDayCustomization ? "Ocultar horas de cada día" : "🕐 Personalizar las horas de cada día") + '</button>' + (state.showDayCustomization ? '<div class="welcome-flow-day-times">' + dayCustomization + '</div>' : '') + '</fieldset>' +
       '<div class="welcome-flow-time-grid"><label>Empiezo mi día<select id="welcome-start">' + timeOptions(state.start) + '</select></label>' +
       '<label>Termino mis actividades sobre<select id="welcome-end">' + timeOptions(state.end) + '</select></label></div>' +
@@ -664,8 +671,8 @@
   function renderDecisionStep() {
     return renderHeader(state.step, "¿Quieres verlo ya o seguimos afinándolo?", "Ya podemos crear una buena base. Tú decides si prefieres verla ahora o contarnos un poco más.") +
       '<div class="welcome-flow-fields"><fieldset><legend>¿Cuánto suele durarte un bloque que quieres dedicar a una actividad?</legend>' + minuteControl("Duración del bloque", "welcome-block-duration-custom", state.blockDuration, [15, 25, 30, 45, 50, 60], 5, 180, "block-duration", "", "Puedes elegir una sugerencia o escribir otra cantidad. El plan respetará este tiempo como punto de partida, no como predicción del tiempo de una tarea.") + '</fieldset>' +
-      '<div class="welcome-flow-path-choice"><button type="button" data-welcome-action="generate-now"><span>⚡</span><strong>Ver mi horario ahora</strong><small>Generamos una propuesta con lo que ya respondiste. Seguirá siendo editable.</small></button>' +
-      '<button type="button" class="is-recommended" data-welcome-action="more-questions"><em>RECOMENDADO</em><span>✨</span><strong>Seguir con más preguntas</strong><small>Afinaremos energía, frecuencia, comidas, traslados y tiempo libre para acercarnos más a tu vida real.</small></button></div></div>' +
+      '<div class="welcome-flow-path-choice"><button type="button" class="' + (state.mode === "quick" ? "is-recommended" : "") + '" data-welcome-action="generate-now">' + (state.mode === "quick" ? '<em>RECOMENDADO</em>' : '') + '<span>⚡</span><strong>Ver mi horario ahora</strong><small>Generamos una propuesta con lo que ya respondiste. Seguirá siendo editable.</small></button>' +
+      '<button type="button" class="' + (state.mode === "quick" ? "" : "is-recommended") + '" data-welcome-action="more-questions">' + (state.mode === "quick" ? '' : '<em>RECOMENDADO</em>') + '<span>✨</span><strong>Seguir con más preguntas</strong><small>Afinaremos energía, frecuencia, comidas, traslados y tiempo libre para acercarnos más a tu vida real.</small></button></div></div>' +
       '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="back">← Atrás</button><span>No perderás ninguna respuesta.</span></footer>';
   }
 
@@ -1701,7 +1708,8 @@
     var existingOverlay = document.getElementById("welcome-flow-overlay");
     if (!existingOverlay || !existingOverlay.contains(document.activeElement)) welcomeReturnFocus = document.activeElement;
     state.step = 0;
-    state.mode = ["manual", "guided", "detailed"].indexOf(preferredMode) >= 0 ? preferredMode : "guided";
+    state.mode = ["manual", "quick", "guided", "detailed"].indexOf(preferredMode) >= 0 ? preferredMode : "quick";
+    state.startedFromHub = Boolean(preferredMode && preferredMode !== "manual");
     state.userName = localStorage.getItem("planify_nombre") || "";
     state.priority = "study";
     state.roles = ["study"];
@@ -1712,6 +1720,10 @@
     state.specialty = "industrial";
     state.specialtyOther = "";
     state.studyContext = "classes";
+    if (state.mode === "quick") {
+      state.career = "other";
+      state.specialty = "general";
+    }
     state.jobRole = "";
     state.jobPattern = "fixed";
     state.ventures = [];
@@ -1770,6 +1782,7 @@
     state.commandDraft = "";
     state.feedbackUndo = [];
     state.previewColumnWidths = {};
+    state.step = state.startedFromHub ? 1 : 0;
     render();
     var title = document.getElementById("welcome-flow-title");
     if (title) title.focus({ preventScroll: true });
@@ -2244,6 +2257,11 @@
       var modeButton = target.closest("[data-welcome-mode]");
       if (modeButton) {
         state.mode = modeButton.getAttribute("data-welcome-mode");
+        if (state.mode === "quick") {
+          state.career = "other";
+          state.specialty = "general";
+        }
+        state.startedFromHub = false;
         state.wantMoreQuestions = false;
         state.edits = {};
         state.rowTimes = {};
@@ -2547,6 +2565,14 @@
           }
           state.step = 1;
         } else if (state.step === 1) {
+          if (state.mode === "quick" && !state.goal) {
+            var quickGoalField = document.querySelector("#welcome-quick-goal");
+            if (quickGoalField) {
+              if (!quickGoalField.parentElement.querySelector(".welcome-flow-error")) quickGoalField.insertAdjacentHTML("afterend", '<span class="welcome-flow-error" role="alert">Escribe una actividad para crear una propuesta útil.</span>');
+              quickGoalField.focus();
+            }
+            return;
+          }
           if (!state.days.length) {
             var dayGroup = document.querySelector(".welcome-flow-days");
             if (dayGroup) dayGroup.insertAdjacentHTML("afterend", '<span class="welcome-flow-error">Elige al menos un día activo. También puedes escoger solo los días en que realmente tienes tiempo.</span>');
@@ -2603,6 +2629,7 @@
         if (state.step === proposalStep()) state.step = state.wantMoreQuestions ? lifeStep() : decisionStep();
         else if (state.step === decisionStep()) state.step = state.mode === "quick" ? 1 : state.mode === "guided" ? 2 : 3;
         else state.step = Math.max(0, state.step - 1);
+        if (state.step === 0) state.startedFromHub = false;
         render();
         return;
       }
@@ -2649,14 +2676,7 @@
       }
     });
 
-    try {
-      var alreadyStarted = localStorage.getItem("planify_bienvenida_estado");
-      if (!alreadyStarted && !hasExistingPlan()) {
-        window.setTimeout(function () {
-          if (!document.getElementById("welcome-flow-overlay")) open();
-        }, 800);
-      }
-    } catch (error) {}
+    // A first visitor sees the landing page and chooses a route deliberately.
   }
 
   window.PLANIFY_WELCOME = { open: open, requestChange: openScheduleAssistant };

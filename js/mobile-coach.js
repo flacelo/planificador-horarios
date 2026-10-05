@@ -4,7 +4,7 @@
 
   var COPY = {
     diario: { icon: "☀️", title: "Tu día, sin complicarte", text: "Revisa tu siguiente bloque, anota una meta o inicia una sesión de enfoque.", action: "Anotar una meta" },
-    semanal: { icon: "🗓️", title: "Tu semana se puede editar", text: "Toca cualquier celda para cambiarla. Desde Horario y vistas también eliges intervalos de 15, 30 o 60 minutos.", action: "Editar horario" },
+    semanal: { icon: "🗓️", title: "Tu semana se puede editar", text: "Toca una celda para escribir. En Ajustar horario cambias las horas y los días.", action: "Ajustar horario" },
     mensual: { icon: "📆", title: "Mira el mes completo", text: "Usa cada día para ubicar entregas, descansos y momentos importantes sin perder el panorama.", action: "Ver tutorial" },
     anual: { icon: "🧭", title: "Dale dirección a tu año", text: "Escribe un objetivo por mes y deja espacio para temporadas de mayor carga o descanso.", action: "Ver tutorial" },
     dashboard: { icon: "📊", title: "Entiende tu avance", text: "Aquí ves lo que realmente cumpliste y el ajuste más útil para tu siguiente semana.", action: "Pedir un ajuste" }
@@ -50,16 +50,34 @@
 
   function ensureCoach() {
     var coach = document.getElementById("planify-mobile-coach");
-    if (coach) return coach;
-    var anchor = document.querySelector(".header-actions") || document.querySelector(".main-card-container");
+    var view = currentView();
+    var anchor = document.getElementById(view === "dashboard" ? "planify-dashboard-safe" : "view-" + view);
+    if (view === "dashboard" && !anchor) return null;
+    if (anchor) {
+      var intro = anchor.querySelector(".weekly-calm-intro");
+      if (coach && (coach.parentElement !== anchor || (intro && coach.previousElementSibling !== intro))) placeInView(anchor, coach);
+      if (coach) return coach;
+    }
+    anchor = anchor || document.querySelector(".brand-nav-slot") || document.querySelector(".brand-site-header") || document.querySelector(".main-card-container");
     if (!anchor || !anchor.parentNode) return null;
+    if (coach) {
+      if (coach.previousElementSibling !== anchor) anchor.insertAdjacentElement("afterend", coach);
+      return coach;
+    }
     coach = document.createElement("section");
     coach.id = "planify-mobile-coach";
     coach.className = "planify-mobile-coach";
     coach.setAttribute("aria-live", "polite");
     coach.innerHTML = '<span class="mobile-coach-icon" aria-hidden="true"></span><div class="mobile-coach-copy"><strong></strong><small></small></div><button type="button" class="mobile-coach-action" data-mobile-coach-action="primary"></button><button type="button" class="mobile-coach-close" data-mobile-coach-action="close" aria-label="Ocultar ayuda">×</button>';
-    anchor.insertAdjacentElement("afterend", coach);
+    if (anchor.id && (anchor.id.indexOf("view-") === 0 || anchor.id === "planify-dashboard-safe")) placeInView(anchor, coach);
+    else anchor.insertAdjacentElement("afterend", coach);
     return coach;
+  }
+
+  function placeInView(view, coach) {
+    var intro = view.querySelector(".weekly-calm-intro");
+    if (intro) intro.insertAdjacentElement("afterend", coach);
+    else view.insertBefore(coach, view.firstChild);
   }
 
   function refreshCoach() {
@@ -105,7 +123,7 @@
       window.clearTimeout(window.__planifyMobileCoachTimer);
       window.__planifyMobileCoachTimer = window.setTimeout(refreshCoach, 100);
     }).observe(document.body, { childList: true, subtree: true });
-    window.setInterval(refreshCoach, 600);
+    window.setInterval(refreshCoach, 2500);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true }); else init();
   window.PLANIFY_MOBILE_COACH = { refresh: refreshCoach };

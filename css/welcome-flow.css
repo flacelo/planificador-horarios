@@ -46,6 +46,33 @@
 
 /* The dialog heading receives programmatic focus to announce each step; it is not an interactive control. */
 #welcome-flow-title:focus{outline:none}
+
+/* The first choice stays legible without hiding the next action below a long card list. */
+.welcome-flow-card { max-height: min(92dvh, 820px); }
+.welcome-flow-header h2 { color: #1b3c42; }
+.welcome-flow-progress i { background: linear-gradient(90deg, #136f69, #74e3c0); }
+.welcome-flow-primary { background: #146f68; box-shadow: 0 6px 16px rgba(20, 111, 104, .18); }
+.welcome-flow-mode.is-selected { border-color: #2a9e89; background: #eaf7f1; box-shadow: 0 0 0 2px rgba(42, 158, 137, .12); }
+.welcome-flow-mode.is-selected > i, .welcome-flow-mode em { color: #176e61; }
+.welcome-flow-core-name { display: grid !important; gap: 6px; }
+.welcome-flow-core-name input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #bfcfd1; border-radius: 10px; background: #fff; color: #1e293b; font: inherit; font-size: .9rem; }
+.welcome-flow-card :is(button, input, select, textarea):focus-visible { outline: 3px solid #167b70; outline-offset: 2px; }
+#welcome-flow-overlay[data-welcome-step="0"] .welcome-flow-card { width: min(860px, 100%); }
+#welcome-flow-overlay[data-welcome-step="0"] .welcome-flow-modes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+#welcome-flow-overlay[data-welcome-step="0"] .welcome-flow-mode { min-height: 105px; align-items: start; }
+#welcome-flow-overlay[data-welcome-step="0"] .welcome-flow-example-callout { margin-bottom: 6px; }
+#welcome-flow-overlay[data-welcome-step="0"] .welcome-flow-footer { position: sticky; bottom: -28px; z-index: 2; margin: 12px -28px -28px; padding: 12px 28px; border-top: 1px solid #dce8e4; background: rgba(250, 253, 251, .97); }
+@media (max-width: 600px) {
+  .welcome-flow-overlay { padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)); }
+  .welcome-flow-card { max-height: calc(100dvh - max(16px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom))); }
+  .welcome-flow-close { width: 44px; height: 44px; }
+  #welcome-flow-overlay[data-welcome-step="0"] .welcome-flow-modes { grid-template-columns: 1fr; }
+  #welcome-flow-overlay[data-welcome-step="0"] .welcome-flow-mode { min-height: 76px; padding: 10px 12px; }
+  #welcome-flow-overlay[data-welcome-step="0"] .welcome-flow-mode small { margin-top: 2px; line-height: 1.3; }
+  #welcome-flow-overlay[data-welcome-step="0"] .welcome-flow-mode em { margin-top: 2px; }
+  #welcome-flow-overlay[data-welcome-step="0"] .welcome-flow-footer { bottom: -21px; margin: 10px -17px -21px; padding: 10px 17px max(10px, env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) { .welcome-flow-mode, .welcome-flow-progress i { transition: none; } }
 .welcome-flow-confirm{position:fixed;top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:min(420px,calc(100vw - 32px));max-width:100%;margin:0;padding:26px;border:1px solid #c7d2fe;border-radius:20px;background:#fff;color:#1e293b;box-shadow:0 28px 90px rgba(2,6,23,.35);font:inherit;text-align:center;box-sizing:border-box}.welcome-flow-confirm::backdrop{background:rgba(2,6,23,.68);backdrop-filter:blur(3px)}.welcome-flow-confirm-icon{display:grid;width:44px;height:44px;margin:0 auto 12px;place-items:center;border-radius:15px;background:#eef2ff;color:#5b4ac3;font-size:1.5rem;font-weight:800}.welcome-flow-confirm h2{margin:0;color:#312e81;font-size:1.25rem}.welcome-flow-confirm p{margin:10px 0 20px;color:#64748b;font-size:.86rem;line-height:1.5}.welcome-flow-confirm-actions{display:flex;justify-content:flex-end;gap:9px}.welcome-flow-confirm-actions button{min-height:42px;padding:9px 13px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#475569;font:inherit;font-size:.8rem;font-weight:800;cursor:pointer}.welcome-flow-confirm-actions button:last-child{border-color:#5b4ac3;background:#5b4ac3;color:#fff}.welcome-flow-confirm-actions button:focus-visible{outline:3px solid #a5b4fc;outline-offset:2px}.welcome-flow-confirm-actions button:disabled{opacity:.6;cursor:wait}@media(max-width:400px){.welcome-flow-confirm{padding:21px}.welcome-flow-confirm-actions{flex-direction:column-reverse}.welcome-flow-confirm-actions button{width:100%}}
 @media(max-width:600px){.welcome-flow-time-grid{grid-template-columns:minmax(0,1fr)}.welcome-flow-time-grid label{min-width:0}.welcome-flow-fixed-row>.welcome-flow-time-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){.welcome-flow-preview li.welcome-flow-simple-row{grid-template-columns:72px 8px minmax(0,1fr) auto;gap:6px}}

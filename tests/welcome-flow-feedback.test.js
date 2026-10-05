@@ -38,9 +38,11 @@ test("cada turno permite agregar varias tareas por día sin preseleccionar lunes
   assert.match(welcome, /Elige los días de cada turno o compromiso fijo/);
 });
 
-test("un navegador sin datos previos abre la bienvenida inicial automáticamente", () => {
-  assert.match(welcome, /if \(!alreadyStarted && !hasExistingPlan\(\)\)/);
-  assert.match(welcome, /if \(!document\.getElementById\("welcome-flow-overlay"\)\) open\(\)/);
+test("la portada permite escoger un recorrido rápido antes de abrir la guía", () => {
+  assert.match(welcome, /\["quick", "🧩", "Crear mi horario rápido"/);
+  assert.match(welcome, /state\.step = state\.startedFromHub \? 1 : 0/);
+  assert.match(welcome, /state\.mode === "quick" \? decisionStep\(\) : 2/);
+  assert.doesNotMatch(welcome, /window\.setTimeout\(function \(\) \{\s*if \(!document\.getElementById\("welcome-flow-overlay"\)\) open\(\)/);
 });
 
 test("la propuesta se edita directamente y el horario semanal usa acciones guiadas y una lista legible en móvil", () => {

@@ -32,6 +32,14 @@ function runGate(initial = {}, options = {}) {
   const classes = new Set();
   const appended = [];
   const elements = [];
+  const background = {
+    nodeType: 1,
+    inert: false,
+    attributes: {},
+    getAttribute(name) { return this.attributes[name] ?? null; },
+    setAttribute(name, value) { this.attributes[name] = value; },
+    removeAttribute(name) { delete this.attributes[name]; }
+  };
   const document = {
     activeElement: null,
     documentElement: {
@@ -41,7 +49,7 @@ function runGate(initial = {}, options = {}) {
       }
     },
     head: { appendChild(element) { appended.push(element); } },
-    body: { appendChild(element) { elements.push(element); } },
+    body: { children: [background], appendChild(element) { elements.push(element); } },
     createElement(tag) {
       const element = {
         tagName: tag.toUpperCase(),
@@ -70,6 +78,7 @@ function runGate(initial = {}, options = {}) {
     localStorage,
     sessionStorage,
     classes,
+    background,
     elements,
     appended,
     reloads: () => reloads,
@@ -114,6 +123,8 @@ test("oculta un horario anterior hasta que el usuario decide si es suyo", () => 
     horario_data_semanal: JSON.stringify({ filas: [{ celdas: [{ t: "Turno privado" }] }] })
   });
   assert.equal(app.classes.has("planify-data-gate-active"), true);
+  assert.equal(app.background.inert, true);
+  assert.equal(app.background.getAttribute("aria-hidden"), "true");
   assert.equal(app.elements.length, 1);
   assert.match(app.elements[0].innerHTML, /Este navegador ya tiene un plan guardado/);
   assert.match(app.elements[0].innerHTML, /solo en este navegador/);
@@ -124,6 +135,8 @@ test("oculta un horario anterior hasta que el usuario decide si es suyo", () => 
   };
   app.elements[0].handlers.click({ target: { closest() { return continueButton; } } });
   assert.equal(app.classes.has("planify-data-gate-active"), false);
+  assert.equal(app.background.inert, false);
+  assert.equal(app.background.getAttribute("aria-hidden"), null);
   assert.equal(app.sessionStorage.getItem("planify_local_data_choice_v1"), null);
 
   const nextVisit = runGate(Object.fromEntries(app.localStorage.values), {

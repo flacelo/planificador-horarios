@@ -4,6 +4,8 @@
 
   var SESSION_KEY = "planify_local_data_choice_v1";
   var ARCHIVE_PREFIX = "planify_local_data_archive_v1:";
+  var protectedBackground = new Map();
+  var backgroundObserver = null;
   var PERSONAL_KEYS = new Set(["report_email"]);
   var PREFERENCE_KEYS = new Set([
     "horario_dark_mode", "horario_fin", "horario_inicio", "horario_intervalo",
@@ -163,9 +165,35 @@
   }
 
   function unlock() {
+    if (backgroundObserver) backgroundObserver.disconnect();
+    backgroundObserver = null;
+    protectedBackground.forEach(function (previous, node) {
+      node.inert = previous.inert;
+      if (previous.ariaHidden === null) node.removeAttribute("aria-hidden");
+      else node.setAttribute("aria-hidden", previous.ariaHidden);
+    });
+    protectedBackground.clear();
     document.documentElement.classList.remove("planify-data-gate-active");
     var gate = document.getElementById("planify-local-data-gate");
     if (gate) gate.remove();
+  }
+
+  function protectBackground(gate) {
+    function hide(node) {
+      if (!node || node === gate || node.nodeType !== 1 || protectedBackground.has(node)) return;
+      protectedBackground.set(node, { inert: node.inert, ariaHidden: node.getAttribute("aria-hidden") });
+      node.inert = true;
+      node.setAttribute("aria-hidden", "true");
+    }
+    Array.prototype.forEach.call(document.body.children || [], hide);
+    if (typeof MutationObserver !== "undefined") {
+      backgroundObserver = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+          Array.prototype.forEach.call(mutation.addedNodes || [], hide);
+        });
+      });
+      backgroundObserver.observe(document.body, { childList: true });
+    }
   }
 
   function addStyles() {
@@ -243,6 +271,7 @@
       '<button type="button" data-action="' + secondaryAction + '">' + secondaryLabel + '</button></div>' +
       '<p class="local-data-error" role="status" aria-live="polite"></p></div>';
     document.body.appendChild(gate);
+    protectBackground(gate);
     var primary = gate.querySelector("button");
     if (primary) primary.focus();
 

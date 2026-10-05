@@ -58,12 +58,13 @@
       '<div class="brand-hero-copy">' +
         '<span class="brand-eyebrow"><span aria-hidden="true"></span> PLANEA A TU MANERA</span>' +
         '<h2 id="brand-hero-title">' + (returning ? 'Tu plan te espera.<br><em>Continúa a tu ritmo.</em>' : 'Organiza tu tiempo.<br><em>Haz espacio para vivir.</em>') + '</h2>' +
-        '<p>' + (returning ? 'Tu horario sigue aquí. Revísalo, mueve lo que necesites y sigue con tu semana.' : 'Elige cómo empezar: arma tu horario por tu cuenta o responde preguntas para recibir una propuesta que siempre podrás editar.') + '</p>' +
+        '<p>' + (returning ? 'Tu horario sigue aquí. Revísalo, mueve lo que necesites y sigue con tu semana.' : 'Crea una primera versión en pocos pasos, planifica desde cero o personaliza cada detalle. Siempre podrás cambiar tu horario.') + '</p>' +
         '<div class="brand-hero-actions">' +
           (returning
             ? '<button type="button" class="brand-primary" data-brand-action="week">Ver mi semana <span aria-hidden="true">↗</span></button><button type="button" class="brand-secondary" data-brand-action="paths">Ver opciones para crear <span aria-hidden="true">↓</span></button>'
             : '<button type="button" class="brand-primary" data-brand-action="paths">Elegir cómo empezar <span aria-hidden="true">↗</span></button>') +
         '</div>' +
+        '<p class="brand-data-note"><span aria-hidden="true">▣</span> Tu plan se guarda en este navegador. Para usarlo en otro dispositivo, descarga una copia desde Ajustes.</p>' +
       '</div>' +
       (returning ? '' : '<div class="brand-hero-preview" aria-label="Ejemplo ilustrativo de un día organizado">' +
         '<div class="brand-preview-top"><span class="brand-preview-icon" aria-hidden="true">✦</span><div><small>UN EJEMPLO, A TU MEDIDA</small><strong>Un día con intención</strong></div><span class="brand-preview-dots" aria-hidden="true">•••</span></div>' +
@@ -80,10 +81,10 @@
     hub.classList.toggle("is-compact", returning);
     var heading = hub.querySelector(".trust-start-heading h2");
     var description = hub.querySelector(".trust-start-heading p");
-    if (heading) heading.textContent = returning ? "¿Quieres crear otro horario?" : "¿Qué nivel de ayuda prefieres?";
+    if (heading) heading.textContent = returning ? "¿Quieres crear otro horario?" : "¿Cómo quieres empezar?";
     if (description) description.textContent = returning ?
-      "Puedes hacerlo por tu cuenta o responder preguntas para recibir una propuesta editable." :
-      "Elige cuánto quieres armar: por tu cuenta, con preguntas breves o casi listo.";
+      "Puedes crear uno nuevo por tu cuenta o con una propuesta editable." :
+      "Elige entre una tabla vacía, una propuesta rápida o una planificación detallada.";
     var toggle = hub.querySelector('[data-start-action="toggle"]');
     if (returning && !toggle) hub.querySelector(".trust-start-heading").insertAdjacentHTML("beforeend", '<button type="button" data-start-action="toggle">Ver opciones</button>');
     if (!returning && toggle) toggle.remove();

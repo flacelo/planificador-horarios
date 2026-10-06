@@ -391,6 +391,7 @@
   function isDashboardTrigger(target) {
     var trigger = target.closest("button,a,[role='button']");
     if (!trigger || trigger.closest("#planify-dashboard-safe")) return false;
+    if (trigger.getAttribute("data-tab") === "dashboard") return true;
     var id = String(trigger.id || "").toLowerCase();
     var text = String(trigger.textContent || "").trim().toLowerCase();
     return id === "btn-sidebar-dashboard" || id === "btn-view-dashboard" || text === "dashboard" || text === "📊 dashboard" || text === "ver dashboard";
@@ -671,7 +672,7 @@
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=7";
+      script.src = "js/brand-home.js?v=8";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -960,7 +961,7 @@
     if (!document.getElementById("welcome-flow-script")) {
       var welcomeScript = document.createElement("script");
       welcomeScript.id = "welcome-flow-script";
-      welcomeScript.src = "js/welcome-flow.js?v=1.27";
+      welcomeScript.src = "js/welcome-flow.js?v=1.28";
       welcomeScript.defer = true;
       document.head.appendChild(welcomeScript);
     }

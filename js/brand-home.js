@@ -119,6 +119,10 @@
       var button = event.target.closest("[data-tab]");
       var viewName = button && button.getAttribute("data-tab");
       if (!button || VALID_VIEWS.indexOf(viewName) < 0) return;
+      if (viewName === "dashboard") {
+        var beforeDashboard = nav.querySelector('[data-tab][aria-current="page"]');
+        if (beforeDashboard && beforeDashboard.dataset.tab !== "dashboard") viewBeforeDashboard = beforeDashboard.dataset.tab;
+      }
       document.documentElement.classList.add("planify-home-entered");
       nav.querySelectorAll("[data-tab]").forEach(function (item) {
         var current = item === button;
@@ -150,7 +154,7 @@
       dashboardWasOpen = dashboardOpen;
       if (dashboardOpen) {
         var selected = nav.querySelector('[data-tab][aria-current="page"]');
-        viewBeforeDashboard = selected && selected.dataset.tab !== "dashboard" ? selected.dataset.tab : "";
+        if (!viewBeforeDashboard) viewBeforeDashboard = selected && selected.dataset.tab !== "dashboard" ? selected.dataset.tab : "";
         document.documentElement.classList.add("planify-home-entered");
         nav.querySelectorAll("[data-tab]").forEach(function (item) {
           var current = item.dataset.tab === "dashboard";
@@ -160,14 +164,16 @@
         });
         try { localStorage.setItem(LAST_VIEW_KEY, "dashboard"); } catch (error) { /* Private browsing may disable storage. */ }
       } else {
+        var currentSelection = nav.querySelector('[data-tab][aria-current="page"]');
+        var resumeView = currentSelection && currentSelection.dataset.tab !== "dashboard" ? currentSelection.dataset.tab : viewBeforeDashboard;
         nav.querySelectorAll("[data-tab]").forEach(function (item) {
-          var current = Boolean(viewBeforeDashboard) && item.dataset.tab === viewBeforeDashboard;
+          var current = Boolean(resumeView) && item.dataset.tab === resumeView;
           item.classList.toggle("active", current);
           if (current) item.setAttribute("aria-current", "page");
           else item.removeAttribute("aria-current");
         });
-        if (viewBeforeDashboard) {
-          try { localStorage.setItem(LAST_VIEW_KEY, viewBeforeDashboard); } catch (error) { /* Private browsing may disable storage. */ }
+        if (resumeView) {
+          try { localStorage.setItem(LAST_VIEW_KEY, resumeView); } catch (error) { /* Private browsing may disable storage. */ }
         }
         viewBeforeDashboard = "";
       }
@@ -217,6 +223,7 @@
           localStorage.removeItem("planify_bienvenida_aplicada_pendiente_v1");
         } else savedView = localStorage.getItem(LAST_VIEW_KEY) || "";
       } catch (error) { savedView = ""; }
+      if (savedView === "dashboard") savedView = hasSavedSchedule() ? "semanal" : "diario";
       if (VALID_VIEWS.indexOf(savedView) < 0) savedView = hasSavedSchedule() ? "semanal" : "diario";
       var savedButton = nav.querySelector('[data-tab="' + savedView + '"]');
       if (savedButton) savedButton.click();

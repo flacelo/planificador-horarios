@@ -393,7 +393,7 @@
     if (document.getElementById("planify-public-brand-script")) return;
     var script = document.createElement("script");
     script.id = "planify-public-brand-script";
-    script.src = "js/brand-home.js?v=7";
+    script.src = "js/brand-home.js?v=8";
     document.head.appendChild(script);
   }
 
@@ -496,5 +496,6 @@
   } catch (error) {
     return;
   }
+  if (currentData.length) return;
   renderStartLanding(currentData, savedArchives);
 })();

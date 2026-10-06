@@ -5,6 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const html = fs.readFileSync(require.resolve("../index.html"), "utf8");
 const welcome = fs.readFileSync(require.resolve("../js/welcome-flow.js"), "utf8");
+const app = fs.readFileSync(require.resolve("../js/app.js"), "utf8");
 const pdf = fs.readFileSync(require.resolve("../js/export-pdf.js"), "utf8");
 const weekly = fs.readFileSync(require.resolve("../js/weekly-calm.js"), "utf8");
 const daily = fs.readFileSync(require.resolve("../js/day-flow.js"), "utf8");
@@ -43,6 +44,13 @@ test("la portada permite escoger un recorrido rápido antes de abrir la guía", 
   assert.match(welcome, /state\.step = state\.startedFromHub \? 1 : 0/);
   assert.match(welcome, /state\.mode === "quick" \? decisionStep\(\) : 2/);
   assert.doesNotMatch(welcome, /window\.setTimeout\(function \(\) \{\s*if \(!document\.getElementById\("welcome-flow-overlay"\)\) open\(\)/);
+});
+
+test("empezar por cuenta propia pide confirmación antes de sustituir un horario existente", () => {
+  assert.match(welcome, /var replacingManual = hasTasks\(parseJson\(previousWeekly\)\)/);
+  assert.match(welcome, /if \(replacingManual\) \{\s*window\.nuevoPlanificador\(\)/);
+  assert.match(welcome, /if \(localStorage\.getItem\("horario_data_semanal"\) === previousWeekly\) return/);
+  assert.match(app, /function nuevoPlanificador\(\)\{if\(!confirm\([\s\S]*?\)\)return;guardarVersionHistorial\(\)/);
 });
 
 test("la propuesta se edita directamente y el horario semanal usa acciones guiadas y una lista legible en móvil", () => {

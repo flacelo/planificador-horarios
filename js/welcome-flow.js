@@ -2550,17 +2550,30 @@
         getDraftFromForm();
         if (state.step === 0) {
           if (state.mode === "manual") {
+            var previousWeekly = null;
+            try { previousWeekly = localStorage.getItem("horario_data_semanal"); } catch (error) {}
+            var replacingManual = hasTasks(parseJson(previousWeekly));
+            if (replacingManual && typeof window.nuevoPlanificador !== "function") {
+              showPreviewError("No pude abrir un horario nuevo. Tu plan actual sigue intacto.");
+              return;
+            }
+            close(false);
+            if (replacingManual) {
+              window.nuevoPlanificador();
+              try { if (localStorage.getItem("horario_data_semanal") === previousWeekly) return; }
+              catch (error) { return; }
+            } else {
+              var emptyButton = Array.from(document.querySelectorAll("button")).find(function (button) { return /empezar vacío/i.test(button.textContent || ""); });
+              if (emptyButton) emptyButton.click();
+            }
             try {
               localStorage.setItem("planify_bienvenida_estado", "completada");
               if (state.userName) localStorage.setItem("planify_nombre", state.userName);
             } catch (error) {}
-            close(false);
-            var emptyButton = Array.from(document.querySelectorAll("button")).find(function (button) { return /empezar vacío/i.test(button.textContent || ""); });
-            if (emptyButton) emptyButton.click();
             if (typeof window.cambiarTab === "function") window.cambiarTab("semanal");
             else if (typeof window.cambiarVistaPlanify === "function") window.cambiarVistaPlanify("semanal");
             var weeklyTab = document.querySelector('.bottom-nav [data-tab="semanal"]');
-            if (weeklyTab) weeklyTab.focus({ preventScroll: true });
+            if (weeklyTab) { weeklyTab.click(); weeklyTab.focus({ preventScroll: true }); }
             return;
           }
           state.step = 1;

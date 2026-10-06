@@ -64,7 +64,7 @@ function runGate(initial = {}, options = {}) {
       };
       return element;
     },
-    getElementById(id) { return elements.find((element) => element.id === id) || null; }
+    getElementById(id) { return elements.find((element) => element.id === id && !element.removed) || null; }
   };
   let reloads = 0;
   const window = {
@@ -81,9 +81,20 @@ function runGate(initial = {}, options = {}) {
     background,
     elements,
     appended,
+    hold: window.PLANIFY_PRIVATE_HOLD === true,
     reloads: () => reloads,
     hooks: window.__PLANIFY_PRIVACY_TEST_HOOKS__
   };
+}
+
+function clickAction(element, action) {
+  const button = {
+    action,
+    getAttribute(name) { return name === "data-action" ? this.action : null; },
+    setAttribute(name, value) { if (name === "data-action") this.action = value; }
+  };
+  element.handlers.click({ target: { closest() { return button; } } });
+  return button;
 }
 
 test("no bloquea un plan vacío y no confunde preferencias con datos personales", () => {
@@ -112,36 +123,42 @@ test("una primera visita recargada no confunde ajustes automáticos con un plan 
 });
 
 test("el protector se carga antes de que app.js lea el almacenamiento", () => {
-  const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.0"');
+  const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.1"');
   const appIndex = indexHtml.indexOf('src="js/app.js?v=9.7"');
   assert.ok(gateIndex >= 0);
   assert.ok(appIndex > gateIndex);
+  assert.match(indexHtml, /if\(!window\.PLANIFY_PRIVATE_HOLD\)/);
 });
 
-test("oculta un horario anterior hasta que el usuario decide si es suyo", () => {
+test("un plan previo muestra una portada neutra y espera la recuperación explícita", () => {
   const app = runGate({
     horario_data_semanal: JSON.stringify({ filas: [{ celdas: [{ t: "Turno privado" }] }] })
   });
   assert.equal(app.classes.has("planify-data-gate-active"), true);
+  assert.equal(app.hold, true);
   assert.equal(app.background.inert, true);
   assert.equal(app.background.getAttribute("aria-hidden"), "true");
   assert.equal(app.elements.length, 1);
-  assert.match(app.elements[0].innerHTML, /Este navegador ya tiene un plan guardado/);
-  assert.match(app.elements[0].innerHTML, /solo en este navegador/);
+  assert.match(app.elements[0].innerHTML, /Organiza tu tiempo/);
+  assert.match(app.elements[0].innerHTML, /Recuperar datos/);
+  assert.doesNotMatch(app.elements[0].innerHTML, /Este navegador ya tiene un plan guardado/);
   assert.doesNotMatch(app.elements[0].innerHTML, /Turno privado/);
 
-  const continueButton = {
-    getAttribute(name) { return name === "data-action" ? "continue" : null; }
-  };
-  app.elements[0].handlers.click({ target: { closest() { return continueButton; } } });
-  assert.equal(app.classes.has("planify-data-gate-active"), false);
-  assert.equal(app.background.inert, false);
-  assert.equal(app.background.getAttribute("aria-hidden"), null);
-  assert.equal(app.sessionStorage.getItem("planify_local_data_choice_v1"), null);
+  clickAction(app.elements[0], "recover");
+  assert.equal(app.elements[0].removed, true);
+  assert.match(app.elements[1].innerHTML, /Abrir el plan/);
+  assert.doesNotMatch(app.elements[1].innerHTML, /Turno privado/);
+  clickAction(app.elements[1], "continue");
+  assert.equal(app.reloads(), 1);
+  assert.match(app.sessionStorage.getItem("planify_local_data_choice_v1"), /"action":"continue"/);
 
-  const nextVisit = runGate(Object.fromEntries(app.localStorage.values), {
+  const reopened = runGate(Object.fromEntries(app.localStorage.values), {
     session: Object.fromEntries(app.sessionStorage.values)
   });
+  assert.equal(reopened.classes.has("planify-data-gate-active"), false);
+  assert.equal(reopened.sessionStorage.getItem("planify_local_data_choice_v1"), null);
+
+  const nextVisit = runGate(Object.fromEntries(app.localStorage.values));
   assert.equal(nextVisit.classes.has("planify-data-gate-active"), true);
   assert.doesNotMatch(nextVisit.elements[0].innerHTML, /Turno privado/);
 });
@@ -163,22 +180,24 @@ test("empezar en blanco conserva la copia sin bloquear las visitas siguientes", 
     horario_data_semanal: JSON.stringify({ filas: [{ celdas: [{ t: "Horario de prueba" }] }] }),
     planify_nombre: "Persona anterior"
   });
-  const freshButton = {
-    getAttribute(name) { return name === "data-action" ? "fresh" : null; }
-  };
+  const freshButton = clickAction(app.elements[0], "fresh");
+  assert.equal(app.reloads(), 0);
+  assert.match(app.localStorage.getItem("horario_data_semanal"), /Horario de prueba/);
+  assert.equal(freshButton.action, "confirm-fresh");
   app.elements[0].handlers.click({ target: { closest() { return freshButton; } } });
 
   assert.equal(app.reloads(), 1);
   assert.ok(Array.from(app.localStorage.values.keys()).some((key) => key.startsWith("planify_local_data_archive_v1:")));
   assert.equal(app.localStorage.getItem("horario_data_semanal"), null);
   assert.equal(app.localStorage.getItem("planify_nombre"), null);
-  assert.equal(app.sessionStorage.getItem("planify_local_data_choice_v1"), "fresh");
+  assert.equal(app.sessionStorage.getItem("planify_local_data_choice_v1"), null);
 
   const afterFreshReload = runGate(Object.fromEntries(app.localStorage.values), {
     session: Object.fromEntries(app.sessionStorage.values)
   });
   assert.equal(afterFreshReload.classes.has("planify-data-gate-active"), false);
   assert.equal(afterFreshReload.sessionStorage.getItem("planify_local_data_choice_v1"), null);
+  assert.equal(afterFreshReload.elements[0].id, "planify-archive-recovery");
 
   const nextVisit = runGate(Object.fromEntries(afterFreshReload.localStorage.values), {
     session: Object.fromEntries(afterFreshReload.sessionStorage.values)
@@ -191,13 +210,16 @@ test("empezar en blanco conserva la copia sin bloquear las visitas siguientes", 
   nextVisit.elements[0].handlers.click({ target: { closest() { return {}; } } });
   assert.equal(nextVisit.classes.has("planify-data-gate-active"), true);
   assert.match(nextVisit.elements[1].innerHTML, /Hay una copia anterior/);
-  const restoreButton = { getAttribute(name) { return name === "data-action" ? "restore" : null; } };
-  nextVisit.elements[1].handlers.click({ target: { closest() { return restoreButton; } } });
+  clickAction(nextVisit.elements[1], "restore");
   assert.equal(nextVisit.reloads(), 1);
   assert.match(nextVisit.localStorage.getItem("horario_data_semanal"), /Horario de prueba/);
-  const restoredVisit = runGate(Object.fromEntries(nextVisit.localStorage.values));
-  assert.equal(restoredVisit.classes.has("planify-data-gate-active"), true);
-  assert.doesNotMatch(restoredVisit.elements[0].innerHTML, /Horario de prueba/);
+  const restoredVisit = runGate(Object.fromEntries(nextVisit.localStorage.values), {
+    session: Object.fromEntries(nextVisit.sessionStorage.values)
+  });
+  assert.equal(restoredVisit.classes.has("planify-data-gate-active"), false);
+  const laterVisit = runGate(Object.fromEntries(nextVisit.localStorage.values));
+  assert.equal(laterVisit.classes.has("planify-data-gate-active"), true);
+  assert.doesNotMatch(laterVisit.elements[0].innerHTML, /Horario de prueba/);
 });
 
 test("una copia archivada vacía se conserva sin bloquear a una persona nueva", () => {

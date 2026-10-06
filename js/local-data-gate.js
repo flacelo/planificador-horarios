@@ -212,7 +212,7 @@
       "#planify-local-data-gate .local-data-note{padding:12px 14px;border:1px solid #34505a;border-radius:13px;background:#10212d;color:#c5d8d9;font-size:.82rem}" +
       "#planify-local-data-gate .local-data-actions{display:grid;gap:10px;margin-top:20px}" +
       "#planify-local-data-gate:not(.is-start) button{min-height:48px;padding:12px 16px;border:1px solid #4b726f;border-radius:13px;background:#a8f0cc;color:#153a35;font-family:inherit;font-size:.94rem;font-weight:750;line-height:1.3;cursor:pointer}" +
-      "#planify-local-data-gate:not(.is-start) button[data-action='fresh'],#planify-local-data-gate:not(.is-start) button[data-action='blank']{background:#1d3040;color:#edf8f5;border-color:#45616a}" +
+      "#planify-local-data-gate:not(.is-start) button[data-action='fresh'],#planify-local-data-gate:not(.is-start) button[data-action='blank'],#planify-local-data-gate:not(.is-start) button[data-action='back']{background:#1d3040;color:#edf8f5;border-color:#45616a}" +
       "#planify-local-data-gate button:focus-visible{outline:3px solid #91f4d0;outline-offset:3px}" +
       "#planify-local-data-gate .local-data-error{min-height:1.3em;margin:12px 0 0;color:#ffc2b8;font-size:.84rem}" +
       "#planify-local-data-gate.is-start{display:block;padding:0;background:transparent;color:inherit}" +
@@ -230,7 +230,7 @@
       "body.tema-claro #planify-local-data-gate .local-data-note{border-color:#d5e5e2;background:#f4faf8;color:#526970}" +
       "body.tema-claro #planify-local-data-gate.is-start{background:#eef5f2}" +
       "body.tema-claro #planify-local-data-gate.is-start .planify-public-recovery{background:#fff;color:#24464a;border-color:#cbded9}" +
-      "body.tema-claro #planify-local-data-gate:not(.is-start) button[data-action='fresh'],body.tema-claro #planify-local-data-gate:not(.is-start) button[data-action='blank']{background:#f2f7f5;color:#24464a;border-color:#cbded9}" +
+      "body.tema-claro #planify-local-data-gate:not(.is-start) button[data-action='fresh'],body.tema-claro #planify-local-data-gate:not(.is-start) button[data-action='blank'],body.tema-claro #planify-local-data-gate:not(.is-start) button[data-action='back']{background:#f2f7f5;color:#24464a;border-color:#cbded9}" +
       "#planify-archive-recovery{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:12px 14px;border:1px solid #8bd9c4;border-radius:13px;background:#eafff7;color:#174e4b;font:600 14px/1.4 'Outfit','Inter',system-ui,sans-serif}" +
       "#planify-archive-recovery button{min-height:44px;padding:8px 12px;border:1px solid #419988;border-radius:9px;background:#fff;color:#14695e;font-family:inherit;font-size:13px;font-weight:700;line-height:1.3;cursor:pointer}" +
       "#planify-archive-recovery button:focus-visible{outline:3px solid #0d9488;outline-offset:2px}" +
@@ -273,7 +273,7 @@
     var latestArchive = savedArchives[0];
     var title = hasCurrent ? "Recuperar datos de este dispositivo" : latestArchive ? "Hay una copia anterior en este navegador" : "Recuperar datos";
     var description = hasCurrent
-      ? "Puedes abrir el plan de este dispositivo o guardar una copia y empezar en blanco. El contenido seguirá oculto hasta que elijas."
+      ? "Abre el plan de este dispositivo o guarda una copia antes de empezar en blanco."
       : latestArchive ? "No hay un plan activo. Puedes recuperar la copia anterior o seguir con un espacio vacío." : "No hay un plan guardado en este navegador. Puedes empezar uno nuevo desde la portada.";
     var primaryAction = hasCurrent ? "continue" : "restore";
     var primaryLabel = hasCurrent ? "Abrir el plan" : "Restaurar la copia anterior";
@@ -287,7 +287,7 @@
     gate.innerHTML =
       '<div class="local-data-card"><span class="local-data-eyebrow">TUS DATOS, BAJO TU CONTROL</span>' +
       '<h1 id="planify-local-data-title">' + title + '</h1><p>' + description + '</p>' +
-      '<div class="local-data-note">PLANIFY guarda tu información solo en este navegador; no usa una cuenta ni sincroniza entre dispositivos. El contenido permanecerá oculto hasta que elijas.</div>' +
+      (hasCurrent || latestArchive ? '<div class="local-data-note">Tus datos permanecen en este navegador; no se sincronizan con otros dispositivos.</div>' : '') +
       '<div class="local-data-actions">' + (hasCurrent || latestArchive ? '<button type="button" data-action="' + primaryAction + '">' + primaryLabel + '</button>' +
       '<button type="button" data-action="' + secondaryAction + '">' + secondaryLabel + '</button>' : '') +
       '<button type="button" data-action="back">Volver</button></div>' +
@@ -378,7 +378,7 @@
 
   function loadPublicAssets() {
     [["planify-public-trust-style", "css/trust-fixes.css?v=1.7"],
-     ["planify-brand-style", "css/brand-system.css?v=6"]].forEach(function (asset) {
+     ["planify-brand-style", "css/brand-system.css?v=7"]].forEach(function (asset) {
       if (document.getElementById(asset[0])) return;
       var link = document.createElement("link");
       link.id = asset[0];
@@ -393,7 +393,7 @@
     if (document.getElementById("planify-public-brand-script")) return;
     var script = document.createElement("script");
     script.id = "planify-public-brand-script";
-    script.src = "js/brand-home.js?v=6";
+    script.src = "js/brand-home.js?v=7";
     document.head.appendChild(script);
   }
 

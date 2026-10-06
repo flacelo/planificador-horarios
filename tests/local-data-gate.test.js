@@ -115,6 +115,9 @@ test("una visita sin datos ve la portada completa, no un aviso", () => {
   assert.equal(app.hold, true);
   assert.match(app.elements[0].innerHTML, /¿Cómo quieres empezar\?/);
   assert.match(app.elements[0].innerHTML, /Planificar por mi cuenta/);
+  clickAction(app.elements[0], "recover");
+  assert.match(app.elements[1].innerHTML, /No hay un plan guardado/);
+  assert.doesNotMatch(app.elements[1].innerHTML, /Tus datos permanecen/);
 });
 
 test("una primera visita recargada tampoco entra automáticamente al editor", () => {
@@ -142,8 +145,8 @@ test("la portada pública es idéntica con o sin plan y oculta por completo el e
 });
 
 test("el protector se carga antes de que app.js lea el almacenamiento", () => {
-  const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.2"');
-  const appIndex = indexHtml.indexOf('src="js/app.js?v=9.7"');
+  const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.3"');
+  const appIndex = indexHtml.indexOf('src="js/app.js?v=9.8"');
   assert.ok(gateIndex >= 0);
   assert.ok(appIndex > gateIndex);
   assert.match(indexHtml, /if\(!window\.PLANIFY_PRIVATE_HOLD\)/);
@@ -158,7 +161,7 @@ test("un plan previo muestra la misma portada y espera la recuperación explíci
   assert.equal(app.background.inert, true);
   assert.equal(app.background.getAttribute("aria-hidden"), "true");
   assert.equal(app.elements.length, 1);
-  assert.ok(app.appended.some((item) => item.src === "js/brand-home.js?v=6"));
+  assert.ok(app.appended.some((item) => item.src === "js/brand-home.js?v=7"));
   assert.match(app.elements[0].innerHTML, /Planificar por mi cuenta/);
   assert.match(app.elements[0].innerHTML, /Recuperar datos/);
   assert.doesNotMatch(app.elements[0].innerHTML, /Este navegador ya tiene un plan guardado/);
@@ -167,6 +170,9 @@ test("un plan previo muestra la misma portada y espera la recuperación explíci
   clickAction(app.elements[0], "recover");
   assert.equal(app.elements[0].removed, true);
   assert.match(app.elements[1].innerHTML, /Abrir el plan/);
+  assert.match(app.elements[1].innerHTML, /Tus datos permanecen en este navegador/);
+  assert.doesNotMatch(app.elements[1].innerHTML, /El contenido permanecerá oculto/);
+  assert.ok(app.appended.some((item) => item.tagName === "STYLE" && item.textContent.includes("button[data-action='back']")));
   assert.doesNotMatch(app.elements[1].innerHTML, /Turno privado/);
   clickAction(app.elements[1], "continue");
   assert.equal(app.reloads(), 1);

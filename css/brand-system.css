@@ -645,3 +645,51 @@ html.planify-brand-ready.planify-home-new:not(.planify-home-entered) .main-card-
     padding: 4px !important;
   }
 }
+
+/* Keep the public entry focused on the three starting paths at tablet sizes. */
+@media (min-width: 601px) and (max-width: 920px) {
+  .planify-brand-ready .brand-hero { min-height: 0; }
+  .planify-brand-ready .brand-hero-preview { display: none; }
+}
+
+@media (max-width: 920px) {
+  .planify-brand-ready #planify-local-data-gate.is-start .brand-site-header {
+    flex-direction: row;
+    align-items: center;
+    min-height: 56px;
+    gap: 8px;
+  }
+  .planify-brand-ready #planify-local-data-gate.is-start .brand-site-header .header-actions {
+    justify-content: flex-end !important;
+    max-width: none !important;
+    margin-left: auto !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .planify-brand-ready #planify-local-data-gate.is-start .brand-identity { gap: 8px; }
+  .planify-brand-ready #planify-local-data-gate.is-start .brand-site-header h1.planify-public-title {
+    font-size: 1.1rem !important;
+  }
+  .planify-brand-ready #planify-local-data-gate.is-start .planify-public-recovery {
+    min-height: 44px !important;
+    padding: 8px 10px !important;
+  }
+  .planify-brand-ready #view-semanal.weekly-calm-ready #nav-bar-semanal .btn-nav-fecha,
+  .planify-brand-ready #view-mensual.monthly-calm-ready #nav-bar-mensual .btn-nav-fecha {
+    width: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+  .planify-brand-ready #view-semanal.weekly-calm-ready #label-fecha-semanal,
+  .planify-brand-ready #view-mensual.monthly-calm-ready #label-fecha-mensual {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    line-height: 1.25;
+  }
+  .planify-brand-ready [data-pwa-action="guide"] {
+    min-height: 44px !important;
+  }
+  .planify-brand-ready #side-panel .view-toggle button { min-height: 44px !important; }
+  .planify-brand-ready #btn-tema { min-width: 44px !important; }
+}

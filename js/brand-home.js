@@ -65,7 +65,7 @@
             ? '<button type="button" class="brand-primary" data-brand-action="week">Ver mi semana <span aria-hidden="true">↗</span></button><button type="button" class="brand-secondary" data-brand-action="paths">Ver opciones para crear <span aria-hidden="true">↓</span></button>'
             : '<button type="button" class="brand-primary" data-brand-action="paths">Elegir cómo empezar <span aria-hidden="true">↗</span></button>') +
         '</div>' +
-        '<p class="brand-data-note"><span aria-hidden="true">▣</span> Tu plan se guarda en este navegador. Para usarlo en otro dispositivo, descarga una copia desde Ajustes.</p>' +
+        '<p class="brand-data-note"><span aria-hidden="true">▣</span> Tu plan se guarda en este navegador. Para llevarlo a otro dispositivo: ⚙️ → Descargas → Copia de seguridad.</p>' +
       '</div>' +
       (returning ? '' : '<div class="brand-hero-preview" aria-label="Ejemplo ilustrativo de un día organizado">' +
         '<div class="brand-preview-top"><span class="brand-preview-icon" aria-hidden="true">✦</span><div><small>UN EJEMPLO, A TU MEDIDA</small><strong>Un día con intención</strong></div><span class="brand-preview-dots" aria-hidden="true">•••</span></div>' +

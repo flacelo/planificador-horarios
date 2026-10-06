@@ -294,7 +294,7 @@
     overlay.className = "trust-dashboard planify-dashboard-v2";
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
-    overlay.setAttribute("aria-label", "Dashboard de progreso");
+    overlay.setAttribute("aria-label", "Avance de tu plan");
     var ideas = dashboardRecommendations(metrics, profile, focusStats);
     var content = metrics.total ?
       dashboardLeadMarkup(metrics) +
@@ -312,8 +312,8 @@
       (focusStats.completedSessions ? '<small>Ya completaste ' + focusStats.completedSessions + (focusStats.completedSessions === 1 ? ' sesión' : ' sesiones') + ' de enfoque.</small>' : "") + '</div></section>';
     overlay.innerHTML = '<div class="trust-dashboard-inner"><header class="trust-dashboard-header"><div><span class="trust-dashboard-eyebrow">TU PROGRESO, SIN COMPLICACIONES</span><h2>' + escapeHtml(name ? "Tu progreso, " + name : "Tu progreso") + '</h2>' +
       '<p>Tu cumplimiento se guarda por fecha; la distribución de horas refleja el horario que tienes ahora.</p></div><button type="button" id="trust-dashboard-close">← Volver al planificador</button></header>' +
-      '<nav class="dashboard-view-nav" aria-label="Vistas del planificador"><button type="button" data-dashboard-view="diario">📝 <span>Diario</span></button><button type="button" data-dashboard-view="semanal">📅 <span>Semanal</span></button><button type="button" data-dashboard-view="mensual">📆 <span>Mensual</span></button><button type="button" data-dashboard-view="anual">🗓️ <span>Anual</span></button><button type="button" aria-current="page">📊 <span>Dashboard</span></button></nav>' +
-      (metrics.total ? '<nav class="dashboard-week-nav" aria-label="Elegir semana del Dashboard"><button type="button" data-dashboard-week-shift="-7" aria-label="Semana anterior">←</button><strong>' + escapeHtml(dashboardWeekLabel(metrics.weekStart)) + '</strong><button type="button" data-dashboard-week-shift="7" aria-label="Semana siguiente">→</button></nav>' : "") +
+      '<nav class="dashboard-view-nav" aria-label="Vistas del planificador"><button type="button" data-dashboard-view="diario">📝 <span>Diario</span></button><button type="button" data-dashboard-view="semanal">📅 <span>Semanal</span></button><button type="button" data-dashboard-view="mensual">📆 <span>Mensual</span></button><button type="button" data-dashboard-view="anual">🗓️ <span>Anual</span></button><button type="button" aria-current="page">📊 <span>Avance</span></button></nav>' +
+      (metrics.total ? '<nav class="dashboard-week-nav" aria-label="Elegir semana del avance"><button type="button" data-dashboard-week-shift="-7" aria-label="Semana anterior">←</button><strong>' + escapeHtml(dashboardWeekLabel(metrics.weekStart)) + '</strong><button type="button" data-dashboard-week-shift="7" aria-label="Semana siguiente">→</button></nav>' : "") +
       content + '<p class="dashboard-calm-disclaimer">PLANIFY muestra orientación general. Para decisiones de salud, consulta a un profesional.</p></div>';
     document.body.appendChild(overlay);
     previousBodyOverflow = document.body.style.overflow;
@@ -499,7 +499,7 @@
     var completed = localStorage.getItem("planify_bienvenida_estado") === "completada";
     var hub = document.createElement("section");
     hub.className = "trust-start-hub" + (completed ? " is-compact" : "");
-    hub.innerHTML = '<div class="trust-start-heading"><div><span>EMPIEZA COMO PREFIERAS</span><h2>' + (completed ? "¿Qué quieres hacer ahora?" : "Tu horario, con el nivel de ayuda que tú elijas") + '</h2><p>Elige una forma de comenzar. Después podrás editar tu horario y explorar las demás vistas.</p></div>' + (completed ? '<button type="button" data-start-action="toggle">Ver las opciones</button>' : '') + '</div><div class="trust-start-options"><button type="button" data-start-action="manual"><span>✍️</span><strong>Planificar por mi cuenta</strong><small>Empieza con una tabla vacía y añade tus actividades.</small><em>Control total</em></button><button type="button" class="is-recommended" data-start-action="quick"><b>RECOMENDADO</b><span>🧩</span><strong>Crear mi horario rápido</strong><small>Dinos una actividad, tus días y horas. Luego podrás editar la propuesta.</small><em>Solo lo esencial</em></button><button type="button" data-start-action="detailed"><span>✨</span><strong>Personalizar a fondo</strong><small>Incluye compromisos, proyectos, energía y bienestar.</small><em>Más preguntas</em></button></div><div class="trust-start-destinations"><span>Tu espacio incluye</span><b>📝 Diario</b><b>📅 Semanal</b><b>📆 Mensual</b><b>🗓️ Anual</b><b>📊 Dashboard</b></div>';
+    hub.innerHTML = '<div class="trust-start-heading"><div><span>EMPIEZA COMO PREFIERAS</span><h2>' + (completed ? "¿Qué quieres hacer ahora?" : "Tu horario, con el nivel de ayuda que tú elijas") + '</h2><p>Elige una forma de comenzar. Después podrás editar tu horario y explorar las demás vistas.</p></div>' + (completed ? '<button type="button" data-start-action="toggle">Ver las opciones</button>' : '') + '</div><div class="trust-start-options"><button type="button" data-start-action="manual"><span>✍️</span><strong>Planificar por mi cuenta</strong><small>Empieza con una tabla vacía y añade tus actividades.</small><em>Control total</em></button><button type="button" class="is-recommended" data-start-action="quick"><b>RECOMENDADO</b><span>🧩</span><strong>Crear mi horario rápido</strong><small>Dinos una actividad, tus días y horas. Luego podrás editar la propuesta.</small><em>Solo lo esencial</em></button><button type="button" data-start-action="detailed"><span>✨</span><strong>Personalizar a fondo</strong><small>Incluye compromisos, proyectos, energía y bienestar.</small><em>Más preguntas</em></button></div><div class="trust-start-destinations"><span>Tu espacio incluye</span><b>📝 Diario</b><b>📅 Semanal</b><b>📆 Mensual</b><b>🗓️ Anual</b><b>📊 Avance</b></div>';
     anchor.parentNode.insertBefore(hub, anchor);
   }
 
@@ -666,13 +666,13 @@
       var style = document.createElement("link");
       style.id = "planify-brand-style";
       style.rel = "stylesheet";
-      style.href = "css/brand-system.css?v=7";
+      style.href = "css/brand-system.css?v=8";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=8";
+      script.src = "js/brand-home.js?v=9";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -723,7 +723,7 @@
     if (!document.getElementById("planify-monthly-calm-script")) {
       var script = document.createElement("script");
       script.id = "planify-monthly-calm-script";
-      script.src = "js/monthly-calm.js?v=2";
+      script.src = "js/monthly-calm.js?v=3";
       script.defer = true;
       document.head.appendChild(script);
     }

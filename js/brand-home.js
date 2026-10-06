@@ -59,10 +59,10 @@
       '<div class="brand-hero-copy">' +
         '<span class="brand-eyebrow"><span aria-hidden="true"></span> PLANEA A TU MANERA</span>' +
         '<h2 id="brand-hero-title">' + (returning ? 'Tu plan te espera.<br><em>Continúa a tu ritmo.</em>' : 'Organiza tu tiempo.<br><em>Haz espacio para vivir.</em>') + '</h2>' +
-        '<p>' + (returning ? 'Tu horario sigue aquí. Revísalo, mueve lo que necesites y sigue con tu semana.' : 'Crea una primera versión en pocos pasos, planifica desde cero o personaliza cada detalle. Siempre podrás cambiar tu horario.') + '</p>' +
+        '<p>' + (returning ? 'Tu espacio está listo. Añade o mueve actividades y sigue con tu semana.' : 'Crea una primera versión en pocos pasos, planifica desde cero o personaliza cada detalle. Siempre podrás cambiar tu horario.') + '</p>' +
         '<div class="brand-hero-actions">' +
           (returning
-            ? '<button type="button" class="brand-primary" data-brand-action="week">Ver mi semana <span aria-hidden="true">↗</span></button><button type="button" class="brand-secondary" data-brand-action="paths">Ver opciones para crear <span aria-hidden="true">↓</span></button>'
+            ? '<button type="button" class="brand-primary" data-brand-action="week">Ver mi semana <span aria-hidden="true">↗</span></button><button type="button" class="brand-secondary" data-brand-action="paths">Crear otro horario <span aria-hidden="true">↓</span></button>'
             : '<button type="button" class="brand-primary" data-brand-action="paths">Elegir cómo empezar <span aria-hidden="true">↗</span></button>') +
         '</div>' +
         '<p class="brand-data-note"><span aria-hidden="true">▣</span> Tu plan se guarda en este navegador. Para llevarlo a otro dispositivo: ⚙️ → Descargas → Copia de seguridad.</p>' +

@@ -45,7 +45,7 @@
     intro.className = "monthly-calm-intro";
     intro.innerHTML = '<span class="monthly-calm-eyebrow">PANORAMA MENSUAL</span>' +
       '<h2>Tu mes, con espacio para todo</h2>' +
-      '<p>Toca un día para añadir una fecha importante, una entrega o algo que quieras recordar.</p>';
+      '<p>Elige un día para añadir una fecha importante, una entrega o algo que quieras recordar.</p>';
     view.insertBefore(intro, nav);
 
     nav.setAttribute("aria-label", "Cambiar de mes");

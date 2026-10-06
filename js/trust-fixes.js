@@ -665,13 +665,13 @@
       var style = document.createElement("link");
       style.id = "planify-brand-style";
       style.rel = "stylesheet";
-      style.href = "css/brand-system.css?v=5";
+      style.href = "css/brand-system.css?v=6";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=5";
+      script.src = "js/brand-home.js?v=6";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -960,7 +960,7 @@
     if (!document.getElementById("welcome-flow-script")) {
       var welcomeScript = document.createElement("script");
       welcomeScript.id = "welcome-flow-script";
-      welcomeScript.src = "js/welcome-flow.js?v=1.26";
+      welcomeScript.src = "js/welcome-flow.js?v=1.27";
       welcomeScript.defer = true;
       document.head.appendChild(welcomeScript);
     }

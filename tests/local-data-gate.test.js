@@ -57,7 +57,7 @@ function runGate(initial = {}, options = {}) {
         attributes: {},
         setAttribute(name, value) { this.attributes[name] = value; },
         addEventListener(name, handler) { this.handlers[name] = handler; },
-        querySelector() { return { focus() {} }; },
+        querySelector() { return { focus() {}, querySelector() { return { focus() {} }; } }; },
         querySelectorAll() { return [{ focus() {} }, { focus() {} }]; },
         focus() {},
         remove() { this.removed = true; }
@@ -82,6 +82,7 @@ function runGate(initial = {}, options = {}) {
     elements,
     appended,
     hold: window.PLANIFY_PRIVATE_HOLD === true,
+    startRoute: window.PLANIFY_START_ROUTE,
     reloads: () => reloads,
     hooks: window.__PLANIFY_PRIVACY_TEST_HOOKS__
   };
@@ -93,21 +94,30 @@ function clickAction(element, action) {
     getAttribute(name) { return name === "data-action" ? this.action : null; },
     setAttribute(name, value) { if (name === "data-action") this.action = value; }
   };
-  element.handlers.click({ target: { closest() { return button; } } });
+  element.handlers.click({ target: { closest() { return button; } }, preventDefault() {}, stopPropagation() {} });
   return button;
 }
 
-test("no bloquea un plan vacío y no confunde preferencias con datos personales", () => {
+function clickRoute(element, route) {
+  const button = {
+    getAttribute(name) { return name === "data-start-action" ? route : null; }
+  };
+  element.handlers.click({ target: { closest() { return button; } }, preventDefault() {}, stopPropagation() {} });
+}
+
+test("una visita sin datos ve la portada completa, no un aviso", () => {
   const app = runGate({
     horario_data_semanal: JSON.stringify({ dias: ["LUN"], filas: [] }),
     horario_tema: "estelar",
     planify_theme: "dark"
   });
-  assert.equal(app.classes.has("planify-data-gate-active"), false);
-  assert.equal(app.elements.length, 0);
+  assert.equal(app.classes.has("planify-data-gate-active"), true);
+  assert.equal(app.hold, true);
+  assert.match(app.elements[0].innerHTML, /¿Cómo quieres empezar\?/);
+  assert.match(app.elements[0].innerHTML, /Planificar por mi cuenta/);
 });
 
-test("una primera visita recargada no confunde ajustes automáticos con un plan ajeno", () => {
+test("una primera visita recargada tampoco entra automáticamente al editor", () => {
   const app = runGate({
     horario_intervalo: "60",
     horario_inicio: "07:00",
@@ -118,19 +128,28 @@ test("una primera visita recargada no confunde ajustes automáticos con un plan 
     planify_bienvenida_estado: "descartada",
     horario_data_semanal: JSON.stringify({ dias: ["LUNES"], filas: [{ hora: "07:00", celdas: [{ t: "", c: "libre" }] }] })
   });
-  assert.equal(app.classes.has("planify-data-gate-active"), false);
-  assert.equal(app.elements.length, 0);
+  assert.equal(app.classes.has("planify-data-gate-active"), true);
+  assert.equal(app.hold, true);
+  assert.match(app.elements[0].innerHTML, /Recuperar datos/);
+});
+
+test("la portada pública es idéntica con o sin plan y oculta por completo el editor", () => {
+  const empty = runGate();
+  const saved = runGate({ horario_data_semanal: JSON.stringify({ filas: [{ celdas: [{ t: "Dato privado" }] }] }) });
+  assert.equal(saved.elements[0].innerHTML, empty.elements[0].innerHTML);
+  assert.ok(saved.appended.some((item) => item.tagName === "STYLE" && item.textContent.includes("display:none!important")));
+  assert.doesNotMatch(saved.elements[0].innerHTML, /Dato privado/);
 });
 
 test("el protector se carga antes de que app.js lea el almacenamiento", () => {
-  const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.1"');
+  const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.2"');
   const appIndex = indexHtml.indexOf('src="js/app.js?v=9.7"');
   assert.ok(gateIndex >= 0);
   assert.ok(appIndex > gateIndex);
   assert.match(indexHtml, /if\(!window\.PLANIFY_PRIVATE_HOLD\)/);
 });
 
-test("un plan previo muestra una portada neutra y espera la recuperación explícita", () => {
+test("un plan previo muestra la misma portada y espera la recuperación explícita", () => {
   const app = runGate({
     horario_data_semanal: JSON.stringify({ filas: [{ celdas: [{ t: "Turno privado" }] }] })
   });
@@ -139,7 +158,8 @@ test("un plan previo muestra una portada neutra y espera la recuperación explí
   assert.equal(app.background.inert, true);
   assert.equal(app.background.getAttribute("aria-hidden"), "true");
   assert.equal(app.elements.length, 1);
-  assert.match(app.elements[0].innerHTML, /Organiza tu tiempo/);
+  assert.ok(app.appended.some((item) => item.src === "js/brand-home.js?v=6"));
+  assert.match(app.elements[0].innerHTML, /Planificar por mi cuenta/);
   assert.match(app.elements[0].innerHTML, /Recuperar datos/);
   assert.doesNotMatch(app.elements[0].innerHTML, /Este navegador ya tiene un plan guardado/);
   assert.doesNotMatch(app.elements[0].innerHTML, /Turno privado/);
@@ -156,10 +176,12 @@ test("un plan previo muestra una portada neutra y espera la recuperación explí
     session: Object.fromEntries(app.sessionStorage.values)
   });
   assert.equal(reopened.classes.has("planify-data-gate-active"), false);
+  assert.equal(reopened.hold, false);
   assert.equal(reopened.sessionStorage.getItem("planify_local_data_choice_v1"), null);
 
   const nextVisit = runGate(Object.fromEntries(app.localStorage.values));
   assert.equal(nextVisit.classes.has("planify-data-gate-active"), true);
+  assert.match(nextVisit.elements[0].innerHTML, /Planificar por mi cuenta/);
   assert.doesNotMatch(nextVisit.elements[0].innerHTML, /Turno privado/);
 });
 
@@ -175,40 +197,41 @@ test("una confirmación antigua de esta pestaña no muestra el plan automáticam
   assert.doesNotMatch(app.elements[0].innerHTML, /Plan de otra persona/);
 });
 
-test("empezar en blanco conserva la copia sin bloquear las visitas siguientes", () => {
+test("empezar en blanco conserva la copia y las visitas siguientes regresan a la portada", () => {
   const app = runGate({
     horario_data_semanal: JSON.stringify({ filas: [{ celdas: [{ t: "Horario de prueba" }] }] }),
     planify_nombre: "Persona anterior"
   });
-  const freshButton = clickAction(app.elements[0], "fresh");
+  clickRoute(app.elements[0], "manual");
   assert.equal(app.reloads(), 0);
   assert.match(app.localStorage.getItem("horario_data_semanal"), /Horario de prueba/);
-  assert.equal(freshButton.action, "confirm-fresh");
-  app.elements[0].handlers.click({ target: { closest() { return freshButton; } } });
+  const freshButton = {
+    getAttribute(name) { return name === "data-action" ? "confirm-start" : name === "data-route" ? "manual" : null; }
+  };
+  app.elements[0].handlers.click({ target: { closest() { return freshButton; } }, preventDefault() {}, stopPropagation() {} });
 
   assert.equal(app.reloads(), 1);
   assert.ok(Array.from(app.localStorage.values.keys()).some((key) => key.startsWith("planify_local_data_archive_v1:")));
   assert.equal(app.localStorage.getItem("horario_data_semanal"), null);
   assert.equal(app.localStorage.getItem("planify_nombre"), null);
-  assert.equal(app.sessionStorage.getItem("planify_local_data_choice_v1"), null);
+  assert.match(app.sessionStorage.getItem("planify_local_data_choice_v1"), /"action":"start"/);
 
   const afterFreshReload = runGate(Object.fromEntries(app.localStorage.values), {
     session: Object.fromEntries(app.sessionStorage.values)
   });
   assert.equal(afterFreshReload.classes.has("planify-data-gate-active"), false);
+  assert.equal(afterFreshReload.startRoute, "manual");
   assert.equal(afterFreshReload.sessionStorage.getItem("planify_local_data_choice_v1"), null);
-  assert.equal(afterFreshReload.elements[0].id, "planify-archive-recovery");
+  assert.equal(afterFreshReload.elements.length, 0);
 
   const nextVisit = runGate(Object.fromEntries(afterFreshReload.localStorage.values), {
     session: Object.fromEntries(afterFreshReload.sessionStorage.values)
   });
-  assert.equal(nextVisit.classes.has("planify-data-gate-active"), false);
-  assert.equal(nextVisit.elements[0].id, "planify-archive-recovery");
-  assert.match(nextVisit.elements[0].innerHTML, /Recuperar una copia/);
+  assert.equal(nextVisit.classes.has("planify-data-gate-active"), true);
+  assert.match(nextVisit.elements[0].innerHTML, /Recuperar datos/);
   assert.doesNotMatch(nextVisit.elements[0].innerHTML, /Horario de prueba|Persona anterior/);
 
-  nextVisit.elements[0].handlers.click({ target: { closest() { return {}; } } });
-  assert.equal(nextVisit.classes.has("planify-data-gate-active"), true);
+  clickAction(nextVisit.elements[0], "recover");
   assert.match(nextVisit.elements[1].innerHTML, /Hay una copia anterior/);
   clickAction(nextVisit.elements[1], "restore");
   assert.equal(nextVisit.reloads(), 1);
@@ -222,7 +245,7 @@ test("empezar en blanco conserva la copia sin bloquear las visitas siguientes", 
   assert.doesNotMatch(laterVisit.elements[0].innerHTML, /Horario de prueba/);
 });
 
-test("una copia archivada vacía se conserva sin bloquear a una persona nueva", () => {
+test("una copia archivada vacía se conserva sin confundirse con un plan", () => {
   const archiveKey = "planify_local_data_archive_v1:old-empty";
   const emptyArchive = {
     version: 1,
@@ -236,8 +259,8 @@ test("una copia archivada vacía se conserva sin bloquear a una persona nueva", 
   };
   const app = runGate({ [archiveKey]: JSON.stringify(emptyArchive) });
 
-  assert.equal(app.classes.has("planify-data-gate-active"), false);
-  assert.equal(app.elements.length, 0);
+  assert.equal(app.classes.has("planify-data-gate-active"), true);
+  assert.match(app.elements[0].innerHTML, /Planificar por mi cuenta/);
   assert.equal(app.localStorage.getItem(archiveKey), JSON.stringify(emptyArchive));
   assert.equal(app.hooks.archives().length, 0);
 });
@@ -260,10 +283,10 @@ test("la opción de recuperación elige la copia real más reciente e ignora una
     [realKey]: JSON.stringify(realArchive)
   });
 
-  assert.equal(app.classes.has("planify-data-gate-active"), false);
+  assert.equal(app.classes.has("planify-data-gate-active"), true);
   assert.equal(app.hooks.archives().length, 1);
   assert.equal(app.hooks.archives()[0].key, realKey);
-  assert.equal(app.elements[0].id, "planify-archive-recovery");
+  assert.equal(app.elements[0].id, "planify-local-data-gate");
   assert.doesNotMatch(app.elements[0].innerHTML, /Turno real/);
 });
 
@@ -295,8 +318,8 @@ test("detecta y protege también historiales y ajustes del horario, no solo sus 
   const freshStart = app.hooks.createArchive();
   assert.equal(freshStart.ok, true);
   const reopened = runGate(Object.fromEntries(app.localStorage.values));
-  assert.equal(reopened.classes.has("planify-data-gate-active"), false);
-  assert.equal(reopened.elements[0].id, "planify-archive-recovery");
+  assert.equal(reopened.classes.has("planify-data-gate-active"), true);
+  assert.equal(reopened.elements[0].id, "planify-local-data-gate");
 });
 
 test("archiva y restaura datos Planify sin tocar preferencias ni datos de otros sitios", () => {

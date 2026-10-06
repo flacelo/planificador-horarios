@@ -2676,7 +2676,11 @@
       }
     });
 
-    // A first visitor sees the landing page and chooses a route deliberately.
+    var initialRoute = window.PLANIFY_START_ROUTE;
+    if (["manual", "quick", "detailed"].indexOf(initialRoute) >= 0) {
+      window.PLANIFY_START_ROUTE = "";
+      open(initialRoute);
+    }
   }
 
   window.PLANIFY_WELCOME = { open: open, requestChange: openScheduleAssistant };

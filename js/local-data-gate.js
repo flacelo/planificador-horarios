@@ -202,40 +202,35 @@
     style.id = "planify-local-data-gate-styles";
     style.textContent =
       "html.planify-data-gate-active,html.planify-data-gate-active body{overflow:hidden!important}" +
-      "html.planify-data-gate-active body>*:not(#planify-local-data-gate){visibility:hidden!important;pointer-events:none!important}" +
+      "html.planify-data-gate-active body>*:not(#planify-local-data-gate){display:none!important;visibility:hidden!important;pointer-events:none!important}" +
       "#planify-local-data-gate{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;overflow:auto;padding:20px;background:radial-gradient(circle at 12% 8%,rgba(77,196,162,.16),transparent 35%),#0d1723;color:#eef8f5;font:500 16px/1.5 'Outfit','Inter',system-ui,sans-serif;box-sizing:border-box}" +
       "#planify-local-data-gate *{box-sizing:border-box}" +
       "#planify-local-data-gate .local-data-card{width:min(100%,520px);padding:clamp(22px,5vw,34px);border:1px solid #34505a;border-radius:24px;background:#172534;box-shadow:0 24px 72px rgba(0,0,0,.32)}" +
       "#planify-local-data-gate .local-data-eyebrow{color:#82e2c7;font-size:.72rem;font-weight:800;letter-spacing:.13em}" +
-      "#planify-local-data-gate h1{margin:9px 0 10px;color:#f6fcfa;font-size:clamp(1.5rem,5vw,2rem);line-height:1.14;letter-spacing:-.03em}" +
+      "#planify-local-data-gate:not(.is-start) h1{margin:9px 0 10px;color:#f6fcfa;font-size:clamp(1.5rem,5vw,2rem);line-height:1.14;letter-spacing:-.03em}" +
       "#planify-local-data-gate p{margin:0 0 14px;color:#c3d4d7;font-size:.95rem}" +
       "#planify-local-data-gate .local-data-note{padding:12px 14px;border:1px solid #34505a;border-radius:13px;background:#10212d;color:#c5d8d9;font-size:.82rem}" +
       "#planify-local-data-gate .local-data-actions{display:grid;gap:10px;margin-top:20px}" +
-      "#planify-local-data-gate button{min-height:48px;padding:12px 16px;border:1px solid #4b726f;border-radius:13px;background:#a8f0cc;color:#153a35;font-family:inherit;font-size:.94rem;font-weight:750;line-height:1.3;cursor:pointer}" +
-      "#planify-local-data-gate:not(.is-start) button[data-action='fresh'],#planify-local-data-gate button[data-action='blank'],#planify-local-data-gate.is-start button[data-action='recover']{background:#1d3040;color:#edf8f5;border-color:#45616a}" +
+      "#planify-local-data-gate:not(.is-start) button{min-height:48px;padding:12px 16px;border:1px solid #4b726f;border-radius:13px;background:#a8f0cc;color:#153a35;font-family:inherit;font-size:.94rem;font-weight:750;line-height:1.3;cursor:pointer}" +
+      "#planify-local-data-gate:not(.is-start) button[data-action='fresh'],#planify-local-data-gate:not(.is-start) button[data-action='blank']{background:#1d3040;color:#edf8f5;border-color:#45616a}" +
       "#planify-local-data-gate button:focus-visible{outline:3px solid #91f4d0;outline-offset:3px}" +
       "#planify-local-data-gate .local-data-error{min-height:1.3em;margin:12px 0 0;color:#ffc2b8;font-size:.84rem}" +
-      "#planify-local-data-gate.is-start{display:block;padding:clamp(18px,4vw,48px);background:radial-gradient(circle at 15% 12%,#173c43 0,#102231 40%,#0d1723 100%)}" +
-      "#planify-local-data-gate.is-start .local-data-card{width:min(100%,1200px);margin:auto;padding:0;border:0;background:transparent;box-shadow:none}" +
-      "#planify-local-data-gate.is-start .local-data-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:clamp(28px,7vw,86px)}" +
-      "#planify-local-data-gate.is-start .local-data-brand{color:#f6fcfa;font-size:1.35rem;font-weight:850;letter-spacing:.06em}" +
-      "#planify-local-data-gate.is-start .local-data-brand-mark{display:inline-grid;place-items:center;width:38px;height:38px;margin-right:10px;border-radius:12px;background:#60d9bc;color:#153a35}" +
-      "#planify-local-data-gate.is-start button.local-data-recover{min-height:44px;padding:8px 14px;border-color:#3e6570;background:#1a3443;color:#d9f6ee;font-size:.82rem}" +
-      "#planify-local-data-gate.is-start .local-data-hero{padding:clamp(28px,6vw,70px);border:1px solid #34505a;border-radius:30px;background:linear-gradient(120deg,#173a42,#192b43 80%);box-shadow:0 24px 72px rgba(0,0,0,.2)}" +
-      "#planify-local-data-gate.is-start h1{max-width:710px;font-size:clamp(2.2rem,6vw,4.4rem);line-height:1.08}" +
-      "#planify-local-data-gate.is-start .local-data-hero>p{max-width:610px}" +
-      "#planify-local-data-gate.is-start .local-data-actions{grid-template-columns:minmax(0,370px);align-items:center}" +
-      "#planify-local-data-gate.is-start .local-data-note{max-width:610px;margin-top:22px;background:rgba(10,30,39,.35)}" +
-      "@media(max-width:600px){#planify-local-data-gate.is-start .local-data-header{align-items:flex-start}#planify-local-data-gate.is-start .local-data-brand{font-size:1rem}#planify-local-data-gate.is-start .local-data-brand-mark{width:30px;height:30px;margin-right:5px}#planify-local-data-gate.is-start button.local-data-recover{max-width:125px;line-height:1.2}#planify-local-data-gate.is-start .local-data-hero{border-radius:22px}#planify-local-data-gate.is-start .local-data-actions{grid-template-columns:1fr}}" +
+      "#planify-local-data-gate.is-start{display:block;padding:0;background:transparent;color:inherit}" +
+      "#planify-local-data-gate.is-start .planify-public-entry{padding-bottom:40px}" +
+      "#planify-local-data-gate.is-start .planify-public-title{font-size:1.4rem;letter-spacing:.09em}" +
+      "#planify-local-data-gate.is-start .planify-public-recovery{min-height:40px;padding:9px 14px;border:1px solid rgba(203,223,225,.3);border-radius:13px;background:rgba(35,54,67,.8);color:#ecf8f5;font:700 .78rem 'Outfit','Inter',sans-serif;cursor:pointer}" +
+      "#planify-local-data-gate.is-start .planify-public-recovery:hover{background:#305c62}" +
+      "#planify-local-data-gate.is-start .planify-entry-status{max-width:560px;margin:12px 0 0;color:#ffc2b8;font-size:.84rem}" +
+      "#planify-local-data-gate.is-start .trust-start-hub{margin-bottom:30px}" +
+      "@media(max-width:600px){#planify-local-data-gate.is-start .planify-public-recovery{max-width:132px;line-height:1.2}}" +
       "body.tema-claro #planify-local-data-gate{background:radial-gradient(circle at 12% 8%,rgba(77,196,162,.14),transparent 35%),#eef5f2;color:#19343b}" +
       "body.tema-claro #planify-local-data-gate .local-data-card{border-color:#c8ddd6;background:#fff;box-shadow:0 24px 72px rgba(26,63,57,.16)}" +
       "body.tema-claro #planify-local-data-gate h1{color:#18353b}" +
       "body.tema-claro #planify-local-data-gate p{color:#526970}" +
       "body.tema-claro #planify-local-data-gate .local-data-note{border-color:#d5e5e2;background:#f4faf8;color:#526970}" +
       "body.tema-claro #planify-local-data-gate.is-start{background:#eef5f2}" +
-      "body.tema-claro #planify-local-data-gate.is-start .local-data-brand{color:#19343b}" +
-      "body.tema-claro #planify-local-data-gate.is-start .local-data-hero{border-color:#c8ddd6;background:linear-gradient(120deg,#fff,#f0f7f4)}" +
-      "body.tema-claro #planify-local-data-gate:not(.is-start) button[data-action='fresh'],body.tema-claro #planify-local-data-gate button[data-action='blank'],body.tema-claro #planify-local-data-gate.is-start button[data-action='recover']{background:#f2f7f5;color:#24464a;border-color:#cbded9}" +
+      "body.tema-claro #planify-local-data-gate.is-start .planify-public-recovery{background:#fff;color:#24464a;border-color:#cbded9}" +
+      "body.tema-claro #planify-local-data-gate:not(.is-start) button[data-action='fresh'],body.tema-claro #planify-local-data-gate:not(.is-start) button[data-action='blank']{background:#f2f7f5;color:#24464a;border-color:#cbded9}" +
       "#planify-archive-recovery{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:12px 14px;border:1px solid #8bd9c4;border-radius:13px;background:#eafff7;color:#174e4b;font:600 14px/1.4 'Outfit','Inter',system-ui,sans-serif}" +
       "#planify-archive-recovery button{min-height:44px;padding:8px 12px;border:1px solid #419988;border-radius:9px;background:#fff;color:#14695e;font-family:inherit;font-size:13px;font-weight:700;line-height:1.3;cursor:pointer}" +
       "#planify-archive-recovery button:focus-visible{outline:3px solid #0d9488;outline-offset:2px}" +
@@ -260,13 +255,9 @@
     });
   }
 
-  function reloadWithChoice(action, status) {
-    if (action === "fresh") {
-      window.location.reload();
-      return true;
-    }
+  function reloadWithChoice(action, status, route) {
     try {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify({ action: action, issuedAt: Date.now() }));
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify({ action: action, route: route || "", issuedAt: Date.now() }));
     } catch (error) {
       if (status) status.textContent = "No pude abrir el plan porque este navegador no permite guardar la elección temporal.";
       return false;
@@ -280,10 +271,10 @@
     addStyles();
     var hasCurrent = currentKeys.length > 0;
     var latestArchive = savedArchives[0];
-    var title = hasCurrent ? "Recuperar datos de este dispositivo" : "Hay una copia anterior en este navegador";
+    var title = hasCurrent ? "Recuperar datos de este dispositivo" : latestArchive ? "Hay una copia anterior en este navegador" : "Recuperar datos";
     var description = hasCurrent
       ? "Puedes abrir el plan de este dispositivo o guardar una copia y empezar en blanco. El contenido seguirá oculto hasta que elijas."
-      : "No hay un plan activo. Puedes recuperar la copia anterior o seguir con un espacio vacío.";
+      : latestArchive ? "No hay un plan activo. Puedes recuperar la copia anterior o seguir con un espacio vacío." : "No hay un plan guardado en este navegador. Puedes empezar uno nuevo desde la portada.";
     var primaryAction = hasCurrent ? "continue" : "restore";
     var primaryLabel = hasCurrent ? "Abrir el plan" : "Restaurar la copia anterior";
     var secondaryAction = hasCurrent ? "fresh" : "blank";
@@ -297,8 +288,8 @@
       '<div class="local-data-card"><span class="local-data-eyebrow">TUS DATOS, BAJO TU CONTROL</span>' +
       '<h1 id="planify-local-data-title">' + title + '</h1><p>' + description + '</p>' +
       '<div class="local-data-note">PLANIFY guarda tu información solo en este navegador; no usa una cuenta ni sincroniza entre dispositivos. El contenido permanecerá oculto hasta que elijas.</div>' +
-      '<div class="local-data-actions"><button type="button" data-action="' + primaryAction + '">' + primaryLabel + '</button>' +
-      '<button type="button" data-action="' + secondaryAction + '">' + secondaryLabel + '</button>' +
+      '<div class="local-data-actions">' + (hasCurrent || latestArchive ? '<button type="button" data-action="' + primaryAction + '">' + primaryLabel + '</button>' +
+      '<button type="button" data-action="' + secondaryAction + '">' + secondaryLabel + '</button>' : '') +
       '<button type="button" data-action="back">Volver</button></div>' +
       '<p class="local-data-error" role="status" aria-live="polite"></p></div>';
     document.body.appendChild(gate);
@@ -313,7 +304,7 @@
       var status = gate.querySelector(".local-data-error");
       if (action === "back") {
         unlock();
-        if (hasCurrent) renderStartLanding(currentKeys, savedArchives);
+        renderStartLanding(currentKeys, savedArchives);
         return;
       }
       if (action === "continue") {
@@ -321,7 +312,7 @@
         return;
       }
       if (action === "blank") {
-        unlock();
+        reloadWithChoice("start", status, "manual");
         return;
       }
       if (action === "fresh") {
@@ -343,7 +334,7 @@
           }
           return;
         }
-        reloadWithChoice("fresh", status);
+        reloadWithChoice("start", status, "manual");
         return;
       }
       if (action === "rollback") {
@@ -369,7 +360,7 @@
       if (event.key === "Escape") {
         event.preventDefault();
         unlock();
-        if (hasCurrent) renderStartLanding(currentKeys, savedArchives);
+        renderStartLanding(currentKeys, savedArchives);
         return;
       }
       if (event.key !== "Tab") return;
@@ -385,6 +376,27 @@
     });
   }
 
+  function loadPublicAssets() {
+    [["planify-public-trust-style", "css/trust-fixes.css?v=1.7"],
+     ["planify-brand-style", "css/brand-system.css?v=6"]].forEach(function (asset) {
+      if (document.getElementById(asset[0])) return;
+      var link = document.createElement("link");
+      link.id = asset[0];
+      link.rel = "stylesheet";
+      link.href = asset[1];
+      document.head.appendChild(link);
+    });
+    if (window.PLANIFY_RENDER_BRAND_HOME) {
+      window.PLANIFY_RENDER_BRAND_HOME();
+      return;
+    }
+    if (document.getElementById("planify-public-brand-script")) return;
+    var script = document.createElement("script");
+    script.id = "planify-public-brand-script";
+    script.src = "js/brand-home.js?v=6";
+    document.head.appendChild(script);
+  }
+
   function renderStartLanding(currentKeys, savedArchives) {
     window.PLANIFY_PRIVATE_HOLD = true;
     document.documentElement.classList.add("planify-data-gate-active");
@@ -393,42 +405,53 @@
     landing.id = "planify-local-data-gate";
     landing.className = "is-start";
     landing.innerHTML =
-      '<div class="local-data-card"><header class="local-data-header"><span class="local-data-brand"><span class="local-data-brand-mark" aria-hidden="true">✦</span>PLANIFY</span>' +
-      '<button type="button" class="local-data-recover" data-action="recover">Recuperar datos</button></header>' +
-      '<section class="local-data-hero"><span class="local-data-eyebrow">PLANEA A TU MANERA</span>' +
-      '<h1>Organiza tu tiempo. Haz espacio para vivir.</h1>' +
-      '<p>Crea un horario a tu medida y vuelve a él cuando quieras. Tu información se guarda en este dispositivo.</p>' +
-      '<div class="local-data-actions"><button type="button" data-action="fresh">Crear un horario nuevo</button></div>' +
-      '<p class="local-data-note">Al empezar de nuevo, PLANIFY conserva una copia recuperable de los datos que haya en este navegador.</p>' +
-      '<p class="local-data-error" role="status" aria-live="polite"></p></section></div>';
-    document.body.appendChild(landing);
+      '<div class="app planify-public-entry"><h1 class="planify-public-title">PLANIFY</h1>' +
+      '<div class="header-actions"><button type="button" class="planify-public-recovery" data-action="recover">Recuperar datos</button></div>' +
+      '<section class="trust-start-hub"><div class="trust-start-heading"><div><span>EMPIEZA COMO PREFIERAS</span>' +
+      '<h2>¿Cómo quieres empezar?</h2><p>Elige entre una tabla vacía, una propuesta rápida o una planificación detallada.</p></div></div>' +
+      '<div class="trust-start-options"><button type="button" data-start-action="manual"><span>✍️</span><strong>Planificar por mi cuenta</strong><small>Empieza con una tabla vacía y añade tus actividades.</small><em>Control total</em></button>' +
+      '<button type="button" class="is-recommended" data-start-action="quick"><b>RECOMENDADO</b><span>🧩</span><strong>Crear mi horario rápido</strong><small>Dinos una actividad, tus días y horas. Luego podrás editar la propuesta.</small><em>Solo lo esencial</em></button>' +
+      '<button type="button" data-start-action="detailed"><span>✨</span><strong>Personalizar a fondo</strong><small>Incluye compromisos, proyectos, energía y bienestar.</small><em>Más preguntas</em></button></div></section>' +
+      '<div class="planify-entry-status" role="status" aria-live="polite"></div></div>';
+    if (document.body.insertBefore) document.body.insertBefore(landing, document.body.firstChild);
+    else document.body.appendChild(landing);
     protectBackground(landing);
-    var primary = landing.querySelector('[data-action="fresh"]');
-    if (primary) primary.focus();
+    loadPublicAssets();
     landing.addEventListener("click", function (event) {
-      var button = event.target.closest("button[data-action]");
+      var button = event.target.closest("button[data-action],button[data-start-action]");
       if (!button) return;
-      var status = landing.querySelector(".local-data-error");
+      event.preventDefault();
+      event.stopPropagation();
       var action = button.getAttribute("data-action");
+      var status = landing.querySelector(".planify-entry-status");
       if (action === "recover") {
         unlock();
         renderGate(currentKeys, savedArchives);
         return;
       }
-      if (action === "fresh") {
-        button.setAttribute("data-action", "confirm-fresh");
-        button.textContent = "Confirmar: guardar copia y empezar";
-        if (status) status.textContent = "El plan anterior quedará en una copia recuperable en este dispositivo.";
+      if (action === "confirm-start") {
+        var route = button.getAttribute("data-route") || "manual";
+        var result = createArchive();
+        if (!result.ok) {
+          if (status) status.textContent = result.message;
+          return;
+        }
+        reloadWithChoice("start", status, route);
         return;
       }
-      if (action !== "confirm-fresh") return;
-      var result = createArchive();
-      if (!result.ok) {
-        if (status) status.textContent = result.message;
+      var routeChoice = button.getAttribute("data-start-action");
+      if (["manual", "quick", "detailed"].indexOf(routeChoice) < 0) return;
+      if (!currentKeys.length) {
+        reloadWithChoice("start", status, routeChoice);
         return;
       }
-      reloadWithChoice("fresh", status);
-    });
+      if (status) {
+        status.innerHTML = '<span>Guardaremos una copia recuperable de tu plan anterior en este navegador. </span>' +
+          '<button type="button" data-action="confirm-start" data-route="' + routeChoice + '">Confirmar y empezar</button>';
+        var confirmButton = status.querySelector("button");
+        if (confirmButton) confirmButton.focus();
+      }
+    }, true);
   }
 
   function testHooks() {
@@ -454,9 +477,15 @@
     }
   } catch (error) { /* An unreadable or stale choice must never bypass the landing. */ }
   if (sessionChoice && consumedChoice) {
-    if (sessionChoice.action === "continue" &&
-        Number.isFinite(sessionChoice.issuedAt) && Date.now() - sessionChoice.issuedAt >= 0 &&
-        Date.now() - sessionChoice.issuedAt <= 15000) return;
+    var choiceAge = Date.now() - sessionChoice.issuedAt;
+    if (Number.isFinite(sessionChoice.issuedAt) && choiceAge >= 0 && choiceAge <= 15000) {
+      if (sessionChoice.action === "continue") return;
+      if (sessionChoice.action === "start" &&
+          ["manual", "quick", "detailed"].indexOf(sessionChoice.route) >= 0) {
+        window.PLANIFY_START_ROUTE = sessionChoice.route;
+        return;
+      }
+    }
   }
 
   var currentData;
@@ -467,6 +496,5 @@
   } catch (error) {
     return;
   }
-  if (currentData.length) renderStartLanding(currentData, savedArchives);
-  else if (savedArchives.length) renderArchiveRecovery();
+  renderStartLanding(currentData, savedArchives);
 })();

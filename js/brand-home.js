@@ -21,13 +21,14 @@
   }
 
   function isReturningUser() {
+    if (window.PLANIFY_PRIVATE_HOLD) return false;
     try { return hasSavedSchedule() || localStorage.getItem("planify_bienvenida_estado") === "completada"; }
     catch (error) { return hasSavedSchedule(); }
   }
 
   function buildHeader() {
     var app = document.querySelector(".app");
-    var title = document.getElementById("main-title");
+    var title = app && app.querySelector("#main-title, .planify-public-title");
     var actions = app && app.querySelector(".header-actions");
     if (!app || !title || !actions || app.querySelector(".brand-site-header")) return;
 
@@ -94,7 +95,8 @@
 
   function placeNavigation() {
     var header = document.querySelector(".brand-site-header");
-    var nav = document.querySelector(".bottom-nav");
+    var app = header && header.closest(".app");
+    var nav = window.PLANIFY_PRIVATE_HOLD ? app && app.querySelector(".bottom-nav") : document.querySelector(".bottom-nav");
     if (!header || !nav || document.querySelector(".brand-nav-slot")) return;
     nav.setAttribute("aria-label", "Vistas del planificador");
     var daily = nav.querySelector('[data-tab="diario"]');
@@ -256,6 +258,7 @@
     document.documentElement.classList.add("planify-brand-ready");
   }
 
+  window.PLANIFY_RENDER_BRAND_HOME = init;
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();

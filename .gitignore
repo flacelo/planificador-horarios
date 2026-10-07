@@ -11,7 +11,6 @@ dist/
 .opencode/context/
 .opencode/context/task.json
 .opencode/context/review_feedback.txt
-agents.md
 
 # Archivos de sistema y editor
 .DS_Store

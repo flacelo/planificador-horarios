@@ -639,6 +639,11 @@ body.tema-claro #view-semanal.weekly-calm-ready #tabla td.celda.weekly-cell-empt
   touch-action: none;
   cursor: grab;
 }
+#view-semanal.weekly-calm-ready #tabla td.celda:not(.weekly-cell-empty) { padding-left: 36px; }
+@media (min-width: 768px) {
+  /* main.css fija el relleno de .celda con !important en escritorio; sin esto el botón de mover tapa la primera letra */
+  #view-semanal.weekly-calm-ready #tabla td.celda:not(.weekly-cell-empty) { padding-left: 36px !important; padding-right: 26px !important; }
+}
 #view-semanal.weekly-calm-ready #tabla td.celda .weekly-calm-move-handle:active { cursor: grabbing; opacity: 1; }
 #view-semanal.weekly-calm-ready #tabla td.celda .weekly-calm-move-handle:focus-visible { outline: 2px solid #66d8c1; outline-offset: 1px; opacity: 1; }
 body.light-mode #view-semanal.weekly-calm-ready #tabla td.celda .weekly-calm-move-handle,

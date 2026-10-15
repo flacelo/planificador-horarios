@@ -773,3 +773,13 @@ body.tema-claro .weekly-calm-undo { border-color: #86cabc; background: #e9faf5; 
 @media (max-width: 700px) {
   .weekly-calm-cell-actions { width: min(290px, calc(100vw - 24px)); }
 }
+
+/* Escritorio: la columna de horas es más ancha para que "7:30 a. m. – 8:00 a. m." no se corte */
+@media (min-width: 768px) {
+  #view-semanal.weekly-calm-ready #tabla thead th:first-child,
+  #view-semanal.weekly-calm-ready #tabla td.hora-cell {
+    width: 128px !important;
+    min-width: 128px;
+    max-width: 128px;
+  }
+}

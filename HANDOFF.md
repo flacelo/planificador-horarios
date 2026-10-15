@@ -98,10 +98,16 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 
 **Hallazgos de la auditoría visual (2026-10-15, Parte B: vistas diaria, semanal y mensual):**
 - ✅ **B1 (RESUELTO, commit local, con prueba).** Vista Mensual: en Octubre 2026 los días grises de septiembre muestran 26, 27 y 28; deberían ser 28, 29 y 30. Confirmar en navegador real y con otros meses.
-- **B2.** Vista Mensual: no muestra las actividades del horario semanal (todas las casillas vacías) y no lo explica; un usuario nuevo puede pensar que está rota.
-- **B3.** Vista Diaria: "Ver mi jornada de hoy" casi no se ve (gris pálido) y esconde las actividades del día.
+- ✅ **B2 (RESUELTO, commit `98cc89c`).** Vista Mensual: no muestra las actividades del horario semanal (todas las casillas vacías) y no lo explica; un usuario nuevo puede pensar que está rota.
+- ✅ **B3 (RESUELTO, commit `354cf13`).** Vista Diaria: "Ver mi jornada de hoy" casi no se ve (gris pálido) y esconde las actividades del día.
 - **B4.** Vista Diaria: la fecha aparece como `10/15/2026` (formato de EE. UU.) en una app en español.
-- **B5.** Las tres vistas: la barra flotante de pestañas y el botón ⚙️ tapan contenido (casillas de la tabla semanal, columna de horas, "Ideas para organizar tu mes").
+- ✅ **B5 (RESUELTO solo en escritorio, commit `f7f79a0`; en móvil la barra sigue fija y puede tapar contenido).** Las tres vistas: la barra flotante de pestañas y el botón ⚙️ tapan contenido (casillas de la tabla semanal, columna de horas, "Ideas para organizar tu mes").
+
+**Limpieza hecha (commit `ee4e3c2`): cuentas, recuperación de contraseña y sesiones.**
+- Se eliminó código que no funcionaba y al que ningún botón daba acceso: inicio de sesión con Google y Facebook, recuperación de contraseña y sesiones/dispositivos.
+- Se quitaron las ventanas ocultas `#modal-login` y `#modal-recover` de `index.html`, las funciones de `js/app.js` (login, Google, Facebook, cerrar sesión, recuperar contraseña, sesiones y dispositivos, `etagLocal`), los servicios de prueba `/api/auth/*` de `server.js` y sus dos etiquetas en `scripts/optimize-a11y.js`.
+- No cambió el diseño, los textos visibles ni el nombre; la comparación antes/después de todas las vistas dio el mismo texto y 0 errores de JavaScript.
+- Quedan sin tocar: la regla CSS `.btn-facebook` en `css/main.css` (sin uso) y los avisos de Google Calendar / `FACEBOOK_APP_ID` en `.env.example` y `scripts/check-env.js`.
 
 ### 🟡 Prioridad Media (Estabilidad técnica)
 3. **Instalar dependencias locales:**
@@ -122,10 +128,12 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 
 ## 5. Siguiente Tarea Exacta
 
-> **Tarea inmediata:** 
-> 1. Mostrar al usuario los textos encontrados en el tutorial (Parte B) relacionados a Word y a la versión completa, y proponer un reemplazo corto y gratuito.
-> 2. Esperar confirmación del usuario para aplicar este reemplazo en `index.html`.
-> 3. Documentar en `ROADMAP.md` el plan de 4 pasos para construir el motor de cálculo del Dashboard, conservando la nota técnica de que las "horas de enfoque" deben ser tiempo real, no tiempo planeado.
+> **Tarea inmediata (a elegir por el dueño del proyecto):**
+> 1. **B5 en móvil (600 px o menos):** la barra inferior sigue fija siempre y puede tapar contenido; en escritorio ya se esconde al bajar.
+> 2. **A4 en móvil:** la columna de horas de la vista Semanal sigue cortada (en escritorio ya se lee completa).
+> 3. **Menores:** B4 (fecha del Diario como `10/15/2026`) y A5 a A8.
+> 4. Confirmar en el navegador real (no en el de prueba de la nube) las vistas Semanal, Mensual y el asistente.
+> 5. Antes de subir a GitHub hay que pedir y recibir la confirmación explícita del dueño (regla 5 de `AGENTS.md`).
 
 ---
 
@@ -138,3 +146,4 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 | **2026-10-08** | **Antigravity** | Limpieza progresiva y segura del código (`index.html`, `server.js`, `js/app.js`): eliminación del panel de administración, modal de compra y falsas métricas del Dashboard (ahora muestra ceros y un estado vacío). Se ejecutaron pruebas (77/77) tras cada cambio. |
 | **2026-10-15** | **Claude Code** | Retomado el proyecto. `npm install` hecho: pruebas 77/77 y `npm run check` correctos. Revisado en navegador: Dashboard muestra ceros y mensaje de bienvenida, el tutorial dice "PDF y Excel" y ya no hay mensaje de licencia ni pie de página con texto de compra. Sin cambios de código. |
 | **2026-10-15** | **Claude Code** | Corregidos A1, A2, A3, A4 (escritorio) y B1 en 5 commits locales separados (sin push). Nueva prueba `tests/monthly-calendar.test.js`; pruebas 79/79. Pendiente aparte: la columna de horas sigue cortada en móvil; el calendario mensual usa `_mesActual+2` para los días grises finales (en diciembre da mes 13). |
+| **2026-10-15** | **Claude Code** | Corregidos B3, B2 y B5 (escritorio) en 3 commits separados (`354cf13`, `98cc89c`, `f7f79a0`) y eliminado el código de cuentas, recuperación de contraseña y sesiones (`ee4e3c2`). Nueva prueba `tests/monthly-schedule-preview.test.js`; pruebas 82/82. Subido todo a `codex/ux-audit-20261006` con confirmación del dueño; `main` intacto. Siguiente: subir la versión del caché (`app.js?v=11.0`, `planify-shell-v19`). |

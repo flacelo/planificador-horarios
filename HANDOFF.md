@@ -88,6 +88,21 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 2. **Corregir las 5 inconsistencias anteriores:**
    - Quitar "mensaje eliminado", corregir falsos números del Dashboard, alinear pagos con el aviso de demo, corregir mención de Word en el tutorial y retirar/ocultar el panel admin del navegador.
 
+**Hallazgos de la auditoría visual en computadora (2026-10-15, Parte A) — PENDIENTES, sin corregir:**
+- **A1.** En el asistente "Crear mi horario rápido" (paso 1), los botones **Seguir** y **Atrás** quedan al fondo de la ventana; en pantalla de 850 px de alto hay que bajar dentro del cuadro para verlos.
+- **A2.** El asistente dice "PASO 1 DE 5", pero al elegir "Ver mi horario ahora" salta a "PASO 5 DE 5"; parece que se saltaron pasos.
+- **A3.** En la vista Semanal, el icono de la actividad tapa la primera letra ("Estudiar inglés" se lee "tudiar inglés").
+- **A4.** En la vista Semanal, las horas de la columna izquierda se cortan ("7:00 a. m. – 7:30 a").
+- A5 a A8 (menores): dos opciones del paso 1 se ven resaltadas a la vez; el Perfil muestra "Estudiante" y un nombre vacío sin que el usuario lo eligiera; botones Excel/PDF con estilos distintos; la pestaña Avance muestra una raya sin número.
+- Nota: se vio en un navegador de prueba en la nube con otras tipografías; confirmar A3 y A4 en el navegador real.
+
+**Hallazgos de la auditoría visual (2026-10-15, Parte B: vistas diaria, semanal y mensual) — PENDIENTES, sin corregir:**
+- **B1.** Vista Mensual: en Octubre 2026 los días grises de septiembre muestran 26, 27 y 28; deberían ser 28, 29 y 30. Confirmar en navegador real y con otros meses.
+- **B2.** Vista Mensual: no muestra las actividades del horario semanal (todas las casillas vacías) y no lo explica; un usuario nuevo puede pensar que está rota.
+- **B3.** Vista Diaria: "Ver mi jornada de hoy" casi no se ve (gris pálido) y esconde las actividades del día.
+- **B4.** Vista Diaria: la fecha aparece como `10/15/2026` (formato de EE. UU.) en una app en español.
+- **B5.** Las tres vistas: la barra flotante de pestañas y el botón ⚙️ tapan contenido (casillas de la tabla semanal, columna de horas, "Ideas para organizar tu mes").
+
 ### 🟡 Prioridad Media (Estabilidad técnica)
 3. **Instalar dependencias locales:**
    - Correr `npm install` para que el 100% de pruebas (73/73) pasen en local.

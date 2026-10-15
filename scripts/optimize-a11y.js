@@ -32,7 +32,7 @@ function transform(input) {
   );
 
   html = html.replace(/<div class="(modal-overlay(?: [^"]*)?)" id="([^"]+)"([^>]*)>/g, (tag, className, id, attrs) => {
-    const label = ({ modal: 'Editar actividad', 'modal-login': 'Iniciar sesión', 'modal-recover': 'Recuperar contraseña', 'modal-report': 'Enviar reporte semanal', 'modal-evento': 'Editar evento', 'tutorial-modal': 'Tutorial guiado' })[id] || 'Ventana de PLANIFY';
+    const label = ({ modal: 'Editar actividad', 'modal-report': 'Enviar reporte semanal', 'modal-evento': 'Editar evento', 'tutorial-modal': 'Tutorial guiado' })[id] || 'Ventana de PLANIFY';
     if (/\brole=["']dialog["']/i.test(attrs)) return tag;
     return '<div class="' + className + '" id="' + id + '"' + attrs + ' role="dialog" aria-modal="true" aria-label="' + label + '">';
   });

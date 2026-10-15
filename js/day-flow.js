@@ -72,13 +72,13 @@
     return "✦ Plan del día";
   }
 
-  function getTodayItems(now) {
-    now = now || new Date();
+  // preview = true sirve para mostrar el horario en otras vistas (p. ej. el mes): no asigna ids ni marca avances.
+  function getItemsForKey(dateKey, preview) {
     var history = window.PLANIFY_COMPLETION_HISTORY;
     var stored = readSchedule();
-    if (history) stored.value = history.ensureActivityIds();
+    if (history && !preview) stored.value = history.ensureActivityIds();
     var rows = stored.value.filas || [];
-    var today = getDateKey(now);
+    var today = dateKey;
     var dayIndex = getDayIndex(today, stored.value.dias);
     var items = [];
     rows.forEach(function (row, index) {
@@ -104,13 +104,18 @@
         category: categoryFor(cell),
         activityId: String(cell.planifyActivityId || ""),
         dateKey: today,
-        done: Boolean(history && cell.planifyActivityId && history.isDone(today, cell.planifyActivityId)),
+        done: !preview && Boolean(history && cell.planifyActivityId && history.isDone(today, cell.planifyActivityId)),
         row: index,
         day: dayIndex,
         storage: stored
       });
     });
     return items.sort(function (a, b) { return a.start - b.start; });
+  }
+
+  function getTodayItems(now) {
+    now = now || new Date();
+    return getItemsForKey(getDateKey(now), false);
   }
 
   function durationLabel(minutes) {
@@ -223,7 +228,7 @@
     }).observe(document.body, { childList: true, subtree: true });
   }
 
-  window.PLANIFY_DAY_FLOW = { refresh: render, today: getTodayItems };
+  window.PLANIFY_DAY_FLOW = { refresh: render, today: getTodayItems, forDate: function (dateKey) { return getItemsForKey(dateKey, true); } };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();

@@ -6,8 +6,55 @@
     return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
   }
 
+  var MAX_SCHEDULE_ITEMS = 3;
+
+  function scheduleFor(cache, iso, date) {
+    var flow = window.PLANIFY_DAY_FLOW;
+    if (!flow || typeof flow.forDate !== "function") return [];
+    var weekday = date.getDay();
+    if (!cache[weekday]) {
+      try { cache[weekday] = flow.forDate(iso); } catch (error) { cache[weekday] = []; }
+    }
+    return cache[weekday];
+  }
+
+  function timeLabel(minutes) {
+    var time = window.PLANIFY_SCHEDULE_TIME;
+    return time && typeof time.formatTime12 === "function" ? time.formatTime12(minutes) : "";
+  }
+
+  // Muestra en cada día las actividades que el horario semanal tiene para ese día de la semana.
+  function renderScheduleList(cell, items) {
+    var old = cell.querySelector(".cal-horario");
+    if (old) old.remove();
+    if (!items.length) return;
+    var list = document.createElement("ul");
+    list.className = "cal-horario";
+    list.setAttribute("aria-hidden", "true");
+    items.slice(0, MAX_SCHEDULE_ITEMS).forEach(function (item) {
+      var row = document.createElement("li");
+      var time = document.createElement("time");
+      time.textContent = timeLabel(item.start);
+      var title = document.createElement("span");
+      title.textContent = item.title;
+      row.appendChild(time);
+      row.appendChild(title);
+      list.appendChild(row);
+    });
+    if (items.length > MAX_SCHEDULE_ITEMS) {
+      var more = document.createElement("li");
+      more.className = "cal-horario-mas";
+      more.textContent = "+" + (items.length - MAX_SCHEDULE_ITEMS) + " más";
+      list.appendChild(more);
+    }
+    var number = cell.querySelector(".cal-numero");
+    if (number) number.insertAdjacentElement("afterend", list);
+    else cell.insertBefore(list, cell.firstChild);
+  }
+
   function enhanceCalendarCells(grid) {
     if (!grid) return;
+    var scheduleCache = {};
     var cells = Array.prototype.slice.call(grid.querySelectorAll(".cal-dia"));
     var currentMonthCells = cells.filter(function (cell) { return Boolean(cell.dataset.fecha); });
     var lastCurrentIndex = currentMonthCells.length ? cells.indexOf(currentMonthCells[currentMonthCells.length - 1]) : -1;
@@ -27,7 +74,10 @@
       var label = new Intl.DateTimeFormat("es-PE", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(date);
       cell.setAttribute("role", "button");
       cell.setAttribute("tabindex", "0");
-      cell.setAttribute("aria-label", "Añadir o editar fecha para " + label);
+      // Solo los días del mes que se está viendo; los grises son de otro mes y no tienen número propio.
+      var items = cell.classList.contains("otro-mes") ? [] : scheduleFor(scheduleCache, iso, date);
+      renderScheduleList(cell, items);
+      cell.setAttribute("aria-label", "Añadir o editar fecha para " + label + (items.length ? ". Horario: " + items.map(function (item) { return item.title; }).join(", ") : ""));
       cell.setAttribute("aria-keyshortcuts", "Enter Space");
       if (cell.classList.contains("hoy")) cell.setAttribute("aria-current", "date");
       else cell.removeAttribute("aria-current");

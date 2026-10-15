@@ -12,7 +12,7 @@
     'script', 'iframe', 'button', 'svg', '.no-print', '.empty-state',
     '.table-actions', '.header-controls', '.cal-nav', '.tutorial-overlay',
     '#nav-bar-semanal', '.barra-nav-fecha',
-    '.modal-overlay', '.screenshot-warning', '.resizer', '.merge-badge',
+    '.modal-overlay', '.resizer', '.merge-badge',
     '.lic-msg', '.lic-texto',
     '.btn-remove', '.remove-btn', '.btn-delete', '.btn-eliminar',
     '.btn-eliminar-fila', '.close-btn', '.close-x', '.x-btn',

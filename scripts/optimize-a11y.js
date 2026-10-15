@@ -32,7 +32,7 @@ function transform(input) {
   );
 
   html = html.replace(/<div class="(modal-overlay(?: [^"]*)?)" id="([^"]+)"([^>]*)>/g, (tag, className, id, attrs) => {
-    const label = ({ modal: 'Editar actividad', 'modal-compra': 'Comprar licencia', 'modal-activar': 'Activar licencia', 'modal-login': 'Iniciar sesión', 'modal-recover': 'Recuperar contraseña', 'modal-admin': 'Panel de administración', 'modal-report': 'Enviar reporte semanal', 'modal-evento': 'Editar evento', 'tutorial-modal': 'Tutorial guiado' })[id] || 'Ventana de PLANIFY';
+    const label = ({ modal: 'Editar actividad', 'modal-login': 'Iniciar sesión', 'modal-recover': 'Recuperar contraseña', 'modal-report': 'Enviar reporte semanal', 'modal-evento': 'Editar evento', 'tutorial-modal': 'Tutorial guiado' })[id] || 'Ventana de PLANIFY';
     if (/\brole=["']dialog["']/i.test(attrs)) return tag;
     return '<div class="' + className + '" id="' + id + '"' + attrs + ' role="dialog" aria-modal="true" aria-label="' + label + '">';
   });
@@ -40,7 +40,6 @@ function transform(input) {
   html = html.replace(/<script[^>]*connect\.facebook\.net[^>]*YOUR_FACEBOOK_APP_ID[^>]*><\/script>/gi, '');
   html = html.replace(/<script[^>]*accounts\.google\.com\/gsi\/client[^>]*><\/script>/gi, '');
   html = html.replace(/data-client_id=["']YOUR_GOOGLE_CLIENT_ID\.apps\.googleusercontent\.com["']/gi, 'data-client_id=""');
-  html = html.replace(/admin123/gi, 'credencial del servidor');
   return html;
 }
 

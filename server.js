@@ -4,14 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const PORT = 3000;
-// Las rutas administrativas solo se habilitan cuando el token existe en el
-// entorno del servidor. Nunca dejamos una credencial de demostración fija en
-// el código ni la exponemos al navegador.
-const ADMIN_TOKEN = process.env.PLANIFY_ADMIN_TOKEN || '';
 
-function validarTokenAdmin(token) {
-  return Boolean(ADMIN_TOKEN) && token === ADMIN_TOKEN;
-}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -25,55 +18,10 @@ const MIME = {
 
 // Persistent mock stores
 var sesionesPorUsuario = {};
-var usuariosAdmin = [
-  { id: 1, nombre: 'Usuario Demo 1', correo: 'demo-1@example.invalid', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
-  { id: 2, nombre: 'Usuario Demo 2', correo: 'demo-2@example.invalid', licencia: 'Mensual', estado: 'Activo', ultimoAcceso: '2026-07-09' },
-  { id: 3, nombre: 'Usuario Demo 3', correo: 'demo-3@example.invalid', licencia: 'Demo', estado: 'Pendiente', ultimoAcceso: '2026-07-08' },
-  { id: 4, nombre: 'Usuario Demo 4', correo: 'demo-4@example.invalid', licencia: 'Mensual', estado: 'Vencido', ultimoAcceso: '2026-06-15' },
-  { id: 5, nombre: 'Usuario Demo 5', correo: 'demo-5@example.invalid', licencia: 'Demo', estado: 'Activo', ultimoAcceso: '2026-07-10' },
-  { id: 6, nombre: 'Usuario Demo 6', correo: 'demo-6@example.invalid', licencia: 'Vitalicia', estado: 'Activo', ultimoAcceso: '2026-07-10' },
-];
+
 var serialesLicencia = {};
-var sesionesPago = {};
 
-function generarSerial() {
-  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  var parte = function(len) {
-    var s = '';
-    for (var i = 0; i < len; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
-    return s;
-  };
-  return 'PTECH-' + parte(4) + '-' + parte(4) + '-' + parte(4);
-}
 
-function calcularExpiracion(plan) {
-  var ahora = new Date();
-  var exp = new Date(ahora);
-  var tipo = (plan || '').toLowerCase();
-  if (tipo.indexOf('vital') !== -1 || tipo.indexOf('perpetuo') !== -1) {
-    return { tipo: 'vitalicio', fecha: null, etiqueta: 'Indefinido' };
-  }
-  var dias = 0;
-  if (tipo.indexOf('semestral') !== -1 || tipo.indexOf('180') !== -1) dias = 180;
-  else if (tipo.indexOf('anual') !== -1 || tipo.indexOf('365') !== -1) dias = 365;
-  else dias = 30;
-  exp.setDate(exp.getDate() + dias);
-  return { tipo: dias + 'dias', fecha: exp.toISOString(), etiqueta: dias + ' días' };
-}
-
-function verificarExpiracion() {
-  var ahora = new Date();
-  for (var i = 0; i < usuariosAdmin.length; i++) {
-    var u = usuariosAdmin[i];
-    if (u.estado === 'Activo' && u.fechaExpiracion) {
-      var exp = new Date(u.fechaExpiracion);
-      if (exp < ahora) {
-        u.estado = 'Vencido';
-        console.log('[EXP] Licencia vencida para', u.nombre, '(' + u.correo + ')');
-      }
-    }
-  }
-}
 
 http.createServer((req, res) => {
   // API routes
@@ -145,196 +93,9 @@ http.createServer((req, res) => {
     return;
   }
 
-  // Admin API (protegida simulada)
 
-  if (req.method === 'GET' && req.url.startsWith('/api/admin/users')) {
-    var params = new URL(req.url, 'http://localhost').searchParams;
-    var token = params.get('token') || '';
-    if (!validarTokenAdmin(token)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: false, error: 'No autorizado' }));
-      return;
-    }
-    verificarExpiracion();
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, usuarios: usuariosAdmin }));
-    return;
-  }
 
-  if (req.method === 'POST' && req.url === '/api/admin/users/activate') {
-    let body = '';
-    req.on('data', function(chunk) { body += chunk; });
-    req.on('end', function() {
-      try {
-        var data = JSON.parse(body);
-        if (!validarTokenAdmin(data.token)) {
-          res.writeHead(401, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ ok: false, error: 'No autorizado' }));
-          return;
-        }
-        var user = null;
-        for (var i = 0; i < usuariosAdmin.length; i++) {
-          if (usuariosAdmin[i].id === data.userId) { user = usuariosAdmin[i]; break; }
-        }
-        if (!user) {
-          res.writeHead(404, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ ok: false, error: 'Usuario no encontrado' }));
-          return;
-        }
-        var plan = data.plan || 'mensual';
-        var exp = calcularExpiracion(plan);
-        user.estado = 'Activo';
-        user.ultimoAcceso = new Date().toISOString().slice(0, 10);
-        user.planTipo = exp.tipo;
-        user.fechaExpiracion = exp.fecha;
-        console.log('[ADMIN] Licencia activada para', user.nombre, '(' + user.correo + ')', 'Plan:', plan, 'Exp:', exp.etiqueta);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true, message: 'Licencia ' + plan + ' activada para ' + user.nombre, expiracion: exp }));
-      } catch(e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));
-      }
-    });
-    return;
-  }
 
-  // Checkout / Payment mock
-
-  if (req.method === 'POST' && req.url === '/api/checkout/create-session') {
-    let body = '';
-    req.on('data', function(chunk) { body += chunk; });
-    req.on('end', function() {
-      try {
-        var data = JSON.parse(body);
-        var plan = data.plan || 'Licencia Personal S/15';
-        var email = data.email || 'cliente@email.com';
-        var sessionId = 'cs_test_' + crypto.randomBytes(16).toString('hex');
-        sesionesPago[sessionId] = { plan: plan, email: email, estado: 'pendiente', creado: new Date().toISOString() };
-        console.log('[CHECKOUT] Sesión creada:', sessionId, 'Plan:', plan);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          ok: true,
-          sessionId: sessionId,
-          redirectUrl: '/api/checkout/success?session_id=' + sessionId
-        }));
-      } catch(e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));
-      }
-    });
-    return;
-  }
-
-  if (req.method === 'GET' && req.url.startsWith('/api/checkout/success')) {
-    var urlParams = new URL(req.url, 'http://localhost').searchParams;
-    var sessionId = urlParams.get('session_id') || '';
-    var session = sesionesPago[sessionId];
-    if (!session) {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: false, error: 'Sesión no encontrada' }));
-      return;
-    }
-    session.estado = 'completado';
-    console.log('[CHECKOUT] Pago completado para sesión:', sessionId);
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, message: 'Pago exitoso', sessionId: sessionId }));
-    return;
-  }
-
-  if (req.method === 'POST' && req.url === '/api/checkout/webhook') {
-    let body = '';
-    req.on('data', function(chunk) { body += chunk; });
-    req.on('end', function() {
-      try {
-        var data = JSON.parse(body);
-        var sessionId = data.sessionId || data.session_id || '';
-        var session = sesionesPago[sessionId];
-        var serial = '';
-        if (session) {
-          session.estado = 'completado';
-          console.log('[WEBHOOK] Pago confirmado para sesión:', sessionId);
-          serial = generarSerial();
-          serialesLicencia[session.email] = serial;
-          var exp = calcularExpiracion(session.plan);
-          for (var ui = 0; ui < usuariosAdmin.length; ui++) {
-            if (usuariosAdmin[ui].correo === session.email) {
-              usuariosAdmin[ui].estado = 'Activo';
-              usuariosAdmin[ui].ultimoAcceso = new Date().toISOString().slice(0, 10);
-              usuariosAdmin[ui].serial = serial;
-              usuariosAdmin[ui].planTipo = exp.tipo;
-              usuariosAdmin[ui].fechaExpiracion = exp.fecha;
-              break;
-            }
-          }
-        }
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        var expInfo = session ? calcularExpiracion(session.plan) : null;
-        res.end(JSON.stringify({ ok: true, message: 'Webhook recibido', serial: serial, expiracion: expInfo }));
-      } catch(e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));
-      }
-    });
-    return;
-  }
-
-  if (req.method === 'GET' && req.url.startsWith('/api/checkout/invoice/')) {
-    var sessionId = req.url.replace('/api/checkout/invoice/', '').split('?')[0];
-    var session = sesionesPago[sessionId];
-    if (!session) {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: false, error: 'Sesión no encontrada' }));
-      return;
-    }
-    var userData = null;
-    for (var ui = 0; ui < usuariosAdmin.length; ui++) {
-      if (usuariosAdmin[ui].correo === session.email) { userData = usuariosAdmin[ui]; break; }
-    }
-    var serial = serialesLicencia[session.email] || '';
-    var expInfo = calcularExpiracion(session.plan);
-    var factura = {
-      ok: true,
-      invoice: {
-        id: 'INV-' + sessionId.replace('cs_test_', '').slice(0, 12).toUpperCase(),
-        sessionId: sessionId,
-        transaccionId: 'TXN-' + crypto.randomBytes(6).toString('hex').toUpperCase(),
-        fecha: session.creado,
-        cliente: session.email,
-        nombreCliente: userData ? userData.nombre : session.email,
-        plan: session.plan,
-        planTipo: expInfo.tipo,
-        monto: 'S/ 15.00',
-        moneda: 'PEN',
-        serial: serial,
-        expiracion: expInfo.fecha,
-        emisor: 'PLANIFY · demostración',
-        ruc: '',
-        sello: 'EJEMPLO · NO VÁLIDO COMO COMPROBANTE'
-      }
-    };
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(factura));
-    return;
-  }
-
-  if (req.method === 'POST' && req.url === '/api/licenses/verify') {
-    let body = '';
-    req.on('data', function(chunk) { body += chunk; });
-    req.on('end', function() {
-      try {
-        var data = JSON.parse(body);
-        var email = data.email || '';
-        var codigo = (data.codigo || '').toUpperCase();
-        var valido = serialesLicencia[email] && serialesLicencia[email] === codigo;
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true, valido: valido, email: email }));
-      } catch(e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: false, error: 'Solicitud inválida' }));
-      }
-    });
-    return;
-  }
 
   // Static files
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');

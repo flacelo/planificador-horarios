@@ -206,11 +206,53 @@
       welcomeWasOpen = welcomeOpen;
     });
     welcomeObserver.observe(document.body, { childList: true, subtree: true });
+    var lastScrollY = window.scrollY || 0;
+    var tucked = false;
+    var userScrollUntil = 0;
+    function markUserScroll() { userScrollUntil = Date.now() + 700; }
+    function setTucked(value) {
+      if (value === tucked) return;
+      tucked = value;
+      nav.classList.toggle("is-tucked", value);
+      var gear = document.getElementById("cloud-btn");
+      if (gear) gear.classList.toggle("is-tucked", value);
+    }
+    function overlayIsOpen() {
+      return Boolean(document.querySelector(".modal-overlay.active,#welcome-flow-overlay,#side-panel.open"));
+    }
+    // La barra flotante y el botón ⚙️ se esconden al bajar para no tapar lo que se lee,
+    // y reaparecen al subir, al acercar el cursor al borde inferior, con el teclado o al llegar al final.
+    function updateTuck() {
+      var y = window.scrollY || 0;
+      var delta = y - lastScrollY;
+      var atEnd = y + window.innerHeight >= document.documentElement.scrollHeight - 8;
+      if (!nav.classList.contains("is-pinned") || atEnd || overlayIsOpen()) setTucked(false);
+      else if (delta > 6 && y > 120 && Date.now() < userScrollUntil) setTucked(true);
+      else if (delta < -6) setTucked(false);
+      lastScrollY = y;
+    }
     function updatePosition() {
-      nav.classList.toggle("is-pinned", window.innerWidth > 600 && slot.getBoundingClientRect().bottom < 0);
+      var pinned = window.innerWidth > 600 && slot.getBoundingClientRect().bottom < 0;
+      nav.classList.toggle("is-pinned", pinned);
+      // Con la barra fija, deja espacio al final de la página para que nada quede detrás de ella.
+      document.body.classList.toggle("planify-nav-pinned", pinned);
+      updateTuck();
     }
     window.addEventListener("scroll", updatePosition, { passive: true });
     window.addEventListener("resize", updatePosition);
+    // Solo se esconden con un desplazamiento hecho por la persona, no con los que hace la propia página al cambiar de vista.
+    window.addEventListener("wheel", markUserScroll, { passive: true });
+    window.addEventListener("touchmove", markUserScroll, { passive: true });
+    window.addEventListener("keydown", function (event) {
+      if (/^(ArrowDown|PageDown|End| )$/.test(event.key)) markUserScroll();
+    });
+    nav.addEventListener("click", function () { setTucked(false); });
+    document.addEventListener("mousemove", function (event) {
+      if (tucked && event.clientY > window.innerHeight - 90) setTucked(false);
+    }, { passive: true });
+    document.addEventListener("focusin", function (event) {
+      if (tucked && event.target.closest && event.target.closest(".bottom-nav,#cloud-btn")) setTucked(false);
+    });
     updatePosition();
 
     var returning = isReturningUser();

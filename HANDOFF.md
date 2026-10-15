@@ -10,10 +10,10 @@
 | Dato | Estado actual |
 | :--- | :--- |
 | **Rama activa:** | `codex/ux-audit-20261006` |
-| **Cambios locales pendientes ("0↓ 2↑"):** | 2 commits guardados en local (`8ef0ced` y `f29199b`). |
+| **Estado de Git:** | Rama local igual a la remota (0↓ 0↑), sin cambios pendientes. |
 | **Página publicada (Producción):** | [https://planificador-horarios-dun.vercel.app](https://planificador-horarios-dun.vercel.app) |
 | **¿Los 2 cambios ya están en internet?:** | **SÍ**, ya están publicados en Vercel porque ya fueron subidos a `origin/main`. |
-| **Siguiente tarea prioritaria:** | Auditoría visual y de uso en computadora (desktop) + corrección de inconsistencias. |
+| **Siguiente tarea prioritaria:** | Auditoría visual en computadora (navegación y primer uso) y revisión de cuentas/nube simuladas. |
 
 ---
 
@@ -121,3 +121,4 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 | **2026-10-06** | **ChatGPT** | Mejoras en acceso a planes guardados (`8ef0ced`) y pulido de etiquetas y progreso en versión de escritorio (`f29199b`). Ambos cambios subidos a `main`. |
 | **2026-10-07** | **Antigravity** | Auditoría del repositorio, análisis de Git y Vercel, creación y enriquecimiento de `HANDOFF.md` (con detalle técnico de los 5 problemas y la idea del horario universitario) y creación de `AGENTS.md`. Ningún código de la app fue alterado. |
 | **2026-10-08** | **Antigravity** | Limpieza progresiva y segura del código (`index.html`, `server.js`, `js/app.js`): eliminación del panel de administración, modal de compra y falsas métricas del Dashboard (ahora muestra ceros y un estado vacío). Se ejecutaron pruebas (77/77) tras cada cambio. |
+| **2026-10-15** | **Claude Code** | Retomado el proyecto. `npm install` hecho: pruebas 77/77 y `npm run check` correctos. Revisado en navegador: Dashboard muestra ceros y mensaje de bienvenida, el tutorial dice "PDF y Excel" y ya no hay mensaje de licencia ni pie de página con texto de compra. Sin cambios de código. |

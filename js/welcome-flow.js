@@ -544,8 +544,11 @@
 
   function renderHeader(step, title, subtitle) {
     var skippedChoice = state.startedFromHub ? 1 : 0;
-    var total = totalSteps() - skippedChoice;
-    var current = step + 1 - skippedChoice;
+    // En modo rápido, "Ver mi horario ahora" pasa de la decisión a la propuesta sin las preguntas de ritmo y vida diaria:
+    // el contador cuenta solo los pasos que la persona realmente recorre.
+    var shortPath = state.mode === "quick" && !state.wantMoreQuestions;
+    var total = (shortPath ? decisionStep() + 2 : totalSteps()) - skippedChoice;
+    var current = (shortPath && step === proposalStep() ? total + skippedChoice : step + 1) - skippedChoice;
     return '<header class="welcome-flow-header"><div class="welcome-flow-progress" aria-label="Paso ' + current + ' de ' + total + '">' +
       '<i style="width:' + (current * 100 / total) + '%"></i></div><span class="welcome-flow-step">PASO ' + current + ' DE ' + total + '</span>' +
       '<button type="button" class="welcome-flow-close" data-welcome-action="close" aria-label="Cerrar">×</button>' +

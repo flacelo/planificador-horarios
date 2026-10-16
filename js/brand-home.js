@@ -58,7 +58,7 @@
     hero.innerHTML =
       '<div class="brand-hero-copy">' +
         '<span class="brand-eyebrow"><span aria-hidden="true"></span> PLANEA A TU MANERA</span>' +
-        '<h2 id="brand-hero-title">' + (returning ? 'Tu plan te espera.<br><em>Continúa a tu ritmo.</em>' : 'Organiza tu tiempo.<br><em>Haz espacio para vivir.</em>') + '</h2>' +
+        '<h2 id="brand-hero-title">' + (returning ? 'Tu plan te espera.<br><em>Continúa a tu ritmo.</em>' : 'Pon tu meta. Te armo la semana.<br><em>Estudiar, entrenar, descansar.</em>') + '</h2>' +
         '<p>' + (returning ? 'Tu espacio está listo. Añade o mueve actividades y sigue con tu semana.' : 'Crea una primera versión en pocos pasos, planifica desde cero o personaliza cada detalle. Siempre podrás cambiar tu horario.') + '</p>' +
         '<div class="brand-hero-actions">' +
           (returning

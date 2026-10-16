@@ -72,3 +72,15 @@ body.planify-nav-pinned { padding-bottom: 96px; }
 /* Enlace discreto del titular para quien ya tiene horario: despliega las otras formas de empezar */
 .planify-brand-ready .brand-hero-actions .brand-link { min-height: 44px; padding: 8px 6px; border: 0 !important; background: none !important; box-shadow: none !important; color: inherit; font: inherit; font-size: .85rem; font-weight: 700; text-decoration: underline; opacity: .85; cursor: pointer; }
 .planify-brand-ready .brand-hero-actions .brand-link:hover { opacity: 1; }
+
+/* "Otras formas de empezar": el bloque de tarjetas es secundario; la acción principal es el titular */
+.planify-brand-ready .trust-start-hub.is-secondary { padding: 16px 18px !important; box-shadow: none !important; }
+.planify-brand-ready .trust-start-hub.is-secondary .trust-start-heading { margin-bottom: 10px !important; }
+.planify-brand-ready .trust-start-hub.is-secondary .trust-start-heading > div > span { display: none !important; }
+.planify-brand-ready .trust-start-hub.is-secondary .trust-start-heading h2 { margin-top: 0; font-size: 1rem !important; }
+.planify-brand-ready .trust-start-hub.is-secondary .trust-start-heading p { margin: 2px 0 0 !important; font-size: .78rem !important; }
+.planify-brand-ready .trust-start-hub.is-secondary .trust-start-options { gap: 10px !important; }
+.planify-brand-ready .trust-start-hub.is-secondary .trust-start-options > button { min-height: 0 !important; padding: 12px 14px !important; box-shadow: none !important; background: transparent !important; }
+.planify-brand-ready .trust-start-hub.is-secondary .trust-start-options > button > span { font-size: 1.2rem !important; }
+.planify-brand-ready .trust-start-hub.is-secondary .trust-start-options small { font-size: .72rem !important; }
+.planify-brand-ready .trust-start-hub.is-secondary .trust-start-options em { display: none !important; }

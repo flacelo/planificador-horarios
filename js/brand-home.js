@@ -80,12 +80,11 @@
     var hub = document.querySelector(".trust-start-hub");
     if (!hub) return;
     hub.classList.toggle("is-compact", returning);
+    hub.classList.add("is-secondary");
     var heading = hub.querySelector(".trust-start-heading h2");
     var description = hub.querySelector(".trust-start-heading p");
-    if (heading) heading.textContent = returning ? "¿Quieres crear otro horario?" : "¿Cómo quieres empezar?";
-    if (description) description.textContent = returning ?
-      "Puedes crear uno nuevo por tu cuenta o con una propuesta editable." :
-      "Elige entre una tabla vacía, una propuesta rápida o una planificación detallada.";
+    if (heading) heading.textContent = "Otras formas de empezar";
+    if (description) description.textContent = "Si prefieres otro camino, elige una de estas opciones.";
     var toggle = hub.querySelector('[data-start-action="toggle"]');
     if (returning && !toggle) hub.querySelector(".trust-start-heading").insertAdjacentHTML("beforeend", '<button type="button" data-start-action="toggle">Ver opciones</button>');
     if (!returning && toggle) toggle.remove();

@@ -377,7 +377,7 @@
   }
 
   function loadPublicAssets() {
-    [["planify-public-trust-style", "css/trust-fixes.css?v=1.10"],
+    [["planify-public-trust-style", "css/trust-fixes.css?v=1.11"],
      ["planify-brand-style", "css/brand-system.css?v=8"]].forEach(function (asset) {
       if (document.getElementById(asset[0])) return;
       var link = document.createElement("link");
@@ -393,7 +393,7 @@
     if (document.getElementById("planify-public-brand-script")) return;
     var script = document.createElement("script");
     script.id = "planify-public-brand-script";
-    script.src = "js/brand-home.js?v=14";
+    script.src = "js/brand-home.js?v=15";
     document.head.appendChild(script);
   }
 
@@ -408,9 +408,9 @@
       '<div class="app planify-public-entry"><h1 class="planify-public-title">Liberday</h1>' +
       '<div class="header-actions"><button type="button" class="planify-public-recovery" data-action="recover">Recuperar datos</button></div>' +
       '<section class="trust-start-hub"><div class="trust-start-heading"><div><span>EMPIEZA COMO PREFIERAS</span>' +
-      '<h2>¿Cómo quieres empezar?</h2><p>Elige entre una tabla vacía, una propuesta rápida o una planificación detallada.</p></div></div>' +
+      '<h2>Otras formas de empezar</h2><p>Si prefieres otro camino, elige una de estas opciones.</p></div></div>' +
       '<div class="trust-start-options"><button type="button" data-start-action="manual"><span>✍️</span><strong>Planificar por mi cuenta</strong><small>Empieza con una tabla vacía y añade tus actividades.</small><em>Control total</em></button>' +
-      '<button type="button" class="is-recommended" data-start-action="quick"><b>RECOMENDADO</b><span>🧩</span><strong>Crear mi horario rápido</strong><small>Dinos una actividad, tus días y horas. Luego podrás editar la propuesta.</small><em>Solo lo esencial</em></button>' +
+      '<button type="button" data-start-action="quick"><span>🧩</span><strong>Crear mi horario rápido</strong><small>Dinos una actividad, tus días y horas. Luego podrás editar la propuesta.</small><em>Solo lo esencial</em></button>' +
       '<button type="button" data-start-action="detailed"><span>✨</span><strong>Personalizar a fondo</strong><small>Incluye compromisos, proyectos, energía y bienestar.</small><em>Más preguntas</em></button></div></section>' +
       '<div class="planify-entry-status" role="status" aria-live="polite"></div></div>';
     if (document.body.insertBefore) document.body.insertBefore(landing, document.body.firstChild);

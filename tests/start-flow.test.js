@@ -180,3 +180,19 @@ test("una sola puerta: Diario vacío, Avance vacío y \"Crear otro horario\" abr
   // quien ya tiene horario conserva un camino a las otras formas de empezar
   assert.match(brandSource, /data-brand-action="others">Otras formas de empezar<\/button>/);
 });
+
+test("las tarjetas quedan en \"Otras formas de empezar\", sin RECOMENDADO, con las mismas 3 rutas", () => {
+  assert.ok(!/RECOMENDADO/.test(gateSource), "la puerta ya no marca una tarjeta como recomendada");
+  assert.ok(!/RECOMENDADO/.test(trustSource), "el bloque de tarjetas tampoco");
+  assert.ok(!/is-recommended/.test(gateSource) && !/is-recommended/.test(trustSource));
+  assert.ok(gateSource.includes("<h2>Otras formas de empezar</h2><p>Si prefieres otro camino, elige una de estas opciones.</p>"));
+  assert.match(brandSource, /heading\.textContent = "Otras formas de empezar"/);
+  assert.match(brandSource, /hub\.classList\.add\("is-secondary"\)/);
+  // la tarjeta "rápido" se conserva y las 3 rutas siguen igual (misma lista de rutas aceptadas)
+  ["manual", "quick", "detailed"].forEach((route) => {
+    assert.ok(gateSource.includes('data-start-action="' + route + '"'), "puerta: " + route);
+    assert.ok(trustSource.includes('data-start-action="' + route + '"'), "bloque: " + route);
+  });
+  assert.ok(gateSource.includes('["manual", "quick", "detailed", "inicio"].indexOf(routeChoice) < 0'));
+  assert.ok(gateSource.includes('Crear mi horario rápido'));
+});

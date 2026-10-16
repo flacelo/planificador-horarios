@@ -113,7 +113,7 @@ test("una visita sin datos ve la portada completa, no un aviso", () => {
   });
   assert.equal(app.classes.has("planify-data-gate-active"), true);
   assert.equal(app.hold, true);
-  assert.match(app.elements[0].innerHTML, /¿Cómo quieres empezar\?/);
+  assert.match(app.elements[0].innerHTML, /Otras formas de empezar/);
   assert.match(app.elements[0].innerHTML, /Planificar por mi cuenta/);
   clickAction(app.elements[0], "recover");
   assert.match(app.elements[1].innerHTML, /No hay un plan guardado/);
@@ -146,8 +146,8 @@ test("una visita con contenido guardado abre directamente el plan", () => {
 });
 
 test("el protector se carga antes de que app.js lea el almacenamiento", () => {
-  const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.10"');
-  const appIndex = indexHtml.indexOf('src="js/app.js?v=24.0"');
+  const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.11"');
+  const appIndex = indexHtml.indexOf('src="js/app.js?v=25.0"');
   assert.ok(gateIndex >= 0);
   assert.ok(appIndex > gateIndex);
   assert.match(indexHtml, /if\(!window\.PLANIFY_PRIVATE_HOLD\)/);

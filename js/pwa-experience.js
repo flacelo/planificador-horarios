@@ -6,7 +6,7 @@
   var isStandalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
   if (!isStandalone && window.navigator.standalone) isStandalone = true;
 
-  function installLabel() { return deferredPrompt ? "Instalar PLANIFY" : "Ver cómo instalar"; }
+  function installLabel() { return deferredPrompt ? "Instalar Liberday" : "Ver cómo instalar"; }
 
   function ensureModal() {
     var modal = document.getElementById("planify-pwa-modal");
@@ -47,11 +47,11 @@
       guideReturnFocus = document.getElementById("cloud-btn");
     }
     var modal = ensureModal();
-    var promptAction = deferredPrompt ? '<button type="button" class="pwa-primary-action" data-pwa-action="install">📲 Instalar PLANIFY ahora</button>' : "";
+    var promptAction = deferredPrompt ? '<button type="button" class="pwa-primary-action" data-pwa-action="install">📲 Instalar Liberday ahora</button>' : "";
     modal.innerHTML = '<div class="planify-pwa-dialog">' +
       '<button type="button" class="planify-pwa-close" data-pwa-action="close" aria-label="Cerrar">×</button>' +
-      '<span class="planify-pwa-kicker">PLANIFY EN TU CELULAR</span><h2 id="planify-pwa-modal-title">Úsalo como una app</h2>' +
-      '<p>Guarda PLANIFY en tu pantalla de inicio para entrar más rápido. Tus horarios siguen siendo tuyos y podrás abrirlos desde el mismo navegador.</p>' + promptAction +
+      '<span class="planify-pwa-kicker">Liberday en tu celular</span><h2 id="planify-pwa-modal-title">Úsalo como una app</h2>' +
+      '<p>Guarda Liberday en tu pantalla de inicio para entrar más rápido. Tus horarios siguen siendo tuyos y podrás abrirlos desde el mismo navegador.</p>' + promptAction +
       '<div class="planify-pwa-steps">' +
         '<article><span>🤖</span><div><strong>Android · Chrome</strong><p>Toca el menú ⋮ y elige <b>“Instalar aplicación”</b> o <b>“Añadir a pantalla de inicio”</b>.</p></div></article>' +
         '<article><span>🍎</span><div><strong>iPhone / iPad · Safari</strong><p>Toca <b>Compartir</b> y luego <b>“Añadir a pantalla de inicio”</b>.</p></div></article>' +
@@ -95,7 +95,7 @@
     if (!tab || tab.querySelector(".planify-pwa-settings-card")) return;
     var card = document.createElement("section");
     card.className = "planify-pwa-settings-card";
-    card.innerHTML = '<div><span aria-hidden="true">📱</span><p><strong>PLANIFY como app</strong><small>Ten un acceso directo en tu celular o computadora.</small></p></div><button type="button" data-pwa-action="guide" data-pwa-entry-label></button>';
+    card.innerHTML = '<div><span aria-hidden="true">📱</span><p><strong>Liberday como app</strong><small>Ten un acceso directo en tu celular o computadora.</small></p></div><button type="button" data-pwa-action="guide" data-pwa-entry-label></button>';
     tab.appendChild(card);
     refreshEntryPoints();
   }

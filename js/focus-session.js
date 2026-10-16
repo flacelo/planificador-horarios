@@ -245,7 +245,7 @@
     showToast(message);
     writeLiveMessage(message);
     if ("Notification" in window && Notification.permission === "granted") {
-      try { new Notification("PLANIFY", { body: message }); } catch (error) {}
+      try { new Notification("Liberday", { body: message }); } catch (error) {}
     }
   }
 
@@ -400,19 +400,19 @@
 
   function requestNotifications() {
     if (!("Notification" in window)) {
-      showToast("Este navegador no permite notificaciones. El aviso seguirá apareciendo dentro de PLANIFY.");
+      showToast("Este navegador no permite notificaciones. El aviso seguirá apareciendo dentro de Liberday.");
       return;
     }
     if (Notification.permission === "granted") {
-      showToast("Las notificaciones ya están activadas para PLANIFY.");
+      showToast("Las notificaciones ya están activadas para Liberday.");
       render();
       return;
     }
     Notification.requestPermission().then(function (permission) {
-      showToast(permission === "granted" ? "Notificaciones activadas. Te avisaremos mientras PLANIFY esté abierta." : "Seguiremos mostrando avisos dentro de PLANIFY.");
+      showToast(permission === "granted" ? "Notificaciones activadas. Te avisaremos mientras Liberday esté abierta." : "Seguiremos mostrando avisos dentro de Liberday.");
       render();
     }).catch(function () {
-      showToast("No se pudo activar la notificación. Puedes usar los avisos dentro de PLANIFY.");
+      showToast("No se pudo activar la notificación. Puedes usar los avisos dentro de Liberday.");
     });
   }
 
@@ -492,7 +492,7 @@
     var modal = document.getElementById("planify-focus-modal");
     if (!modal) return;
     var permission = "Notification" in window ? Notification.permission : "unsupported";
-    var notificationText = permission === "granted" ? "✓ Avisos del navegador activados" : permission === "denied" ? "Avisos dentro de PLANIFY activos" : "Activar avisos del navegador";
+    var notificationText = permission === "granted" ? "✓ Avisos del navegador activados" : permission === "denied" ? "Avisos dentro de Liberday activos" : "Activar avisos del navegador";
     modal.innerHTML = '<div class="planify-focus-card" role="dialog" aria-modal="true" aria-labelledby="planify-focus-title">' +
       '<button type="button" class="planify-focus-close" data-focus-action="close" aria-label="Cerrar temporizador">×</button>' +
       '<span class="planify-focus-eyebrow">' + (state.selectedActivity ? "SESIÓN VINCULADA" : "SESIÓN PERSONAL") + '</span><h2 id="planify-focus-title">' + phaseEmoji() + ' ' + phaseLabel() + ' sin presión</h2>' +
@@ -506,7 +506,7 @@
       '<div class="planify-focus-summary"><span>⏱️ ' + state.completedSessions + (state.completedSessions === 1 ? " sesión completada" : " sesiones completadas") + '</span><span>✨ ' + state.completedMinutes + " min de enfoque acumulado" + '</span></div>' +
       scheduleReminderMarkup() +
       '<button type="button" class="planify-focus-notifications" data-focus-action="notifications" ' + (permission === "granted" ? "disabled" : "") + '>🔔 ' + notificationText + '</button>' +
-      '<p class="planify-focus-note">Los avisos funcionan mientras PLANIFY esté abierta. No sustituye indicaciones profesionales ni bloquea otras aplicaciones.</p>' +
+      '<p class="planify-focus-note">Los avisos funcionan mientras Liberday esté abierta. No sustituye indicaciones profesionales ni bloquea otras aplicaciones.</p>' +
       '<span id="planify-focus-live" class="sr-only" role="status" aria-live="polite"></span></div>';
     updateBreathUI(true);
   }

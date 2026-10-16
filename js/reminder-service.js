@@ -50,7 +50,7 @@
     document.body.appendChild(toast);
     window.setTimeout(function () { if (toast.parentNode) toast.remove(); }, 6500);
     if ("Notification" in window && Notification.permission === "granted") {
-      try { new Notification("PLANIFY · recordatorio", { body: message }); } catch (error) {}
+      try { new Notification("Liberday · recordatorio", { body: message }); } catch (error) {}
     }
   }
 

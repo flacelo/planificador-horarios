@@ -234,7 +234,7 @@
   function decoratePanel(panel) {
     var header = panel.querySelector(".sp-header");
     var title = header && header.querySelector(".sp-title");
-    if (title) title.innerHTML = '<span class="panel-brand-mark" aria-hidden="true">✦</span><span>Tu espacio<small>PLANIFY · A tu manera</small></span>';
+    if (title) title.innerHTML = '<span class="panel-brand-mark" aria-hidden="true">✦</span><span>Tu espacio<small>Liberday · A tu manera</small></span>';
     var intro = panel.querySelector(".trust-panel-intro");
     if (intro) intro.innerHTML = '<span class="panel-intro-kicker">HECHO PARA TU RUTINA</span><strong>Organiza lo que importa.</strong><p>Personaliza tu perfil, ajusta tu horario y conserva una copia de tus planes.</p><span class="panel-intro-flower" aria-hidden="true">✳</span>';
     var trigger = document.getElementById("cloud-btn");

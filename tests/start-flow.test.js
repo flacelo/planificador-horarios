@@ -133,3 +133,13 @@ test("la ruta inicio se acepta en la puerta de datos y en el asistente, y las 3 
   ["manual", "quick", "detailed"].forEach((route) => assert.ok(gateSource.includes('data-start-action="' + route + '"'), route));
   assert.ok(!/data-start-action="inicio"/.test(gateSource), "la puerta no agrega una tarjeta nueva");
 });
+
+test("al empezar quedan marcadas solo Tarde y Noche, y la meta ya no cae de madrugada", () => {
+  const hooks = loadHooks();
+  assert.deepEqual(Array.from(hooks.state.franjas), ["afternoon", "evening"]);
+  assert.match(welcomeSource, /state\.franjas = \["afternoon", "evening"\];/, "open() reinicia con Tarde y Noche");
+  answer(hooks, { franjas: hooks.state.franjas, goal: "Estudiar matemáticas" });
+  assert.equal(hooks.state.start, "12:00");
+  assert.equal(hooks.state.end, "22:00");
+  assert.equal(hooks.startMoments()[0].range, "1:00 a 2:00 p. m.");
+});

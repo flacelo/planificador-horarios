@@ -27,7 +27,7 @@
     step: 0,
     mode: "guided",
     inicioScreen: 0,
-    franjas: ["morning", "afternoon", "evening"],
+    franjas: ["afternoon", "evening"],
     inicioMinutes: 60,
     startedFromHub: false,
     userName: "",
@@ -1900,7 +1900,7 @@
       state.specialty = "general";
     }
     state.inicioScreen = state.mode === "inicio" ? 1 : 0;
-    state.franjas = ["morning", "afternoon", "evening"];
+    state.franjas = ["afternoon", "evening"];
     state.inicioMinutes = 60;
     state.jobRole = "";
     state.jobPattern = "fixed";

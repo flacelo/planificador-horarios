@@ -672,7 +672,7 @@
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=15";
+      script.src = "js/brand-home.js?v=16";
       script.defer = true;
       document.head.appendChild(script);
     }

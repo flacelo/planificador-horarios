@@ -62,7 +62,7 @@
         '<p>' + (returning ? 'Tu espacio está listo. Añade o mueve actividades y sigue con tu semana.' : 'Crea una primera versión en pocos pasos, planifica desde cero o personaliza cada detalle. Siempre podrás cambiar tu horario.') + '</p>' +
         '<div class="brand-hero-actions">' +
           (returning
-            ? '<button type="button" class="brand-primary" data-brand-action="week">Ver mi semana <span aria-hidden="true">↗</span></button><button type="button" class="brand-secondary" data-brand-action="paths">Crear otro horario <span aria-hidden="true">↓</span></button><button type="button" class="brand-link" data-brand-action="others">Otras formas de empezar</button>'
+            ? '<button type="button" class="brand-primary" data-brand-action="week">Ver mi semana <span aria-hidden="true">↗</span></button><button type="button" class="brand-secondary" data-brand-action="paths">Crear otro horario</button><button type="button" class="brand-link" data-brand-action="others">Otras formas de empezar</button>'
             : '<button type="button" class="brand-primary" data-brand-action="paths">Elegir cómo empezar <span aria-hidden="true">↗</span></button>') +
         '</div>' +
         '<p class="brand-data-note"><span aria-hidden="true">▣</span> Tu plan se guarda en este navegador. Para llevarlo a otro dispositivo: ⚙️ → Descargas → Copia de seguridad.</p>' +

@@ -203,3 +203,11 @@ test("la pantalla 3 aclara que se arma la semana completa, con el texto acordado
   const note = welcomeSource.indexOf("welcome-flow-start-week-note");
   assert.ok(moments > 0 && note > moments, "la línea va después de los momentos");
 });
+
+test("\"Crear otro horario\" ya no lleva flecha hacia abajo, porque abre el flujo en vez de bajar", () => {
+  assert.ok(brandSource.includes('data-brand-action="paths">Crear otro horario</button>'));
+  assert.ok(!/Crear otro horario <span/.test(brandSource));
+  // los otros dos botones del titular conservan su flecha
+  assert.match(brandSource, /data-brand-action="week">Ver mi semana <span aria-hidden="true">↗<\/span>/);
+  assert.match(brandSource, /data-brand-action="paths">Elegir cómo empezar <span aria-hidden="true">↗<\/span>/);
+});

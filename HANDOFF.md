@@ -12,10 +12,10 @@
 | Dato | Estado actual |
 | :--- | :--- |
 | **Rama activa:** | `codex/ux-audit-20261006` |
-| **Estado de Git:** | La rama local tiene commits **sin subir** del cambio de nombre a Liberday (ver sección 2). **No se sube nada a GitHub sin confirmación explícita del dueño** (regla 5 de `AGENTS.md`). |
+| **Estado de Git:** | La rama de trabajo `codex/ux-audit-20261006` está **subida a GitHub** (todo el cambio de nombre incluido). `main` sigue en `f29199b`: **no se ha pasado nada a `main`**. No se sube nada a `main` sin confirmación explícita del dueño (regla 5 de `AGENTS.md`). |
 | **Página publicada (Producción):** | [https://planificador-horarios-dun.vercel.app](https://planificador-horarios-dun.vercel.app). **La dirección no se cambia por ahora**; el dueño decidirá aparte (ver la advertencia de la sección 1). |
-| **¿El cambio de nombre ya está en internet?:** | **NO.** Está solo en commits locales de la rama de trabajo. Lo que se publica en Vercel sale de `main`. |
-| **Siguiente tarea prioritaria:** | Commit 7 del cambio de nombre: definir el nombre en un solo lugar y renombrar los mensajes internos de consola. Después, el dueño decide cuándo subir. |
+| **¿El cambio de nombre ya está en internet?:** | **NO en producción.** Está en la rama de trabajo, que no es la que publica Vercel (esa sale de `main`). Puede existir una vista previa de la rama en Vercel con otra dirección; no se ha comprobado. |
+| **Siguiente tarea prioritaria:** | Prueba en celular (pendiente del dueño) y decidir si se pasan los cambios a `main`. El commit 7 del nombre y el favicon pueden ir después. |
 
 ---
 
@@ -48,7 +48,7 @@ Aunque la app ahora se llama Liberday, estos nombres internos **se conservan**. 
 
 ## 2. Lo Último que se Hizo
 
-**Cambio de nombre a Liberday** (escritura con mayúscula inicial). Decisiones del dueño: sin aviso de transición (nadie usa la app todavía), ícono y logo se mantienen, la dirección de Vercel no cambia, el nombre en un solo lugar va en un commit aparte. Todo está en commits **locales** de la rama `codex/ux-audit-20261006`, sin subir:
+**Cambio de nombre a Liberday** (escritura con mayúscula inicial). Decisiones del dueño: sin aviso de transición (nadie usa la app todavía), ícono y logo se mantienen, la dirección de Vercel no cambia, el nombre en un solo lugar va en un commit aparte. Todo está en commits de la rama `codex/ux-audit-20261006`, **ya subidos a esa rama** (no a `main`):
 
 | Commit | Qué cambió |
 | :--- | :--- |
@@ -61,6 +61,13 @@ Aunque la app ahora se llama Liberday, estos nombres internos **se conservan**. 
 | commit 6 | Documentos: `README.md`, `ROADMAP.md`, `TODO.md`, `SECURITY.md`, `CHANGELOG.md` (v1.5) y este `HANDOFF.md`. |
 
 **Antes de lo anterior (ya subido a la rama de trabajo):** correcciones A1–A4 y B1–B3, B5 de la auditoría visual, eliminación del código de cuentas y sesiones (`ee4e3c2`) y subida de `app.js` a 11.0.
+
+**Prueba manual del dueño en su navegador de escritorio (2026-10-16): completa y correcta.** Hecha en su carpeta local tras traer la rama, con `npm run dev` y ventana privada:
+- Pasos 1 y 2 (pantalla de inicio y crear un horario), pasos 3 a 7 (vistas, panel, Enfoque, Tutorial y descargas) y paso 8 (**restaurar la copia vieja** `tests/fixtures/backup-v3-local.json`): todo correcto. La pestaña, la cabecera y las pantallas dicen "Liberday" y **no aparece "planify" en pantalla**.
+- La restauración de la copia vieja salió **sin errores**: la app mostró el horario de la copia ("Horario base local", lunes de 7:00 a 8:00 a. m.). Confirma que las copias de la versión anterior siguen importándose.
+- Única observación de la consola: el **404 de `favicon.ico`** (ajeno al cambio de nombre; anotado en la sección 4).
+- No se reportó el paso 9 de la guía (revisar `Cache Storage` en las herramientas del navegador); en la nube sí se comprobó que queda `liberday-shell-v1` y se borran las cachés `planify-…`.
+- **Pendiente: prueba en celular.** Ver la sección 5.
 
 **Lo que todavía dice "PLANIFY" a propósito:** los nombres internos de la lista de la sección 1, los mensajes técnicos de consola (`console.warn/log("PLANIFY …")`) y algunos comentarios de código. Se resuelven en el commit 7. `.env.example` conserva `PLANIFY_ADMIN_TOKEN` y un comentario con el nombre viejo.
 
@@ -153,11 +160,12 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 ## 5. Siguiente Tarea Exacta
 
 > **Tarea inmediata (pedir confirmación al dueño antes de cada paso):**
-> 1. **Commit 7 del cambio de nombre:** definir el nombre "Liberday" una sola vez (para que un futuro cambio sea de un solo archivo) y renombrar los mensajes técnicos de consola y los comentarios. No tocar nada de la lista "Nombres que NO se deben renombrar".
-> 2. **Decidir con el dueño la subida:** hoy hay commits locales sin subir. Subir solo a `codex/ux-audit-20261006`, nunca a `main` sin orden explícita.
-> 3. **Decisión aparte del dueño:** la dirección de Vercel (ver advertencia) y si se renombra el repositorio de GitHub.
-> 4. **Pendientes anteriores:** B5 y A4 en móvil, B4 (fecha del Diario como `10/15/2026`), A5 a A8 y el 404 de `favicon.ico` (ver sección 4).
-> 5. **Replanteo de la primera pantalla** (frase de valor, flujo de inicio de 3 pasos): propuesto al dueño, pendiente de su aprobación; no se ha tocado código.
+> 1. **Prueba en celular (pendiente del dueño).** Dos problemas conocidos solo se ven en móvil: la barra inferior queda fija y puede tapar contenido (B5 en móvil) y la columna de horas de la vista semanal sigue cortada (A4 en móvil). Se puede probar con una vista previa de la rama en Vercel (si existe) o con la IP local del PC en la misma red Wi-Fi (`http://<IP>:3000`, sin HTTPS: no permite probar instalación ni notificaciones).
+> 2. **Decidir si B5 y A4 en móvil se arreglan antes de pasar a `main`**, según lo que se vea en el celular.
+> 3. **Decidir con el dueño si se pasan los cambios a `main`.** Estado a 2026-10-16: `main` = `f29199b`; la rama de trabajo tiene 25 commits más y `main` no tiene commits que la rama no tenga (unión directa, sin conflictos de historial; 40 archivos, +797/−413). Pasar a `main` **publica en Vercel** y requiere orden explícita del dueño. Ojo: `main` todavía contiene lo viejo (ventana "Pagar con tarjeta", cifras falsas "28.5 hrs", generador de licencias y código de inicio de sesión en el navegador); el paso a `main` lo corrige. Se sugiere hacerlo con una solicitud de cambios (pull request) para poder revisarlo.
+> 4. **Después, sin bloquear:** commit 7 del cambio de nombre (definir el nombre "Liberday" una sola vez y renombrar mensajes técnicos de consola y comentarios, sin tocar la lista "Nombres que NO se deben renombrar"), 404 de `favicon.ico`, B4 (fecha del Diario como `10/15/2026`), A5 a A8 y el comentario de `.env.example`.
+> 5. **Decisión aparte del dueño:** la dirección de Vercel (ver advertencia de la sección 1) y si se renombra el repositorio de GitHub.
+> 6. **Replanteo de la primera pantalla** (frase de valor, flujo de inicio de 3 pasos): propuesto al dueño, pendiente de su aprobación; no se ha tocado código.
 
 ---
 
@@ -173,3 +181,4 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 | **2026-10-15** | **Claude Code** | Corregidos B3, B2 y B5 (escritorio) en 3 commits separados (`354cf13`, `98cc89c`, `f7f79a0`) y eliminado el código de cuentas, recuperación de contraseña y sesiones (`ee4e3c2`). Nueva prueba `tests/monthly-schedule-preview.test.js`; pruebas 82/82. Subido todo a `codex/ux-audit-20261006` con confirmación del dueño; `main` intacto. Siguiente: subir la versión del caché (`app.js?v=11.0`, `planify-shell-v19`). |
 | **2026-10-16** | **Claude Code** | Cambio de nombre de Planify a Liberday en 6 commits locales sin subir (pestaña/manifest, inicio y asistente, panel/enfoque/recordatorios/instalación, PDF/respaldos/reporte, service worker y versiones, documentos). Pruebas en verde antes de cada commit (82 y luego 85 con las pruebas nuevas del service worker). Nombres internos, claves de datos, formato de respaldo y dirección de Vercel se mantienen a propósito (ver sección 1). Pendiente: commit 7 y decisión de subida. |
 | **2026-10-16** | **Claude Code** | Los 7 commits del cambio de nombre se subieron a `codex/ux-audit-20261006` (`e2e4c3e`, `main` intacto). Prueba manual del dueño en su navegador, paso 1: la pestaña, la cabecera y la pantalla de inicio dicen Liberday; en la consola solo aparece un 404 de `favicon.ico`, ajeno al cambio de nombre y anotado como pendiente. El dueño sigue con el paso 2 (crear un horario). Sin cambios de código. |
+| **2026-10-16** | **Claude Code** | El dueño completó la prueba manual en su navegador de escritorio (pasos 1 a 8, todo correcto, incluida la restauración de la copia vieja `backup-v3-local.json` sin errores; todo dice Liberday y no aparece "planify" en pantalla). Quedó pendiente la prueba en celular. Se revisó el estado frente a `main` (`f29199b`): la rama va 25 commits adelante, sin conflictos de historial; `main` aún tiene la ventana de pago, las cifras falsas y el generador de licencias. Sin cambios de código; nada se subió a `main`. |

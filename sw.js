@@ -1,5 +1,7 @@
-/* PLANIFY: caché pequeña y actualizable para que la app no se quede en una versión antigua. */
-const CACHE_NAME = "planify-shell-v19";
+/* Liberday: caché pequeña y actualizable para que la app no se quede en una versión antigua. */
+const CACHE_NAME = "liberday-shell-v1";
+// Antes la app se llamaba Planify: se limpian también sus cachés viejas ("planify-…").
+const CACHE_PREFIXES = ["liberday-", "planify-"];
 const CORE_ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", event => {
@@ -14,7 +16,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
-      keys.filter(key => key.startsWith("planify-") && key !== CACHE_NAME).map(key => caches.delete(key))
+      keys.filter(key => CACHE_PREFIXES.some(prefix => key.startsWith(prefix)) && key !== CACHE_NAME).map(key => caches.delete(key))
     )).then(() => self.clients.claim())
   );
 });

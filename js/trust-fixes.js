@@ -17,7 +17,7 @@
   if (!document.querySelector("link[data-planify-follow-up]")) {
     var followUpStyles = document.createElement("link");
     followUpStyles.rel = "stylesheet";
-    followUpStyles.href = "css/ux-follow-up.css?v=1";
+    followUpStyles.href = "css/ux-follow-up.css?v=2";
     followUpStyles.dataset.planifyFollowUp = "true";
     document.head.appendChild(followUpStyles);
   }
@@ -521,7 +521,7 @@
       var style = document.createElement("link");
       style.id = "planify-focus-style";
       style.rel = "stylesheet";
-      style.href = "css/focus-session.css?v=2";
+      style.href = "css/focus-session.css?v=3";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-focus-task-style")) {
@@ -543,7 +543,7 @@
         if (document.getElementById("planify-focus-script")) return;
         var focusScript = document.createElement("script");
         focusScript.id = "planify-focus-script";
-        focusScript.src = "js/focus-session.js?v=4";
+        focusScript.src = "js/focus-session.js?v=5";
         focusScript.async = false;
         document.head.appendChild(focusScript);
       }
@@ -566,7 +566,7 @@
     if (document.getElementById("planify-reminder-script")) return;
     var script = document.createElement("script");
     script.id = "planify-reminder-script";
-    script.src = "js/reminder-service.js?v=1";
+    script.src = "js/reminder-service.js?v=2";
     script.defer = true;
     document.head.appendChild(script);
   }
@@ -576,13 +576,13 @@
       var style = document.createElement("link");
       style.id = "planify-day-flow-style";
       style.rel = "stylesheet";
-      style.href = "css/day-flow.css?v=1";
+      style.href = "css/day-flow.css?v=2";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-day-flow-script")) {
       var script = document.createElement("script");
       script.id = "planify-day-flow-script";
-      script.src = "js/day-flow.js?v=4";
+      script.src = "js/day-flow.js?v=5";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -672,7 +672,7 @@
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=9";
+      script.src = "js/brand-home.js?v=10";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -689,7 +689,7 @@
     if (!document.getElementById("planify-panel-redesign-script")) {
       var script = document.createElement("script");
       script.id = "planify-panel-redesign-script";
-      script.src = "js/panel-redesign.js?v=11";
+      script.src = "js/panel-redesign.js?v=12";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -700,13 +700,13 @@
       var style = document.createElement("link");
       style.id = "planify-weekly-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/weekly-calm.css?v=10";
+      style.href = "css/weekly-calm.css?v=11";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-weekly-calm-script")) {
       var script = document.createElement("script");
       script.id = "planify-weekly-calm-script";
-      script.src = "js/weekly-calm.js?v=8";
+      script.src = "js/weekly-calm.js?v=9";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -717,13 +717,13 @@
       var style = document.createElement("link");
       style.id = "planify-monthly-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/monthly-calm.css?v=8";
+      style.href = "css/monthly-calm.css?v=9";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-monthly-calm-script")) {
       var script = document.createElement("script");
       script.id = "planify-monthly-calm-script";
-      script.src = "js/monthly-calm.js?v=3";
+      script.src = "js/monthly-calm.js?v=4";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -776,7 +776,7 @@
     if (document.getElementById("planify-daily-backup-script")) return;
     var script = document.createElement("script");
     script.id = "planify-daily-backup-script";
-    script.src = "js/daily-backup.js?v=11";
+    script.src = "js/daily-backup.js?v=12";
     script.defer = true;
     document.head.appendChild(script);
   }
@@ -792,7 +792,7 @@
     if (!document.getElementById("planify-pwa-script")) {
       var script = document.createElement("script");
       script.id = "planify-pwa-script";
-      script.src = "js/pwa-experience.js?v=2";
+      script.src = "js/pwa-experience.js?v=3";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -809,7 +809,7 @@
     if (!document.getElementById("planify-mobile-coach-script")) {
       var script = document.createElement("script");
       script.id = "planify-mobile-coach-script";
-      script.src = "js/mobile-coach.js?v=2";
+      script.src = "js/mobile-coach.js?v=3";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -955,13 +955,13 @@
       var welcomeStyle = document.createElement("link");
       welcomeStyle.id = "welcome-flow-style";
       welcomeStyle.rel = "stylesheet";
-      welcomeStyle.href = "css/welcome-flow.css?v=1.19";
+      welcomeStyle.href = "css/welcome-flow.css?v=1.20";
       document.head.appendChild(welcomeStyle);
     }
     if (!document.getElementById("welcome-flow-script")) {
       var welcomeScript = document.createElement("script");
       welcomeScript.id = "welcome-flow-script";
-      welcomeScript.src = "js/welcome-flow.js?v=1.28";
+      welcomeScript.src = "js/welcome-flow.js?v=1.29";
       welcomeScript.defer = true;
       document.head.appendChild(welcomeScript);
     }

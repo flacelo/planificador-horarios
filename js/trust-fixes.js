@@ -23,7 +23,7 @@
   }
 
   var TUTORIAL_STEPS = [
-    { icon: "👋", title: "Vuelve a esta guía cuando quieras", text: "El tutorial está disponible desde el encabezado. Cada paso señala un control concreto de PLANIFY.", target: "#tutorial-btn", where: "Botón 📖 Tutorial, en el encabezado." },
+    { icon: "👋", title: "Vuelve a esta guía cuando quieras", text: "El tutorial está disponible desde el encabezado. Cada paso señala un control concreto de Liberday.", target: "#tutorial-btn", where: "Botón 📖 Tutorial, en el encabezado." },
     { icon: "🗓️", title: "Abre tu semana", text: "Toca Semanal en la barra inferior. Allí puedes revisar los días y escribir una actividad directamente en una celda.", target: ".bottom-nav [data-tab='semanal']", where: "Semanal, en la barra fija inferior." },
     { icon: "✍️", title: "Escribe en el horario", text: "En la tabla semanal, pulsa una celda y escribe. Para cambiar el texto, vuelve a tocarlo; no necesitas abrir una ventana de edición.", target: "#tabla tbody td", where: "Cualquier celda de actividad dentro de la cuadrícula semanal." },
     { icon: "📝", title: "Organiza también tu día", text: "Diario/Notas está en la misma barra inferior. Toca ese botón para escribir tus notas y revisar tu día.", target: ".bottom-nav [data-tab='diario']", where: "Diario/Notas, en la barra fija inferior." },
@@ -247,7 +247,7 @@
   function dashboardRecommendations(metrics, profile, focusStats) {
     var ideas = [];
     if (!metrics.total) ideas.push(["🌱", "Crea tu primera semana", "Elige una de las rutas guiadas y obtendrás una base que luego podrás editar.", "start"]);
-    else if (!metrics.hasHistory) ideas.push(["🎯", "Empieza a registrar tu avance", "Marca cada actividad al terminarla. PLANIFY la guardará en la fecha de la semana que estés planificando.", "change"]);
+    else if (!metrics.hasHistory) ideas.push(["🎯", "Empieza a registrar tu avance", "Marca cada actividad al terminarla. Liberday la guardará en la fecha de la semana que estés planificando.", "change"]);
     else if (!metrics.completed) ideas.push(["🎯", "Empieza por un bloque", "Tu horario está listo. Elige un bloque para comenzar y ajústalo si no encaja con tu día.", "change"]);
     else if (metrics.percent < 35) ideas.push(["🎯", "Revisa lo que queda pendiente", "Compara tu horario con la semana que realmente tuviste y ajusta los bloques que no encajaron.", "change"]);
     else if (metrics.percent < 75) ideas.push(["↗", "Protege lo que ya funciona", "Hay avance real. Conserva tus mejores días y mueve solo lo que suele quedar pendiente.", "change"]);
@@ -314,7 +314,7 @@
       '<p>Tu cumplimiento se guarda por fecha; la distribución de horas refleja el horario que tienes ahora.</p></div><button type="button" id="trust-dashboard-close">← Volver al planificador</button></header>' +
       '<nav class="dashboard-view-nav" aria-label="Vistas del planificador"><button type="button" data-dashboard-view="diario">📝 <span>Diario</span></button><button type="button" data-dashboard-view="semanal">📅 <span>Semanal</span></button><button type="button" data-dashboard-view="mensual">📆 <span>Mensual</span></button><button type="button" data-dashboard-view="anual">🗓️ <span>Anual</span></button><button type="button" aria-current="page">📊 <span>Avance</span></button></nav>' +
       (metrics.total ? '<nav class="dashboard-week-nav" aria-label="Elegir semana del avance"><button type="button" data-dashboard-week-shift="-7" aria-label="Semana anterior">←</button><strong>' + escapeHtml(dashboardWeekLabel(metrics.weekStart)) + '</strong><button type="button" data-dashboard-week-shift="7" aria-label="Semana siguiente">→</button></nav>' : "") +
-      content + '<p class="dashboard-calm-disclaimer">PLANIFY muestra orientación general. Para decisiones de salud, consulta a un profesional.</p></div>';
+      content + '<p class="dashboard-calm-disclaimer">Liberday muestra orientación general. Para decisiones de salud, consulta a un profesional.</p></div>';
     document.body.appendChild(overlay);
     previousBodyOverflow = document.body.style.overflow;
     previousHtmlOverflow = document.documentElement.style.overflow;
@@ -372,7 +372,7 @@
     overlay.className = "trust-tutorial-overlay";
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
-    overlay.setAttribute("aria-label", "Tutorial de PLANIFY");
+    overlay.setAttribute("aria-label", "Tutorial de Liberday");
     overlay.innerHTML = '<div class="trust-tutorial-card"><button type="button" id="trust-tutorial-close" class="trust-tutorial-close" aria-label="Cerrar tutorial">×</button>' +
       '<div class="trust-tutorial-counter"></div><div class="trust-tutorial-progress"><i></i></div><div class="trust-tutorial-icon"></div>' +
       '<h2 class="trust-tutorial-title"></h2><p class="trust-tutorial-text"></p><div class="trust-tutorial-where"><span>📍 Dónde pulsar</span><strong></strong></div><footer><button type="button" id="trust-tutorial-back" class="trust-secondary">← Atrás</button>' +
@@ -444,7 +444,7 @@
     var daily = document.querySelector("#view-diario");
     if (daily && !daily.querySelector('[data-planify-guidance="daily"]')) {
       var name = String(profile.name || localStorage.getItem("planify_nombre") || "").trim().split(/\s+/)[0];
-      daily.insertAdjacentHTML("afterbegin", '<section class="trust-friendly-guide" data-planify-guidance="daily"><div><span>☀</span><div><strong>' + escapeHtml(name ? "Hola, " + name + ". Este espacio es tuyo." : "Este espacio es tuyo") + '</strong><small>Empieza por una sola cosa. PLANIFY te acompaña sin obligarte a llenar todo.</small></div></div><div><button type="button" data-trust-action="goal">Anotar mi meta</button><button type="button" data-trust-action="change">Pedir un cambio</button><button type="button" data-trust-action="restart">Revisar mis preferencias</button></div></section>');
+      daily.insertAdjacentHTML("afterbegin", '<section class="trust-friendly-guide" data-planify-guidance="daily"><div><span>☀</span><div><strong>' + escapeHtml(name ? "Hola, " + name + ". Este espacio es tuyo." : "Este espacio es tuyo") + '</strong><small>Empieza por una sola cosa. Liberday te acompaña sin obligarte a llenar todo.</small></div></div><div><button type="button" data-trust-action="goal">Anotar mi meta</button><button type="button" data-trust-action="change">Pedir un cambio</button><button type="button" data-trust-action="restart">Revisar mis preferencias</button></div></section>');
     }
     var monthly = document.querySelector("#view-mensual");
     if (monthly && !monthly.querySelector('[data-planify-guidance="monthly"]')) monthly.insertAdjacentHTML("afterbegin", guidanceMarkup(profile, "monthly"));

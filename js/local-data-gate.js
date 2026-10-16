@@ -405,7 +405,7 @@
     landing.id = "planify-local-data-gate";
     landing.className = "is-start";
     landing.innerHTML =
-      '<div class="app planify-public-entry"><h1 class="planify-public-title">PLANIFY</h1>' +
+      '<div class="app planify-public-entry"><h1 class="planify-public-title">Liberday</h1>' +
       '<div class="header-actions"><button type="button" class="planify-public-recovery" data-action="recover">Recuperar datos</button></div>' +
       '<section class="trust-start-hub"><div class="trust-start-heading"><div><span>EMPIEZA COMO PREFIERAS</span>' +
       '<h2>¿Cómo quieres empezar?</h2><p>Elige entre una tabla vacía, una propuesta rápida o una planificación detallada.</p></div></div>' +

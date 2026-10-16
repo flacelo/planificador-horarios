@@ -68,3 +68,7 @@ body.planify-nav-pinned { padding-bottom: 96px; }
   .planify-brand-ready .brand-nav-slot > .bottom-nav { transition: none; }
 }
 
+
+/* Enlace discreto del titular para quien ya tiene horario: despliega las otras formas de empezar */
+.planify-brand-ready .brand-hero-actions .brand-link { min-height: 44px; padding: 8px 6px; border: 0 !important; background: none !important; box-shadow: none !important; color: inherit; font: inherit; font-size: .85rem; font-weight: 700; text-decoration: underline; opacity: .85; cursor: pointer; }
+.planify-brand-ready .brand-hero-actions .brand-link:hover { opacity: 1; }

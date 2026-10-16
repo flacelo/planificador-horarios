@@ -62,7 +62,7 @@
         '<p>' + (returning ? 'Tu espacio está listo. Añade o mueve actividades y sigue con tu semana.' : 'Crea una primera versión en pocos pasos, planifica desde cero o personaliza cada detalle. Siempre podrás cambiar tu horario.') + '</p>' +
         '<div class="brand-hero-actions">' +
           (returning
-            ? '<button type="button" class="brand-primary" data-brand-action="week">Ver mi semana <span aria-hidden="true">↗</span></button><button type="button" class="brand-secondary" data-brand-action="paths">Crear otro horario <span aria-hidden="true">↓</span></button>'
+            ? '<button type="button" class="brand-primary" data-brand-action="week">Ver mi semana <span aria-hidden="true">↗</span></button><button type="button" class="brand-secondary" data-brand-action="paths">Crear otro horario <span aria-hidden="true">↓</span></button><button type="button" class="brand-link" data-brand-action="others">Otras formas de empezar</button>'
             : '<button type="button" class="brand-primary" data-brand-action="paths">Elegir cómo empezar <span aria-hidden="true">↗</span></button>') +
         '</div>' +
         '<p class="brand-data-note"><span aria-hidden="true">▣</span> Tu plan se guarda en este navegador. Para llevarlo a otro dispositivo: ⚙️ → Descargas → Copia de seguridad.</p>' +
@@ -284,8 +284,8 @@
     var button = event.target.closest("[data-brand-action]");
     if (!button) return;
     var action = button.getAttribute("data-brand-action");
-    if (action === "paths" && document.documentElement.classList.contains("planify-home-new") && startFlow()) return;
-    if (action === "paths") {
+    if (action === "paths" && startFlow()) return;
+    if (action === "paths" || action === "others") {
       var hub = document.querySelector(".trust-start-hub");
       if (hub) {
         hub.classList.add("is-expanded");
@@ -300,7 +300,7 @@
     }
   });
 
-  // Quien entra por primera vez empieza por el inicio de 3 pantallas ("inicio" en el asistente).
+  // Una sola puerta: crear un horario (titular, "Crear otro horario", Diario y Avance) abre el inicio de 3 pantallas ("inicio" en el asistente).
   // Si el asistente ya está cargado se abre directo; si no, se usa la misma puerta que las tarjetas de inicio.
   function startFlow() {
     if (window.PLANIFY_WELCOME && typeof window.PLANIFY_WELCOME.open === "function") {

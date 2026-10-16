@@ -582,7 +582,7 @@
     if (!document.getElementById("planify-day-flow-script")) {
       var script = document.createElement("script");
       script.id = "planify-day-flow-script";
-      script.src = "js/day-flow.js?v=5";
+      script.src = "js/day-flow.js?v=6";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -672,7 +672,7 @@
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=13";
+      script.src = "js/brand-home.js?v=14";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -861,7 +861,7 @@
       event.preventDefault();
       var dashboardActionName = dashboardAction.getAttribute("data-dashboard-action");
       closeDashboard();
-      if (dashboardActionName === "start" && window.PLANIFY_WELCOME) window.PLANIFY_WELCOME.open("guided");
+      if (dashboardActionName === "start" && window.PLANIFY_WELCOME) window.PLANIFY_WELCOME.open("inicio");
       if (dashboardActionName === "change") {
         if (window.PLANIFY_WELCOME && typeof window.PLANIFY_WELCOME.requestChange === "function") window.PLANIFY_WELCOME.requestChange();
         else { var changeButton = document.getElementById("schedule-change-open"); if (changeButton) changeButton.click(); }

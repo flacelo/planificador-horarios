@@ -210,7 +210,7 @@
       else window.PLANIFY_FOCUS.open();
     }
     if (action === "schedule" && typeof window.cambiarTab === "function") window.cambiarTab("semanal");
-    if (action === "create" && window.PLANIFY_WELCOME && typeof window.PLANIFY_WELCOME.open === "function") window.PLANIFY_WELCOME.open("guided");
+    if (action === "create" && window.PLANIFY_WELCOME && typeof window.PLANIFY_WELCOME.open === "function") window.PLANIFY_WELCOME.open("inicio");
     if (action === "goal") {
       var goal = document.querySelector(".goals-section textarea,.goals-section input");
       if (goal) { goal.scrollIntoView({ behavior: "smooth", block: "center" }); goal.focus(); }

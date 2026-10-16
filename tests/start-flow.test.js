@@ -119,12 +119,12 @@ test("la pantalla 3 usa los textos y botones acordados y guarda con el flujo seg
 const brandSource = fs.readFileSync(require.resolve("../js/brand-home.js"), "utf8");
 const gateSource = fs.readFileSync(require.resolve("../js/local-data-gate.js"), "utf8");
 
-test("el botón del titular abre el inicio de 3 pantallas solo para quien es nuevo", () => {
-  assert.match(brandSource, /action === "paths" && document\.documentElement\.classList\.contains\("planify-home-new"\) && startFlow\(\)\) return;/);
+test("el botón del titular abre el inicio de 3 pantallas, también \"Crear otro horario\"", () => {
+  assert.match(brandSource, /action === "paths" && startFlow\(\)\) return;/);
   assert.match(brandSource, /PLANIFY_WELCOME\.open\("inicio"\)/);
   assert.match(brandSource, /setAttribute\("data-start-action", "inicio"\)/);
-  // quien ya tiene horario conserva el comportamiento de antes: bajar a las opciones
-  assert.match(brandSource, /if \(action === "paths"\) \{\s*var hub = document\.querySelector\("\.trust-start-hub"\);/);
+  // si no hay forma de abrir el flujo, se conserva lo de antes: bajar a las opciones (y el enlace "Otras formas de empezar" las despliega)
+  assert.match(brandSource, /if \(action === "paths" \|\| action === "others"\) \{\s*var hub = document\.querySelector\("\.trust-start-hub"\);/);
 });
 
 test("la ruta inicio se acepta en la puerta de datos y en el asistente, y las 3 tarjetas no cambian", () => {
@@ -165,4 +165,18 @@ test("\"Empezar con este día\" guarda directo solo si no hay horario que reempl
   // el guardado sigue protegido contra doble toque y conserva la copia de respaldo
   assert.match(welcomeSource, /function applyProposal\(withoutDialog\) \{\s*if \(applyingProposal \|\|/);
   assert.match(welcomeSource, /planify_bienvenida_respaldo_/);
+});
+
+const dayFlowSource = fs.readFileSync(require.resolve("../js/day-flow.js"), "utf8");
+const trustSource = fs.readFileSync(require.resolve("../js/trust-fixes.js"), "utf8");
+
+test("una sola puerta: Diario vacío, Avance vacío y \"Crear otro horario\" abren el inicio de 3 pantallas", () => {
+  assert.match(dayFlowSource, /action === "create" && window\.PLANIFY_WELCOME[\s\S]*?PLANIFY_WELCOME\.open\("inicio"\)/);
+  assert.match(trustSource, /dashboardActionName === "start" && window\.PLANIFY_WELCOME\) window\.PLANIFY_WELCOME\.open\("inicio"\)/);
+  assert.doesNotMatch(dayFlowSource, /PLANIFY_WELCOME\.open\("guided"\)/);
+  assert.doesNotMatch(trustSource, /PLANIFY_WELCOME\.open\("guided"\)/);
+  // las tarjetas siguen abriendo su propia ruta
+  assert.match(trustSource, /PLANIFY_WELCOME\.open\(startName\)/);
+  // quien ya tiene horario conserva un camino a las otras formas de empezar
+  assert.match(brandSource, /data-brand-action="others">Otras formas de empezar<\/button>/);
 });

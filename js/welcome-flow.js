@@ -1995,7 +1995,9 @@
     if (applyButton) applyButton.focus({ preventScroll: true });
   }
 
-  function requestApplyProposal() {
+  // skipConfirmWhenEmpty: "Empezar con este día" guarda directo si no hay un horario que reemplazar;
+  // si ya hay uno, la confirmación de reemplazo se mantiene.
+  function requestApplyProposal(skipConfirmWhenEmpty) {
     if (state.example) return;
     readPreviewEdits();
     var validationError = validatePreviewBlocks();
@@ -2005,6 +2007,10 @@
     }
     if (document.getElementById("welcome-flow-confirm")) return;
     var replacing = hasTasks(parseJson(localStorage.getItem("horario_data_semanal")));
+    if (skipConfirmWhenEmpty && !replacing) {
+      applyProposal(true);
+      return;
+    }
     var dialog = document.createElement("dialog");
     dialog.id = "welcome-flow-confirm";
     dialog.className = "welcome-flow-confirm";
@@ -2020,8 +2026,8 @@
     dialog.querySelector('[data-welcome-action="cancel-apply"]').focus();
   }
 
-  function applyProposal() {
-    if (applyingProposal || !document.getElementById("welcome-flow-confirm")) return;
+  function applyProposal(withoutDialog) {
+    if (applyingProposal || (!withoutDialog && !document.getElementById("welcome-flow-confirm"))) return;
     applyingProposal = true;
     var confirmButton = document.querySelector('#welcome-flow-confirm [data-welcome-action="confirm-apply"]');
     if (confirmButton) confirmButton.disabled = true;
@@ -2490,7 +2496,7 @@
         render();
         return;
       }
-      if (name === "start-apply") { requestApplyProposal(); return; }
+      if (name === "start-apply") { requestApplyProposal(true); return; }
       if (name === "close-schedule-assistant") {
         var scheduleOverlay = document.getElementById("schedule-change-overlay");
         if (scheduleOverlay) scheduleOverlay.remove();

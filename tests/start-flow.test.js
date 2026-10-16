@@ -112,7 +112,7 @@ test("el primer día es el primer día marcado, no siempre el lunes", () => {
 test("la pantalla 3 usa los textos y botones acordados y guarda con el flujo seguro de siempre", () => {
   ["Así podría ser tu primer día", "Es un borrador. Muévelo, cámbialo o quítalo.", "Empezar con este día", "Ajustar antes de empezar"]
     .forEach((text) => assert.ok(welcomeSource.includes(text), text));
-  assert.match(welcomeSource, /name === "start-apply"\) \{ requestApplyProposal\(\); return; \}/);
+  assert.match(welcomeSource, /name === "start-apply"\) \{ requestApplyProposal\(true\); return; \}/);
   assert.match(welcomeSource, /name === "start-adjust"[\s\S]*?state\.step = proposalStep\(\)/);
 });
 
@@ -152,4 +152,17 @@ test("cada franja muestra sus horas en letra pequeña, sin cambiar sus nombres",
   assert.match(welcomeSource, /item\[1\] \+ '<small>' \+ franjaHours\(item\) \+ '<\/small>/);
   // las horas mostradas salen de la misma lista que usa el cálculo
   assert.match(welcomeSource, /\["morning", "Mañana", "06:00", "12:00"\], \["afternoon", "Tarde", "12:00", "18:00"\], \["evening", "Noche", "18:00", "22:00"\]/);
+});
+
+test("\"Empezar con este día\" guarda directo solo si no hay horario que reemplazar", () => {
+  assert.match(welcomeSource, /function requestApplyProposal\(skipConfirmWhenEmpty\)/);
+  assert.match(welcomeSource, /if \(skipConfirmWhenEmpty && !replacing\) \{\s*applyProposal\(true\);\s*return;\s*\}/);
+  // con horario previo se sigue pidiendo la confirmación de reemplazo
+  assert.match(welcomeSource, /¿Reemplazar tu horario actual\?/);
+  // la confirmación de los demás caminos ("Guardar este horario", tarjetas) no cambia
+  assert.match(welcomeSource, /if \(name === "apply"\) requestApplyProposal\(\);/);
+  assert.match(welcomeSource, /if \(name === "confirm-apply"\) applyProposal\(\);/);
+  // el guardado sigue protegido contra doble toque y conserva la copia de respaldo
+  assert.match(welcomeSource, /function applyProposal\(withoutDialog\) \{\s*if \(applyingProposal \|\|/);
+  assert.match(welcomeSource, /planify_bienvenida_respaldo_/);
 });

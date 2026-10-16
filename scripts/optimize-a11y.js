@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const SEO_DESCRIPTION = 'PLANIFY — Planificador personal para organizar horarios, hábitos, metas y tiempo de enfoque.';
+const SEO_DESCRIPTION = 'Liberday — Planificador personal para organizar horarios, hábitos, metas y tiempo de enfoque.';
 const SEO_KEYWORDS = 'planificador, horarios, productividad, gestión del tiempo, organización, estudio, trabajo';
 
 function replaceMeta(html, pattern, tag) {
@@ -15,7 +15,7 @@ function transform(input) {
   html = replaceMeta(html, /<meta\s+name=["']keywords["'][^>]*>/gi,
     '<meta name="keywords" content="' + SEO_KEYWORDS + '">');
   html = html.replace(/<meta\s+property=["']og:(?:title|description|type|url)["'][^>]*>/gi, '');
-  html = html.replace('</head>', '<meta property="og:title" content="PLANIFY — Planificador personal"><meta property="og:description" content="Organiza horarios, hábitos, metas y tiempo de enfoque."><meta property="og:type" content="website"></head>');
+  html = html.replace('</head>', '<meta property="og:title" content="Liberday — Planificador personal"><meta property="og:description" content="Organiza horarios, hábitos, metas y tiempo de enfoque."><meta property="og:type" content="website"></head>');
 
   // Estos elementos ya no existen en el HTML actual. Sus antiguas correcciones
   // son opcionales, así que su ausencia nunca debe producir una falsa alarma.
@@ -32,7 +32,7 @@ function transform(input) {
   );
 
   html = html.replace(/<div class="(modal-overlay(?: [^"]*)?)" id="([^"]+)"([^>]*)>/g, (tag, className, id, attrs) => {
-    const label = ({ modal: 'Editar actividad', 'modal-report': 'Enviar reporte semanal', 'modal-evento': 'Editar evento', 'tutorial-modal': 'Tutorial guiado' })[id] || 'Ventana de PLANIFY';
+    const label = ({ modal: 'Editar actividad', 'modal-report': 'Enviar reporte semanal', 'modal-evento': 'Editar evento', 'tutorial-modal': 'Tutorial guiado' })[id] || 'Ventana de Liberday';
     if (/\brole=["']dialog["']/i.test(attrs)) return tag;
     return '<div class="' + className + '" id="' + id + '"' + attrs + ' role="dialog" aria-modal="true" aria-label="' + label + '">';
   });

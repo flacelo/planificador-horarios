@@ -1,6 +1,6 @@
 {
-  "name": "PLANIFY — Planificador personal",
-  "short_name": "PLANIFY",
+  "name": "Liberday — Planificador personal",
+  "short_name": "Liberday",
   "description": "Organiza horarios, hábitos, metas y tiempo de enfoque en un solo lugar.",
   "start_url": "./?source=pwa",
   "scope": "./",

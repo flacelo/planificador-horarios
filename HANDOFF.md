@@ -135,6 +135,10 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 4. **Sincronizar Git:**
    - Alinear la rama local con la remota para que el indicador quede en `"0↓ 0↑"`.
 
+5. **Error 404 de `favicon.ico` en la consola del navegador** (encontrado por el dueño en la prueba manual del 2026-10-16; no viene del cambio de nombre):
+   - *Causa:* `index.html` solo declara `<link rel="apple-touch-icon" href="icon.svg">`; no hay `<link rel="icon">` y no existe `favicon.ico` en el proyecto. El navegador pide `/favicon.ico` por defecto y recibe 404.
+   - *Solución sugerida (sin hacer todavía):* agregar `<link rel="icon" href="icon.svg" type="image/svg+xml">` en `index.html` (y subir el número de versión/caché si corresponde). Es un cambio de una línea; hay que pedir confirmación al dueño antes de tocar código.
+
 ### 🟢 Prioridad Futura (Funcionalidad Estrella)
 5. **Subida de Horario Universitario (PDF o Foto) con Detección Automática:**
    - **Objetivo:** Que el alumno suba el horario que le entrega su universidad (en PDF o fotografía) y Liberday reconozca los cursos y sus bloques horarios.
@@ -152,7 +156,7 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 > 1. **Commit 7 del cambio de nombre:** definir el nombre "Liberday" una sola vez (para que un futuro cambio sea de un solo archivo) y renombrar los mensajes técnicos de consola y los comentarios. No tocar nada de la lista "Nombres que NO se deben renombrar".
 > 2. **Decidir con el dueño la subida:** hoy hay commits locales sin subir. Subir solo a `codex/ux-audit-20261006`, nunca a `main` sin orden explícita.
 > 3. **Decisión aparte del dueño:** la dirección de Vercel (ver advertencia) y si se renombra el repositorio de GitHub.
-> 4. **Pendientes anteriores:** B5 y A4 en móvil, B4 (fecha del Diario como `10/15/2026`) y A5 a A8.
+> 4. **Pendientes anteriores:** B5 y A4 en móvil, B4 (fecha del Diario como `10/15/2026`), A5 a A8 y el 404 de `favicon.ico` (ver sección 4).
 > 5. **Replanteo de la primera pantalla** (frase de valor, flujo de inicio de 3 pasos): propuesto al dueño, pendiente de su aprobación; no se ha tocado código.
 
 ---
@@ -168,3 +172,4 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 | **2026-10-15** | **Claude Code** | Corregidos A1, A2, A3, A4 (escritorio) y B1 en 5 commits locales separados (sin push). Nueva prueba `tests/monthly-calendar.test.js`; pruebas 79/79. Pendiente aparte: la columna de horas sigue cortada en móvil; el calendario mensual usa `_mesActual+2` para los días grises finales (en diciembre da mes 13). |
 | **2026-10-15** | **Claude Code** | Corregidos B3, B2 y B5 (escritorio) en 3 commits separados (`354cf13`, `98cc89c`, `f7f79a0`) y eliminado el código de cuentas, recuperación de contraseña y sesiones (`ee4e3c2`). Nueva prueba `tests/monthly-schedule-preview.test.js`; pruebas 82/82. Subido todo a `codex/ux-audit-20261006` con confirmación del dueño; `main` intacto. Siguiente: subir la versión del caché (`app.js?v=11.0`, `planify-shell-v19`). |
 | **2026-10-16** | **Claude Code** | Cambio de nombre de Planify a Liberday en 6 commits locales sin subir (pestaña/manifest, inicio y asistente, panel/enfoque/recordatorios/instalación, PDF/respaldos/reporte, service worker y versiones, documentos). Pruebas en verde antes de cada commit (82 y luego 85 con las pruebas nuevas del service worker). Nombres internos, claves de datos, formato de respaldo y dirección de Vercel se mantienen a propósito (ver sección 1). Pendiente: commit 7 y decisión de subida. |
+| **2026-10-16** | **Claude Code** | Los 7 commits del cambio de nombre se subieron a `codex/ux-audit-20261006` (`e2e4c3e`, `main` intacto). Prueba manual del dueño en su navegador, paso 1: la pestaña, la cabecera y la pantalla de inicio dicen Liberday; en la consola solo aparece un 404 de `favicon.ico`, ajeno al cambio de nombre y anotado como pendiente. El dueño sigue con el paso 2 (crear un horario). Sin cambios de código. |

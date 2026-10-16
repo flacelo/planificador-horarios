@@ -120,3 +120,20 @@
 /* El pie (Atrás / Seguir) queda siempre visible al bajar dentro de la ventana del asistente */
 .welcome-flow-footer{position:sticky;bottom:-28px;z-index:3;margin-bottom:-28px;padding:14px 0 28px;background:linear-gradient(to top,#f8faff 80%,rgba(248,250,255,0))}
 @media(max-width:600px){.welcome-flow-footer{bottom:-21px;margin-bottom:-21px;padding-bottom:21px}}
+
+/* Inicio de 3 pantallas (modo "inicio") */
+.welcome-flow-start-goal{gap:12px}
+.welcome-flow-start-goal textarea{font-size:1rem;min-height:72px;resize:none}
+.welcome-flow-start-chips{display:flex;flex-wrap:wrap;gap:8px}
+.welcome-flow-start-chip{min-height:40px;padding:8px 15px;border:1px solid #cbd5e1;border-radius:999px;background:#fff;color:#334155;font:inherit;font-size:.85rem;font-weight:750;cursor:pointer}
+.welcome-flow-start-chip:hover{border-color:#146f68;background:#e6f4f1}
+.welcome-flow-start-chip:focus-visible{outline:3px solid #7cc7bd;outline-offset:2px}
+.welcome-flow-start-when{gap:20px}
+.welcome-flow-start-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.welcome-flow-start-day input,.welcome-flow-start-pill input{position:absolute;opacity:0;pointer-events:none}
+.welcome-flow-start-day span{display:grid;min-height:46px;place-items:center;border:1px solid #dbe3f0;border-radius:12px;background:#fff;color:#475569;font-size:.95rem;font-weight:800;cursor:pointer}
+.welcome-flow-start-pills{display:flex;flex-wrap:wrap;gap:8px}
+.welcome-flow-start-pill span{display:inline-grid;min-height:44px;place-items:center;padding:8px 18px;border:1px solid #dbe3f0;border-radius:999px;background:#fff;color:#475569;font-size:.88rem;font-weight:800;cursor:pointer}
+.welcome-flow-start-day input:checked+span,.welcome-flow-start-pill input:checked+span{border-color:#146f68;background:#146f68;color:#fff}
+.welcome-flow-start-day input:focus-visible+span,.welcome-flow-start-pill input:focus-visible+span{outline:3px solid #a5b4fc;outline-offset:2px}
+@media(max-width:600px){.welcome-flow-start-days{gap:4px}.welcome-flow-start-day span{min-height:44px;font-size:.9rem}.welcome-flow-start-footer{align-items:stretch;flex-direction:column-reverse}.welcome-flow-start-footer>span{text-align:center}.welcome-flow-start-footer .welcome-flow-primary{width:100%;margin-left:0}}

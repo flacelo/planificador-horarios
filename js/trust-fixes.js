@@ -955,13 +955,13 @@
       var welcomeStyle = document.createElement("link");
       welcomeStyle.id = "welcome-flow-style";
       welcomeStyle.rel = "stylesheet";
-      welcomeStyle.href = "css/welcome-flow.css?v=1.20";
+      welcomeStyle.href = "css/welcome-flow.css?v=1.21";
       document.head.appendChild(welcomeStyle);
     }
     if (!document.getElementById("welcome-flow-script")) {
       var welcomeScript = document.createElement("script");
       welcomeScript.id = "welcome-flow-script";
-      welcomeScript.src = "js/welcome-flow.js?v=1.29";
+      welcomeScript.src = "js/welcome-flow.js?v=1.30";
       welcomeScript.defer = true;
       document.head.appendChild(welcomeScript);
     }

@@ -3,6 +3,11 @@
 
   var DAYS = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"];
   var DAY_LABELS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+  // Inicio de 3 pantallas (modo "inicio"): franjas del día, duraciones y atajos de la primera pantalla.
+  var START_FRANJAS = [["morning", "Mañana", "06:00", "12:00"], ["afternoon", "Tarde", "12:00", "18:00"], ["evening", "Noche", "18:00", "22:00"]];
+  var START_DURATIONS = [[30, "30 min"], [60, "1 hora"], [120, "2 horas"]];
+  var START_DAY_LETTERS = ["L", "M", "X", "J", "V", "S", "D"];
+  var START_SHORTCUTS = ["Estudiar", "Entrenar", "Descansar mejor"];
   var welcomeReturnFocus = null;
   var applyingProposal = false;
   var weeklyResizeDrag = null;
@@ -21,6 +26,9 @@
   var state = {
     step: 0,
     mode: "guided",
+    inicioScreen: 0,
+    franjas: ["morning", "afternoon", "evening"],
+    inicioMinutes: 60,
     startedFromHub: false,
     userName: "",
     priority: "study",
@@ -356,7 +364,7 @@
   }
 
   function decisionStep() {
-    return state.mode === "quick" ? 2 : state.mode === "guided" ? 3 : 4;
+    return state.mode === "quick" || state.mode === "inicio" ? 2 : state.mode === "guided" ? 3 : 4;
   }
 
   function rhythmStep() {
@@ -410,6 +418,11 @@
       }).filter(function (venture) { return venture.name || venture.details; });
     }
     state.priority = inferPriority(state.goal);
+    if (overlay.querySelector("input[name='welcome-franja']")) {
+      state.franjas = Array.from(overlay.querySelectorAll("input[name='welcome-franja']:checked")).map(function (input) { return input.value; });
+    }
+    var inicioMinutes = overlay.querySelector("input[name='welcome-inicio-minutes']:checked");
+    if (inicioMinutes) state.inicioMinutes = Number(inicioMinutes.value);
     var selectedDays = Array.from(overlay.querySelectorAll("input[name='welcome-day']:checked")).map(function (input) { return Number(input.value); });
     if (overlay.querySelector("input[name='welcome-day']")) state.days = selectedDays;
     if (overlay.querySelector("input[name='welcome-day']")) state.weeklyFrequency = Math.max(1, state.days.length);
@@ -546,7 +559,7 @@
     var skippedChoice = state.startedFromHub ? 1 : 0;
     // En modo rápido, "Ver mi horario ahora" pasa de la decisión a la propuesta sin las preguntas de ritmo y vida diaria:
     // el contador cuenta solo los pasos que la persona realmente recorre.
-    var shortPath = state.mode === "quick" && !state.wantMoreQuestions;
+    var shortPath = (state.mode === "quick" || state.mode === "inicio") && !state.wantMoreQuestions;
     var total = (shortPath ? decisionStep() + 2 : totalSteps()) - skippedChoice;
     var current = (shortPath && step === proposalStep() ? total + skippedChoice : step + 1) - skippedChoice;
     return '<header class="welcome-flow-header"><div class="welcome-flow-progress" aria-label="Paso ' + current + ' de ' + total + '">' +
@@ -570,6 +583,128 @@
       }).join("") + '</div>' +
       '<div class="welcome-flow-example-callout"><span>👀</span><div><strong>¿Prefieres mirar antes?</strong><small>Te enseñamos un ejemplo completo sin guardar ni cambiar tus datos.</small></div><button type="button" class="welcome-flow-secondary" data-welcome-action="example">Ver ejemplo</button></div>' +
       '<footer class="welcome-flow-footer"><span>Nada queda bloqueado: puedes cambiar de método después.</span><button class="welcome-flow-primary" data-welcome-action="next">Continuar →</button></footer>';
+  }
+
+  function startHeader(screen, title, subtitle) {
+    return '<header class="welcome-flow-header"><div class="welcome-flow-progress" aria-label="Paso ' + screen + ' de 3"><i style="width:' + (screen * 100 / 3) + '%"></i></div>' +
+      '<span class="welcome-flow-step">PASO ' + screen + ' DE 3</span>' +
+      '<button type="button" class="welcome-flow-close" data-welcome-action="close" aria-label="Cerrar">×</button>' +
+      '<h2 id="welcome-flow-title" tabindex="-1">' + title + '</h2><p>' + subtitle + '</p></header>';
+  }
+
+  function renderStartGoalScreen() {
+    var shortcuts = START_SHORTCUTS.map(function (label) {
+      return '<button type="button" class="welcome-flow-start-chip" data-welcome-action="start-shortcut" data-start-shortcut="' + escapeHtml(label) + '">' + label + '</button>';
+    }).join("");
+    return startHeader(1, "¿Qué quieres lograr?", "Una meta basta. Puedes cambiarla cuando quieras.") +
+      '<div class="welcome-flow-fields welcome-flow-start-goal"><textarea id="welcome-quick-goal" rows="2" maxlength="160" required aria-label="¿Qué quieres lograr?" placeholder="Por ejemplo: aprobar matemáticas, entrenar 3 veces por semana, descansar mejor">' + escapeHtml(state.goal) + '</textarea>' +
+      '<div class="welcome-flow-start-chips">' + shortcuts + '</div></div>' +
+      '<footer class="welcome-flow-footer welcome-flow-start-footer"><span>Tus datos se quedan en tu navegador</span><button class="welcome-flow-primary" data-welcome-action="start-next">Siguiente</button></footer>';
+  }
+
+  function renderStartWhenScreen() {
+    var days = DAY_LABELS.map(function (day, index) {
+      return '<label class="welcome-flow-start-day"><input type="checkbox" name="welcome-day" value="' + index + '" aria-label="' + day + '" ' + (state.days.indexOf(index) >= 0 ? "checked" : "") + '><span aria-hidden="true">' + START_DAY_LETTERS[index] + '</span></label>';
+    }).join("");
+    var franjas = START_FRANJAS.map(function (item) {
+      return '<label class="welcome-flow-start-pill"><input type="checkbox" name="welcome-franja" value="' + item[0] + '" ' + (state.franjas.indexOf(item[0]) >= 0 ? "checked" : "") + '><span>' + item[1] + '</span></label>';
+    }).join("");
+    var durations = START_DURATIONS.map(function (item) {
+      return '<label class="welcome-flow-start-pill"><input type="radio" name="welcome-inicio-minutes" value="' + item[0] + '" ' + (Number(state.inicioMinutes) === item[0] ? "checked" : "") + '><span>' + item[1] + '</span></label>';
+    }).join("");
+    return startHeader(2, "¿Cuándo puedes hacerlo?", "Marca los días y las horas libres. Yo no pongo nada fuera de ellos.") +
+      '<div class="welcome-flow-fields welcome-flow-start-when">' +
+      '<fieldset class="welcome-flow-start-group"><legend>Días</legend><div class="welcome-flow-start-days">' + days + '</div></fieldset>' +
+      '<fieldset class="welcome-flow-start-group"><legend>Horas libres</legend><div class="welcome-flow-start-pills">' + franjas + '</div></fieldset>' +
+      '<fieldset class="welcome-flow-start-group"><legend>¿Cuánto tiempo por vez?</legend><div class="welcome-flow-start-pills">' + durations + '</div></fieldset></div>' +
+      '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="start-back">Atrás</button><button class="welcome-flow-primary" data-welcome-action="start-next">Siguiente</button></footer>';
+  }
+
+  function renderStartScreen() {
+    return state.inicioScreen === 2 ? renderStartWhenScreen() : renderStartGoalScreen();
+  }
+
+  // Convierte las respuestas de las pantallas 1 y 2 en los datos que ya usa buildProposal():
+  // la meta, los días, el rango de horas, el largo del bloque y las franjas que se dejan libres.
+  function applyStartAnswers() {
+    var chosen = START_FRANJAS.filter(function (item) { return state.franjas.indexOf(item[0]) >= 0; });
+    if (!chosen.length) chosen = START_FRANJAS.slice();
+    var first = chosen[0];
+    var last = chosen[chosen.length - 1];
+    state.start = first[2];
+    state.end = last[3];
+    state.blockDuration = 30;
+    state.sessionsPerDay = Math.max(1, Math.round(Number(state.inicioMinutes) / 30)) || 2;
+    state.startStyle = "direct";
+    state.energyPeak = "morning";
+    state.weeklyFrequency = Math.max(1, state.days.length);
+    state.dayTimes = {};
+    state.manualRequests = state.manualRequests.filter(function (item) { return !item.inicio; });
+    var rangeStart = timeToMinutes(first[2]);
+    var rangeEnd = timeToMinutes(last[3]);
+    START_FRANJAS.forEach(function (item) {
+      if (state.franjas.indexOf(item[0]) >= 0) return;
+      var from = timeToMinutes(item[2]);
+      var to = timeToMinutes(item[3]);
+      if (from < rangeStart || to > rangeEnd) return;
+      state.days.forEach(function (day) {
+        state.manualRequests.push({ day: Number(day), start: from, end: to, text: "", category: "libre", inicio: true });
+      });
+    });
+    state.edits = {};
+    state.rowTimes = {};
+    state.wantMoreQuestions = false;
+  }
+
+  function showStartError(selector, message) {
+    var field = document.querySelector(selector);
+    if (!field) return;
+    var old = field.parentElement.querySelector(".welcome-flow-error");
+    if (old) old.remove();
+    field.insertAdjacentHTML("afterend", '<span class="welcome-flow-error" role="alert">' + message + '</span>');
+  }
+
+  function startNext() {
+    getDraftFromForm();
+    if (state.inicioScreen === 1) {
+      if (!state.goal) {
+        showStartError("#welcome-quick-goal", "Escribe una meta para seguir. Puede ser algo sencillo.");
+        var goalField = document.querySelector("#welcome-quick-goal");
+        if (goalField) goalField.focus();
+        return;
+      }
+      state.inicioScreen = 2;
+      state.step = 12;
+    } else if (state.inicioScreen === 2) {
+      if (!state.days.length) {
+        showStartError(".welcome-flow-start-days", "Marca al menos un día.");
+        return;
+      }
+      if (!state.franjas.length) {
+        showStartError(".welcome-flow-start-pills", "Marca al menos una franja de horas libres.");
+        return;
+      }
+      applyStartAnswers();
+      var startError = validatePreviewBlocks();
+      if (startError) {
+        showPreviewError(startError);
+        return;
+      }
+      state.inicioScreen = 0;
+      state.step = proposalStep();
+    } else {
+      return;
+    }
+    render();
+  }
+
+  function startBack() {
+    getDraftFromForm();
+    if (state.inicioScreen === 2) {
+      state.inicioScreen = 1;
+      state.step = 11;
+      render();
+    }
   }
 
   function renderCoreStep() {
@@ -1668,7 +1803,8 @@
         return true;
       });
     }
-    var content = state.step === 0 ? renderModeStep() :
+    var content = state.mode === "inicio" && state.inicioScreen ? renderStartScreen() :
+      state.step === 0 ? renderModeStep() :
       state.step === 1 ? renderCoreStep() :
       state.step === 2 && state.mode !== "quick" ? renderCommitmentsStep() :
       state.step === 3 && state.mode === "detailed" ? renderRemindersStep() :
@@ -1711,7 +1847,7 @@
     var existingOverlay = document.getElementById("welcome-flow-overlay");
     if (!existingOverlay || !existingOverlay.contains(document.activeElement)) welcomeReturnFocus = document.activeElement;
     state.step = 0;
-    state.mode = ["manual", "quick", "guided", "detailed"].indexOf(preferredMode) >= 0 ? preferredMode : "quick";
+    state.mode = ["manual", "quick", "guided", "detailed", "inicio"].indexOf(preferredMode) >= 0 ? preferredMode : "quick";
     state.startedFromHub = Boolean(preferredMode && preferredMode !== "manual");
     state.userName = localStorage.getItem("planify_nombre") || "";
     state.priority = "study";
@@ -1723,10 +1859,13 @@
     state.specialty = "industrial";
     state.specialtyOther = "";
     state.studyContext = "classes";
-    if (state.mode === "quick") {
+    if (state.mode === "quick" || state.mode === "inicio") {
       state.career = "other";
       state.specialty = "general";
     }
+    state.inicioScreen = state.mode === "inicio" ? 1 : 0;
+    state.franjas = ["morning", "afternoon", "evening"];
+    state.inicioMinutes = 60;
     state.jobRole = "";
     state.jobPattern = "fixed";
     state.ventures = [];
@@ -1786,6 +1925,7 @@
     state.feedbackUndo = [];
     state.previewColumnWidths = {};
     state.step = state.startedFromHub ? 1 : 0;
+    if (state.mode === "inicio") state.step = 11;
     render();
     var title = document.getElementById("welcome-flow-title");
     if (title) title.focus({ preventScroll: true });
@@ -2291,6 +2431,18 @@
       var name = action.getAttribute("data-welcome-action");
       if (["next", "generate-now", "more-questions", "preview", "preview-extra-now", "skip-rhythm", "skip-life"].indexOf(name) >= 0 && !validateMinuteFields()) return;
       if (name === "close") { close(true); return; }
+      if (name === "start-shortcut") {
+        var shortcutField = document.querySelector("#welcome-quick-goal");
+        if (shortcutField) {
+          shortcutField.value = action.getAttribute("data-start-shortcut") || "";
+          var shortcutError = shortcutField.parentElement.querySelector(".welcome-flow-error");
+          if (shortcutError) shortcutError.remove();
+          shortcutField.focus();
+        }
+        return;
+      }
+      if (name === "start-next") { startNext(); return; }
+      if (name === "start-back") { startBack(); return; }
       if (name === "close-schedule-assistant") {
         var scheduleOverlay = document.getElementById("schedule-change-overlay");
         if (scheduleOverlay) scheduleOverlay.remove();
@@ -2642,6 +2794,12 @@
       }
       if (name === "back") {
         getDraftFromForm();
+        if (state.mode === "inicio" && state.step === proposalStep()) {
+          state.inicioScreen = 2;
+          state.step = 12;
+          render();
+          return;
+        }
         if (state.step === proposalStep()) state.step = state.wantMoreQuestions ? lifeStep() : decisionStep();
         else if (state.step === decisionStep()) state.step = state.mode === "quick" ? 1 : state.mode === "guided" ? 2 : 3;
         else state.step = Math.max(0, state.step - 1);
@@ -2700,6 +2858,7 @@
   }
 
   window.PLANIFY_WELCOME = { open: open, requestChange: openScheduleAssistant };
+  if (window.__PLANIFY_START_TEST__) window.__PLANIFY_START_TEST_HOOKS__ = { state: state, applyStartAnswers: applyStartAnswers, buildProposal: buildProposal, minutesToTime: minutesToTime };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();

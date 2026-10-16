@@ -217,6 +217,8 @@
       var gear = document.getElementById("cloud-btn");
       if (gear) gear.classList.toggle("is-tucked", value);
     }
+    // En celular (600 px o menos) la barra siempre queda fija abajo, aunque no use la clase is-pinned de escritorio.
+    function phoneBar() { return window.innerWidth <= 600; }
     function overlayIsOpen() {
       return Boolean(document.querySelector(".modal-overlay.active,#welcome-flow-overlay,#side-panel.open"));
     }
@@ -226,7 +228,8 @@
       var y = window.scrollY || 0;
       var delta = y - lastScrollY;
       var atEnd = y + window.innerHeight >= document.documentElement.scrollHeight - 8;
-      if (!nav.classList.contains("is-pinned") || atEnd || overlayIsOpen()) setTucked(false);
+      var fixedBar = nav.classList.contains("is-pinned") || phoneBar();
+      if (!fixedBar || atEnd || overlayIsOpen()) setTucked(false);
       else if (delta > 6 && y > 120 && Date.now() < userScrollUntil) setTucked(true);
       else if (delta < -6) setTucked(false);
       lastScrollY = y;
@@ -235,7 +238,7 @@
       var pinned = window.innerWidth > 600 && slot.getBoundingClientRect().bottom < 0;
       nav.classList.toggle("is-pinned", pinned);
       // Con la barra fija, deja espacio al final de la página para que nada quede detrás de ella.
-      document.body.classList.toggle("planify-nav-pinned", pinned);
+      document.body.classList.toggle("planify-nav-pinned", pinned || phoneBar());
       updateTuck();
     }
     window.addEventListener("scroll", updatePosition, { passive: true });

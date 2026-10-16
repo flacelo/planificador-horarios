@@ -155,7 +155,7 @@
         showMessage(error, true);
         return;
       }
-      showMessage("Horario anterior restaurado. PLANIFY se actualizará ahora.", false);
+      showMessage("Horario anterior restaurado. Liberday se actualizará ahora.", false);
       dialog.close();
       dialog.remove();
       window.location.reload();
@@ -187,7 +187,7 @@
     var url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
     var link = document.createElement("a");
     link.href = url;
-    link.download = "planify_respaldo_" + new Date().toISOString().slice(0, 10) + ".json";
+    link.download = "liberday_respaldo_" + new Date().toISOString().slice(0, 10) + ".json";
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -273,7 +273,7 @@
     importButton.id = "btn-import-complete-json";
     importButton.className = "sp-action-btn btn-secondary";
     importButton.textContent = "Restaurar respaldo";
-    importButton.title = "Importa una copia descargada desde PLANIFY";
+    importButton.title = "Importa una copia descargada desde Liberday";
 
     var fileInput = document.createElement("input");
     fileInput.type = "file";
@@ -483,10 +483,10 @@
             else localStorage.setItem(key, oldValues[key]);
           } catch (rollbackError) { /* Keep attempting to restore the remaining keys. */ }
         });
-        return showMessage("No se pudo guardar la copia completa; PLANIFY restauró los datos anteriores.", true);
+        return showMessage("No se pudo guardar la copia completa; Liberday restauró los datos anteriores.", true);
       }
 
-      showMessage("Copia restaurada. PLANIFY se actualizará ahora.", false);
+      showMessage("Copia restaurada. Liberday se actualizará ahora.", false);
       window.setTimeout(function () { window.location.reload(); }, 500);
     };
     reader.readAsText(file);

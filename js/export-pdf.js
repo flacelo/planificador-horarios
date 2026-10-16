@@ -337,7 +337,7 @@
     var pageClass = 'planify-export-page planify-export-' + opcion.tipo + (opcion.compactWeekly ? ' planify-export-semanal-hoja' : Number.isInteger(opcion.weekDay) ? ' planify-export-semanal-dia' : '');
     var pageSubtitle = opcion.compactWeekly ? 'Los siete días en una hoja · ' + subtitulo : Number.isInteger(opcion.weekDay) ? 'Vista semanal completa · ' + ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'][opcion.weekDay] + ' · ' + subtitulo : subtitulo;
     return '<section class="' + pageClass + '" data-planify-page="' + opcion.id + '">' +
-      '<header class="planify-export-header"><div class="planify-export-brand">PLANIFY</div>' +
+      '<header class="planify-export-header"><div class="planify-export-brand">Liberday</div>' +
       '<h1>' + escaparHTML(opcion.label) + '</h1><p>' + escaparHTML(pageSubtitle) + '</p></header>' +
       '<div class="planify-export-viewport"><div class="planify-export-fit">' + prepararClon(elemento, opcion) + '</div></div>' +
       '<footer class="planify-export-footer">Planificador de horarios</footer></section>';
@@ -551,7 +551,7 @@
     document.body.appendChild(iframe);
     var doc = iframe.contentWindow.document;
     doc.open();
-    doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>PLANIFY - Exportación PDF</title><style id="planify-pdf-clean-styles">' + estilosDocumento() + '</style></head><body id="planify-pdf-document">' + paginas.join('') + '</body></html>');
+    doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Liberday - Exportación PDF</title><style id="planify-pdf-clean-styles">' + estilosDocumento() + '</style></head><body id="planify-pdf-document">' + paginas.join('') + '</body></html>');
     doc.close();
     return iframe;
   }

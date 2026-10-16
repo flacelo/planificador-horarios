@@ -14,7 +14,7 @@ test("el reporte es local, ofrece descarga y no simula el envío de correo", () 
   assert.ok(reportIndex > appIndex);
   assert.match(report, /window\.getMailReportTemplate/);
   assert.match(report, /new Blob\(\[report\]/);
-  assert.match(report, /planify-reporte-semanal-/);
+  assert.match(report, /liberday-reporte-semanal-/);
   assert.match(report, /No se envió ningún correo/);
   assert.doesNotMatch(report, /fetch\s*\(|XMLHttpRequest|trackAnonymEvent/);
   assert.doesNotMatch(report, /localStorage\.setItem\(["']report_email/);

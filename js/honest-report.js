@@ -15,7 +15,7 @@
       var date = new Date();
       var datePart = [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
       link.href = url;
-      link.download = "planify-reporte-semanal-" + datePart + ".html";
+      link.download = "liberday-reporte-semanal-" + datePart + ".html";
       link.hidden = true;
       document.body.appendChild(link);
       link.click();
@@ -50,7 +50,7 @@
     var heading = modal.querySelector("h3");
     if (heading) heading.textContent = "📊 Descargar reporte semanal";
     var description = modal.querySelector("p");
-    if (description) description.textContent = "Guarda un resumen local que puedes abrir o imprimir. Planify no envía correos.";
+    if (description) description.textContent = "Guarda un resumen local que puedes abrir o imprimir. Liberday no envía correos.";
     var email = document.getElementById("inp-report-email");
     if (email) email.remove();
     var message = document.getElementById("msg-report-email");

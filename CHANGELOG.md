@@ -60,3 +60,20 @@
 - Incrementado caché de Service Worker de `planificador-v1` a `planificador-v2` para forzar recarga de archivos actualizados y evitar que el navegador sirva una versión antigua con errores.
 - Eliminados iconos PNG (`icon-192.png`, `icon-512.png`) de los assets del Service Worker (no existen en el repositorio, impedían la instalación correcta del SW).
 - Eliminado archivo duplicado `index_BACKUP_2026-07-06.html` para evitar confusiones al abrir la aplicación.
+
+## v1.5 — Cambio de nombre a Liberday
+
+**Nuevo**
+- La aplicación pasa a llamarse **Liberday** (antes Planify): título de la pestaña, vista previa, nombre al instalar la app, cabecera, asistente, tutorial, panel lateral, enfoque, recordatorios, avisos de instalación, PDF, reporte semanal y documentos.
+- Los archivos que se descargan ahora se llaman `liberday_respaldo_AAAA-MM-DD.json` y `liberday-reporte-semanal-AAAA-MM-DD.html`.
+- El service worker usa la caché `liberday-shell-v1` y, al activarse, borra también las cachés viejas de Planify (`planify-…`).
+- Se subieron los números de versión (`?v=`) de los 24 archivos de `js/` y `css/` que habían cambiado (por ejemplo `app.js` 11.0 → 12.0).
+
+**Se mantiene por compatibilidad**
+- Las claves donde se guardan los datos (`planify_*`), el formato de respaldo `planify-backup` (versiones 2, 3 y 4), `planifyActivityId` y los nombres internos de funciones y clases.
+- La dirección publicada (`planificador-horarios-dun.vercel.app`): los datos se guardan en el navegador y dependen de ella. Cambiarla es una decisión aparte.
+
+**Otros cambios recientes**
+- Se eliminó el código de cuentas (Google/Facebook), recuperación de contraseña y sesiones, que no funcionaba.
+- Correcciones de la auditoría visual en computadora (asistente, vista semanal, vista mensual con el horario, barra flotante). El detalle está en `HANDOFF.md`.
+

@@ -1,4 +1,4 @@
-# Ideas futuras de PLANIFY
+# Ideas futuras de Liberday
 
 Estas son posibilidades para explorar después de estabilizar la edición y completar las pruebas móviles descritas en el [roadmap](ROADMAP.md).
 

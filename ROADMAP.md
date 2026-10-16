@@ -1,8 +1,8 @@
-# Roadmap de PLANIFY
+# Roadmap de Liberday
 
 ## Estado actual
 
-PLANIFY es un prototipo público que organiza horarios con reglas y guarda la información en el navegador. Las funciones simuladas no deben interpretarse como servicios conectados.
+Liberday es un prototipo público que organiza horarios con reglas y guarda la información en el navegador. Las funciones simuladas no deben interpretarse como servicios conectados.
 
 ## Disponible
 

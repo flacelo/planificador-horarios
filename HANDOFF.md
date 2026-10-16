@@ -1,4 +1,6 @@
-# PLANIFY — Documento de Relevo (HANDOFF.md)
+# Liberday — Documento de Relevo (HANDOFF.md)
+
+> **Nombre de la app: Liberday** (antes se llamaba Planify). El repositorio (`planificador-horarios`) y la dirección publicada todavía conservan el nombre viejo; ver sección 1.
 
 > Este archivo es el punto de encuentro oficial entre **ChatGPT** y **Antigravity**.  
 > **Regla de oro:** Toda IA que trabaje en este repositorio debe leer este archivo antes de comenzar y actualizarlo al finalizar su turno.
@@ -10,10 +12,10 @@
 | Dato | Estado actual |
 | :--- | :--- |
 | **Rama activa:** | `codex/ux-audit-20261006` |
-| **Estado de Git:** | Rama local igual a la remota (0↓ 0↑), sin cambios pendientes. |
-| **Página publicada (Producción):** | [https://planificador-horarios-dun.vercel.app](https://planificador-horarios-dun.vercel.app) |
-| **¿Los 2 cambios ya están en internet?:** | **SÍ**, ya están publicados en Vercel porque ya fueron subidos a `origin/main`. |
-| **Siguiente tarea prioritaria:** | Auditoría visual en computadora (navegación y primer uso) y revisión de cuentas/nube simuladas. |
+| **Estado de Git:** | La rama local tiene commits **sin subir** del cambio de nombre a Liberday (ver sección 2). **No se sube nada a GitHub sin confirmación explícita del dueño** (regla 5 de `AGENTS.md`). |
+| **Página publicada (Producción):** | [https://planificador-horarios-dun.vercel.app](https://planificador-horarios-dun.vercel.app). **La dirección no se cambia por ahora**; el dueño decidirá aparte (ver la advertencia de la sección 1). |
+| **¿El cambio de nombre ya está en internet?:** | **NO.** Está solo en commits locales de la rama de trabajo. Lo que se publica en Vercel sale de `main`. |
+| **Siguiente tarea prioritaria:** | Commit 7 del cambio de nombre: definir el nombre en un solo lugar y renombrar los mensajes internos de consola. Después, el dueño decide cuándo subir. |
 
 ---
 
@@ -30,19 +32,37 @@
 
 ### ¿Qué está a medias o simulado?
 - **Servidor simulado (Mock):** `server.js` es solo un servidor de pruebas para desarrollo local. No existe un servidor real en la nube.
-- **Cuentas y nube simuladas:** Las opciones de iniciar sesión con Google/Facebook o sincronizar en la nube son interfaces visuales de demostración; la app no tiene backend de usuarios ni base de datos remota.
+- **Cuentas y nube:** el código de inicio de sesión (Google/Facebook), recuperación de contraseña y sesiones se eliminó (commit `ee4e3c2`) porque no funcionaba. La app **no tiene cuentas ni nube**: todo vive en el navegador.
+
+
+### ⚠️ Nombres que NO se deben renombrar (compatibilidad con datos ya guardados)
+Aunque la app ahora se llama Liberday, estos nombres internos **se conservan**. Cambiarlos haría que las personas pierdan sus datos o que las copias de seguridad viejas dejen de importarse:
+- **Claves de guardado `planify_*`** en `localStorage` (26 claves y prefijos distintos: nombre, tema, idioma, historial de cumplimiento, sesiones y minutos de enfoque, diario, metas anuales, archivo de datos locales…). `js/local-data-gate.js` usa el prefijo `planify_` para saber qué datos son de la app. Ojo: `planify_bienvenida_respaldo_` y `planify_cambio_respaldo_` son prefijos de claves de datos (copias automáticas guardadas en el navegador), no nombres de archivos descargables; los archivos que se descargan sí cambiaron a `liberday_…`.
+- **Formato de respaldo `backupFormat: "planify-backup"`** (versiones 2, 3 y 4): se sigue leyendo y escribiendo.
+- **`planifyActivityId`:** identificador guardado dentro de cada actividad y de su historial.
+- **Nombres internos:** funciones y variables `PLANIFY_*`, `cambiarVistaPlanify`, clases `planify-*`, atributos `data-planify-*`, IDs, y el marcador de compilación `.planify-build-manifest.json`.
+- **`PLANIFY_ADMIN_TOKEN`** (variable de entorno del servidor de pruebas) y su mención en `SECURITY.md` y `.env.example`.
+- **La dirección web `planificador-horarios-dun.vercel.app`:** los datos están **atados a la dirección** del navegador. Con otra dirección, todas las personas empezarían vacías, y una redirección no mueve los datos. Si algún día se quiere una dirección nueva, hay que dejar la vieja funcionando y ofrecer "traer mis datos" con copia de seguridad y restauración. Tampoco conviene tocar `sw.js`, `manifest.json`, `start_url` ni `scope`.
 
 ---
 
 ## 2. Lo Último que se Hizo
 
-- **Rama actual de trabajo:** `codex/ux-audit-20261006`
-- **Los 2 cambios locales guardados ("0↓ 2↑"):**
-  1. `8ef0ced` (*"Fix returning plan access and mobile navigation"*): Mejoró el acceso para personas con horarios ya guardados y pulió la navegación en móviles.
-  2. `f29199b` (*"Polish desktop return and progress labels"*): Pulió los textos de progreso, retorno y estilos visuales en la versión de computadora (`css/brand-system.css`, `index.html`, etc.).
-- **Aclaración sobre Vercel y GitHub:**
-  - En tu editor ves `"0↓ 2↑"` porque tu rama local `codex/ux-audit-20261006` tiene esos dos commits y no se han subido a la rama remota con ese mismo nombre en GitHub.
-  - Sin embargo, **ambos cambios ya están en `origin/main` y por lo tanto ya están publicados y visibles en Vercel**.
+**Cambio de nombre a Liberday** (escritura con mayúscula inicial). Decisiones del dueño: sin aviso de transición (nadie usa la app todavía), ícono y logo se mantienen, la dirección de Vercel no cambia, el nombre en un solo lugar va en un commit aparte. Todo está en commits **locales** de la rama `codex/ux-audit-20261006`, sin subir:
+
+| Commit | Qué cambió |
+| :--- | :--- |
+| `1ce2aca` (1/7) | Pestaña, vista previa, nombre al instalar (`index.html`, `manifest.json`, `scripts/optimize-a11y.js`). |
+| `38b710a` (2/7) | Cabecera (se quitó la mayúscula forzada del título), asistente, tutorial, avance (`welcome-flow.js`, `trust-fixes.js`, `local-data-gate.js`, `css/main.css`). |
+| `5ecd3d5` (3/7) | Panel lateral, enfoque, recordatorios, instalación en el celular, etiqueta del ícono. |
+| `b369f94` (4/7) | PDF, avisos de respaldo, reporte semanal; los archivos descargados pasan a `liberday_respaldo_…json` y `liberday-reporte-semanal-…html`. |
+| `df4d047` (4b) | Pie del reporte: `© 2026 Liberday`. |
+| `d1cfd16` (5/7) | Service worker `liberday-shell-v1` (borra también las cachés `planify-…`) y números `?v=` de 24 archivos (`app.js` 12.0, `trust-fixes.js` 4.17…). |
+| commit 6 | Documentos: `README.md`, `ROADMAP.md`, `TODO.md`, `SECURITY.md`, `CHANGELOG.md` (v1.5) y este `HANDOFF.md`. |
+
+**Antes de lo anterior (ya subido a la rama de trabajo):** correcciones A1–A4 y B1–B3, B5 de la auditoría visual, eliminación del código de cuentas y sesiones (`ee4e3c2`) y subida de `app.js` a 11.0.
+
+**Lo que todavía dice "PLANIFY" a propósito:** los nombres internos de la lista de la sección 1, los mensajes técnicos de consola (`console.warn/log("PLANIFY …")`) y algunos comentarios de código. Se resuelven en el commit 7. `.env.example` conserva `PLANIFY_ADMIN_TOKEN` y un comentario con el nombre viejo.
 
 ---
 
@@ -117,23 +137,23 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 
 ### 🟢 Prioridad Futura (Funcionalidad Estrella)
 5. **Subida de Horario Universitario (PDF o Foto) con Detección Automática:**
-   - **Objetivo:** Que el alumno suba el horario que le entrega su universidad (en PDF o fotografía) y PLANIFY reconozca los cursos y sus bloques horarios.
+   - **Objetivo:** Que el alumno suba el horario que le entrega su universidad (en PDF o fotografía) y Liberday reconozca los cursos y sus bloques horarios.
    - **Flujo diseñado:**
      1. Botón visible: *"Subir horario universitario (PDF o Foto)"*.
      2. Extracción (OCR / análisis de texto): Detección de nombre de curso, día de la semana y horas de inicio y fin.
      3. **Pantalla de revisión previa (Modal de confirmación):** Muestra una tabla borrador con los cursos detectados para que el usuario pueda editar, corregir o borrar cualquier curso mal interpretado antes de aplicarlo.
-     4. Inserción final: Los cursos aprobados se colocan automáticamente en la cuadrícula de PLANIFY sin romper actividades existentes.
+     4. Inserción final: Los cursos aprobados se colocan automáticamente en la cuadrícula de Liberday sin romper actividades existentes.
 
 ---
 
 ## 5. Siguiente Tarea Exacta
 
-> **Tarea inmediata (a elegir por el dueño del proyecto):**
-> 1. **B5 en móvil (600 px o menos):** la barra inferior sigue fija siempre y puede tapar contenido; en escritorio ya se esconde al bajar.
-> 2. **A4 en móvil:** la columna de horas de la vista Semanal sigue cortada (en escritorio ya se lee completa).
-> 3. **Menores:** B4 (fecha del Diario como `10/15/2026`) y A5 a A8.
-> 4. Confirmar en el navegador real (no en el de prueba de la nube) las vistas Semanal, Mensual y el asistente.
-> 5. Antes de subir a GitHub hay que pedir y recibir la confirmación explícita del dueño (regla 5 de `AGENTS.md`).
+> **Tarea inmediata (pedir confirmación al dueño antes de cada paso):**
+> 1. **Commit 7 del cambio de nombre:** definir el nombre "Liberday" una sola vez (para que un futuro cambio sea de un solo archivo) y renombrar los mensajes técnicos de consola y los comentarios. No tocar nada de la lista "Nombres que NO se deben renombrar".
+> 2. **Decidir con el dueño la subida:** hoy hay commits locales sin subir. Subir solo a `codex/ux-audit-20261006`, nunca a `main` sin orden explícita.
+> 3. **Decisión aparte del dueño:** la dirección de Vercel (ver advertencia) y si se renombra el repositorio de GitHub.
+> 4. **Pendientes anteriores:** B5 y A4 en móvil, B4 (fecha del Diario como `10/15/2026`) y A5 a A8.
+> 5. **Replanteo de la primera pantalla** (frase de valor, flujo de inicio de 3 pasos): propuesto al dueño, pendiente de su aprobación; no se ha tocado código.
 
 ---
 
@@ -147,3 +167,4 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 | **2026-10-15** | **Claude Code** | Retomado el proyecto. `npm install` hecho: pruebas 77/77 y `npm run check` correctos. Revisado en navegador: Dashboard muestra ceros y mensaje de bienvenida, el tutorial dice "PDF y Excel" y ya no hay mensaje de licencia ni pie de página con texto de compra. Sin cambios de código. |
 | **2026-10-15** | **Claude Code** | Corregidos A1, A2, A3, A4 (escritorio) y B1 en 5 commits locales separados (sin push). Nueva prueba `tests/monthly-calendar.test.js`; pruebas 79/79. Pendiente aparte: la columna de horas sigue cortada en móvil; el calendario mensual usa `_mesActual+2` para los días grises finales (en diciembre da mes 13). |
 | **2026-10-15** | **Claude Code** | Corregidos B3, B2 y B5 (escritorio) en 3 commits separados (`354cf13`, `98cc89c`, `f7f79a0`) y eliminado el código de cuentas, recuperación de contraseña y sesiones (`ee4e3c2`). Nueva prueba `tests/monthly-schedule-preview.test.js`; pruebas 82/82. Subido todo a `codex/ux-audit-20261006` con confirmación del dueño; `main` intacto. Siguiente: subir la versión del caché (`app.js?v=11.0`, `planify-shell-v19`). |
+| **2026-10-16** | **Claude Code** | Cambio de nombre de Planify a Liberday en 6 commits locales sin subir (pestaña/manifest, inicio y asistente, panel/enfoque/recordatorios/instalación, PDF/respaldos/reporte, service worker y versiones, documentos). Pruebas en verde antes de cada commit (82 y luego 85 con las pruebas nuevas del service worker). Nombres internos, claves de datos, formato de respaldo y dirección de Vercel se mantienen a propósito (ver sección 1). Pendiente: commit 7 y decisión de subida. |

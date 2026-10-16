@@ -1,6 +1,8 @@
-# PLANIFY
+# Liberday
 
-PLANIFY es gratuita, sin pagos ni licencias. Los datos de tu plan se guardan en tu navegador.
+Liberday es gratuita, sin pagos ni licencias. Los datos de tu plan se guardan en tu navegador.
+
+Liberday se llamaba antes Planify. Por eso el repositorio y la dirección publicada todavía dicen `planificador-horarios`, y por compatibilidad con los datos y copias de seguridad de la versión anterior se conservan nombres internos como `planify_*` y el formato de respaldo `planify-backup`.
 
 Las propuestas de horario se generan mediante reglas basadas en las respuestas de cada persona. La aplicación no integra un modelo de IA generativa ni necesita una API de pago para crear el horario.
 
@@ -17,9 +19,9 @@ Las propuestas de horario se generan mediante reglas basadas en las respuestas d
 
 ## Datos y privacidad
 
-El horario, las preferencias y otros datos de uso se guardan principalmente en el almacenamiento local de este navegador. No se sincronizan automáticamente entre dispositivos ni existe una cuenta remota que los recupere. En un navegador compartido, el almacenamiento local también es compartido: al detectar un plan previo, PLANIFY lo oculta y pregunta si corresponde a la persona que acaba de entrar. “Empezar en blanco” guarda primero una copia recuperable de los datos de PLANIFY. Esta confirmación es una medida para evitar que se muestren por accidente; no es una cuenta, cifrado ni aislamiento seguro entre personas. Exporta periódicamente un respaldo y guárdalo en un lugar seguro; importar un respaldo puede reemplazar datos locales.
+El horario, las preferencias y otros datos de uso se guardan principalmente en el almacenamiento local de este navegador. No se sincronizan automáticamente entre dispositivos ni existe una cuenta remota que los recupere. En un navegador compartido, el almacenamiento local también es compartido: al detectar un plan previo, Liberday lo oculta y pregunta si corresponde a la persona que acaba de entrar. “Empezar en blanco” guarda primero una copia recuperable de los datos de Liberday. Esta confirmación es una medida para evitar que se muestren por accidente; no es una cuenta, cifrado ni aislamiento seguro entre personas. Exporta periódicamente un respaldo y guárdalo en un lugar seguro; importar un respaldo puede reemplazar datos locales.
 
-El servidor incluido (`server.js`) es un servidor local para desarrollo, no un backend seguro ni debe exponerse públicamente. El reporte semanal se genera como archivo HTML en el dispositivo: no se solicita un correo ni se envía información. PLANIFY no brinda diagnósticos ni recomendaciones médicas.
+El servidor incluido (`server.js`) es un servidor local para desarrollo, no un backend seguro ni debe exponerse públicamente. El reporte semanal se genera como archivo HTML en el dispositivo: no se solicita un correo ni se envía información. Liberday no brinda diagnósticos ni recomendaciones médicas.
 
 El planificador base y sus archivos propios son estáticos.
 
@@ -53,9 +55,9 @@ El resultado queda en `dist/`. El build no debe reescribir los archivos fuente y
 
 ## Publicación
 
-La versión principal se publica en [planificador-horarios-dun.vercel.app](https://planificador-horarios-dun.vercel.app/) desde la rama `main`. `vercel.json` construye y sirve únicamente `dist/`; las ramas de trabajo pueden generar vistas previas con otras direcciones. Si acabas de entrar, comienza por la bienvenida. Si ya utilizaste PLANIFY en ese mismo navegador, tus datos locales pueden seguir allí.
+La versión principal se publica en [planificador-horarios-dun.vercel.app](https://planificador-horarios-dun.vercel.app/) desde la rama `main`. `vercel.json` construye y sirve únicamente `dist/`; las ramas de trabajo pueden generar vistas previas con otras direcciones. Si acabas de entrar, comienza por la bienvenida. Si ya utilizaste Liberday en ese mismo navegador, tus datos locales pueden seguir allí.
 
-Consulta el [roadmap](ROADMAP.md) para conocer el estado del producto y [las ideas futuras](TODO.md) para posibles mejoras. El código propio de PLANIFY se publica bajo la [licencia MIT](LICENSE). Las bibliotecas y tipografías cargadas desde servicios externos conservan sus propias licencias; no están incluidas en esta concesión.
+Consulta el [roadmap](ROADMAP.md) para conocer el estado del producto y [las ideas futuras](TODO.md) para posibles mejoras. El código propio de Liberday se publica bajo la [licencia MIT](LICENSE). Las bibliotecas y tipografías cargadas desde servicios externos conservan sus propias licencias; no están incluidas en esta concesión.
 
 ## Estructura principal
 
@@ -68,4 +70,4 @@ Consulta el [roadmap](ROADMAP.md) para conocer el estado del producto y [las ide
 
 ## Estado
 
-PLANIFY continúa siendo un prototipo personal en evolución. Esta documentación no representa una auditoría de seguridad, una garantía de disponibilidad, ni una validación de autenticación, pagos o servicios remotos.
+Liberday continúa siendo un prototipo personal en evolución. Esta documentación no representa una auditoría de seguridad, una garantía de disponibilidad, ni una validación de autenticación, pagos o servicios remotos.

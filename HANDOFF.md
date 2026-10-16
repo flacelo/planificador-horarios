@@ -15,7 +15,7 @@
 | **Estado de Git:** | La rama de trabajo `codex/ux-audit-20261006` está **subida a GitHub** (todo el cambio de nombre incluido). `main` sigue en `f29199b`: **no se ha pasado nada a `main`**. No se sube nada a `main` sin confirmación explícita del dueño (regla 5 de `AGENTS.md`). |
 | **Página publicada (Producción):** | [https://planificador-horarios-dun.vercel.app](https://planificador-horarios-dun.vercel.app). **La dirección no se cambia por ahora**; el dueño decidirá aparte (ver la advertencia de la sección 1). |
 | **¿El cambio de nombre ya está en internet?:** | **NO en producción.** Está en la rama de trabajo, que no es la que publica Vercel (esa sale de `main`). Puede existir una vista previa de la rama en Vercel con otra dirección; no se ha comprobado. |
-| **Siguiente tarea prioritaria:** | Prueba en celular (pendiente del dueño) y decidir si se pasan los cambios a `main`. El commit 7 del nombre y el favicon pueden ir después. |
+| **Siguiente tarea prioritaria:** | Decidir si se pasan los cambios a `main` (la prueba en celular ya se hizo y salió bien). El commit 7 del nombre y el favicon pueden ir después. |
 
 ---
 
@@ -64,12 +64,16 @@ Aunque la app ahora se llama Liberday, estos nombres internos **se conservan**. 
 
 **Titular de la primera pantalla (2026-10-16, commit `6852751`, subido a la rama):** para quien entra por primera vez, el titular cambió de «Organiza tu tiempo. Haz espacio para vivir.» a **«Pon tu meta. Te armo la semana.»**, con «Estudiar, entrenar, descansar.» debajo (la segunda línea, resaltada). Opción elegida por el dueño entre 3 propuestas. Es solo texto, en `js/brand-home.js`; el titular de quien ya tiene horario («Tu plan te espera. Continúa a tu ritmo.») no cambió. Revisado en un navegador de prueba a 320, 390 y 1366 px sin desbordes; pruebas 85/85. El texto de apoyo de debajo y el resto del replanteo siguen sin tocar.
 
+**Arreglos en celular (2026-10-16, ya subidos a la rama):** en pantallas de 600 px o menos, la barra inferior se esconde al bajar con el dedo (con el botón ⚙️), vuelve al subir, al llegar al final o al tocar una pestaña, y deja espacio al final de la página (commit `149f1ea`, B5 móvil). En la vista Semanal, la columna de horas pasó a 124 px en pantallas de 700 px o menos, así que la última hora («10:30 p. m. – 11:00 p. m.») se ve completa con su p. m. (commit `d28854b`, A4 móvil). Escritorio sin cambios.
+
+**Prueba en celular del dueño (2026-10-16): correcta.** Usó su celular con su navegador (no indicó cuál): la barra se esconde al bajar y no tapa nada al final; en Semanal se ve completa la última hora con su p. m.; el titular nuevo se ve bien. Antes se había probado en un navegador de prueba en la nube a 320, 360, 375, 390, 412, 600 y 700 px; en un teléfono real solo existe esta prueba del dueño (Safari y Firefox no se probaron).
+
 **Prueba manual del dueño en su navegador de escritorio (2026-10-16): completa y correcta.** Hecha en su carpeta local tras traer la rama, con `npm run dev` y ventana privada:
 - Pasos 1 y 2 (pantalla de inicio y crear un horario), pasos 3 a 7 (vistas, panel, Enfoque, Tutorial y descargas) y paso 8 (**restaurar la copia vieja** `tests/fixtures/backup-v3-local.json`): todo correcto. La pestaña, la cabecera y las pantallas dicen "Liberday" y **no aparece "planify" en pantalla**.
 - La restauración de la copia vieja salió **sin errores**: la app mostró el horario de la copia ("Horario base local", lunes de 7:00 a 8:00 a. m.). Confirma que las copias de la versión anterior siguen importándose.
 - Única observación de la consola: el **404 de `favicon.ico`** (ajeno al cambio de nombre; anotado en la sección 4).
 - No se reportó el paso 9 de la guía (revisar `Cache Storage` en las herramientas del navegador); en la nube sí se comprobó que queda `liberday-shell-v1` y se borran las cachés `planify-…`.
-- **Pendiente: prueba en celular.** Ver la sección 5.
+- **Prueba en celular (2026-10-16): correcta.** Ver el bloque de abajo.
 
 **Lo que todavía dice "PLANIFY" a propósito:** los nombres internos de la lista de la sección 1, los mensajes técnicos de consola (`console.warn/log("PLANIFY …")`) y algunos comentarios de código. Se resuelven en el commit 7. `.env.example` conserva `PLANIFY_ADMIN_TOKEN` y un comentario con el nombre viejo.
 
@@ -121,7 +125,7 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 - ✅ **A1 (RESUELTO, commit local).** En el asistente "Crear mi horario rápido" (paso 1), los botones **Seguir** y **Atrás** quedan al fondo de la ventana; en pantalla de 850 px de alto hay que bajar dentro del cuadro para verlos.
 - ✅ **A2 (RESUELTO, commit local).** El asistente dice "PASO 1 DE 5", pero al elegir "Ver mi horario ahora" salta a "PASO 5 DE 5"; parece que se saltaron pasos.
 - ✅ **A3 (RESUELTO, commit local).** En la vista Semanal, el icono de la actividad tapa la primera letra ("Estudiar inglés" se lee "tudiar inglés").
-- ✅ **A4 (RESUELTO en escritorio; en móvil la columna de horas sigue cortada).** En la vista Semanal, las horas de la columna izquierda se cortan ("7:00 a. m. – 7:30 a").
+- ✅ **A4 (RESUELTO en escritorio y en celular; móvil en el commit `d28854b`, confirmado por el dueño en su celular).** En la vista Semanal, las horas de la columna izquierda se cortan ("7:00 a. m. – 7:30 a").
 - A5 a A8 (menores): dos opciones del paso 1 se ven resaltadas a la vez; el Perfil muestra "Estudiante" y un nombre vacío sin que el usuario lo eligiera; botones Excel/PDF con estilos distintos; la pestaña Avance muestra una raya sin número.
 - Nota: se vio en un navegador de prueba en la nube con otras tipografías; confirmar A3 y A4 en el navegador real.
 
@@ -130,7 +134,7 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 - ✅ **B2 (RESUELTO, commit `98cc89c`).** Vista Mensual: no muestra las actividades del horario semanal (todas las casillas vacías) y no lo explica; un usuario nuevo puede pensar que está rota.
 - ✅ **B3 (RESUELTO, commit `354cf13`).** Vista Diaria: "Ver mi jornada de hoy" casi no se ve (gris pálido) y esconde las actividades del día.
 - **B4.** Vista Diaria: la fecha aparece como `10/15/2026` (formato de EE. UU.) en una app en español.
-- ✅ **B5 (RESUELTO solo en escritorio, commit `f7f79a0`; en móvil la barra sigue fija y puede tapar contenido).** Las tres vistas: la barra flotante de pestañas y el botón ⚙️ tapan contenido (casillas de la tabla semanal, columna de horas, "Ideas para organizar tu mes").
+- ✅ **B5 (RESUELTO en escritorio, commit `f7f79a0`, y en celular, commit `149f1ea`, confirmado por el dueño en su celular).** Las tres vistas: la barra flotante de pestañas y el botón ⚙️ tapan contenido (casillas de la tabla semanal, columna de horas, "Ideas para organizar tu mes").
 
 **Limpieza hecha (commit `ee4e3c2`): cuentas, recuperación de contraseña y sesiones.**
 - Se eliminó código que no funcionaba y al que ningún botón daba acceso: inicio de sesión con Google y Facebook, recuperación de contraseña y sesiones/dispositivos.
@@ -162,8 +166,8 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 ## 5. Siguiente Tarea Exacta
 
 > **Tarea inmediata (pedir confirmación al dueño antes de cada paso):**
-> 1. **Prueba en celular (pendiente del dueño).** Dos problemas conocidos solo se ven en móvil: la barra inferior queda fija y puede tapar contenido (B5 en móvil) y la columna de horas de la vista semanal sigue cortada (A4 en móvil). Se puede probar con una vista previa de la rama en Vercel (si existe) o con la IP local del PC en la misma red Wi-Fi (`http://<IP>:3000`, sin HTTPS: no permite probar instalación ni notificaciones).
-> 2. **Decidir si B5 y A4 en móvil se arreglan antes de pasar a `main`**, según lo que se vea en el celular.
+> 1. ✅ **Prueba en celular: hecha por el dueño (2026-10-16), todo bien.** Los dos problemas que solo se veían en móvil quedaron resueltos: B5 en móvil (`149f1ea`) y A4 en móvil (`d28854b`).
+> 2. ✅ **B5 y A4 en móvil se arreglaron antes de pasar a `main`** (ver el punto 1).
 > 3. **Decidir con el dueño si se pasan los cambios a `main`.** Estado a 2026-10-16: `main` = `f29199b`; la rama de trabajo tiene 25 commits más y `main` no tiene commits que la rama no tenga (unión directa, sin conflictos de historial; 40 archivos, +797/−413). Pasar a `main` **publica en Vercel** y requiere orden explícita del dueño. Ojo: `main` todavía contiene lo viejo (ventana "Pagar con tarjeta", cifras falsas "28.5 hrs", generador de licencias y código de inicio de sesión en el navegador); el paso a `main` lo corrige. Se sugiere hacerlo con una solicitud de cambios (pull request) para poder revisarlo.
 > 4. **Después, sin bloquear:** commit 7 del cambio de nombre (definir el nombre "Liberday" una sola vez y renombrar mensajes técnicos de consola y comentarios, sin tocar la lista "Nombres que NO se deben renombrar"), 404 de `favicon.ico`, B4 (fecha del Diario como `10/15/2026`), A5 a A8 y el comentario de `.env.example`.
 > 5. **Decisión aparte del dueño:** la dirección de Vercel (ver advertencia de la sección 1) y si se renombra el repositorio de GitHub.
@@ -185,3 +189,4 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 | **2026-10-16** | **Claude Code** | Los 7 commits del cambio de nombre se subieron a `codex/ux-audit-20261006` (`e2e4c3e`, `main` intacto). Prueba manual del dueño en su navegador, paso 1: la pestaña, la cabecera y la pantalla de inicio dicen Liberday; en la consola solo aparece un 404 de `favicon.ico`, ajeno al cambio de nombre y anotado como pendiente. El dueño sigue con el paso 2 (crear un horario). Sin cambios de código. |
 | **2026-10-16** | **Claude Code** | El dueño completó la prueba manual en su navegador de escritorio (pasos 1 a 8, todo correcto, incluida la restauración de la copia vieja `backup-v3-local.json` sin errores; todo dice Liberday y no aparece "planify" en pantalla). Quedó pendiente la prueba en celular. Se revisó el estado frente a `main` (`f29199b`): la rama va 25 commits adelante, sin conflictos de historial; `main` aún tiene la ventana de pago, las cifras falsas y el generador de licencias. Sin cambios de código; nada se subió a `main`. |
 | **2026-10-16** | **Claude Code** | Nuevo titular de la primera pantalla: «Pon tu meta. Te armo la semana.» con «Estudiar, entrenar, descansar.» debajo (commit `6852751`, solo texto en `js/brand-home.js`, pruebas 85/85). Subido a `codex/ux-audit-20261006` con confirmación del dueño; `main` intacto. |
+| **2026-10-16** | **Claude Code** | HANDOFF.md corregido: B5 y A4 en móvil resueltos (`149f1ea`, `d28854b`) y confirmados por el dueño en su celular (barra se esconde y no tapa, última hora completa con p. m., titular nuevo bien). Sin cambios de código; `main` intacto. Siguiente: decidir si se pasan los cambios a `main`. |

@@ -589,7 +589,7 @@
     return '<header class="welcome-flow-header"><div class="welcome-flow-progress" aria-label="Paso ' + screen + ' de 3"><i style="width:' + (screen * 100 / 3) + '%"></i></div>' +
       '<span class="welcome-flow-step">PASO ' + screen + ' DE 3</span>' +
       '<button type="button" class="welcome-flow-close" data-welcome-action="close" aria-label="Cerrar">×</button>' +
-      '<h2 id="welcome-flow-title" tabindex="-1">' + title + '</h2><p>' + subtitle + '</p></header>';
+      '<h2 id="welcome-flow-title" class="welcome-flow-start-title" tabindex="-1">' + title + '</h2><p>' + subtitle + '</p></header>';
   }
 
   function renderStartGoalScreen() {
@@ -620,8 +620,44 @@
       '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="start-back">Atrás</button><button class="welcome-flow-primary" data-welcome-action="start-next">Siguiente</button></footer>';
   }
 
+  // "4:00 a 5:00 p. m." (si los dos extremos comparten a. m./p. m. se dice una sola vez).
+  function formatStartRange(from, to) {
+    var first = formatClock(from);
+    var second = formatClock(to);
+    var firstSuffix = first.slice(first.indexOf(" ") + 1);
+    var secondSuffix = second.slice(second.indexOf(" ") + 1);
+    return (firstSuffix === secondSuffix ? first.slice(0, first.indexOf(" ")) : first) + " a " + second;
+  }
+
+  // Los momentos del primer día activo, tomados de la misma propuesta que se guardaría (máximo 3).
+  function startMoments() {
+    var proposal = buildProposal();
+    var day = proposal.plannedDays[0];
+    var moments = [];
+    proposal.filas.forEach(function (row, index) {
+      var cell = row.celdas[day];
+      if (!cell || !cell.t || cell.rowspan === 0) return;
+      var last = proposal.filas[index + (cell.rowspan || 1) - 1] || row;
+      var from = (row.hora.match(/\d{2}:\d{2}/g) || [])[0];
+      var to = (last.hora.match(/\d{2}:\d{2}/g) || [])[1];
+      if (!from || !to) return;
+      moments.push({ text: cell.t.replace(/^[◌▣◇☕↗✦☾·]\s*/, ""), range: formatStartRange(from, to) });
+    });
+    return moments.slice(0, 3);
+  }
+
+  function renderStartDayScreen() {
+    var moments = startMoments();
+    var list = moments.length ? '<ol class="welcome-flow-start-moments">' + moments.map(function (moment) {
+      return '<li><strong>' + escapeHtml(moment.text) + '</strong><span>' + moment.range + '</span></li>';
+    }).join("") + '</ol>' : '<p class="welcome-flow-note">Con esos días y horas todavía no hay momentos para mostrar. Toca «Ajustar antes de empezar» para elegirlos tú.</p>';
+    return startHeader(3, "Así podría ser tu primer día", "Es un borrador. Muévelo, cámbialo o quítalo.") +
+      '<div class="welcome-flow-fields">' + list + '</div>' +
+      '<footer class="welcome-flow-footer welcome-flow-start-footer"><button type="button" class="welcome-flow-start-adjust" data-welcome-action="start-adjust">Ajustar antes de empezar</button><button class="welcome-flow-primary" data-welcome-action="start-apply">Empezar con este día</button></footer>';
+  }
+
   function renderStartScreen() {
-    return state.inicioScreen === 2 ? renderStartWhenScreen() : renderStartGoalScreen();
+    return state.inicioScreen === 3 ? renderStartDayScreen() : state.inicioScreen === 2 ? renderStartWhenScreen() : renderStartGoalScreen();
   }
 
   // Convierte las respuestas de las pantallas 1 y 2 en los datos que ya usa buildProposal():
@@ -636,7 +672,7 @@
     state.blockDuration = 30;
     state.sessionsPerDay = Math.max(1, Math.round(Number(state.inicioMinutes) / 30)) || 2;
     state.startStyle = "direct";
-    state.energyPeak = "morning";
+    state.energyPeak = first[0];
     state.weeklyFrequency = Math.max(1, state.days.length);
     state.dayTimes = {};
     state.manualRequests = state.manualRequests.filter(function (item) { return !item.inicio; });
@@ -690,8 +726,8 @@
         showPreviewError(startError);
         return;
       }
-      state.inicioScreen = 0;
-      state.step = proposalStep();
+      state.inicioScreen = 3;
+      state.step = 13;
     } else {
       return;
     }
@@ -700,9 +736,9 @@
 
   function startBack() {
     getDraftFromForm();
-    if (state.inicioScreen === 2) {
-      state.inicioScreen = 1;
-      state.step = 11;
+    if (state.inicioScreen === 2 || state.inicioScreen === 3) {
+      state.inicioScreen -= 1;
+      state.step = 10 + state.inicioScreen;
       render();
     }
   }
@@ -2443,6 +2479,13 @@
       }
       if (name === "start-next") { startNext(); return; }
       if (name === "start-back") { startBack(); return; }
+      if (name === "start-adjust") {
+        state.inicioScreen = 0;
+        state.step = proposalStep();
+        render();
+        return;
+      }
+      if (name === "start-apply") { requestApplyProposal(); return; }
       if (name === "close-schedule-assistant") {
         var scheduleOverlay = document.getElementById("schedule-change-overlay");
         if (scheduleOverlay) scheduleOverlay.remove();
@@ -2795,8 +2838,8 @@
       if (name === "back") {
         getDraftFromForm();
         if (state.mode === "inicio" && state.step === proposalStep()) {
-          state.inicioScreen = 2;
-          state.step = 12;
+          state.inicioScreen = 3;
+          state.step = 13;
           render();
           return;
         }
@@ -2858,7 +2901,7 @@
   }
 
   window.PLANIFY_WELCOME = { open: open, requestChange: openScheduleAssistant };
-  if (window.__PLANIFY_START_TEST__) window.__PLANIFY_START_TEST_HOOKS__ = { state: state, applyStartAnswers: applyStartAnswers, buildProposal: buildProposal, minutesToTime: minutesToTime };
+  if (window.__PLANIFY_START_TEST__) window.__PLANIFY_START_TEST_HOOKS__ = { state: state, applyStartAnswers: applyStartAnswers, buildProposal: buildProposal, minutesToTime: minutesToTime, startMoments: startMoments };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();

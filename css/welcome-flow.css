@@ -137,3 +137,10 @@
 .welcome-flow-start-day input:checked+span,.welcome-flow-start-pill input:checked+span{border-color:#146f68;background:#146f68;color:#fff}
 .welcome-flow-start-day input:focus-visible+span,.welcome-flow-start-pill input:focus-visible+span{outline:3px solid #a5b4fc;outline-offset:2px}
 @media(max-width:600px){.welcome-flow-start-days{gap:4px}.welcome-flow-start-day span{min-height:44px;font-size:.9rem}.welcome-flow-start-footer{align-items:stretch;flex-direction:column-reverse}.welcome-flow-start-footer>span{text-align:center}.welcome-flow-start-footer .welcome-flow-primary{width:100%;margin-left:0}}
+.welcome-flow-start-moments{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.welcome-flow-start-moments li{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 14px;padding:14px 16px;border:1px solid #cfe3df;border-left:5px solid #146f68;border-radius:12px;background:#fff}
+.welcome-flow-start-moments strong{color:#1e3a36;font-size:1rem}
+.welcome-flow-start-moments span{color:#146f68;font-size:.9rem;font-weight:800}
+.welcome-flow-card .welcome-flow-start-footer .welcome-flow-start-adjust{min-height:44px;padding:8px 6px;border:0!important;border-radius:8px;background:none!important;box-shadow:none!important;color:#475569!important;font:inherit;font-size:.85rem;font-weight:700;text-decoration:underline;cursor:pointer}
+.welcome-flow-start-adjust:focus-visible{outline:3px solid #7cc7bd;outline-offset:2px;border-radius:8px}
+.welcome-flow-card .welcome-flow-start-title{padding:0 34px}

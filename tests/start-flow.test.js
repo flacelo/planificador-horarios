@@ -46,7 +46,7 @@ test("las franjas marcadas definen el rango de horas y cada duración da un bloq
   assert.equal(blocks.length, 5, "un bloque por cada día marcado");
   blocks.forEach((block) => {
     assert.equal(block.rowspan, 4, "2 horas = cuatro tramos de 30 min seguidos");
-    assert.ok(block.from >= "12:00" && block.from < "18:00", "empieza dentro de la tarde: " + block.from);
+    assert.ok(block.from >= "13:00" && block.from < "18:00", "empieza dentro de la tarde: " + block.from);
   });
   [30, 60].forEach((minutes) => {
     const shorter = goalBlocks(answer(hooks, { inicioMinutes: minutes }), "aprobar matemáticas");
@@ -88,4 +88,30 @@ test("las pantallas 1 y 2 usan los textos acordados", () => {
   assert.match(welcomeSource, /\["L", "M", "X", "J", "V", "S", "D"\]/);
   assert.match(welcomeSource, /\["morning", "Mañana"[\s\S]*"Tarde"[\s\S]*"Noche"/);
   assert.match(welcomeSource, /\[30, "30 min"\], \[60, "1 hora"\], \[120, "2 horas"\]/);
+});
+
+test("la pantalla 3 muestra 2 o 3 momentos reales del primer día con su hora", () => {
+  const hooks = loadHooks();
+  answer(hooks, { franjas: ["afternoon"], inicioMinutes: 60, goal: "Estudiar matemáticas" });
+  const moments = hooks.startMoments();
+  assert.ok(moments.length >= 2 && moments.length <= 3, "momentos: " + moments.length);
+  assert.equal(moments[0].text, "Estudiar matemáticas");
+  assert.equal(moments[0].range, "1:00 a 2:00 p. m.", "la tarde empieza a mirar desde la 1:00 p. m.");
+  assert.match(moments[moments.length - 1].text, /Tiempo libre/);
+  moments.forEach((moment) => assert.match(moment.range, /^\d{1,2}:\d{2}( [ap]\. m\.)? a \d{1,2}:\d{2} [ap]\. m\.$/));
+});
+
+test("el primer día es el primer día marcado, no siempre el lunes", () => {
+  const hooks = loadHooks();
+  answer(hooks, { days: [2, 4], franjas: ["morning"], inicioMinutes: 120, goal: "Entrenar" });
+  const moments = hooks.startMoments();
+  assert.equal(moments[0].text, "Entrenar");
+  assert.equal(moments[0].range, "6:00 a 8:00 a. m.");
+});
+
+test("la pantalla 3 usa los textos y botones acordados y guarda con el flujo seguro de siempre", () => {
+  ["Así podría ser tu primer día", "Es un borrador. Muévelo, cámbialo o quítalo.", "Empezar con este día", "Ajustar antes de empezar"]
+    .forEach((text) => assert.ok(welcomeSource.includes(text), text));
+  assert.match(welcomeSource, /name === "start-apply"\) \{ requestApplyProposal\(\); return; \}/);
+  assert.match(welcomeSource, /name === "start-adjust"[\s\S]*?state\.step = proposalStep\(\)/);
 });

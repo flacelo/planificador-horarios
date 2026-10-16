@@ -672,7 +672,7 @@
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=12";
+      script.src = "js/brand-home.js?v=13";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -961,7 +961,7 @@
     if (!document.getElementById("welcome-flow-script")) {
       var welcomeScript = document.createElement("script");
       welcomeScript.id = "welcome-flow-script";
-      welcomeScript.src = "js/welcome-flow.js?v=1.33";
+      welcomeScript.src = "js/welcome-flow.js?v=1.34";
       welcomeScript.defer = true;
       document.head.appendChild(welcomeScript);
     }

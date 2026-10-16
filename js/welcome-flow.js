@@ -2894,7 +2894,7 @@
     });
 
     var initialRoute = window.PLANIFY_START_ROUTE;
-    if (["manual", "quick", "detailed"].indexOf(initialRoute) >= 0) {
+    if (["manual", "quick", "detailed", "inicio"].indexOf(initialRoute) >= 0) {
       window.PLANIFY_START_ROUTE = "";
       open(initialRoute);
     }

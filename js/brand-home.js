@@ -284,6 +284,7 @@
     var button = event.target.closest("[data-brand-action]");
     if (!button) return;
     var action = button.getAttribute("data-brand-action");
+    if (action === "paths" && document.documentElement.classList.contains("planify-home-new") && startFlow()) return;
     if (action === "paths") {
       var hub = document.querySelector(".trust-start-hub");
       if (hub) {
@@ -298,6 +299,25 @@
       if (week) week.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   });
+
+  // Quien entra por primera vez empieza por el inicio de 3 pantallas ("inicio" en el asistente).
+  // Si el asistente ya está cargado se abre directo; si no, se usa la misma puerta que las tarjetas de inicio.
+  function startFlow() {
+    if (window.PLANIFY_WELCOME && typeof window.PLANIFY_WELCOME.open === "function") {
+      window.PLANIFY_WELCOME.open("inicio");
+      return true;
+    }
+    var landing = document.getElementById("planify-local-data-gate");
+    if (!landing) return false;
+    var starter = document.createElement("button");
+    starter.type = "button";
+    starter.hidden = true;
+    starter.setAttribute("data-start-action", "inicio");
+    landing.appendChild(starter);
+    starter.click();
+    starter.remove();
+    return true;
+  }
 
   function init() {
     var returning = isReturningUser();

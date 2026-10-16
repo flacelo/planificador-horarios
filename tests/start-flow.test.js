@@ -115,3 +115,21 @@ test("la pantalla 3 usa los textos y botones acordados y guarda con el flujo seg
   assert.match(welcomeSource, /name === "start-apply"\) \{ requestApplyProposal\(\); return; \}/);
   assert.match(welcomeSource, /name === "start-adjust"[\s\S]*?state\.step = proposalStep\(\)/);
 });
+
+const brandSource = fs.readFileSync(require.resolve("../js/brand-home.js"), "utf8");
+const gateSource = fs.readFileSync(require.resolve("../js/local-data-gate.js"), "utf8");
+
+test("el botón del titular abre el inicio de 3 pantallas solo para quien es nuevo", () => {
+  assert.match(brandSource, /action === "paths" && document\.documentElement\.classList\.contains\("planify-home-new"\) && startFlow\(\)\) return;/);
+  assert.match(brandSource, /PLANIFY_WELCOME\.open\("inicio"\)/);
+  assert.match(brandSource, /setAttribute\("data-start-action", "inicio"\)/);
+  // quien ya tiene horario conserva el comportamiento de antes: bajar a las opciones
+  assert.match(brandSource, /if \(action === "paths"\) \{\s*var hub = document\.querySelector\("\.trust-start-hub"\);/);
+});
+
+test("la ruta inicio se acepta en la puerta de datos y en el asistente, y las 3 tarjetas no cambian", () => {
+  assert.equal((gateSource.match(/\["manual", "quick", "detailed", "inicio"\]/g) || []).length, 2);
+  assert.match(welcomeSource, /\["manual", "quick", "detailed", "inicio"\]\.indexOf\(initialRoute\) >= 0/);
+  ["manual", "quick", "detailed"].forEach((route) => assert.ok(gateSource.includes('data-start-action="' + route + '"'), route));
+  assert.ok(!/data-start-action="inicio"/.test(gateSource), "la puerta no agrega una tarjeta nueva");
+});

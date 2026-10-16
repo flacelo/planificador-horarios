@@ -393,7 +393,7 @@
     if (document.getElementById("planify-public-brand-script")) return;
     var script = document.createElement("script");
     script.id = "planify-public-brand-script";
-    script.src = "js/brand-home.js?v=12";
+    script.src = "js/brand-home.js?v=13";
     document.head.appendChild(script);
   }
 
@@ -440,7 +440,7 @@
         return;
       }
       var routeChoice = button.getAttribute("data-start-action");
-      if (["manual", "quick", "detailed"].indexOf(routeChoice) < 0) return;
+      if (["manual", "quick", "detailed", "inicio"].indexOf(routeChoice) < 0) return;
       if (!currentKeys.length) {
         reloadWithChoice("start", status, routeChoice);
         return;
@@ -481,7 +481,7 @@
     if (Number.isFinite(sessionChoice.issuedAt) && choiceAge >= 0 && choiceAge <= 15000) {
       if (sessionChoice.action === "continue") return;
       if (sessionChoice.action === "start" &&
-          ["manual", "quick", "detailed"].indexOf(sessionChoice.route) >= 0) {
+          ["manual", "quick", "detailed", "inicio"].indexOf(sessionChoice.route) >= 0) {
         window.PLANIFY_START_ROUTE = sessionChoice.route;
         return;
       }

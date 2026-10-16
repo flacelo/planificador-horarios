@@ -657,7 +657,7 @@
       return '<li><strong>' + escapeHtml(moment.text) + '</strong><span>' + moment.range + '</span></li>';
     }).join("") + '</ol>' : '<p class="welcome-flow-note">Con esos días y horas todavía no hay momentos para mostrar. Toca «Ajustar antes de empezar» para elegirlos tú.</p>';
     return startHeader(3, "Así podría ser tu primer día", "Es un borrador. Muévelo, cámbialo o quítalo.") +
-      '<div class="welcome-flow-fields">' + list + '</div>' +
+      '<div class="welcome-flow-fields">' + list + '<p class="welcome-flow-start-week-note">Armamos tu semana completa. Aquí ves un día.</p></div>' +
       '<footer class="welcome-flow-footer welcome-flow-start-footer"><button type="button" class="welcome-flow-start-adjust" data-welcome-action="start-adjust">Ajustar antes de empezar</button><button class="welcome-flow-primary" data-welcome-action="start-apply">Empezar con este día</button></footer>';
   }
 

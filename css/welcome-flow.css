@@ -146,3 +146,4 @@
 .welcome-flow-card .welcome-flow-start-title{padding:0 34px}
 .welcome-flow-start-pill small{display:block;margin-top:1px;font-size:.68rem;font-weight:600;opacity:.75;line-height:1.1}
 .welcome-flow-start-pill span:has(small){padding-block:6px;text-align:center}
+.welcome-flow-start-week-note{margin:2px 0 0;color:#5e7180;font-size:.82rem;text-align:center}

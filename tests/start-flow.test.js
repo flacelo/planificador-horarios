@@ -196,3 +196,10 @@ test("las tarjetas quedan en \"Otras formas de empezar\", sin RECOMENDADO, con l
   assert.ok(gateSource.includes('["manual", "quick", "detailed", "inicio"].indexOf(routeChoice) < 0'));
   assert.ok(gateSource.includes('Crear mi horario rápido'));
 });
+
+test("la pantalla 3 aclara que se arma la semana completa, con el texto acordado", () => {
+  assert.ok(welcomeSource.includes('<p class="welcome-flow-start-week-note">Armamos tu semana completa. Aquí ves un día.</p>'));
+  const moments = welcomeSource.indexOf("welcome-flow-start-moments");
+  const note = welcomeSource.indexOf("welcome-flow-start-week-note");
+  assert.ok(moments > 0 && note > moments, "la línea va después de los momentos");
+});

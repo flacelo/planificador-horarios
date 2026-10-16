@@ -144,3 +144,5 @@
 .welcome-flow-card .welcome-flow-start-footer .welcome-flow-start-adjust{min-height:44px;padding:8px 6px;border:0!important;border-radius:8px;background:none!important;box-shadow:none!important;color:#475569!important;font:inherit;font-size:.85rem;font-weight:700;text-decoration:underline;cursor:pointer}
 .welcome-flow-start-adjust:focus-visible{outline:3px solid #7cc7bd;outline-offset:2px;border-radius:8px}
 .welcome-flow-card .welcome-flow-start-title{padding:0 34px}
+.welcome-flow-start-pill small{display:block;margin-top:1px;font-size:.68rem;font-weight:600;opacity:.75;line-height:1.1}
+.welcome-flow-start-pill span:has(small){padding-block:6px;text-align:center}

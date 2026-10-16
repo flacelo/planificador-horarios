@@ -602,12 +602,17 @@
       '<footer class="welcome-flow-footer welcome-flow-start-footer"><span>Tus datos se quedan en tu navegador</span><button class="welcome-flow-primary" data-welcome-action="start-next">Siguiente</button></footer>';
   }
 
+  // "6 a 12": las horas de la franja, tomadas de START_FRANJAS para que lo que se ve sea lo que se calcula.
+  function franjaHours(item) {
+    return parseInt(item[2], 10) + " a " + parseInt(item[3], 10);
+  }
+
   function renderStartWhenScreen() {
     var days = DAY_LABELS.map(function (day, index) {
       return '<label class="welcome-flow-start-day"><input type="checkbox" name="welcome-day" value="' + index + '" aria-label="' + day + '" ' + (state.days.indexOf(index) >= 0 ? "checked" : "") + '><span aria-hidden="true">' + START_DAY_LETTERS[index] + '</span></label>';
     }).join("");
     var franjas = START_FRANJAS.map(function (item) {
-      return '<label class="welcome-flow-start-pill"><input type="checkbox" name="welcome-franja" value="' + item[0] + '" ' + (state.franjas.indexOf(item[0]) >= 0 ? "checked" : "") + '><span>' + item[1] + '</span></label>';
+      return '<label class="welcome-flow-start-pill"><input type="checkbox" name="welcome-franja" value="' + item[0] + '" ' + (state.franjas.indexOf(item[0]) >= 0 ? "checked" : "") + '><span>' + item[1] + '<small>' + franjaHours(item) + '</small></span></label>';
     }).join("");
     var durations = START_DURATIONS.map(function (item) {
       return '<label class="welcome-flow-start-pill"><input type="radio" name="welcome-inicio-minutes" value="' + item[0] + '" ' + (Number(state.inicioMinutes) === item[0] ? "checked" : "") + '><span>' + item[1] + '</span></label>';
@@ -2901,7 +2906,7 @@
   }
 
   window.PLANIFY_WELCOME = { open: open, requestChange: openScheduleAssistant };
-  if (window.__PLANIFY_START_TEST__) window.__PLANIFY_START_TEST_HOOKS__ = { state: state, applyStartAnswers: applyStartAnswers, buildProposal: buildProposal, minutesToTime: minutesToTime, startMoments: startMoments };
+  if (window.__PLANIFY_START_TEST__) window.__PLANIFY_START_TEST_HOOKS__ = { state: state, applyStartAnswers: applyStartAnswers, buildProposal: buildProposal, minutesToTime: minutesToTime, startMoments: startMoments, franjaHours: franjaHours };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();

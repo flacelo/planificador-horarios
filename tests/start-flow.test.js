@@ -143,3 +143,13 @@ test("al empezar quedan marcadas solo Tarde y Noche, y la meta ya no cae de madr
   assert.equal(hooks.state.end, "22:00");
   assert.equal(hooks.startMoments()[0].range, "1:00 a 2:00 p. m.");
 });
+
+test("cada franja muestra sus horas en letra pequeña, sin cambiar sus nombres", () => {
+  const hooks = loadHooks();
+  assert.equal(hooks.franjaHours(["morning", "Mañana", "06:00", "12:00"]), "6 a 12");
+  assert.equal(hooks.franjaHours(["afternoon", "Tarde", "12:00", "18:00"]), "12 a 18");
+  assert.equal(hooks.franjaHours(["evening", "Noche", "18:00", "22:00"]), "18 a 22");
+  assert.match(welcomeSource, /item\[1\] \+ '<small>' \+ franjaHours\(item\) \+ '<\/small>/);
+  // las horas mostradas salen de la misma lista que usa el cálculo
+  assert.match(welcomeSource, /\["morning", "Mañana", "06:00", "12:00"\], \["afternoon", "Tarde", "12:00", "18:00"\], \["evening", "Noche", "18:00", "22:00"\]/);
+});

@@ -783,3 +783,13 @@ body.tema-claro .weekly-calm-undo { border-color: #86cabc; background: #e9faf5; 
     max-width: 128px;
   }
 }
+
+/* Celular: la columna de horas es más ancha para que se vea completa la última hora con su a. m./p. m. */
+@media (max-width: 700px) {
+  #view-semanal.weekly-calm-ready #tabla thead th:first-child,
+  #view-semanal.weekly-calm-ready #tabla td.hora-cell {
+    width: 124px !important;
+    min-width: 124px;
+    max-width: 124px;
+  }
+}

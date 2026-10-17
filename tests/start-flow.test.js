@@ -250,3 +250,14 @@ test("en el borrador y las preguntas se dice \"momento(s)\"; \"bloque\" queda so
   ["Listo: el bloque quedó de", "Llegaste al límite de este bloque", "Bloque acortado", "Celdas unidas en un solo bloque", "Este bloque ya dura 15 minutos", "Duración del bloque", "Bloque elegido: "]
     .forEach((text) => assert.ok(welcomeSource.includes(text), "debe seguir: " + text));
 });
+
+test("\"tu día\" aparece solo donde queda natural, y el horario guardado sigue llamándose horario", () => {
+  assert.ok(brandSource.includes("Crea un primer borrador en pocos pasos"));
+  assert.ok(brandSource.includes("Siempre podrás cambiarlo."));
+  assert.ok(!brandSource.includes("Siempre podrás cambiar tu horario."));
+  assert.ok(welcomeSource.includes("para que tu día no se vea bonito solamente"));
+  assert.ok(welcomeSource.includes("reservarán momentos reales en tu día"));
+  // textos que nombran lo guardado o horas concretas no cambian
+  ["tu horario semanal", "Tu horario actual será sustituido", "Tus horarios de trabajo suelen ser", "Mis horarios de sueño cambian mucho", "Recuperar un horario anterior"]
+    .forEach((text) => assert.ok((welcomeSource + gateSource).includes(text), text));
+});

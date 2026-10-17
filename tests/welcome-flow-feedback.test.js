@@ -132,7 +132,7 @@ test("el PDF semanal coloca los siete días en una sola hoja apaisada", () => {
 });
 
 test("las duraciones genéricas no se presentan como actividades observadas", () => {
-  assert.match(welcome, /de enfoque incluidos en la propuesta/);
+  assert.match(welcome, /de enfoque incluidos en el borrador/);
   assert.match(welcome, /no predice cuánto tardas/);
   assert.match(welcome, /No fijamos una hora para la procrastinación/);
   assert.match(welcome, /Los demás espacios quedan disponibles; no les asignamos actividades ni tiempos que no indicaste/);
@@ -144,7 +144,7 @@ test("las duraciones genéricas no se presentan como actividades observadas", ()
 test("la propuesta puede pulirse antes de guardarla con reglas locales y sin adivinar", () => {
   assert.match(welcome, /¿Qué te gustaría mejorar antes de guardar\?/);
   assert.match(welcome, /parsePreviewRevision/);
-  assert.match(welcome, /Actualizar toda la propuesta/);
+  assert.match(welcome, /Actualizar todo el borrador/);
   assert.match(welcome, /Deshacer último ajuste/);
   assert.match(welcome, /No entendí ese ajuste todavía/);
   assert.match(welcome, /No voy a adivinar tus turnos/);

@@ -557,7 +557,7 @@
 
   function renderHeader(step, title, subtitle) {
     var skippedChoice = state.startedFromHub ? 1 : 0;
-    // En modo rápido, "Ver mi horario ahora" pasa de la decisión a la propuesta sin las preguntas de ritmo y vida diaria:
+    // En modo rápido, "Ver mi borrador ahora" pasa de la decisión a la propuesta sin las preguntas de ritmo y vida diaria:
     // el contador cuenta solo los pasos que la persona realmente recorre.
     var shortPath = (state.mode === "quick" || state.mode === "inicio") && !state.wantMoreQuestions;
     var total = (shortPath ? decisionStep() + 2 : totalSteps()) - skippedChoice;
@@ -572,11 +572,11 @@
   function renderModeStep() {
     var modes = [
       ["manual", "✍️", "Quiero planificar por mi cuenta", "Irás directo al planificador vacío con todas las herramientas para construir y editar tu horario.", "Control total · puedes pedir ayuda después"],
-      ["quick", "🧩", "Crear mi horario rápido", "Elige tus días y horas; después podrás revisar y editar una propuesta inicial.", "Solo lo esencial · recomendado"],
-      ["guided", "🗓️", "Ayúdame paso a paso", "Incluye tus compromisos fijos y recibe una propuesta editable.", "Más detalle"],
+      ["quick", "🧩", "Crear mi horario rápido", "Elige tus días y horas; después podrás revisar y editar un borrador inicial.", "Solo lo esencial · recomendado"],
+      ["guided", "🗓️", "Ayúdame paso a paso", "Incluye tus compromisos fijos y recibe un borrador editable.", "Más detalle"],
       ["detailed", "✨", "Personalizar a fondo", "Incluye estudios, trabajos, emprendimientos, energía, bienestar y recordatorios.", "Más preguntas"]
     ];
-    return renderHeader(0, "¿Cómo te gustaría crear tu horario?", "Elige la ayuda que prefieras. Todas las rutas terminan en un horario editable.") +
+    return renderHeader(0, "¿Cómo te gustaría crear tu horario?", "Elige la ayuda que prefieras. Todas las rutas terminan en un borrador editable.") +
       '<div class="welcome-flow-fields welcome-flow-name"><label>¿Cómo te gustaría que te llamemos? <span class="welcome-flow-optional">(nombre o apodo)</span><input id="welcome-name" maxlength="50" value="' + escapeHtml(state.userName) + '" placeholder="Ej.: Flavio"></label></div>' +
       '<div class="welcome-flow-options welcome-flow-modes">' + modes.map(function (mode) {
         return '<button type="button" class="welcome-flow-mode ' + (state.mode === mode[0] ? "is-selected" : "") + '" data-welcome-mode="' + mode[0] + '" aria-pressed="' + (state.mode === mode[0] ? "true" : "false") + '"><span>' + mode[1] + '</span><span><strong>' + mode[2] + '</strong><small>' + mode[3] + '</small><em>' + mode[4] + '</em></span><i>✓</i></button>';
@@ -770,7 +770,7 @@
     var studyContextOptions = state.career === "medicine" ? [["theory","Cursos y exámenes teóricos"],["practice","Prácticas clínicas"],["rotation","Rotaciones o guardias"],["mixed","Una combinación de todo"]] : state.career === "engineering" ? [["classes","Cursos y ejercicios"],["labs","Laboratorios o talleres"],["projects","Proyectos y entregables"],["mixed","Una combinación de todo"]] : [["classes","Clases y evaluaciones"],["practice","Prácticas o actividades aplicadas"],["projects","Proyectos y entregables"],["mixed","Una combinación de todo"]];
     if (!studyContextOptions.some(function (item) { return item[0] === state.studyContext; })) state.studyContext = studyContextOptions[0][0];
     var combinedRoles = hasRole("study") && hasRole("work");
-    return renderHeader(1, named("cuéntanos qué ocupa tu vida ahora"), state.mode === "quick" ? "Escribe una actividad concreta y elige tus días y horas. Podrás cambiar la propuesta después." : "Las preguntas se adaptan a las actividades que elijas.") +
+    return renderHeader(1, named("cuéntanos qué ocupa tu vida ahora"), state.mode === "quick" ? "Escribe una actividad concreta y elige tus días y horas. Podrás cambiar el borrador después." : "Las preguntas se adaptan a las actividades que elijas.") +
       '<div class="welcome-flow-fields"><label class="welcome-flow-core-name">Tu nombre o apodo <span class="welcome-flow-optional">(opcional)</span><input id="welcome-name" maxlength="50" value="' + escapeHtml(state.userName) + '" placeholder="¿Cómo te gustaría que te llamemos?"></label><fieldset><legend>¿Qué cosas forman parte de tu vida actualmente?</legend><small class="welcome-flow-field-help">Puedes marcar varias: por ejemplo, estudiar, trabajar y llevar dos emprendimientos al mismo tiempo.</small><div class="welcome-flow-choice-pills welcome-flow-role-pills">' +
       '<label class="welcome-flow-combined-role"><input type="checkbox" name="welcome-role-combined" ' + (combinedRoles ? "checked" : "") + '><span>Estudio y trabajo</span></label>' +
       occupations.map(function (item) { return '<label><input type="checkbox" name="welcome-role" value="' + item[0] + '" ' + (state.roles.indexOf(item[0]) >= 0 ? "checked" : "") + '><span>' + item[1] + '</span></label>'; }).join("") +
@@ -818,11 +818,11 @@
     return renderHeader(2, named("coloquemos primero lo que no puede moverse"), "Puedes repetir una misma clase o turno en varios días, y dejar libre un día distinto aunque normalmente trabajes o estudies.") +
       '<div class="welcome-flow-fields"><section class="welcome-flow-question-group"><div class="welcome-flow-group-heading"><strong>' + (studies && works ? "Cursos, trabajo y otros compromisos" : studies ? "Cursos, prácticas y otros compromisos" : works ? "Trabajo, turnos y otros compromisos" : "Tus compromisos fijos") + '</strong><small>Añade una fila por cada horario diferente. Si algo cambia de hora según el día, añádelo como otra fila.</small></div>' +
       (works && !hasWorkSchedule ? '<div class="welcome-flow-needed"><span>💼</span><div><strong>No olvides añadir tu trabajo o turnos</strong><small>Elegiste que trabajas. Necesito saber qué días y horas ocupa para no colocar estudio, descanso u otras actividades encima.</small></div><button type="button" data-welcome-action="add-fixed-template" data-fixed-template="work">Añadir mi trabajo</button></div>' : '') +
-      (studies && !hasStudySchedule ? '<div class="welcome-flow-needed"><span>▣</span><div><strong>Añade al menos tu clase, práctica o curso más importante</strong><small>Así la propuesta distinguirá tus horas obligatorias de tus momentos de estudio autónomo.</small></div></div>' : '') +
+      (studies && !hasStudySchedule ? '<div class="welcome-flow-needed"><span>▣</span><div><strong>Añade al menos tu clase, práctica o curso más importante</strong><small>Así el borrador distinguirá tus horas obligatorias de tus momentos de estudio autónomo.</small></div></div>' : '') +
       fixedMarkup + '<div class="welcome-flow-template-actions">' + quickTemplates + '</div></section>' +
       '<fieldset><legend>¿Qué te gustaría que aparezca en tu horario?</legend><div class="welcome-flow-activity-grid">' + activityMarkup + '</div><p class="welcome-flow-answer-feedback" data-activity-feedback>' + activityFeedback + '</p></fieldset>' +
       '<fieldset><legend>¿Cómo te gustan los descansos?</legend><div class="welcome-flow-options welcome-flow-break-options">' + breakOptions.map(function (item) {
-        return '<label class="welcome-flow-option"><input type="radio" name="welcome-break-style" value="' + item[0] + '" ' + (state.breakStyle === item[0] ? "checked" : "") + '><span><strong>' + item[1] + '</strong><small>' + (item[0] === "often" ? "La propuesta dejará ratos libres entre varias actividades." : item[0] === "balanced" ? "Combina avance, comida y descanso." : "Tendrás más espacios sin asignar para decidir después.") + '</small></span></label>';
+        return '<label class="welcome-flow-option"><input type="radio" name="welcome-break-style" value="' + item[0] + '" ' + (state.breakStyle === item[0] ? "checked" : "") + '><span><strong>' + item[1] + '</strong><small>' + (item[0] === "often" ? "El borrador dejará ratos libres entre varias actividades." : item[0] === "balanced" ? "Combina avance, comida y descanso." : "Tendrás más espacios sin asignar para decidir después.") + '</small></span></label>';
       }).join("") + '</div></fieldset>' +
       (state.mode === "detailed" ? '<label>¿Qué disfrutas hacer para recargar energía? <span class="welcome-flow-optional">(opcional)</span><input id="welcome-likes" maxlength="100" value="' + escapeHtml(state.likes) + '" placeholder="Ej.: caminar, leer, música, cocinar"></label>' : '') +
       '<p class="welcome-flow-note">Ejemplo: puedes marcar trabajo de lunes a miércoles de 8:00 a 13:00, dejar el jueves libre y añadir el viernes con otro horario.</p></div>' +
@@ -850,7 +850,7 @@
   function renderDecisionStep() {
     return renderHeader(state.step, "¿Quieres verlo ya o seguimos afinándolo?", "Ya podemos crear una buena base. Tú decides si prefieres verla ahora o contarnos un poco más.") +
       '<div class="welcome-flow-fields"><fieldset><legend>¿Cuánto suele durarte un bloque que quieres dedicar a una actividad?</legend>' + minuteControl("Duración del bloque", "welcome-block-duration-custom", state.blockDuration, [15, 25, 30, 45, 50, 60], 5, 180, "block-duration", "", "Puedes elegir una sugerencia o escribir otra cantidad. El plan respetará este tiempo como punto de partida, no como predicción del tiempo de una tarea.") + '</fieldset>' +
-      '<div class="welcome-flow-path-choice"><button type="button" class="' + (state.mode === "quick" ? "is-recommended" : "") + '" data-welcome-action="generate-now">' + (state.mode === "quick" ? '<em>RECOMENDADO</em>' : '') + '<span>⚡</span><strong>Ver mi horario ahora</strong><small>Generamos una propuesta con lo que ya respondiste. Seguirá siendo editable.</small></button>' +
+      '<div class="welcome-flow-path-choice"><button type="button" class="' + (state.mode === "quick" ? "is-recommended" : "") + '" data-welcome-action="generate-now">' + (state.mode === "quick" ? '<em>RECOMENDADO</em>' : '') + '<span>⚡</span><strong>Ver mi borrador ahora</strong><small>Generamos un borrador con lo que ya respondiste. Seguirá siendo editable.</small></button>' +
       '<button type="button" class="' + (state.mode === "quick" ? "" : "is-recommended") + '" data-welcome-action="more-questions">' + (state.mode === "quick" ? '' : '<em>RECOMENDADO</em>') + '<span>✨</span><strong>Seguir con más preguntas</strong><small>Afinaremos energía, frecuencia, comidas, traslados y tiempo libre para acercarnos más a tu vida real.</small></button></div></div>' +
       '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="back">← Atrás</button><span>No perderás ninguna respuesta.</span></footer>';
   }
@@ -881,7 +881,7 @@
       ["none", "Sin consideraciones especiales", "Solo reservaré tus comidas y pausas."],
       ["sensitive", "Hay alimentos que prefiero evitar", "Usaré tus propias notas, sin inventar una dieta."],
       ["ibs", "Tengo colon irritable o sensibilidad digestiva", "Reservaré comidas y un registro de tolerancia; no haré recomendaciones clínicas."],
-      ["professional", "Sigo indicaciones de un profesional", "El horario respetará lo que ya te indicaron."]
+      ["professional", "Sigo indicaciones de un profesional", "El borrador respetará lo que ya te indicaron."]
     ];
     var sleepChallenges = [["none", "Duermo bien la mayoría de noches"], ["falling", "Me cuesta conciliar el sueño"], ["waking", "Me despierto durante la noche"], ["irregular", "Mis horarios de sueño cambian mucho"]];
     var movementStyles = [["unsure", "No sé por dónde empezar", "Propondremos movimiento suave y fácil de probar."], ["activebreaks", "Pausas activas", "Caminatas o estiramientos cortos entre bloques."], ["home", "Ejercicio en casa", "Reservaremos un bloque sencillo en casa."], ["gym", "Gimnasio", "Separaremos tiempo para entrenar y trasladarte."], ["sport", "Deporte", "Apartaremos sesiones para tu deporte."], ["none", "No incluirlo por ahora", "No añadiremos ejercicio automáticamente."]];
@@ -899,7 +899,7 @@
       '<label class="welcome-flow-check-card"><input id="welcome-quiet-evening" type="checkbox" ' + (state.quietEvening ? "checked" : "") + '><span><strong>🌙 Quiero noches más tranquilas</strong><small>Después de las 7:00 p. m. evitaremos colocar trabajo o estudio, siempre que tus compromisos fijos lo permitan.</small></span></label>' +
       '<section class="welcome-flow-wellbeing"><div class="welcome-flow-group-heading"><strong>Movimiento que sí encaje contigo</strong><small>No necesitas saber de ejercicio: elegiremos el formato, y tú podrás cambiarlo después.</small></div><div class="welcome-flow-rich-options welcome-flow-movement-options">' + movementStyles.map(function (item) { return '<label><input type="radio" name="welcome-movement-style" value="' + item[0] + '" ' + (state.movementStyle === item[0] ? "checked" : "") + '><span><strong>' + item[1] + '</strong><small>' + item[2] + '</small></span></label>'; }).join("") + '</div>' + minuteControl("¿Cuántos minutos quieres reservar para moverte?", "welcome-movement-minutes", state.movementMinutes, [0, 10, 15, 20, 30, 45, 60], 0, 240, "movement", "", "Puedes escribir otra cantidad. Si elegiste no incluir movimiento, usa “No reservar”.") + '</section>' +
       '<p class="welcome-flow-health-note"><strong>Tu seguridad importa.</strong> Liberday puede ordenar comidas, pausas, agua, descanso y recordatorios que tú indiques. No diagnostica, no prescribe suplementos y no sustituye a un médico o nutricionista.</p>' +
-      '<div class="welcome-flow-final-answer"><span>✅</span><div><strong>Con esto ya tenemos suficiente para una propuesta mucho más personal.</strong><small>Podrás alternar la vista diaria y semanal, editar bloques y regresar si algo no te convence.</small></div></div></div>' +
+      '<div class="welcome-flow-final-answer"><span>✅</span><div><strong>Con esto ya tenemos suficiente para un borrador mucho más personal.</strong><small>Podrás alternar la vista diaria y semanal, editar bloques y regresar si algo no te convence.</small></div></div></div>' +
       '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="back">← Atrás</button><button class="welcome-flow-secondary" data-welcome-action="skip-life">Omitir esta parte</button><button class="welcome-flow-primary" data-welcome-action="preview">Crear mi súper horario →</button></footer>';
   }
 
@@ -1006,7 +1006,7 @@
 
   function commandEditorMarkup(context) {
     if (context === "preview") {
-      return '<section class="welcome-flow-command welcome-flow-refine"><span aria-hidden="true">🪄</span><div><strong>¿Qué te gustaría mejorar antes de guardar?</strong><small>El planificador local entiende algunos cambios habituales. Si una petición no queda clara, no la inventará.</small><label class="sr-only" for="welcome-change-command">Describe un cambio para toda tu propuesta</label><textarea id="welcome-change-command" maxlength="180" rows="2" placeholder="Ej.: Deja el viernes libre; reparte mejor el estudio; prefiero avanzar por la tarde.">' + escapeHtml(state.commandDraft) + '</textarea><div class="welcome-flow-refine-suggestions"><button type="button" data-welcome-command="Deja el viernes libre">Viernes libre</button><button type="button" data-welcome-command="Reparte mejor mis actividades">Repartir mejor</button><button type="button" data-welcome-command="Prefiero avanzar por la tarde">Por la tarde</button></div><button type="button" class="welcome-flow-refine-apply" data-welcome-action="apply-command">Actualizar toda la propuesta</button>' + (state.feedbackUndo.length ? '<button type="button" class="welcome-flow-refine-undo" data-welcome-action="undo-revision">Deshacer último ajuste</button>' : '') + '<em role="status" aria-live="polite">' + escapeHtml(state.commandMessage || "Nada se guarda hasta que elijas “Guardar este horario”.") + '</em></div></section>';
+      return '<section class="welcome-flow-command welcome-flow-refine"><span aria-hidden="true">🪄</span><div><strong>¿Qué te gustaría mejorar antes de guardar?</strong><small>El planificador local entiende algunos cambios habituales. Si una petición no queda clara, no la inventará.</small><label class="sr-only" for="welcome-change-command">Describe un cambio para todo tu borrador</label><textarea id="welcome-change-command" maxlength="180" rows="2" placeholder="Ej.: Deja el viernes libre; reparte mejor el estudio; prefiero avanzar por la tarde.">' + escapeHtml(state.commandDraft) + '</textarea><div class="welcome-flow-refine-suggestions"><button type="button" data-welcome-command="Deja el viernes libre">Viernes libre</button><button type="button" data-welcome-command="Reparte mejor mis actividades">Repartir mejor</button><button type="button" data-welcome-command="Prefiero avanzar por la tarde">Por la tarde</button></div><button type="button" class="welcome-flow-refine-apply" data-welcome-action="apply-command">Actualizar todo el borrador</button>' + (state.feedbackUndo.length ? '<button type="button" class="welcome-flow-refine-undo" data-welcome-action="undo-revision">Deshacer último ajuste</button>' : '') + '<em role="status" aria-live="polite">' + escapeHtml(state.commandMessage || "Nada se guarda hasta que elijas “Guardar este horario”.") + '</em></div></section>';
     }
     return '<section class="welcome-flow-command"><span aria-hidden="true">🪄</span><div><strong>Pide un cambio concreto</strong><small>El asistente local entiende cambios con día y hora. Tus datos no salen de este navegador.</small><div class="welcome-flow-command-row"><input id="schedule-change-command" maxlength="180" placeholder="Ej.: Pon gimnasio el martes de 6:00 p. m. a 7:00 p. m."><button type="button" data-welcome-action="apply-saved-command">Hacer cambio</button></div><em>' + escapeHtml(state.commandMessage || "También puedes escribir: “Deja libre el domingo de 3:00 p. m. a 5:00 p. m.”.") + '</em></div></section>';
   }
@@ -1096,7 +1096,7 @@
       state.manualRequests.push(request);
       state.previewDay = request.day;
       state.previewMode = "daily";
-      message = "Propuesta actualizada: " + DAY_LABELS[request.day] + ", " + minutesToTime(request.start) + "–" + minutesToTime(request.end) + (request.text ? " · " + request.text : " libre") + ".";
+      message = "Borrador actualizado: " + DAY_LABELS[request.day] + ", " + minutesToTime(request.start) + "–" + minutesToTime(request.end) + (request.text ? " · " + request.text : " libre") + ".";
     } else if (parsed.type === "free-day") {
       var dayTime = state.dayTimes[parsed.day] || {};
       var start = timeToMinutes(dayTime.start || state.start);
@@ -1105,25 +1105,25 @@
       state.manualRequests.push({ day: parsed.day, start: start, end: end, text: "", category: "libre" });
       state.previewDay = parsed.day;
       state.previewMode = "daily";
-      message = "Propuesta actualizada: " + DAY_LABELS[parsed.day] + " queda libre, salvo los compromisos fijos que ya indicaste.";
+      message = "Borrador actualizado: " + DAY_LABELS[parsed.day] + " queda libre, salvo los compromisos fijos que ya indicaste.";
     } else if (parsed.type === "less-load") {
       state.weeklyFrequency = Math.max(1, state.weeklyFrequency - 1);
-      message = "Propuesta actualizada: distribuí el enfoque en menos días y dejé más espacios disponibles.";
+      message = "Borrador actualizado: distribuí el enfoque en menos días y dejé más espacios disponibles.";
     } else if (parsed.type === "more-focus") {
       state.weeklyFrequency = Math.min(Math.max(1, state.days.length), state.weeklyFrequency + 1);
-      message = "Propuesta actualizada: añadí un día para avanzar tu prioridad.";
+      message = "Borrador actualizado: añadí un día para avanzar tu prioridad.";
     } else if (parsed.type === "spread") {
       state.energyPeak = "variable";
-      message = "Propuesta actualizada: repartí los bloques en distintos momentos de tus días activos.";
+      message = "Borrador actualizado: repartí los bloques en distintos momentos de tus días activos.";
     } else if (parsed.type === "time-of-day") {
       state.energyPeak = parsed.value;
-      message = "Propuesta actualizada: prioricé tus bloques de enfoque " + (parsed.value === "afternoon" ? "por la tarde" : parsed.value === "evening" ? "por la noche" : "por la mañana") + ".";
+      message = "Borrador actualizado: prioricé tus bloques de enfoque " + (parsed.value === "afternoon" ? "por la tarde" : parsed.value === "evening" ? "por la noche" : "por la mañana") + ".";
     } else if (parsed.type === "balance") {
       state.priority = "balance";
-      message = "Propuesta actualizada: equilibré la prioridad con los demás espacios de la semana.";
+      message = "Borrador actualizado: equilibré la prioridad con los demás espacios de la semana.";
     }
     state.commandDraft = "";
-    state.commandMessage = message + " Revisa el horario; todavía no se ha guardado.";
+    state.commandMessage = message + " Revisa el borrador; todavía no se ha guardado.";
     state.edits = {};
     state.rowTimes = {};
     state.editing = false;
@@ -1142,7 +1142,7 @@
     state.previewDay = previous.previewDay;
     state.previewMode = previous.previewMode;
     state.commandDraft = "";
-    state.commandMessage = "Deshice el último ajuste. Tu propuesta anterior sigue sin guardar.";
+    state.commandMessage = "Deshice el último ajuste. Tu borrador anterior sigue sin guardar.";
     state.edits = previous.edits;
     state.rowTimes = previous.rowTimes;
     state.editing = false;
@@ -1230,7 +1230,7 @@
     state.manualRequests.push({ day: targetDay, start: nextStart, end: nextEnd, text: source.text, category: source.category, focusCreditMinutes: targetDay === sourceDay ? focusCreditMinutes : 0, replacedProjectIds: replacedProjectIds });
     state.previewDay = targetDay;
     state.previewMode = "weekly";
-    state.commandMessage = "Listo: el bloque quedó de " + formatClock(nextStart) + " a " + formatClock(nextEnd) + ". Revisa la propuesta; aún no se ha guardado.";
+    state.commandMessage = "Listo: el bloque quedó de " + formatClock(nextStart) + " a " + formatClock(nextEnd) + ". Revisa el borrador; aún no se ha guardado.";
     state.editing = false;
     render();
     return "";
@@ -1639,7 +1639,7 @@
 
   function validatePreviewBlocks() {
     readPreviewEdits();
-    if (!state.days.length && !state.fixed.some(function (item) { return item.title; })) return "Elige al menos un día para preparar tu horario.";
+    if (!state.days.length && !state.fixed.some(function (item) { return item.title; })) return "Elige al menos un día para preparar tu borrador.";
     var missingFixedDays = state.fixed.find(function (item) { return item.title && !fixedDays(item).length; });
     if (missingFixedDays) return "Marca al menos un día para “" + missingFixedDays.title + "”.";
     for (var dayIndex = 0; dayIndex < state.days.length; dayIndex += 1) {
@@ -1796,14 +1796,14 @@
     var dailyView = '<div class="welcome-flow-day-tabs">' + dayTabs + '</div>' + dailyCompanion + '<div class="welcome-flow-preview"><div class="welcome-flow-preview-head"><strong>Vista de ' + DAY_LABELS[previewDay] + '</strong><span>' + formatClockRange(minutesToTime(previewStart) + " – " + minutesToTime(previewEnd)) + '</span></div><p class="welcome-flow-simple-help">Toca cualquier actividad para escribir directamente. Si dejas el campo vacío, ese espacio queda libre.</p><ul>' + sampleDay + '</ul></div>';
     var weeklyView = '<p class="welcome-flow-simple-help">Escribe una actividad y pulsa «Unir ↑» o «Unir ↓» para sumar un espacio libre del mismo día. «Acortar» libera el último tramo. Las actividades iguales y seguidas se unen solas. <span class="welcome-flow-desktop-tip">También puedes arrastrar los bordes; el borde derecho del nombre del día cambia su ancho.</span></p><div class="welcome-flow-weekly-action-status" role="status" aria-live="polite"></div><div class="welcome-flow-weekly-desktop"><div class="welcome-flow-weekly-wrap"><table class="welcome-flow-weekly" style="width:' + weeklyTableWidth + 'px;min-width:' + weeklyTableWidth + 'px">' + weeklyColGroup + '<thead><tr><th>Hora</th>' + weeklyHeaders + '</tr></thead><tbody>' + weeklyRows + '</tbody></table></div></div><div class="welcome-flow-weekly-mobile-view"><div class="welcome-flow-day-tabs" aria-label="Elegir día de la semana">' + weeklyDayTabs + '</div><div class="welcome-flow-preview"><div class="welcome-flow-preview-head"><strong>Vista de ' + DAY_LABELS[previewDay] + '</strong><span>' + formatClockRange(minutesToTime(previewStart) + " – " + minutesToTime(previewEnd)) + '</span></div><ul>' + sampleDay + '</ul></div></div>';
     var replacing = hasTasks(parseJson(localStorage.getItem("horario_data_semanal")));
-    var previewTitle = state.example ? "Así podría quedar un horario hecho para ti" : (firstName() ? firstName() + ", tu primera propuesta está lista" : "Tu primera propuesta está lista");
-    var previewSubtitle = state.example ? "Este ejemplo es solo una demostración y no modificará tu horario." : "Esta es una propuesta editable. Puedes pulir la semana completa aquí, antes de guardarla.";
+    var previewTitle = state.example ? "Así podría quedar un horario hecho para ti" : (firstName() ? firstName() + ", tu primer borrador está listo" : "Tu primer borrador está listo");
+    var previewSubtitle = state.example ? "Este ejemplo es solo una demostración y no modificará tu horario." : "Este es un borrador editable. Puedes pulir la semana completa aquí, antes de guardarla.";
     var focusDayCount = proposal.focusDays.length;
     var quickActions = state.example || !focusDayCount ? "" : '<div class="welcome-flow-quick"><span>¿Qué te gustaría cambiar?</span><button type="button" data-welcome-action="more-focus">🎯 Más días de enfoque</button><button type="button" data-welcome-action="more-rest">🌿 Más espacios libres</button><button type="button" data-welcome-action="regenerate">🔄 Cambiar momento sugerido</button></div>';
     var footer = state.example ? '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="close">Cerrar ejemplo</button><button class="welcome-flow-primary" data-welcome-action="use-example">Crear el mío con estas preguntas →</button></footer>' :
       '<footer class="welcome-flow-footer"><button class="welcome-flow-secondary" data-welcome-action="back">← Cambiar respuestas</button><button class="welcome-flow-primary" data-welcome-action="apply">' + (replacing ? "Reemplazar horario" : "Guardar este horario") + '</button></footer>';
     var weeklyMinutes = focusDayCount * Math.max(1, state.sessionsPerDay) * state.blockDuration;
-    var focusSummary = focusDayCount ? Math.floor(weeklyMinutes / 60) + ' h ' + (weeklyMinutes % 60) + ' min de enfoque incluidos en la propuesta' : 'Sin bloques de enfoque añadidos sin una actividad concreta';
+    var focusSummary = focusDayCount ? Math.floor(weeklyMinutes / 60) + ' h ' + (weeklyMinutes % 60) + ' min de enfoque incluidos en el borrador' : 'Sin bloques de enfoque añadidos sin una actividad concreta';
     if (proposal.unplacedProjectBlocks.length) focusSummary += ' · ' + proposal.unplacedProjectBlocks.length + ' bloques no encontraron espacio; revisa días y minutos';
     return renderHeader(proposalStep(), previewTitle, previewSubtitle) +
       '<div class="welcome-flow-preview-summary"><span>🎯 ' + escapeHtml(state.goal || (state.projects.length ? "Tus proyectos declarados" : "Tus compromisos y espacios")) + '</span><span>🗓️ ' + activeLabels.map(escapeHtml).join(" · ") + '</span><span>⏱️ ' +
@@ -1815,8 +1815,8 @@
       '<div class="welcome-flow-influence"><strong>Así usamos tus respuestas</strong>' + (focusDayCount ? '<span>Reservamos ' + state.sessionsPerDay + (state.sessionsPerDay === 1 ? ' momento' : ' momentos') + ' de ' + state.blockDuration + ' minutos en ' + focusDayCount + (focusDayCount === 1 ? ' día' : ' días') + ', preferentemente ' + ({ morning: "por la mañana", afternoon: "por la tarde", evening: "por la noche", variable: "en momentos variados" }[state.energyPeak] || "cuando tengas espacio") + '.</span>' : state.priority === "procrastination" ? '<span>No fijamos una hora para la procrastinación: no necesitas adivinar cuándo ocurre. Dejamos los espacios disponibles; si indicas una tarea concreta, podremos proponer cuándo avanzar en ella.</span>' : '') + '<span>' + (state.freeMinutes ? "Dejamos los últimos " + state.freeMinutes + " minutos del día sin obligaciones." : "Los demás espacios quedan disponibles; no les asignamos actividades ni tiempos que no indicaste.") + '</span>' + (state.projects.length ? '<span>Distribuimos ' + state.projects.length + (state.projects.length === 1 ? ' curso, proyecto o meta' : ' cursos, proyectos o metas') + ' según su frecuencia y momento preferido.</span>' : '') + (state.lifeDetailsUsed && state.caffeineCutoff === "no-caffeine" ? '<span>Indicaste que no consumes cafeína; no añadimos un límite de consumo.</span>' : state.lifeDetailsUsed && /^\d{2}:\d{2}$/.test(state.caffeineCutoff || "") ? '<span>Marcamos el límite de cafeína que elegiste: ' + escapeHtml(formatClock(state.caffeineCutoff)) + '.</span>' : '') + (state.lifeDetailsUsed && (state.commuteMinutes || state.preparationMinutes) ? proposal.commuteBlocks.length ? '<span>Con el compromiso fijo que indicaste, ubicamos únicamente el tiempo que elegiste para prepararte y/o ir desde casa antes del primer turno. No inventamos el trayecto de regreso.</span>' : '<span>No añadimos preparación ni traslado porque falta un compromiso fijo de trabajo o estudios que sirva de destino; puedes registrarlo antes de guardar.</span>' : '') + (proposal.commuteOmittedDays.length ? '<span>No añadimos el traslado en ' + proposal.commuteOmittedDays.map(function (day) { return DAY_LABELS[day]; }).join(', ') + ' porque se cruzaría con otro compromiso, un cambio que pediste o el día anterior.</span>' : '') + (state.lifeDetailsUsed ? '<span>Las comidas, pausas y otras actividades quedan disponibles hasta que indiques en qué momento y cuánto tiempo quieres reservar.</span>' : state.wantMoreQuestions ? '<span>Omitiste los detalles de vida diaria; podrás añadirlos después.</span>' : '<span>Elegiste generar ahora; estas preferencias se pueden afinar después.</span>') + '</div>' +
       quickActions + (state.example ? "" : commandEditorMarkup("preview")) + previewSwitch + (state.previewMode === "weekly" && !state.editing ? weeklyView : dailyView) +
       '<p class="welcome-flow-repeat-note">' + (state.fixed.length ? 'Se respetaron ' + expandedFixed().length + ' apariciones de tus compromisos fijos. ' : '') + 'Después podrás ajustar cada día por separado desde tu horario semanal.</p>' +
-      (state.example ? '<p class="welcome-flow-safe-note">Puedes explorar este ejemplo con tranquilidad: no se guardará ni cambiará tus datos.</p>' : replacing ? '<div class="welcome-flow-warning"><strong>Ya tienes un horario semanal guardado.</strong><span>Si aplicas esta propuesta, lo reemplazaremos. Liberday conservará una copia local que podrás restaurar desde Panel de control → Descargas.</span></div>' :
-        '<p class="welcome-flow-safe-note">Todavía no se ha guardado nada. Tu horario solo cambia si eliges usar esta propuesta.</p>') +
+      (state.example ? '<p class="welcome-flow-safe-note">Puedes explorar este ejemplo con tranquilidad: no se guardará ni cambiará tus datos.</p>' : replacing ? '<div class="welcome-flow-warning"><strong>Ya tienes un horario semanal guardado.</strong><span>Si aplicas este borrador, lo reemplazaremos. Liberday conservará una copia local que podrás restaurar desde Panel de control → Descargas.</span></div>' :
+        '<p class="welcome-flow-safe-note">Todavía no se ha guardado nada. Tu horario solo cambia si eliges usar este borrador.</p>') +
       footer;
   }
 
@@ -2018,7 +2018,7 @@
     dialog.setAttribute("aria-describedby", "welcome-flow-confirm-description");
     dialog.innerHTML = '<span class="welcome-flow-confirm-icon" aria-hidden="true">' + (replacing ? "↻" : "✓") + '</span>' +
       '<h2 id="welcome-flow-confirm-title">' + (replacing ? "¿Reemplazar tu horario actual?" : "¿Usar este horario?") + '</h2>' +
-      '<p id="welcome-flow-confirm-description">' + (replacing ? "Tu horario actual será sustituido. Liberday conservará una copia local que podrás recuperar desde Descargas. Para guardarla fuera de este navegador, descarga también un respaldo." : "Esta propuesta se guardará como tu horario semanal. Podrás seguir editándola después.") + '</p>' +
+      '<p id="welcome-flow-confirm-description">' + (replacing ? "Tu horario actual será sustituido. Liberday conservará una copia local que podrás recuperar desde Descargas. Para guardarla fuera de este navegador, descarga también un respaldo." : "Este borrador se guardará como tu horario semanal. Podrás seguir editándola después.") + '</p>' +
       '<div class="welcome-flow-confirm-actions"><button type="button" data-welcome-action="cancel-apply">Cancelar</button><button type="button" data-welcome-action="confirm-apply">' + (replacing ? "Reemplazar horario" : "Usar este horario") + '</button></div>';
     document.getElementById("welcome-flow-overlay").appendChild(dialog);
     dialog.addEventListener("cancel", function (event) { event.preventDefault(); dismissApplyConfirmation(); });
@@ -2694,7 +2694,7 @@
       if (name === "regenerate") {
         var moments = ["morning", "afternoon", "evening", "variable"];
         state.energyPeak = moments[(moments.indexOf(state.energyPeak) + 1) % moments.length];
-        state.commandMessage = "Cambié el momento sugerido a " + ({ morning: "la mañana", afternoon: "la tarde", evening: "la noche", variable: "momentos variados" }[state.energyPeak]) + ". Revisa la propuesta antes de guardarla.";
+        state.commandMessage = "Cambié el momento sugerido a " + ({ morning: "la mañana", afternoon: "la tarde", evening: "la noche", variable: "momentos variados" }[state.energyPeak]) + ". Revisa el borrador antes de guardarlo.";
         state.edits = {};
         state.rowTimes = {};
         state.editing = false;
@@ -2790,7 +2790,7 @@
           if (state.mode === "quick" && !state.goal) {
             var quickGoalField = document.querySelector("#welcome-quick-goal");
             if (quickGoalField) {
-              if (!quickGoalField.parentElement.querySelector(".welcome-flow-error")) quickGoalField.insertAdjacentHTML("afterend", '<span class="welcome-flow-error" role="alert">Escribe una actividad para crear una propuesta útil.</span>');
+              if (!quickGoalField.parentElement.querySelector(".welcome-flow-error")) quickGoalField.insertAdjacentHTML("afterend", '<span class="welcome-flow-error" role="alert">Escribe una actividad para crear un borrador útil.</span>');
               quickGoalField.focus();
             }
             return;

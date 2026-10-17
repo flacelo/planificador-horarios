@@ -211,3 +211,27 @@ test("\"Crear otro horario\" ya no lleva flecha hacia abajo, porque abre el fluj
   assert.match(brandSource, /data-brand-action="week">Ver mi semana <span aria-hidden="true">↗<\/span>/);
   assert.match(brandSource, /data-brand-action="paths">Elegir cómo empezar <span aria-hidden="true">↗<\/span>/);
 });
+
+// Vocabulario del inicio y del borrador: "propuesta" pasa a "borrador".
+function visibleLines(source) {
+  return source.split("\n").filter((line) => !/^\s*\/\//.test(line));
+}
+
+test("el inicio y el borrador dicen \"borrador\" y ya no \"propuesta\" en textos visibles", () => {
+  [["welcome-flow.js", welcomeSource], ["local-data-gate.js", gateSource], ["trust-fixes.js", trustSource], ["brand-home.js", brandSource]].forEach(([name, source]) => {
+    const left = visibleLines(source).filter((line) => /propuesta/i.test(line));
+    assert.deepEqual(left.map((line) => line.trim().slice(0, 80)), [], "quedan textos con \"propuesta\" en " + name);
+  });
+  [
+    "Luego podrás editar el borrador.", "editar un borrador inicial.", "recibe un borrador editable.",
+    "Todas las rutas terminan en un borrador editable.", "Ver mi borrador ahora", "Generamos un borrador con lo que ya respondiste.",
+    "Tu primer borrador está listo", "tu primer borrador está listo", "Este es un borrador editable.", "Borrador actualizado: ",
+    "Revisa el borrador; aún no se ha guardado.", "Tu borrador anterior sigue sin guardar.", "Este borrador se guardará como tu horario semanal.",
+    "Si aplicas este borrador, lo reemplazaremos.", "para preparar tu borrador."
+  ].forEach((text) => assert.ok((welcomeSource + gateSource + trustSource).includes(text), text));
+});
+
+test("lo guardado sigue llamándose horario: los botones y avisos de guardado no cambian", () => {
+  ["Guardar este horario", "Reemplazar horario", "¿Usar este horario?", "¿Reemplazar tu horario actual?", "Crear mi horario rápido", "Duración del bloque"]
+    .forEach((text) => assert.ok((welcomeSource + gateSource).includes(text), text));
+});

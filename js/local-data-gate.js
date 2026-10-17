@@ -410,7 +410,7 @@
       '<section class="trust-start-hub"><div class="trust-start-heading"><div><span>EMPIEZA COMO PREFIERAS</span>' +
       '<h2>Otras formas de empezar</h2><p>Si prefieres otro camino, elige una de estas opciones.</p></div></div>' +
       '<div class="trust-start-options"><button type="button" data-start-action="manual"><span>✍️</span><strong>Planificar por mi cuenta</strong><small>Empieza con una tabla vacía y añade tus actividades.</small><em>Control total</em></button>' +
-      '<button type="button" data-start-action="quick"><span>🧩</span><strong>Crear mi horario rápido</strong><small>Dinos una actividad, tus días y horas. Luego podrás editar la propuesta.</small><em>Solo lo esencial</em></button>' +
+      '<button type="button" data-start-action="quick"><span>🧩</span><strong>Crear mi horario rápido</strong><small>Dinos una actividad, tus días y horas. Luego podrás editar el borrador.</small><em>Solo lo esencial</em></button>' +
       '<button type="button" data-start-action="detailed"><span>✨</span><strong>Personalizar a fondo</strong><small>Incluye compromisos, proyectos, energía y bienestar.</small><em>Más preguntas</em></button></div></section>' +
       '<div class="planify-entry-status" role="status" aria-live="polite"></div></div>';
     if (document.body.insertBefore) document.body.insertBefore(landing, document.body.firstChild);

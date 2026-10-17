@@ -44,6 +44,22 @@ Aunque la app ahora se llama Liberday, estos nombres internos **se conservan**. 
 - **`PLANIFY_ADMIN_TOKEN`** (variable de entorno del servidor de pruebas) y su mención en `SECURITY.md` y `.env.example`.
 - **La dirección web `planificador-horarios-dun.vercel.app`:** los datos están **atados a la dirección** del navegador. Con otra dirección, todas las personas empezarían vacías, y una redirección no mueve los datos. Si algún día se quiere una dirección nueva, hay que dejar la vieja funcionando y ofrecer "traer mis datos" con copia de seguridad y restauración. Tampoco conviene tocar `sw.js`, `manifest.json`, `start_url` ni `scope`.
 
+### 🏷️ Dónde está escrito el nombre "Liberday" (para cambiarlo algún día)
+El nombre no vive en un solo archivo: los archivos estáticos (título de la pestaña, instalación, caché, ícono) no pueden leerlo de una constante de JavaScript, así que se eligió **vigilarlo con una prueba** en vez de centralizarlo. La prueba `tests/brand-name.test.js` falla si el nombre aparece escrito a mano en un archivo que no está en esta lista, si se escribe distinto (siempre «Liberday», con mayúscula inicial), si los lugares estáticos dejan de coincidir o si el nombre viejo («Planify») vuelve a verse como nombre de la app. Si agregas el nombre en un archivo nuevo, agrégalo también a la lista `ALLOWED` de esa prueba y a esta tabla.
+
+| Dónde | Qué dice | Archivos |
+| :--- | :--- | :--- |
+| Pestaña, vista previa y título | `<title>`, textos para lectores de pantalla | `index.html` |
+| Instalación de la app | `name` y `short_name` | `manifest.json` |
+| Ícono | texto alternativo «Ícono de Liberday» (no se toca el ícono ni el logo) | `icon.svg` |
+| Caché sin conexión | prefijo técnico `liberday-shell-v1` y comentario; al activarse borra también las cachés `planify-…` viejas | `sw.js` |
+| Empaquetado | títulos que se ponen al compilar | `scripts/optimize-a11y.js` |
+| Frases de la app | «Instalar Liberday», avisos del navegador, copias de seguridad, tutorial, panel, asistente, enfoque, recordatorios | `js/app.js`, `js/daily-backup.js`, `js/export-pdf.js`, `js/focus-session.js`, `js/honest-report.js`, `js/local-data-gate.js`, `js/panel-redesign.js`, `js/pwa-experience.js`, `js/reminder-service.js`, `js/trust-fixes.js`, `js/welcome-flow.js` |
+| Archivos que se descargan | `liberday_respaldo_…json` y `liberday-reporte-semanal-…html` (nombres técnicos en minúscula) | `js/daily-backup.js`, `js/honest-report.js` |
+| Documentos | README, ROADMAP, TODO, SECURITY, CHANGELOG, este archivo | (raíz) |
+
+**No cambian con el nombre:** todo lo de la lista «Nombres que NO se deben renombrar» (claves `planify_*`, `planify-backup`, `PLANIFY_ADMIN_TOKEN`, clases, ids y funciones internas), la dirección de Vercel y el nombre del repositorio.
+
 ---
 
 ## 2. Lo Último que se Hizo
@@ -175,7 +191,7 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 > 1. ✅ **Prueba en celular: hecha por el dueño (2026-10-16), todo bien.** Los dos problemas que solo se veían en móvil quedaron resueltos: B5 en móvil (`149f1ea`) y A4 en móvil (`d28854b`).
 > 2. ✅ **B5 y A4 en móvil se arreglaron antes de pasar a `main`** (ver el punto 1).
 > 3. **Decidir con el dueño si se pasan los cambios a `main`.** Estado a 2026-10-16: `main` = `f29199b`; la rama de trabajo tiene 25 commits más y `main` no tiene commits que la rama no tenga (unión directa, sin conflictos de historial; 40 archivos, +797/−413). Pasar a `main` **publica en Vercel** y requiere orden explícita del dueño. Ojo: `main` todavía contiene lo viejo (ventana "Pagar con tarjeta", cifras falsas "28.5 hrs", generador de licencias y código de inicio de sesión en el navegador); el paso a `main` lo corrige. Se sugiere hacerlo con una solicitud de cambios (pull request) para poder revisarlo.
-> 4. **Después, sin bloquear:** commit 7 del cambio de nombre (definir el nombre "Liberday" una sola vez y renombrar mensajes técnicos de consola y comentarios, sin tocar la lista "Nombres que NO se deben renombrar"), B4 (fecha del Diario como `10/15/2026`), A5 a A8 y el comentario de `.env.example`.
+> 4. **Después, sin bloquear:** commit 7 del cambio de nombre: **hecho en dos PR** (7a: mensajes de consola y comentarios; 7b: prueba que vigila el nombre y lista de dónde está escrito, en la sección 1), B4 (fecha del Diario como `10/15/2026`), A5 a A8 y el comentario de `.env.example`.
 > 5. **Decisión aparte del dueño:** la dirección de Vercel (ver advertencia de la sección 1) y si se renombra el repositorio de GitHub.
 > 6. **Replanteo de la primera pantalla:** el **titular ya cambió** a «Pon tu meta. Te armo la semana.» (commit `6852751`, ya en `main`) y el **flujo de inicio de 3 pantallas está hecho en la rama `codex/inicio-3-pantallas`**, a la espera de la revisión del dueño en su pull request (no se une a `main` sin su orden). Siguen pendientes de aprobación del dueño el resto del replanteo (frase de valor del texto de apoyo) y definir si las 3 tarjetas actuales se quedan o se reemplazan.
 
@@ -200,5 +216,6 @@ Estos 5 puntos fueron descubiertos en la revisión y deben solucionarse para que
 | **2026-10-16** | **Claude Code** | Ajustes al PR del inicio de 3 pantallas según la revisión del dueño: Tarde y Noche marcadas por defecto, horas bajo cada franja y guardado directo en «Empezar con este día» cuando no hay horario previo (con confirmación si hay uno que reemplazar). Pruebas 97/97 y prueba en navegador de prueba (falla de guardado, reintento, doble toque, reemplazo). Subido solo a `codex/inicio-3-pantallas`; `main` intacto, sin merge. |
 | **2026-10-16** | **Claude Code** | Paso 1 «una sola puerta» en la rama `codex/una-sola-puerta`: titular, «Crear otro horario», Diario y Avance abren el inicio de 3 pantallas; tarjetas en «Otras formas de empezar» sin RECOMENDADO; línea nueva en la pantalla 3. Pruebas 100/100 y prueba en navegador de prueba (nuevo, con datos sin horario, con horario; 390 y 1366 px). PR para revisión; `main` intacto, sin merge. |
 | **2026-10-17** | **Claude Code** | Paso 2 de vocabulario en la rama `codex/vocabulario-borrador`: «propuesta»→«borrador», «bloque»→«momento» en la narrativa del borrador y «tu día» donde queda natural; lo guardado sigue llamándose horario y «bloque» queda en la edición de la tabla. Pruebas 105/105 y recorrido en navegador de prueba (390 y 1366 px). PR para revisión; `main` intacto, sin merge. |
+| **2026-10-17** | **Claude Code** | Commit 7b del cambio de nombre: prueba nueva `tests/brand-name.test.js` que vigila dónde está escrito «Liberday» (lista de archivos, mayúscula inicial, lugares estáticos coincidentes y que el nombre viejo no vuelva a verse) y sección «Dónde está escrito el nombre» en este archivo (rama `codex/prueba-nombre`). Elegida la opción B (vigilar) y no centralizar el nombre en un archivo de JavaScript, porque los archivos estáticos no pueden leerlo. Sin cambios de código de la app. PR para revisión; `main` intacto, sin merge. |
 | **2026-10-17** | **Claude Code** | Favicon: se agregó `<link rel="icon" href="icon.svg" type="image/svg+xml">` a `index.html` (rama `codex/favicon-404`, commit `4301b13`) y la prueba `tests/favicon.test.js`; ya no hay 404 de `favicon.ico`. Pruebas 107/107 y comprobación en navegador de prueba. PR para revisión; `main` intacto, sin merge. |
 | **2026-10-17** | **Claude Code** | Commit 7a: mensajes de consola y comentarios de PLANIFY a Liberday (rama `codex/consola-liberday`, commit `a0dca95`), sin tocar `PLANIFY_ADMIN_TOKEN`, claves `planify_*`, `planify-backup` ni nombres internos. Pruebas 110/110 y comprobación en navegador de prueba. PR para revisión; `main` intacto, sin merge. |

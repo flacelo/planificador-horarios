@@ -194,18 +194,18 @@
 
   function dashboardLeadMarkup(metrics) {
     var message = !metrics.hasHistory ? "Empieza a registrar cómo te fue esta semana." :
-      metrics.percent === 100 ? "Has marcado todos los bloques de tu horario." :
+      metrics.percent === 100 ? "Has marcado todos los momentos de tu semana." :
       metrics.percent >= 50 ? "Ya marcaste más de la mitad de tu horario." :
-      metrics.percent > 0 ? "Cada bloque marcado cuenta. Sigue a tu ritmo." :
-      "Tu horario está preparado. Empieza por un bloque.";
-    var progressText = metrics.hasHistory ? metrics.completed + " de " + metrics.trackedTotal + " bloques marcados en fechas registradas" :
+      metrics.percent > 0 ? "Cada momento marcado cuenta. Sigue a tu ritmo." :
+      "Tu semana está lista. Empieza por un momento.";
+    var progressText = metrics.hasHistory ? metrics.completed + " de " + metrics.trackedTotal + " momentos marcados en fechas registradas" :
       "Aún no hay marcas para estas fechas";
-    return '<section class="dashboard-calm-lead" aria-label="Avance del horario semanal"><div class="dashboard-calm-lead-copy">' +
+    return '<section class="dashboard-calm-lead" aria-label="Avance de la semana"><div class="dashboard-calm-lead-copy">' +
       '<span class="dashboard-calm-kicker">CUMPLIMIENTO DE ESTA SEMANA</span><h3>' + escapeHtml(message) + '</h3>' +
       '<p>' + escapeHtml(progressText) + '</p>' +
-      '<div class="dashboard-calm-progress" role="progressbar" aria-label="Bloques marcados en el horario" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + metrics.percent + '"><span style="width:' + metrics.percent + '%"></span></div>' +
+      '<div class="dashboard-calm-progress" role="progressbar" aria-label="Momentos marcados en la semana" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + metrics.percent + '"><span style="width:' + metrics.percent + '%"></span></div>' +
       '<small class="dashboard-calm-history-note">' + (metrics.hasHistory ? "El avance corresponde solo a las fechas registradas; los datos anteriores no se inventaron." : "Las marcas antiguas no tenían una fecha asociada, así que no cuentan para este periodo.") + '</small></div>' +
-      '<div class="dashboard-calm-percent"><strong>' + (metrics.hasHistory ? metrics.percent + "%" : "—") + '</strong><span>' + (metrics.hasHistory ? "de los bloques registrados" : "sin datos para estas fechas") + '</span></div></section>';
+      '<div class="dashboard-calm-percent"><strong>' + (metrics.hasHistory ? metrics.percent + "%" : "—") + '</strong><span>' + (metrics.hasHistory ? "de los momentos registrados" : "sin datos para estas fechas") + '</span></div></section>';
   }
 
   function dashboardCard(label, value, note, color) {
@@ -224,7 +224,7 @@
       var completion = count ? Math.round(completed * 100 / count) : 0;
       var date = Array.isArray(dates) ? dates[index] : "";
       var recorded = Array.isArray(recordedDays) && recordedDays[index];
-      return '<div class="trust-bar-column" role="img" aria-label="' + label + (date ? " " + date : "") + (recorded ? ': ' + completed + ' de ' + count + ' bloques registrados completados' : ': sin registro') + '" title="' + (recorded ? completed + ' de ' + count + ' bloques completados' : 'Sin registro para esta fecha') + '">' +
+      return '<div class="trust-bar-column" role="img" aria-label="' + label + (date ? " " + date : "") + (recorded ? ': ' + completed + ' de ' + count + ' momentos registrados completados' : ': sin registro') + '" title="' + (recorded ? completed + ' de ' + count + ' momentos completados' : 'Sin registro para esta fecha') + '">' +
         '<span class="trust-bar-value">' + (recorded ? completed + '/' + count : "—") + '</span>' +
         '<span class="trust-bar" style="height:' + height + '%"><i class="trust-bar-completed" style="height:' + completion + '%"></i></span>' +
         '<span class="trust-bar-label">' + label + '</span></div>';
@@ -248,7 +248,7 @@
     var ideas = [];
     if (!metrics.total) ideas.push(["🌱", "Crea tu primera semana", "Elige una de las rutas guiadas y obtendrás una base que luego podrás editar.", "start"]);
     else if (!metrics.hasHistory) ideas.push(["🎯", "Empieza a registrar tu avance", "Marca cada actividad al terminarla. Liberday la guardará en la fecha de la semana que estés planificando.", "change"]);
-    else if (!metrics.completed) ideas.push(["🎯", "Empieza por un bloque", "Tu horario está listo. Elige un bloque para comenzar y ajústalo si no encaja con tu día.", "change"]);
+    else if (!metrics.completed) ideas.push(["🎯", "Empieza por un momento", "Tu semana está lista. Elige un momento para comenzar y ajústalo si no encaja con tu día.", "change"]);
     else if (metrics.percent < 35) ideas.push(["🎯", "Revisa lo que queda pendiente", "Compara tu horario con la semana que realmente tuviste y ajusta los bloques que no encajaron.", "change"]);
     else if (metrics.percent < 75) ideas.push(["↗", "Protege lo que ya funciona", "Hay avance real. Conserva tus mejores días y mueve solo lo que suele quedar pendiente.", "change"]);
     else ideas.push(["✨", "Tu sistema está funcionando", "Mantén la estructura y revisa una sola mejora para la próxima semana.", "change"]);
@@ -256,7 +256,7 @@
     if (profile.sleepChallenge && profile.sleepChallenge !== "none") ideas.push(["🌙", "Cuida el cierre del día", "Reserva una rutina tranquila y busca orientación profesional si el problema de sueño persiste.", "preferences"]);
     if (profile.foodProfile && profile.foodProfile !== "none") ideas.push(["🍽️", "Hazlo personal y observable", "Conserva horarios regulares y registra qué alimentos toleras; evita cambiar una dieta clínica sin orientación profesional.", "preferences"]);
     if (Array.isArray(profile.ventures) && profile.ventures.length) ideas.push(["🚀", "Dale un siguiente paso a tu emprendimiento", "Reserva un avance concreto para " + (profile.ventures[0].name || "tu emprendimiento") + ", no solo tiempo genérico.", "change"]);
-    if (metrics.total && !focusStats.completedSessions) ideas.push(["⏱️", "Prueba una sesión de enfoque", "Elige un bloque pequeño y trabaja sin intentar resolver toda la semana de una vez.", "focus"]);
+    if (metrics.total && !focusStats.completedSessions) ideas.push(["⏱️", "Prueba una sesión de enfoque", "Elige un momento pequeño y trabaja sin intentar resolver toda la semana de una vez.", "focus"]);
     return ideas.slice(0, 3);
   }
 
@@ -299,12 +299,12 @@
     var content = metrics.total ?
       dashboardLeadMarkup(metrics) +
       '<div class="dashboard-calm-stats">' +
-      dashboardCard("Tiempo planificado", formatHours(metrics.hours), "En los bloques de tu horario", "#76c9ad") +
-      dashboardCard("Días con plan", metrics.plannedDayCount + " / 7", "Días con bloques", "#82a9e8") +
+      dashboardCard("Tiempo planificado", formatHours(metrics.hours), "En los momentos de tu semana", "#76c9ad") +
+      dashboardCard("Días con plan", metrics.plannedDayCount + " / 7", "Días con momentos", "#82a9e8") +
       dashboardCard("Enfoque realizado", formatFocusMinutes(focusStats.completedMinutes), focusStats.completedSessions + (focusStats.completedSessions === 1 ? " sesión terminada" : " sesiones terminadas"), "#d7a8dc") +
       '</div>' +
       '<section class="dashboard-calm-section"><div class="dashboard-calm-section-heading"><span class="dashboard-calm-kicker">MIRA TU SEMANA</span><h3>Cómo está distribuido tu plan</h3></div>' +
-      '<div class="trust-dashboard-grid"><article class="trust-chart"><h4>Bloques por día</h4><p class="dashboard-calm-chart-note">' + (metrics.hasHistory ? "Solo cuentan los días con seguimiento; los demás aparecen sin registro." : "Las marcas antiguas no tenían una fecha asociada.") + '</p><div class="trust-bars" role="group" aria-label="Bloques marcados por día de la semana">' + barsMarkup(metrics.byDay, metrics.completedByDay, metrics.datesByDay, metrics.recordedByDay) + '</div><div class="dashboard-calm-chart-legend"><span><i class="is-complete"></i>Hechos en esa fecha</span><span>— Sin registro</span></div></article>' +
+      '<div class="trust-dashboard-grid"><article class="trust-chart"><h4>Momentos por día</h4><p class="dashboard-calm-chart-note">' + (metrics.hasHistory ? "Solo cuentan los días con seguimiento; los demás aparecen sin registro." : "Las marcas antiguas no tenían una fecha asociada.") + '</p><div class="trust-bars" role="group" aria-label="Momentos marcados por día">' + barsMarkup(metrics.byDay, metrics.completedByDay, metrics.datesByDay, metrics.recordedByDay) + '</div><div class="dashboard-calm-chart-legend"><span><i class="is-complete"></i>Hechos en esa fecha</span><span>— Sin registro</span></div></article>' +
       '<article class="trust-chart"><h4>Tiempo por área</h4><div class="trust-categories">' + categoriesMarkup(metrics) + '</div></article></div></section>' +
       '<section class="dashboard-calm-next"><div class="dashboard-calm-section-heading"><span class="dashboard-calm-kicker">UN PASO A LA VEZ</span><h3>Tu siguiente paso</h3></div>' + recommendationMarkup(ideas.slice(0, 1)) +
       (ideas.length > 1 ? '<details class="dashboard-calm-more"><summary>Ver otras sugerencias</summary><div>' + recommendationMarkup(ideas.slice(1)) + '</div></details>' : "") + '</section>' :

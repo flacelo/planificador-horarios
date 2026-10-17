@@ -1,4 +1,4 @@
-/* PLANIFY: ayuda contextual breve para que la edición móvil sea fácil de descubrir. */
+/* Liberday: ayuda contextual breve para que la edición móvil sea fácil de descubrir. */
 (function () {
   "use strict";
 

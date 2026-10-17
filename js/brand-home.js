@@ -1,4 +1,4 @@
-/* PLANIFY's visual welcome. Keeps the existing planner and its actions intact. */
+/* Liberday's visual welcome. Keeps the existing planner and its actions intact. */
 (function () {
   "use strict";
 

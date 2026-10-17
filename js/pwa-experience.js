@@ -1,4 +1,4 @@
-/* PLANIFY PWA: instalación clara y segura, sin prometer funciones que el navegador no ofrece. */
+/* Liberday PWA: instalación clara y segura, sin prometer funciones que el navegador no ofrece. */
 (function () {
   "use strict";
   var deferredPrompt = null;
@@ -111,7 +111,7 @@
     if (!("serviceWorker" in navigator)) return;
     var locallySecure = location.hostname === "localhost" || location.hostname === "127.0.0.1";
     if (location.protocol !== "https:" && !locallySecure) return;
-    navigator.serviceWorker.register("sw.js").catch(function () { /* PLANIFY sigue funcionando en línea. */ });
+    navigator.serviceWorker.register("sw.js").catch(function () { /* Liberday sigue funcionando en línea. */ });
   }
 
   window.addEventListener("beforeinstallprompt", function (event) { event.preventDefault(); deferredPrompt = event; refreshEntryPoints(); });

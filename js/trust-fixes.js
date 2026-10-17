@@ -60,7 +60,7 @@
           return { dias: Array.isArray(parsed.dias) ? parsed.dias : [], filas: parsed.filas };
         }
       } catch (error) {
-        console.warn("PLANIFY: no se pudo leer " + keys[i], error);
+        console.warn("Liberday: no se pudo leer " + keys[i], error);
       }
     }
     return { dias: [], filas: [] };
@@ -597,7 +597,7 @@
       script.id = "planify-completion-history-script";
       script.src = "js/completion-history.js?v=3";
       script.async = false;
-      script.onerror = function () { console.warn("PLANIFY: no se pudo cargar el historial por fecha."); };
+      script.onerror = function () { console.warn("Liberday: no se pudo cargar el historial por fecha."); };
       document.head.appendChild(script);
     }
   }
@@ -672,7 +672,7 @@
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=17";
+      script.src = "js/brand-home.js?v=18";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -767,7 +767,7 @@
     if (document.getElementById("planify-daily-persistence-script")) return;
     var script = document.createElement("script");
     script.id = "planify-daily-persistence-script";
-    script.src = "js/daily-persistence.js?v=1";
+    script.src = "js/daily-persistence.js?v=2";
     script.defer = true;
     document.head.appendChild(script);
   }
@@ -776,7 +776,7 @@
     if (document.getElementById("planify-daily-backup-script")) return;
     var script = document.createElement("script");
     script.id = "planify-daily-backup-script";
-    script.src = "js/daily-backup.js?v=12";
+    script.src = "js/daily-backup.js?v=13";
     script.defer = true;
     document.head.appendChild(script);
   }
@@ -792,7 +792,7 @@
     if (!document.getElementById("planify-pwa-script")) {
       var script = document.createElement("script");
       script.id = "planify-pwa-script";
-      script.src = "js/pwa-experience.js?v=3";
+      script.src = "js/pwa-experience.js?v=4";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -809,7 +809,7 @@
     if (!document.getElementById("planify-mobile-coach-script")) {
       var script = document.createElement("script");
       script.id = "planify-mobile-coach-script";
-      script.src = "js/mobile-coach.js?v=3";
+      script.src = "js/mobile-coach.js?v=4";
       script.defer = true;
       document.head.appendChild(script);
     }

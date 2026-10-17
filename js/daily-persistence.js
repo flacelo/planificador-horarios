@@ -35,7 +35,7 @@
       return data;
     } catch (error) {
       storageAvailable = false;
-      console.warn("PLANIFY: no se pudo leer el diario guardado; se conserva sin reemplazar.", error);
+      console.warn("Liberday: no se pudo leer el diario guardado; se conserva sin reemplazar.", error);
       return null;
     }
   }
@@ -43,7 +43,7 @@
   function writeStore(data) {
     if (!storageAvailable) return;
     try { localStorage.setItem(KEY, JSON.stringify(data)); }
-    catch (error) { console.warn("PLANIFY: no se pudo guardar el diario.", error); }
+    catch (error) { console.warn("Liberday: no se pudo guardar el diario.", error); }
   }
 
   function textValue(selector) {
@@ -89,7 +89,7 @@
       if (record.title) localStorage.setItem("planify_titulo_rutina", record.title);
       if (record.sleep) localStorage.setItem("planify_sueño_horas", record.sleep);
       if (record.productivity) localStorage.setItem("planify_rating_diario", String(record.productivity));
-    } catch (error) { console.warn("PLANIFY: no se pudieron actualizar las preferencias antiguas del diario.", error); }
+    } catch (error) { console.warn("Liberday: no se pudieron actualizar las preferencias antiguas del diario.", error); }
   }
 
   function save(date) {

@@ -1,4 +1,4 @@
-/* Export and restore a scoped PLANIFY backup without exposing unrelated storage. */
+/* Export and restore a scoped Liberday backup without exposing unrelated storage. */
 (function () {
   "use strict";
 

@@ -235,3 +235,18 @@ test("lo guardado sigue llamándose horario: los botones y avisos de guardado no
   ["Guardar este horario", "Reemplazar horario", "¿Usar este horario?", "¿Reemplazar tu horario actual?", "Crear mi horario rápido", "Duración del bloque"]
     .forEach((text) => assert.ok((welcomeSource + gateSource).includes(text), text));
 });
+
+test("en el borrador y las preguntas se dice \"momento(s)\"; \"bloque\" queda solo en la edición de la tabla y en la duración técnica", () => {
+  [
+    "distinguir tus momentos de trabajo", "Pausa entre cada momento", "Avisarme cuando toque mi momento", "entre momentos.",
+    "Reservaremos un momento sencillo", "si no quieres añadir ese momento.", "Ya hay un momento de enfoque",
+    "prioricé tus momentos de enfoque", "Sin momentos de enfoque añadidos", "momentos no encontraron espacio", "Reservaremos un momento para esta actividad"
+  ].forEach((text) => assert.ok(welcomeSource.includes(text), text));
+  [
+    "distinguir tus bloques laborales", "Pausa entre cada bloque", "Avisarme cuando toque mi bloque", "Sin bloques de enfoque añadidos",
+    "Ya hay un bloque de enfoque", "prioricé tus bloques de enfoque", "Reservaremos un bloque para esta actividad"
+  ].forEach((text) => assert.ok(!welcomeSource.includes(text), "no debe quedar: " + text));
+  // la edición de la tabla conserva "bloque"
+  ["Listo: el bloque quedó de", "Llegaste al límite de este bloque", "Bloque acortado", "Celdas unidas en un solo bloque", "Este bloque ya dura 15 minutos", "Duración del bloque", "Bloque elegido: "]
+    .forEach((text) => assert.ok(welcomeSource.includes(text), "debe seguir: " + text));
+});

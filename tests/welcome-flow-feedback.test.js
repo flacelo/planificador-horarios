@@ -149,7 +149,7 @@ test("la propuesta puede pulirse antes de guardarla con reglas locales y sin adi
   assert.match(welcome, /No entendí ese ajuste todavía/);
   assert.match(welcome, /No voy a adivinar tus turnos/);
   assert.match(welcome, /var focusDays = !state\.goal \|\| state\.priority === "procrastination" && !hasConcreteGoal/);
-  assert.match(welcome, /Sin bloques de enfoque añadidos sin una actividad concreta/);
+  assert.match(welcome, /Sin momentos de enfoque añadidos sin una actividad concreta/);
   assert.doesNotMatch(welcome, /fetch\s*\(|XMLHttpRequest|https:\/\/api\./);
 });
 
@@ -173,6 +173,6 @@ test("los tiempos elegidos permiten minutos personalizados y las duraciones de p
   assert.match(welcome, /¿Cuánto tiempo quieres reservar para prepararte antes de salir\?/);
   assert.match(welcome, /Minutos que quieres reservar cada día/);
   assert.match(welcome, /projectBlocks\.push\(\{ day: Number\(day\), start: candidate, end: candidate \+ projectDuration/);
-  assert.match(welcome, /bloques no encontraron espacio/);
+  assert.match(welcome, /momentos no encontraron espacio/);
   assert.doesNotMatch(welcome, /Math\.ceil\(Number\(project\.duration/);
 });

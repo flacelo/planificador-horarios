@@ -36,3 +36,11 @@ test("la tarjeta es solo lectura: sin formularios, enlaces, botones ni envío de
   assert.doesNotMatch(block, /<(form|input|button|a |textarea|select|script)/i);
   assert.doesNotMatch(block, /href|onclick|mailto|fetch|XMLHttpRequest|sendBeacon|localStorage/);
 });
+
+test("el estilo de la tarjeta existe, con tema claro y foco visible", () => {
+  const css = read("css/panel-redesign.css");
+  assert.match(css, /#side-panel \.panel-exploring \{/);
+  assert.match(css, /#side-panel \.panel-exploring summary:focus-visible/);
+  assert.match(css, /body\.tema-claro #side-panel \.panel-exploring/);
+  assert.match(css, /#side-panel \.panel-exploring-list li \{[^}]*min-width: 0/);
+});

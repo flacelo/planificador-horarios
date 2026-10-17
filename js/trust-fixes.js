@@ -683,7 +683,7 @@
       var style = document.createElement("link");
       style.id = "planify-panel-redesign-style";
       style.rel = "stylesheet";
-      style.href = "css/panel-redesign.css?v=15";
+      style.href = "css/panel-redesign.css?v=16";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-panel-redesign-script")) {

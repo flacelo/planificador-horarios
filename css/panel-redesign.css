@@ -621,6 +621,12 @@ html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card button 
 .planify-panel-redesign-ready body.tema-claro #side-panel .sp-title small,
 .planify-panel-redesign-ready body.tema-claro #side-panel .panel-section-intro p,
 .planify-panel-redesign-ready body.tema-claro #side-panel .panel-card-hint { color: #566f6b !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-exploring { background: #f5faf7; border-color: #d5e5df; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-exploring summary,
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-exploring-list strong { color: #173c37; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-exploring-lead,
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-exploring-list span,
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-exploring-note { color: #566f6b; }
 .planify-panel-redesign-ready body.tema-claro #side-panel .panel-brand-mark {
   background: #d9f4e5;
   color: #227d61;
@@ -745,3 +751,38 @@ html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card button 
 @media (max-width: 360px) {
   .planify-panel-redesign-ready #side-panel .panel-backup-actions { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Estamos explorando: ideas en estudio, solo lectura */
+.planify-panel-redesign-ready #side-panel .panel-exploring {
+  margin: 14px 0 6px;
+  padding: 0 14px;
+  border: 1px solid rgba(172, 198, 197, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.planify-panel-redesign-ready #side-panel .panel-exploring summary {
+  padding: 13px 0;
+  color: #e6f2f0;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+.planify-panel-redesign-ready #side-panel .panel-exploring summary:focus-visible {
+  outline: 2px solid #76c9ad;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.planify-panel-redesign-ready #side-panel .panel-exploring-lead,
+.planify-panel-redesign-ready #side-panel .panel-exploring-note {
+  margin: 0 0 10px;
+  color: #acc6c5;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.planify-panel-redesign-ready #side-panel .panel-exploring-note { display: block; padding-bottom: 12px; }
+.planify-panel-redesign-ready #side-panel .panel-exploring-list { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 10px; }
+.planify-panel-redesign-ready #side-panel .panel-exploring-list li { min-width: 0; display: grid; gap: 2px; overflow-wrap: anywhere; }
+.planify-panel-redesign-ready #side-panel .panel-exploring-list strong { color: #e6f2f0; font-size: 13px; }
+.planify-panel-redesign-ready #side-panel .panel-exploring-list span { color: #acc6c5; font-size: 12px; line-height: 1.45; }

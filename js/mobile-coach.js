@@ -3,7 +3,7 @@
   "use strict";
 
   var COPY = {
-    diario: { icon: "☀️", title: "Tu día, sin complicarte", text: "Revisa tu siguiente bloque, anota una meta o inicia una sesión de enfoque.", action: "Anotar una meta" },
+    diario: { icon: "☀️", title: "Tu día, sin complicarte", text: "Revisa tu siguiente momento, anota una meta o inicia una sesión de enfoque.", action: "Anotar una meta" },
     semanal: { icon: "🗓️", title: "Tu semana se puede editar", text: "Toca una celda para escribir. En Ajustar horario cambias las horas y los días.", action: "Ajustar horario" },
     mensual: { icon: "📆", title: "Mira el mes completo", text: "Usa cada día para ubicar entregas, descansos y momentos importantes sin perder el panorama.", action: "Ver tutorial" },
     anual: { icon: "🧭", title: "Dale dirección a tu año", text: "Escribe un objetivo por mes y deja espacio para temporadas de mayor carga o descanso.", action: "Ver tutorial" },

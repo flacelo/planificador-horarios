@@ -582,7 +582,7 @@
     if (!document.getElementById("planify-day-flow-script")) {
       var script = document.createElement("script");
       script.id = "planify-day-flow-script";
-      script.src = "js/day-flow.js?v=6";
+      script.src = "js/day-flow.js?v=7";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -809,7 +809,7 @@
     if (!document.getElementById("planify-mobile-coach-script")) {
       var script = document.createElement("script");
       script.id = "planify-mobile-coach-script";
-      script.src = "js/mobile-coach.js?v=4";
+      script.src = "js/mobile-coach.js?v=5";
       script.defer = true;
       document.head.appendChild(script);
     }

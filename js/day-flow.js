@@ -146,7 +146,7 @@
       detail = completed === items.length ? "Ya completaste todo lo que estaba planificado para hoy. Disfruta tu cierre del día." : "No queda una actividad pendiente con hora para hoy. Revisa tu horario si quieres reorganizar algo.";
       action = '<button type="button" class="day-flow-primary" data-day-flow-action="schedule">Ver mi horario</button>';
     } else {
-      detail = "Aún no hay bloques para hoy. Puedes crear una propuesta guiada o anotar una sola meta para comenzar.";
+      detail = "Aún no hay momentos para hoy. Puedes crear un borrador guiado o anotar una sola meta para comenzar.";
       action = '<button type="button" class="day-flow-primary" data-day-flow-action="create">✨ Crear mi día</button>' +
         '<button type="button" class="day-flow-secondary" data-day-flow-action="goal">Anotar mi meta</button>';
     }
@@ -159,7 +159,7 @@
       '<div class="day-flow-head"><span class="day-flow-icon">' + (current ? "⏳" : next ? "🎯" : "☀️") + '</span><div><strong>' + headline + '</strong>' +
       (activity ? '<h3>' + escapeHtml(activity.title) + '</h3><small>' + escapeHtml(activity.category) + " · " + escapeHtml(detail) + '</small>' : '<p>' + escapeHtml(detail) + '</p>') + '</div></div>' +
       '<div class="day-flow-actions">' + action + '</div></div>' +
-      '<aside class="day-flow-glance"><div><span>AVANCE</span><strong>' + completed + "/" + items.length + '</strong><small>bloques completados</small></div>' +
+      '<aside class="day-flow-glance"><div><span>AVANCE</span><strong>' + completed + "/" + items.length + '</strong><small>momentos hechos</small></div>' +
       '<div><span>AVISOS</span><strong>' + reminders.length + '</strong><small>' + (reminders.length ? "para hoy" : "sin avisos") + '</small></div></aside>' +
       (items.length ? '<details class="day-flow-list"><summary>Ver mi jornada de hoy</summary><ul>' + list + '</ul></details>' : "") +
       '</section>';

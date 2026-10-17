@@ -689,7 +689,7 @@
     if (!document.getElementById("planify-panel-redesign-script")) {
       var script = document.createElement("script");
       script.id = "planify-panel-redesign-script";
-      script.src = "js/panel-redesign.js?v=12";
+      script.src = "js/panel-redesign.js?v=13";
       script.defer = true;
       document.head.appendChild(script);
     }

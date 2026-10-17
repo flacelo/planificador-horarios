@@ -229,6 +229,19 @@
       hint.textContent = "PDF para ver o imprimir. Excel para revisar tu horario en una hoja de cálculo.";
       titles[1].insertAdjacentElement("afterend", hint);
     }
+    // Ideas en estudio (ROADMAP.md, "Posibles etapas futuras"): solo lectura, sin enlaces, campos ni envíos.
+    if (!data.querySelector(".panel-exploring")) {
+      var exploring = document.createElement("details");
+      exploring.className = "panel-exploring";
+      exploring.innerHTML = '<summary>Estamos explorando</summary>' +
+        '<p class="panel-exploring-lead">Ideas en estudio, no promesas ni fechas. Tu horario sigue guardado solo en este navegador.</p>' +
+        '<ul class="panel-exploring-list">' +
+        '<li><strong>Tu horario en varios dispositivos</strong><span>Hoy tus datos viven solo en este navegador. Estudiamos cómo llevarlos a otro dispositivo de forma segura y con tu permiso.</span></li>' +
+        '<li><strong>Más formas de ver tu avance</strong><span>Estudiamos más resúmenes de tu semana, siempre con datos que tú marcaste, sin inventar cifras.</span></li>' +
+        '<li><strong>Avisos y uso sin internet</strong><span>Estudiamos recordatorios y uso sin conexión, según lo que permita tu navegador.</span></li>' +
+        '</ul><small class="panel-exploring-note">Aún no existen.</small>';
+      data.appendChild(exploring);
+    }
   }
 
   function decoratePanel(panel) {

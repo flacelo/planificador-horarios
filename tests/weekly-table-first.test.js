@@ -24,3 +24,13 @@ test("la tabla y su estructura no cambian: siguen sus piezas en el mismo orden r
   assert.match(js, /tableView\.insertBefore\(hint, table\);/);
   assert.match(js, /tableView\.insertBefore\(dayPicker, table\);/);
 });
+
+test("'Resumen de hoy' se ve debajo de la tabla solo por orden visual (CSS), sin moverlo en la página", () => {
+  const css = read("css/weekly-calm.css");
+  assert.match(css, /@media screen \{\s*#view-semanal\.weekly-calm-ready #view-table \{\s*display: flex !important;\s*flex-direction: column;/);
+  assert.match(css, /#view-semanal\.weekly-calm-ready #view-table > \* \{ min-width: 0; \}/);
+  assert.match(css, /#view-semanal\.weekly-calm-ready #view-table > #day-summary \{ order: 1; margin: 14px 0 0 !important; \}/);
+  assert.match(css, /#view-semanal\.weekly-calm-ready #view-table > \.weekly-calm-legend \{ order: 2; \}/);
+  // El orden real no cambia: el PDF y el resto del código siguen leyendo lo mismo.
+  assert.doesNotMatch(read("js/weekly-calm.js"), /day-summary/);
+});

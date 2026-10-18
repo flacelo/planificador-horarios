@@ -81,6 +81,18 @@
 #view-semanal.weekly-calm-ready #view-table {
   padding: 0 !important;
 }
+/* La tabla primero: "Resumen de hoy" y la leyenda se ven debajo solo por orden visual; el orden real no cambia.
+   main.css ya fuerza esta zona a "block !important" en pantalla; aquí solo se cambia a flex y solo en pantalla
+   (la impresión conserva sus propias reglas). */
+@media screen {
+  #view-semanal.weekly-calm-ready #view-table {
+    display: flex !important;
+    flex-direction: column;
+  }
+}
+#view-semanal.weekly-calm-ready #view-table > * { min-width: 0; }
+#view-semanal.weekly-calm-ready #view-table > #day-summary { order: 1; margin: 14px 0 0 !important; }
+#view-semanal.weekly-calm-ready #view-table > .weekly-calm-legend { order: 2; }
 #view-semanal.weekly-calm-ready #empty-state {
   margin: 0 0 14px;
   border: 1px solid var(--weekly-border);

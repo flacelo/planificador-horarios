@@ -321,7 +321,18 @@
     return true;
   }
 
+  // Capa visual "Cristal y luz": colores, radios, sombras, escala tipográfica, fondo con malla y vidrio.
+  function ensureAurora() {
+    if (document.getElementById("planify-aurora-style")) return;
+    var link = document.createElement("link");
+    link.id = "planify-aurora-style";
+    link.rel = "stylesheet";
+    link.href = "css/aurora.css?v=1";
+    document.head.appendChild(link);
+  }
+
   function init() {
+    ensureAurora();
     var returning = isReturningUser();
     document.documentElement.classList.toggle("planify-has-schedule", returning);
     document.documentElement.classList.toggle("planify-home-new", !returning);

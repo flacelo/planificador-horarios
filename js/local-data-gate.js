@@ -393,7 +393,7 @@
     if (document.getElementById("planify-public-brand-script")) return;
     var script = document.createElement("script");
     script.id = "planify-public-brand-script";
-    script.src = "js/brand-home.js?v=21";
+    script.src = "js/brand-home.js?v=22";
     document.head.appendChild(script);
   }
 

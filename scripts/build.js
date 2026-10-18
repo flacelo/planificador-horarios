@@ -8,7 +8,7 @@ const DIST = path.join(ROOT, 'dist');
 const MARKER = '.planify-build-manifest.json';
 const STATIC_ROOT_FILES = ['index.html', 'manifest.json', 'icon.svg', 'sw.js'];
 const STATIC_ASSETS = [
-  'css/annual-calm.css', 'css/brand-system.css', 'css/daily-calm.css', 'css/dashboard-calm.css',
+  'css/annual-calm.css', 'css/aurora.css', 'css/brand-system.css', 'css/daily-calm.css', 'css/dashboard-calm.css',
   'css/dashboard-polish.css', 'css/dashboard.css', 'css/day-flow.css', 'css/focus-breath.css',
   'css/focus-session.css', 'css/focus-task.css', 'css/grid.css', 'css/interface-polish.css',
   'css/main.css', 'css/mobile-coach.css', 'css/monthly-calm.css', 'css/panel-redesign.css',

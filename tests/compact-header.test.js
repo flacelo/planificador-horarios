@@ -21,7 +21,7 @@ function renderHero(withPlan) {
   };
   const classes = { toggle() {}, add() {}, contains() { return false; } };
   const document = {
-    readyState: "complete", body: {},
+    readyState: "complete", body: {}, head: { appendChild() {} }, getElementById() { return null; },
     documentElement: { classList: classes },
     querySelector(sel) { return sel === ".trust-start-hub" ? hub : null; },
     createElement() { return { setAttribute() {}, set innerHTML(v) { this._h = v; }, get innerHTML() { return this._h; }, className: "" }; },

@@ -1,0 +1,119 @@
+/* Liberday · capa visual "Cristal y luz" (maqueta).
+   Colores, radios, sombras, escala tipográfica, fondos con malla y superficies de vidrio.
+   Reglas de la casa:
+   - La menta (--au-mint) es el único color de acción (botones). Cielo y violeta solo en fondos y gráficos.
+   - El vidrio (desenfoque) se usa en 3 superficies como máximo a la vez, siempre con respaldo opaco.
+   - Las animaciones van dentro de prefers-reduced-motion: no-preference (la regla única de main.css apaga el resto).
+   - No toca la tabla de Semanal, el PDF, el ícono ni el logo. */
+
+:root {
+  /* Color base (el tema oscuro es el de fábrica; body.tema-claro lo cambia más abajo). */
+  --au-mint: #74e3c0;
+  --au-mint-ink: #103a38;
+  --au-sky: #6fb8ff;
+  --au-violet: #9a8cff;
+
+  /* Radios */
+  --au-r-sm: 14px;
+  --au-r-md: 20px;
+  --au-r-lg: 28px;
+  --au-r-xl: 36px;
+
+  /* Escala tipográfica: títulos grandes en Outfit, texto en Poppins; el piso es 12 px. */
+  --au-font-display: "Outfit", system-ui, sans-serif;
+  --au-font-body: "Poppins", "Inter", system-ui, sans-serif;
+  --au-t-display: clamp(2.5rem, 7.5vw + 0.5rem, 4.75rem);
+  --au-t-h1: clamp(1.9rem, 4vw + 0.5rem, 3rem);
+  --au-t-h2: clamp(1.35rem, 2vw + 0.6rem, 1.9rem);
+  --au-t-lead: clamp(1rem, 1vw + 0.8rem, 1.2rem);
+  --au-t-body: 1rem;
+  --au-t-small: 0.75rem;
+  --au-track-display: -0.035em;
+}
+
+/* Tema oscuro (de fábrica) */
+body {
+  --au-bg: #0a1220;
+  --au-text: #eaf5f3;
+  --au-text-soft: #b9c9d6;
+  --au-glass: rgba(20, 38, 58, 0.58);
+  --au-glass-solid: #14263a;
+  --au-glass-line: rgba(160, 225, 215, 0.24);
+  --au-tile: #172a40;
+  --au-tile-line: rgba(160, 225, 215, 0.16);
+  --au-shadow-sm: 0 6px 18px rgba(2, 10, 20, 0.24);
+  --au-shadow-md: 0 18px 48px rgba(2, 10, 20, 0.34);
+  --au-glow: 0 0 0 1px rgba(116, 227, 192, 0.18), 0 12px 40px rgba(116, 227, 192, 0.1);
+  --au-ring-a: #74e3c0;
+  --au-ring-b: #6fb8ff;
+  --au-ring-track: rgba(255, 255, 255, 0.14);
+  --au-mesh:
+    radial-gradient(52% 40% at 8% 0%, rgba(111, 184, 255, 0.22), transparent 68%),
+    radial-gradient(46% 38% at 92% 6%, rgba(154, 140, 255, 0.22), transparent 66%),
+    radial-gradient(60% 42% at 62% 100%, rgba(116, 227, 192, 0.15), transparent 68%);
+}
+
+/* Tema claro */
+body.tema-claro,
+body.light-mode {
+  --au-bg: #f4f7f5;
+  --au-text: #152336;
+  --au-text-soft: #4a5b70;
+  --au-glass: rgba(255, 255, 255, 0.66);
+  --au-glass-solid: #ffffff;
+  --au-glass-line: rgba(21, 35, 54, 0.1);
+  --au-tile: #ffffff;
+  --au-tile-line: rgba(21, 35, 54, 0.08);
+  --au-shadow-sm: 0 6px 18px rgba(21, 35, 54, 0.08);
+  --au-shadow-md: 0 18px 48px rgba(21, 35, 54, 0.12);
+  --au-glow: 0 0 0 1px rgba(10, 127, 117, 0.14), 0 12px 40px rgba(10, 127, 117, 0.08);
+  --au-ring-a: #0a7f75;
+  --au-ring-b: #2f6fd0;
+  --au-ring-track: #d5e6df;
+  --au-mesh:
+    radial-gradient(52% 40% at 6% 0%, rgba(111, 184, 255, 0.3), transparent 68%),
+    radial-gradient(46% 38% at 94% 4%, rgba(154, 140, 255, 0.24), transparent 66%),
+    radial-gradient(60% 42% at 60% 100%, rgba(116, 227, 192, 0.28), transparent 68%);
+}
+
+/* Fondo con malla de degradados (estático: no cuesta nada al desplazarse). */
+html.planify-brand-ready body {
+  background: var(--au-mesh), var(--au-bg) !important;
+  color: var(--au-text);
+}
+html.planify-brand-ready body.tema-claro,
+html.planify-brand-ready body.light-mode {
+  background: var(--au-mesh), var(--au-bg) !important;
+  color: var(--au-text);
+}
+
+/* Superficie de vidrio. Por defecto es opaca; solo si el navegador sabe desenfocar (y la persona no pidió menos transparencia)
+   se vuelve de vidrio. Se usa en 3 superficies como máximo a la vez. */
+.au-glass {
+  border: 1px solid var(--au-glass-line);
+  background: var(--au-glass-solid);
+  box-shadow: var(--au-shadow-md);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .au-glass {
+    background: var(--au-glass);
+    -webkit-backdrop-filter: blur(14px) saturate(1.25);
+    backdrop-filter: blur(14px) saturate(1.25);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .au-glass {
+    background: var(--au-glass-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* El panel ⚙️ está cerrado casi siempre: no necesita desenfoque mientras tanto (una superficie de vidrio menos). */
+#side-panel:not(.open) .sp-header {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Las estrellas del tema oscuro se pausan: la malla las reemplaza y así se ahorra trabajo en celulares modestos. */
+html.planify-brand-ready .estrella { display: none !important; }

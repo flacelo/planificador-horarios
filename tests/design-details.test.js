@@ -37,3 +37,12 @@ test("× del panel: botón liviano (transparente con borde suave), 44 px y legib
   assert.match(css, /body\.tema-claro #side-panel button\.trust-panel-close \{[^}]*border-color: #c8ddd3 !important;[^}]*color: #234a42 !important;/);
   assert.match(css, /button\.trust-panel-close:hover \{ background: rgba\(127, 217, 194, \.16\) !important; \}/);
 });
+
+test("ayuda del celular en el Diario: sin el botón 'Anotar una meta' (la meta destacada está justo debajo)", () => {
+  const css = block(read("css/mobile-coach.css"), "/* Detalles: en el Diario");
+  assert.match(css, /\.planify-mobile-coach\[data-view="diario"\] \.mobile-coach-action \{ display: none !important; \}/);
+  // Las otras vistas conservan su botón, y el texto de la ayuda del Diario no cambia.
+  const js = read("js/mobile-coach.js");
+  assert.match(js, /coach\.dataset\.view = view;/);
+  assert.match(js, /semanal: \{ icon: "🗓️", title: "Tu semana se puede editar"[^}]*action: "Ajustar horario" \}/);
+});

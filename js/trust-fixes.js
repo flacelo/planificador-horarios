@@ -803,7 +803,7 @@
       var style = document.createElement("link");
       style.id = "planify-mobile-coach-style";
       style.rel = "stylesheet";
-      style.href = "css/mobile-coach.css?v=3";
+      style.href = "css/mobile-coach.css?v=4";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-mobile-coach-script")) {

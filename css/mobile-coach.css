@@ -8,3 +8,6 @@ body.dark .planify-mobile-coach,body.tema-estelar:not(.light-mode):where(:not(.t
 .planify-mobile-coach .mobile-coach-action { border-color: #3f9f88; background: #e9f8f2; color: #17473d; }
 body.dark .planify-mobile-coach .mobile-coach-action,
 body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-mobile-coach .mobile-coach-action { border-color: #7fd9c2; background: rgba(127, 217, 194, .14); color: #d8f6ee; }
+
+/* Detalles: en el Diario la acción principal es la meta destacada, así que la ayuda no repite «Anotar una meta». */
+.planify-mobile-coach[data-view="diario"] .mobile-coach-action { display: none !important; }

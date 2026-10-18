@@ -54,7 +54,7 @@ El nombre no vive en un solo archivo: los archivos estáticos (título de la pes
 | Ícono | texto alternativo «Ícono de Liberday» (no se toca el ícono ni el logo) | `icon.svg` |
 | Caché sin conexión | prefijo técnico `liberday-shell-v1` y comentario; al activarse borra también las cachés `planify-…` viejas | `sw.js` |
 | Empaquetado | títulos que se ponen al compilar | `scripts/optimize-a11y.js` |
-| Frases de la app | «Instalar Liberday», avisos del navegador, copias de seguridad, tutorial, panel, asistente, enfoque, recordatorios | `js/app.js`, `js/daily-backup.js`, `js/export-pdf.js`, `js/focus-session.js`, `js/honest-report.js`, `js/local-data-gate.js`, `js/panel-redesign.js`, `js/pwa-experience.js`, `js/reminder-service.js`, `js/trust-fixes.js`, `js/welcome-flow.js` |
+| Frases de la app | «Instalar Liberday», avisos del navegador, copias de seguridad, tutorial, panel, asistente, enfoque, recordatorios, vista «como si fuera nuevo» | `js/app.js`, `js/daily-backup.js`, `js/export-pdf.js`, `js/focus-session.js`, `js/fresh-view.js`, `js/honest-report.js`, `js/local-data-gate.js`, `js/panel-redesign.js`, `js/pwa-experience.js`, `js/reminder-service.js`, `js/trust-fixes.js`, `js/welcome-flow.js` |
 | Archivos que se descargan | `liberday_respaldo_…json` y `liberday-reporte-semanal-…html` (nombres técnicos en minúscula) | `js/daily-backup.js`, `js/honest-report.js` |
 | Documentos | README, ROADMAP, TODO, SECURITY, CHANGELOG, este archivo | (raíz) |
 

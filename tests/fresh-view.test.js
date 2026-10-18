@@ -26,7 +26,9 @@ function setup({ real = {}, session = {} } = {}) {
   Object.keys(session).forEach((key) => sess.setItem(key, session[key]));
   const reloads = [];
   const window = { Storage: FakeStorage, localStorage: local, sessionStorage: sess, location: { reload() { reloads.push(1); } } };
-  vm.runInNewContext(source, { window, Object, JSON, String, Array }, { filename: "fresh-view.js" });
+  // La pantalla (tarjeta, aviso, ventanas) se prueba en el navegador; aquí el documento falso espera y no la dibuja.
+  const document = { readyState: "loading", addEventListener() {} };
+  vm.runInNewContext(source, { window, document, Object, JSON, String, Array }, { filename: "fresh-view.js" });
   return { window, local, sess, reloads, api: window.PLANIFY_FRESH_VIEW };
 }
 
@@ -123,7 +125,7 @@ test("si el navegador no deja usar sessionStorage, no entra a la vista y lo dice
   class FullStorage extends FakeStorage { setItem() { throw new Error("lleno"); } }
   const reloads = [];
   const window = { Storage: FullStorage, localStorage: new FullStorage(), sessionStorage: new FullStorage(), location: { reload() { reloads.push(1); } } };
-  vm.runInNewContext(source, { window, Object, JSON, String, Array }, { filename: "fresh-view.js" });
+  vm.runInNewContext(source, { window, document: { readyState: "loading", addEventListener() {} }, Object, JSON, String, Array }, { filename: "fresh-view.js" });
   assert.equal(JSON.stringify(window.PLANIFY_FRESH_VIEW.start()), JSON.stringify({ ok: false, message: "Este navegador no permite abrir esta vista." }));
   assert.equal(reloads.length, 0);
 });
@@ -152,7 +154,64 @@ test("el script va primero: antes del protector de datos y de app.js", () => {
 
 test("no toca las claves de los datos reales ni escribe en localStorage por su cuenta", () => {
   assert.doesNotMatch(source, /localStorage\.(setItem|removeItem|clear)\(/);
-  assert.doesNotMatch(source, /planify-backup/);
+  assert.doesNotMatch(source, /"planify-backup"|backupFormat/);
   // Las únicas claves nuevas son dos de sessionStorage.
   assert.deepEqual([...source.matchAll(/"(planify_vista_nueva[a-z_0-9]*)"/g)].map((m) => m[1]).filter((v, i, a) => a.indexOf(v) === i).sort(), ["planify_vista_nueva_datos_v1", "planify_vista_nueva_v1"]);
+});
+
+// ---- Pantalla (textos y reglas; el comportamiento se prueba en el navegador) ----
+test("textos de la tarjeta, la confirmación y el aviso, tal como se aprobaron", () => {
+  [
+    "Ver Liberday como si fuera nuevo",
+    "Entras como una persona nueva, sin tocar tus datos. Lo que hagas ahí no se guarda.",
+    "Empezar como si fuera nuevo",
+    "Vas a ver Liberday como la primera vez. Tus datos no se borran ni se modifican: solo quedan ocultos mientras estés en esta vista.",
+    "Estás viendo Liberday como si fuera nuevo. Tus datos están a salvo y no se guardará nada de lo que hagas aquí.",
+    "Volver a mi plan",
+    "Se descartará lo que hiciste en esta vista.",
+    "Seguir aquí"
+  ].forEach((text) => assert.ok(source.includes('"' + text + '"'), text));
+});
+
+test("la tarjeta va debajo de 'Copia de seguridad' (.panel-backup) en ⚙️ → Descargas (#tab-ajustes)", () => {
+  assert.match(source, /document\.getElementById\("tab-ajustes"\)/);
+  assert.match(source, /tab\.querySelector\("\.panel-backup"\)/);
+  assert.match(source, /backup\.parentNode\.insertBefore\(card, backup\.nextSibling\)/);
+});
+
+test("en la vista, importar un respaldo queda desactivado (botón y archivo) con su explicación", () => {
+  assert.match(source, /getElementById\("btn-import-complete-json"\)/);
+  assert.match(source, /getElementById\("planify-backup-file"\)/);
+  assert.match(source, /button\.disabled = true;/);
+  assert.match(source, /input\.disabled = true;/);
+  assert.match(source, /importOff: "Cargar un respaldo no está disponible en esta vista\."/);
+});
+
+test("el aviso y las confirmaciones viven dentro del protector de datos cuando está abierto (si no, quedarían inertes)", () => {
+  assert.match(source, /document\.getElementById\("planify-local-data-gate"\) \|\| document\.body/);
+  assert.match(source, /dialog\.addEventListener\("keydown", function \(event\) \{ if \(event\.key === "Escape"\) event\.stopPropagation\(\); \}\);/);
+});
+
+test("salir pide confirmación solo si hay contenido; entrar siempre la pide", () => {
+  assert.match(source, /function askLeave\(\) \{\s*if \(!hasContent\(\)\) \{ exit\(\); return; \}/);
+  assert.match(source, /onYes: start/);
+});
+
+test("botones de 44 px, letra de 12 px o más y sin animaciones", () => {
+  assert.match(source, /min-height:44px/);
+  assert.doesNotMatch(source, /font-size:(1[01]|[0-9])px/);
+  assert.doesNotMatch(source, /transition|animation/);
+});
+
+test("los clics se atienden en la fase de captura y se detienen: app.js frena todo botón que diga 'volver'", () => {
+  assert.match(source, /event\.stopImmediatePropagation\(\);/);
+  assert.match(source, /\}, true\);\n/);
+  // El texto aprobado contiene "volver", así que sin esto el botón no respondería.
+  assert.match(fs.readFileSync(require.resolve("../js/app.js"), "utf8"), /indexOf\("volver"\)/);
+  assert.match(source, /data-fresh-action", "confirm"/);
+  assert.match(source, /data-fresh-action", "cancel"/);
+});
+
+test("la ventana de confirmación se centra en la pantalla (la app reinicia los márgenes de <dialog>)", () => {
+  assert.match(source, /#planify-fresh-dialog\{position:fixed;inset:0;margin:auto;height:fit-content;/);
 });

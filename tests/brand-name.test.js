@@ -15,7 +15,7 @@ const list = (dir, ext) => fs.readdirSync(path.join(root, dir)).filter((name) =>
 // Archivos de la app (no documentos ni pruebas) que pueden tener el nombre escrito a mano.
 const ALLOWED = [
   "index.html", "manifest.json", "sw.js", "icon.svg", "scripts/optimize-a11y.js",
-  "js/app.js", "js/daily-backup.js", "js/export-pdf.js", "js/focus-session.js", "js/honest-report.js",
+  "js/app.js", "js/daily-backup.js", "js/export-pdf.js", "js/focus-session.js", "js/fresh-view.js", "js/honest-report.js",
   "js/local-data-gate.js", "js/panel-redesign.js", "js/pwa-experience.js", "js/reminder-service.js",
   "js/trust-fixes.js", "js/welcome-flow.js"
 ];

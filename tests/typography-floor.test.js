@@ -46,3 +46,9 @@ test("cabecera y ayuda del celular a 12 px", () => {
   assert.match(block(read("css/brand-system.css"), "/* Tipografía mínima"), /\.planify-brand-ready \.brand-hero \.brand-eyebrow \{ font-size: 12px !important; \}/);
   assert.match(block(read("css/mobile-coach.css"), "/* Tipografía mínima"), /\.planify-mobile-coach \.mobile-coach-action \{ font-size: 12px !important; \}/);
 });
+
+test("barra inferior: rótulos e íconos a 12 px; en pantallas de 340 px o menos se conserva el tamaño anterior para que no se corte 'Semanal'", () => {
+  const css = block(read("css/brand-system.css"), "/* Tipografía mínima: los rótulos y el ícono de la barra inferior");
+  assert.match(css, /\.planify-brand-ready \.brand-nav-slot > \.bottom-nav \.tab-btn,\s*\.planify-brand-ready \.brand-nav-slot > \.bottom-nav \.tab-btn span \{ font-size: 12px !important; \}/);
+  assert.match(css, /@media \(max-width: 340px\) \{[\s\S]*?font-size: \.68rem !important;/);
+});

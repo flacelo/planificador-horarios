@@ -779,3 +779,12 @@ html.planify-brand-ready.planify-home-new:not(.planify-home-entered) .main-card-
 
 /* Tipografía mínima: el rótulo de la cabecera a 12 px. */
 .planify-brand-ready .brand-hero .brand-eyebrow { font-size: 12px !important; }
+
+/* Tipografía mínima: los rótulos y el ícono de la barra inferior a 12 px (comprobado sin cortes a 390 y 360 px). */
+.planify-brand-ready .brand-nav-slot > .bottom-nav .tab-btn,
+.planify-brand-ready .brand-nav-slot > .bottom-nav .tab-btn span { font-size: 12px !important; }
+/* En pantallas de 340 px o menos (celulares muy pequeños) "Semanal" no cabe a 12 px: se conserva el tamaño anterior. */
+@media (max-width: 340px) {
+  .planify-brand-ready .brand-nav-slot > .bottom-nav .tab-btn,
+  .planify-brand-ready .brand-nav-slot > .bottom-nav .tab-btn span { font-size: .68rem !important; }
+}

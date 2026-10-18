@@ -718,3 +718,29 @@ html.planify-brand-ready.planify-home-new:not(.planify-home-entered) .main-card-
   .planify-brand-ready #side-panel .view-toggle button { min-height: 44px !important; }
   .planify-brand-ready #btn-tema { min-width: 44px !important; }
 }
+
+/* Barra inferior liviana: vidrio translúcido que deja ver el contenido, con alternativa si no hay desenfoque. */
+.planify-brand-ready .brand-nav-slot > .bottom-nav,
+.planify-brand-ready .main-card-container > .bottom-nav {
+  border-color: rgba(153, 218, 202, .22) !important;
+  background: rgba(19, 39, 51, .74) !important;
+  box-shadow: 0 10px 28px rgba(3, 20, 29, .22) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+.planify-brand-ready body.light-mode .brand-nav-slot > .bottom-nav,
+.planify-brand-ready body.tema-claro .brand-nav-slot > .bottom-nav,
+.planify-brand-ready body.light-mode .main-card-container > .bottom-nav,
+.planify-brand-ready body.tema-claro .main-card-container > .bottom-nav {
+  border-color: rgba(24, 58, 53, .12) !important;
+  background: rgba(255, 255, 255, .78) !important;
+  box-shadow: 0 8px 24px rgba(24, 58, 53, .1) !important;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .planify-brand-ready .brand-nav-slot > .bottom-nav,
+  .planify-brand-ready .main-card-container > .bottom-nav { background: rgba(19, 39, 51, .94) !important; }
+  .planify-brand-ready body.light-mode .brand-nav-slot > .bottom-nav,
+  .planify-brand-ready body.tema-claro .brand-nav-slot > .bottom-nav,
+  .planify-brand-ready body.light-mode .main-card-container > .bottom-nav,
+  .planify-brand-ready body.tema-claro .main-card-container > .bottom-nav { background: rgba(255, 255, 255, .96) !important; }
+}

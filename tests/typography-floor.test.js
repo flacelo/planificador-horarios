@@ -52,3 +52,10 @@ test("barra inferior: rótulos e íconos a 12 px; en pantallas de 340 px o menos
   assert.match(css, /\.planify-brand-ready \.brand-nav-slot > \.bottom-nav \.tab-btn,\s*\.planify-brand-ready \.brand-nav-slot > \.bottom-nav \.tab-btn span \{ font-size: 12px !important; \}/);
   assert.match(css, /@media \(max-width: 340px\) \{[\s\S]*?font-size: \.68rem !important;/);
 });
+
+test("Semanal: días del celular, resumen, leyenda y opciones a 12 px (la tabla es excepción)", () => {
+  const css = block(read("css/weekly-calm.css"), "/* Tipografía mínima");
+  assert.match(css, /#view-semanal\.weekly-calm-ready :is\(\.weekly-calm-day-label, \.weekly-calm-day-count, \.weekly-calm-selected-count, \.weekly-calm-legend span, \.weekly-calm-more > summary, \.weekly-calm-more > summary span, \.merge-badge, #day-summary \.ds-stat, #day-summary \.ds-stat strong, #day-summary \.ds-actions button\) \{ font-size: 12px !important; \}/);
+  // La tabla (#tabla) no se toca.
+  assert.doesNotMatch(css.replace(/\/\*[\s\S]*?\*\//g, ""), /#tabla/);
+});

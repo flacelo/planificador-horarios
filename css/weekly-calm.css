@@ -819,3 +819,6 @@ body.tema-claro .weekly-calm-undo { border-color: #86cabc; background: #e9faf5; 
     max-width: 124px;
   }
 }
+
+/* Tipografía mínima: días del celular, resumen de hoy, leyenda y opciones a 12 px. La tabla (#tabla) es excepción y no se toca. */
+#view-semanal.weekly-calm-ready :is(.weekly-calm-day-label, .weekly-calm-day-count, .weekly-calm-selected-count, .weekly-calm-legend span, .weekly-calm-more > summary, .weekly-calm-more > summary span, .merge-badge, #day-summary .ds-stat, #day-summary .ds-stat strong, #day-summary .ds-actions button) { font-size: 12px !important; }

@@ -758,3 +758,9 @@ html.planify-brand-ready.planify-home-new:not(.planify-home-entered) .main-card-
 .planify-brand-ready body.tema-claro .bottom-nav .tab-btn:not(.active):not([aria-current="page"]) { color: #364f59 !important; }
 .planify-brand-ready body.light-mode .bottom-nav .tab-btn:not(.active):not([aria-current="page"]):hover,
 .planify-brand-ready body.tema-claro .bottom-nav .tab-btn:not(.active):not([aria-current="page"]):hover { background: rgba(8, 126, 115, .1) !important; color: #123c3a !important; }
+
+/* Detalles: el ⚙ del celular está fijo arriba a la derecha (18 px + 44 px). Al tocar una pestaña,
+   la vista se coloca debajo de él para que no tape la tarjeta Hoy ni la ayuda. */
+@media (max-width: 600px) {
+  .planify-brand-ready :is(#view-diario, #view-semanal, #view-mensual, #vista-anual-metas) { scroll-margin-top: 72px !important; }
+}

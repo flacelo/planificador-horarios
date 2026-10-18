@@ -666,7 +666,7 @@
       var style = document.createElement("link");
       style.id = "planify-brand-style";
       style.rel = "stylesheet";
-      style.href = "css/brand-system.css?v=13";
+      style.href = "css/brand-system.css?v=14";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-brand-script")) {

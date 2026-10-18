@@ -402,7 +402,10 @@
 .planify-brand-ready .bottom-nav .tab-btn.active,
 .planify-brand-ready .bottom-nav .tab-btn[aria-current="page"] { background: #7fd9c2 !important; color: #103a38 !important; border-color: #7fd9c2 !important; }
 .planify-brand-ready button:focus-visible,
-.planify-brand-ready a:focus-visible { outline: 3px solid #f4cc6e !important; outline-offset: 3px !important; }
+.planify-brand-ready a:focus-visible { outline: 3px solid #7fd9c2 !important; outline-offset: 3px !important; }
+/* El foco del teclado usa el color de acción: menta en oscuro y verde azulado en claro (contraste ≥ 3 con el fondo). */
+.planify-brand-ready body.tema-claro button:focus-visible,
+.planify-brand-ready body.tema-claro a:focus-visible { outline-color: #087e73 !important; }
 
 @media (max-width: 920px) {
   .planify-brand-ready .brand-site-header { align-items: flex-start; flex-direction: column; gap: 15px; }

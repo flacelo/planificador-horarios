@@ -21,3 +21,12 @@ test("anillo de foco del teclado: menta en oscuro y verde azulado en claro (ya n
   assert.match(css, /\.planify-brand-ready button:focus-visible,\s*\.planify-brand-ready a:focus-visible \{ outline: 3px solid #7fd9c2 !important; outline-offset: 3px !important; \}/);
   assert.match(css, /\.planify-brand-ready body\.tema-claro button:focus-visible,\s*\.planify-brand-ready body\.tema-claro a:focus-visible \{ outline-color: #087e73 !important; \}/);
 });
+
+test("nota del inicio: separada del botón, letra más pequeña y un candado en lugar de '▣'", () => {
+  const js = read("js/brand-home.js");
+  assert.match(js, /<p class="brand-data-note"><span aria-hidden="true">🔒<\/span> Tu plan se guarda en este navegador\. Para llevarlo a otro dispositivo: ⚙️ → Descargas → Copia de seguridad\.<\/p>/);
+  assert.doesNotMatch(js, /▣/);
+  const css = block(read("css/brand-system.css"), "/* Detalles: nota del inicio");
+  assert.match(css, /\.planify-brand-ready \.brand-hero \.brand-data-note \{[^}]*margin-top: 16px !important;[^}]*font-size: \.82rem !important;/);
+  assert.match(css, /\.planify-brand-ready \.brand-hero \.brand-data-note span \{ font-size: \.95rem; \}/);
+});

@@ -146,8 +146,8 @@ test("una visita con contenido guardado abre directamente el plan", () => {
 });
 
 test("el protector se carga antes de que app.js lea el almacenamiento", () => {
-  const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.24"');
-  const appIndex = indexHtml.indexOf('src="js/app.js?v=68.0"');
+  const gateIndex = indexHtml.indexOf('src="js/local-data-gate.js?v=1.25"');
+  const appIndex = indexHtml.indexOf('src="js/app.js?v=69.0"');
   assert.ok(gateIndex >= 0);
   assert.ok(appIndex > gateIndex);
   assert.match(indexHtml, /if\(!window\.PLANIFY_PRIVATE_HOLD\)/);

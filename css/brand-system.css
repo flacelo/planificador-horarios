@@ -767,3 +767,12 @@ html.planify-brand-ready.planify-home-new:not(.planify-home-entered) .main-card-
 @media (max-width: 600px) {
   .planify-brand-ready :is(#view-diario, #view-semanal, #view-mensual, #vista-anual-metas) { scroll-margin-top: 72px !important; }
 }
+
+/* Detalles: nota del inicio separada del botón principal y en letra de nota, no de párrafo. */
+.planify-brand-ready .brand-hero .brand-data-note {
+  margin-top: 16px !important;
+  color: #cde7df;
+  font-size: .82rem !important;
+  line-height: 1.45 !important;
+}
+.planify-brand-ready .brand-hero .brand-data-note span { font-size: .95rem; }

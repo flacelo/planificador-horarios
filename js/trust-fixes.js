@@ -666,13 +666,13 @@
       var style = document.createElement("link");
       style.id = "planify-brand-style";
       style.rel = "stylesheet";
-      style.href = "css/brand-system.css?v=15";
+      style.href = "css/brand-system.css?v=16";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=18";
+      script.src = "js/brand-home.js?v=19";
       script.defer = true;
       document.head.appendChild(script);
     }

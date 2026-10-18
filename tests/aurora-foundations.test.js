@@ -37,7 +37,7 @@ test("la capa visual está en la lista del empaquetado y la carga brand-home.js 
   assert.match(read("scripts/build.js"), /'css\/aurora\.css'/);
   const home = read("js/brand-home.js");
   assert.match(home, /link\.id = "planify-aurora-style";/);
-  assert.match(home, /link\.href = "css\/aurora\.css\?v=1";/);
+  assert.match(home, /link\.href = "css\/aurora\.css\?v=\d+";/);
   assert.match(home, /function init\(\) \{\s*ensureAurora\(\);/);
 });
 

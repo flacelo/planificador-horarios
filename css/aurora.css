@@ -41,6 +41,9 @@ body {
   --au-glass-line: rgba(160, 225, 215, 0.24);
   --au-tile: #172a40;
   --au-tile-line: rgba(160, 225, 215, 0.16);
+  --au-tile-2: rgba(255, 255, 255, 0.05);
+  --au-hero-solid: #14263a;
+  --au-hero-glass: rgba(14, 28, 46, 0.82);
   --au-shadow-sm: 0 6px 18px rgba(2, 10, 20, 0.24);
   --au-shadow-md: 0 18px 48px rgba(2, 10, 20, 0.34);
   --au-glow: 0 0 0 1px rgba(116, 227, 192, 0.18), 0 12px 40px rgba(116, 227, 192, 0.1);
@@ -64,6 +67,7 @@ body.light-mode {
   --au-glass-line: rgba(21, 35, 54, 0.1);
   --au-tile: #ffffff;
   --au-tile-line: rgba(21, 35, 54, 0.08);
+  --au-tile-2: #f1f6f4;
   --au-shadow-sm: 0 6px 18px rgba(21, 35, 54, 0.08);
   --au-shadow-md: 0 18px 48px rgba(21, 35, 54, 0.12);
   --au-glow: 0 0 0 1px rgba(10, 127, 117, 0.14), 0 12px 40px rgba(10, 127, 117, 0.08);
@@ -117,3 +121,104 @@ html.planify-brand-ready body.light-mode {
 
 /* Las estrellas del tema oscuro se pausan: la malla las reemplaza y así se ahorra trabajo en celulares modestos. */
 html.planify-brand-ready .estrella { display: none !important; }
+
+/* ───────── Fase 2 · Inicio y cabecera ───────── */
+
+/* Hero: tarjeta de vidrio oscuro con luz de color por dentro (los colores de luz son solo fondo). Con plan se queda compacto. */
+html.planify-brand-ready .brand-hero.au-glass {
+  --au-hero-tint:
+    radial-gradient(70% 90% at 88% 0%, rgba(154, 140, 255, 0.3), transparent 62%),
+    radial-gradient(60% 80% at 0% 100%, rgba(111, 184, 255, 0.22), transparent 64%),
+    radial-gradient(50% 60% at 58% 112%, rgba(116, 227, 192, 0.2), transparent 62%);
+  border: 1px solid var(--au-glass-line);
+  background: var(--au-hero-tint), var(--au-hero-solid);
+  box-shadow: var(--au-shadow-md), var(--au-glow);
+}
+html.planify-brand-ready .brand-hero.au-glass:not(.is-returning) { border-radius: var(--au-r-xl); }
+html.planify-brand-ready .brand-hero.au-glass::before,
+html.planify-brand-ready .brand-hero.au-glass::after { display: none; }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  html.planify-brand-ready .brand-hero.au-glass { background: var(--au-hero-tint), var(--au-hero-glass); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  html.planify-brand-ready .brand-hero.au-glass { background: var(--au-hero-tint), var(--au-hero-solid); }
+}
+
+/* Título grande (tipografía de la dirección B). Con plan conserva su tamaño compacto. */
+html.planify-brand-ready .brand-hero:not(.is-returning) h2 {
+  max-width: 13ch;
+  font: 700 var(--au-t-display)/1.02 var(--au-font-display) !important;
+  letter-spacing: var(--au-track-display) !important;
+}
+html.planify-brand-ready .brand-hero:not(.is-returning) h2 em { color: #9ee9c6; }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  html.planify-brand-ready .brand-hero h2 em {
+    background: linear-gradient(100deg, var(--au-mint) 0%, var(--au-sky) 58%, var(--au-violet) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+html.planify-brand-ready .brand-hero:not(.is-returning) .brand-hero-copy > p { font-size: var(--au-t-lead); }
+
+/* Botones del hero: la menta es el único color de acción; forma de píldora. */
+html.planify-brand-ready .brand-hero-actions button { border-radius: 999px; }
+html.planify-brand-ready .brand-hero-actions .brand-primary {
+  border-color: transparent;
+  background: var(--au-mint);
+  color: var(--au-mint-ink);
+  box-shadow: 0 8px 28px rgba(116, 227, 192, 0.28);
+}
+html.planify-brand-ready .brand-hero-actions .brand-primary:hover { background: #9af0d4; }
+
+/* Cabecera: botones en píldora de 44 px; solo "Crear" lleva menta. Los demás son neutros y funcionan igual en claro y oscuro. */
+html.planify-brand-ready body .brand-site-header .header-actions button:not(#welcome-flow-open),
+html.planify-brand-ready body .brand-site-header .header-actions .icon-btn:not(#welcome-flow-open),
+html.planify-brand-ready body:is(.tema-claro, .light-mode) .brand-site-header .header-actions button:not(#welcome-flow-open) {
+  min-height: 44px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--au-tile-line) !important;
+  background: var(--au-tile) !important;
+  color: var(--au-text) !important;
+  box-shadow: var(--au-shadow-sm) !important;
+}
+html.planify-brand-ready body .brand-site-header .header-actions button:not(#welcome-flow-open):hover,
+html.planify-brand-ready body:is(.tema-claro, .light-mode) .brand-site-header .header-actions button:not(#welcome-flow-open):hover {
+  background: var(--au-tile-2) !important;
+  border-color: var(--au-ring-a) !important;
+  color: var(--au-text) !important;
+}
+html.planify-brand-ready body .brand-site-header #welcome-flow-open {
+  min-height: 44px !important;
+  border-radius: 999px !important;
+  border-color: transparent !important;
+  background: var(--au-mint) !important;
+  color: var(--au-mint-ink) !important;
+  box-shadow: 0 6px 22px rgba(116, 227, 192, 0.3) !important;
+}
+html.planify-brand-ready body .brand-site-header #welcome-flow-open:hover { background: #9af0d4 !important; color: var(--au-mint-ink) !important; }
+html.planify-brand-ready body .brand-site-header .header-actions .icon-btn:last-child { width: 44px !important; }
+html.planify-brand-ready body .brand-site-header h1#main-title,
+html.planify-brand-ready body .brand-site-header h1.planify-public-title { color: var(--au-text) !important; font-family: var(--au-font-display) !important; }
+
+/* "Otras formas de empezar": mosaico de fichas neutras. La recomendada lleva un borde menta suave. */
+html.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-hub,
+html.planify-brand-ready body .trust-start-hub {
+  border: 1px solid var(--au-tile-line) !important;
+  border-radius: var(--au-r-lg) !important;
+  background: var(--au-tile) !important;
+  box-shadow: var(--au-shadow-sm) !important;
+}
+html.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-hub .trust-start-options > button,
+html.planify-brand-ready body .trust-start-hub .trust-start-options > button {
+  border: 1px solid var(--au-tile-line) !important;
+  border-radius: var(--au-r-md) !important;
+  background: var(--au-tile-2) !important;
+  box-shadow: none !important;
+}
+html.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-hub .trust-start-options > button.is-recommended,
+html.planify-brand-ready body .trust-start-hub .trust-start-options > button.is-recommended {
+  border-color: var(--au-ring-a) !important;
+  box-shadow: var(--au-glow) !important;
+}

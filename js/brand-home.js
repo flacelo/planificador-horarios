@@ -53,7 +53,7 @@
     var existingHero = document.querySelector(".brand-hero");
     if (existingHero) existingHero.remove();
     var hero = document.createElement("section");
-    hero.className = "brand-hero" + (returning ? " is-returning" : "");
+    hero.className = "brand-hero au-glass" + (returning ? " is-returning" : "");
     hero.setAttribute("aria-labelledby", "brand-hero-title");
     hero.innerHTML =
       '<div class="brand-hero-copy">' +
@@ -327,7 +327,7 @@
     var link = document.createElement("link");
     link.id = "planify-aurora-style";
     link.rel = "stylesheet";
-    link.href = "css/aurora.css?v=1";
+    link.href = "css/aurora.css?v=2";
     document.head.appendChild(link);
   }
 

@@ -61,3 +61,26 @@ test("las tarjetas dentro de 'Más para tu día' usan todo el ancho y el fondo d
   assert.match(body, /width: auto !important;/);
   assert.match(body, /background: transparent !important;/);
 });
+
+test("meta del día: línea de ayuda y ejemplo nuevos (en pantalla y en el diccionario en español)", () => {
+  const js = read("js/daily-calm.js");
+  assert.match(js, /hint\.className = "daily-goal-hint";/);
+  assert.match(js, /goalInput\.insertAdjacentElement\("beforebegin", hint\);/);
+  assert.match(js, /hint\.textContent = "¿Qué quieres lograr hoy\? Escribe una o dos cosas\. Se guarda sola\.";/);
+  assert.match(read("index.html"), /id="goals-input" placeholder="Ej\.: Terminar la tarea de matemáticas"/);
+  assert.match(read("js/app.js"), /goalsPh:"Ej\.: Terminar la tarea de matemáticas"/);
+  assert.doesNotMatch(read("js/app.js"), /Ir de compras, metas del día/);
+});
+
+test("'Se guarda sola' es verdad: el diario guarda la meta en cada tecla", () => {
+  const persistence = read("js/daily-persistence.js");
+  assert.match(persistence, /view\.addEventListener\("input", function \(event\) \{\s*if \(event\.target\.matches\("#goals-input, /);
+});
+
+test("la meta se destaca solo cuando no hay un momento en curso o próximo", () => {
+  const flow = read("js/day-flow.js");
+  assert.match(flow, /daily\.dataset\.dayMoment = /);
+  const css = read("css/daily-calm.css");
+  assert.match(css, /#view-diario\.daily-calm-ready:not\(\[data-day-moment="activity"\]\) \.card-section\.goals-section \{[^}]*border: 2px solid var\(--daily-accent\) !important;/);
+  assert.match(css, /\.daily-goal-hint \{[^}]*color: var\(--daily-muted\);/);
+});

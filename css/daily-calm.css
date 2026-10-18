@@ -188,6 +188,18 @@ body.light-mode #view-diario.daily-calm-ready #planner-date { color-scheme: ligh
 #view-diario.daily-calm-ready .star-rating .star[role="radio"]:focus-visible { outline: 2px solid var(--daily-accent); outline-offset: 2px; }
 #view-diario.daily-calm-ready .star-rating .star.active { color: #f3bc55; }
 
+/* Meta del día: acción principal cuando no hay un momento en curso o próximo. */
+#view-diario.daily-calm-ready:not([data-day-moment="activity"]) .card-section.goals-section {
+  border: 2px solid var(--daily-accent) !important;
+  background: color-mix(in srgb, var(--daily-accent) 8%, var(--daily-card)) !important;
+}
+#view-diario.daily-calm-ready .daily-goal-hint {
+  margin: -4px 0 9px;
+  color: var(--daily-muted);
+  font-size: .8rem;
+  line-height: 1.4;
+}
+
 /* "Más para tu día": tarjetas opcionales plegadas debajo de la meta y las tareas. */
 #view-diario.daily-calm-ready .daily-more {
   grid-column: 1 / -1;

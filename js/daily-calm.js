@@ -101,6 +101,15 @@
     var dateLabel = view.querySelector(".date-picker-container label");
     if (date && dateLabel) dateLabel.setAttribute("for", date.id);
 
+    // La ayuda va justo encima del cuadro de la meta (el título y "Ideas +" comparten fila).
+    var goalInput = view.querySelector("#goals-input");
+    if (goalInput && !view.querySelector(".daily-goal-hint")) {
+      var hint = document.createElement("p");
+      hint.className = "daily-goal-hint";
+      hint.textContent = "¿Qué quieres lograr hoy? Escribe una o dos cosas. Se guarda sola.";
+      goalInput.insertAdjacentElement("beforebegin", hint);
+    }
+
     var addTask = view.querySelector("#add-todo-btn");
     if (addTask) addTask.setAttribute("aria-label", "Añadir tarea");
 

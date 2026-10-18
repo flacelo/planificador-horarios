@@ -169,9 +169,14 @@
     var daily = document.getElementById("view-diario");
     if (!daily) return;
     var old = daily.querySelector(".planify-day-flow");
+    var now = new Date();
+    var items = getTodayItems(now);
+    var minutes = now.getHours() * 60 + now.getMinutes();
     var section = document.createElement("div");
-    section.innerHTML = flowMarkup(new Date(), getTodayItems(new Date()));
+    section.innerHTML = flowMarkup(now, items);
     var next = section.firstElementChild;
+    // Acción principal según el momento: si hay un momento en curso o pendiente, manda la tarjeta Hoy; si no, la meta.
+    if (daily.dataset) daily.dataset.dayMoment = items.some(function (item) { return !item.done && item.end > minutes; }) ? "activity" : "free";
     if (old) old.replaceWith(next);
     else {
       var guide = daily.querySelector(".trust-friendly-guide");

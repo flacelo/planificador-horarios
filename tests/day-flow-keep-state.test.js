@@ -33,8 +33,10 @@ function setup({ done = [], hour = 10 }) {
   const handlers = {};
   let current = null;
   const daily = { dataset: {}, querySelector(sel) { return sel === ".planify-day-flow" ? current : null; }, insertAdjacentElement(_p, el) { current = el; } };
+  const published = {};
   const document = {
     body: {}, readyState: "complete",
+    documentElement: { style: { setProperty(k, v) { published[k] = v; }, removeProperty(k) { delete published[k]; } } },
     getElementById(id) { return id === "view-diario" ? daily : null; },
     createElement() { return { set innerHTML(v) { this.firstElementChild = cardFromHtml(v); }, firstElementChild: null }; },
     addEventListener(type, fn) { handlers[type] = fn; }
@@ -49,7 +51,7 @@ function setup({ done = [], hour = 10 }) {
   }, { filename: "day-flow.js" });
   // Cada refresh deja la tarjeta nueva en `current` (replaceWith la guarda en la vieja).
   const refresh = () => { const old = current; window.PLANIFY_DAY_FLOW.refresh(); if (old) current = old.replacedBy; return current; };
-  return { refresh, card: () => current, click: (event) => handlers.click(event), done };
+  return { refresh, card: () => current, click: (event) => handlers.click(event), done, published };
 }
 
 test("'Ver mi jornada de hoy' sigue abierta tras volver a dibujar la tarjeta, sin animarse de nuevo", () => {
@@ -79,26 +81,26 @@ test("al tocar el resumen se quita la marca de restaurada, para que abrir otra v
   assert.equal(next.list.classes.has("is-restored"), false);
 });
 
-test("la barra crece desde su valor anterior solo cuando el avance cambió", () => {
+test("el avance se publica en <html> (fuera de la tarjeta) para que el anillo crezca solo desde su valor anterior", () => {
   const t = setup({});
   t.refresh();
+  assert.deepEqual(t.published, { "--au-day-p": "0", "--au-day-n": "0" });
   t.done.push("a1");
-  const next = t.refresh();
-  assert.deepEqual(next.fill.log, ["0%", "33%"]);
-  assert.equal(next.fill.style.width, "33%");
-  t.done.push("a2", "a3");
-  assert.deepEqual(t.refresh().fill.log, ["33%", "100%"]);
-});
-
-test("sin cambio de avance la barra no se mueve (no parpadea cada 30 s)", () => {
-  const t = setup({ done: ["a1"] });
   t.refresh();
-  const next = t.refresh();
-  assert.deepEqual(next.fill.log, []);
-  assert.equal(next.fill.style.width, "33%");
+  assert.deepEqual(t.published, { "--au-day-p": "33", "--au-day-n": "33" });
+  t.done.push("a2", "a3");
+  t.refresh();
+  assert.equal(t.published["--au-day-p"], "100");
 });
 
-test("la primera vez que se dibuja la barra aparece directo en su valor", () => {
-  const t = setup({ done: ["a1"] });
-  assert.deepEqual(t.refresh().fill.log, []);
+test("el anillo no agrega nada al HTML de la tarjeta (el PDF del Diario la copia tal cual)", () => {
+  const t = setup({});
+  const first = t.refresh().html;
+  t.done.push("a1");
+  const second = t.refresh().html;
+  [first, second].forEach((html) => {
+    assert.doesNotMatch(html, /--au-day|<svg|au-glass|style="[^"]*--/);
+    assert.match(html, /<div class="day-flow-main">/);
+    assert.match(html, /<div class="day-flow-bar" role="progressbar"[^>]*><i style="width:\d+%"><\/i><\/div>/);
+  });
 });

@@ -196,13 +196,23 @@
       '</section>';
   }
 
-  // La tarjeta se vuelve a dibujar cada 30 s y al marcar "Hecho"; esto conserva lo que la persona ya tenía:
-  // "Ver mi jornada de hoy" sigue abierta (sin animarse de nuevo) y la barra crece desde donde estaba solo si el avance cambió.
-  function barFill(card) {
-    var bar = card && card.querySelector(".day-flow-bar");
-    return bar ? bar.firstElementChild : null;
+  // El anillo "Tu día" se dibuja solo con CSS a partir de dos valores que se publican en <html> (fuera de la tarjeta):
+  // así el HTML de la tarjeta queda igual que siempre (el PDF del Diario lo copia tal cual) y el anillo crece suave
+  // desde donde estaba aunque la tarjeta se vuelva a dibujar.
+  function publishProgress(completed, total) {
+    var root = document.documentElement;
+    if (!root || !root.style) return;
+    if (!total) {
+      root.style.removeProperty("--au-day-p");
+      root.style.removeProperty("--au-day-n");
+      return;
+    }
+    var percent = Math.round((completed / total) * 100);
+    root.style.setProperty("--au-day-p", String(percent));
+    root.style.setProperty("--au-day-n", String(percent));
   }
 
+  // La tarjeta se vuelve a dibujar cada 30 s y al marcar "Hecho"; "Ver mi jornada de hoy" sigue abierta (sin animarse de nuevo).
   function carryState(old, next) {
     var oldList = old.querySelector(".day-flow-list");
     var newList = next.querySelector(".day-flow-list");
@@ -210,15 +220,6 @@
       newList.setAttribute("open", "");
       newList.classList.add("is-restored");
     }
-    var before = barFill(old);
-    var after = barFill(next);
-    if (!before || !after) return;
-    var from = parseFloat(before.style.width);
-    var to = after.style.width;
-    if (isNaN(from) || from + "%" === to) return;
-    after.style.width = from + "%";
-    void after.offsetWidth;
-    after.style.width = to;
   }
 
   function render() {
@@ -231,6 +232,7 @@
     var section = document.createElement("div");
     section.innerHTML = flowMarkup(now, items);
     var next = section.firstElementChild;
+    publishProgress(items.filter(function (item) { return item.done; }).length, items.length);
     // Acción principal según el momento: si hay un momento en curso o pendiente, manda la tarjeta Hoy; si no, la meta.
     if (daily.dataset) daily.dataset.dayMoment = items.some(function (item) { return !item.done && item.end > minutes; }) ? "activity" : "free";
     if (old) { old.replaceWith(next); carryState(old, next); }

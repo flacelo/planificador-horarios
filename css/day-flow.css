@@ -53,28 +53,106 @@ body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .d
 body.dark .planify-day-flow .day-flow-date,
 body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-date { color: #b4c3d6; }
 
-/* Barra "Tu día": 8 px, menta de la marca; la animación solo corre si la persona no pidió reducir movimiento. */
-.planify-day-flow .day-flow-glance > .day-flow-progress { flex: 2 1 150px; min-width: 150px; }
+/* Anillo "Tu día": se dibuja con CSS sobre la misma barra de siempre (el HTML de la tarjeta no cambia: el PDF del Diario lo copia tal cual).
+   js/day-flow.js publica el porcentaje en <html> (--au-day-p con transición, --au-day-n para el número del centro).
+   La animación solo corre si la persona no pidió reducir movimiento. */
+@property --au-day-p { syntax: "<number>"; inherits: true; initial-value: 0; }
+.planify-day-flow .day-flow-progress { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; }
 .planify-day-flow .day-flow-bar {
-  height: 8px;
-  margin: 6px 0;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #d5e6df;
+  position: relative;
+  width: 104px;
+  height: 104px;
+  margin: 0;
+  overflow: visible;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--au-ring-a, #0a7f75) 0, var(--au-ring-b, #2f6fd0) calc(var(--au-day-p, 0) * 1%), var(--au-ring-track, #d5e6df) 0);
 }
-.planify-day-flow .day-flow-bar > i {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: #087e73;
+.planify-day-flow .day-flow-bar > i { display: none; }
+.planify-day-flow .day-flow-bar::before {
+  counter-reset: au-day var(--au-day-n, 0);
+  content: counter(au-day) "%";
+  content: counter(au-day) "%" / "";
+  position: absolute;
+  inset: 10px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--au-tile, #fff);
+  color: var(--au-text, #152336);
+  font: 700 1.5rem/1 var(--au-font-display, "Outfit", sans-serif);
 }
-body.dark .planify-day-flow .day-flow-bar,
-body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-bar { background: #38546d; }
-body.dark .planify-day-flow .day-flow-bar > i,
-body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-bar > i { background: #7fd9c2; }
 @media (prefers-reduced-motion: no-preference) {
-  .planify-day-flow .day-flow-bar > i { transition: width 0.4s ease; }
+  html { transition: --au-day-p 0.6s ease; }
 }
+
+/* Mosaico "Hoy": una ficha grande de vidrio (la actividad), una del anillo, una de avisos y la lista. Cada una es su propia ficha. */
+html.planify-brand-ready body .planify-day-flow,
+html.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow {
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  grid-template-areas: "main avisos" "list list";
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+html.planify-brand-ready body .planify-day-flow:has(.day-flow-progress),
+html.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow:has(.day-flow-progress) {
+  grid-template-areas: "main ring" "main avisos" "list list";
+}
+html.planify-brand-ready body .planify-day-flow .day-flow-main {
+  grid-area: main;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--au-glass-line);
+  border-radius: var(--au-r-lg);
+  background: var(--au-glass-solid);
+  box-shadow: var(--au-shadow-md);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  html.planify-brand-ready body .planify-day-flow .day-flow-main {
+    background: var(--au-glass);
+    -webkit-backdrop-filter: blur(14px) saturate(1.25);
+    backdrop-filter: blur(14px) saturate(1.25);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  html.planify-brand-ready body .planify-day-flow .day-flow-main { background: var(--au-glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+html.planify-brand-ready body .planify-day-flow .day-flow-glance { display: contents; }
+html.planify-brand-ready body .planify-day-flow .day-flow-glance > .day-flow-progress { grid-area: ring; }
+html.planify-brand-ready body .planify-day-flow .day-flow-glance > div:not(.day-flow-progress) { grid-area: avisos; }
+html.planify-brand-ready body .planify-day-flow .day-flow-glance > div,
+html.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-glance > div {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--au-tile-line);
+  border-radius: var(--au-r-md);
+  background: var(--au-tile);
+  box-shadow: var(--au-shadow-sm);
+}
+html.planify-brand-ready body .planify-day-flow .day-flow-glance > div:not(.day-flow-progress) { justify-content: center; align-items: flex-start; }
+html.planify-brand-ready body .planify-day-flow .day-flow-glance > div:not(.day-flow-progress) strong { font: 700 2.25rem/1 var(--au-font-display, "Outfit", sans-serif); color: var(--au-text); }
+html.planify-brand-ready body .planify-day-flow .day-flow-list {
+  grid-area: list;
+  margin: 0;
+  padding: 14px 18px;
+  border: 1px solid var(--au-tile-line);
+  border-radius: var(--au-r-md);
+  background: var(--au-tile);
+  box-shadow: var(--au-shadow-sm);
+}
+html.planify-brand-ready body .planify-day-flow .day-flow-hello { font: 700 var(--au-t-h2)/1.15 var(--au-font-display, "Outfit", sans-serif); }
+html.planify-brand-ready body .planify-day-flow .day-flow-head h3 { font: 700 1.3rem/1.2 var(--au-font-display, "Outfit", sans-serif); }
+@media (max-width: 700px) {
+  html.planify-brand-ready body .planify-day-flow,
+  html.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow { grid-template-columns: 1fr 1fr; grid-template-areas: "main main" "avisos avisos" "list list"; }
+  html.planify-brand-ready body .planify-day-flow:has(.day-flow-progress),
+  html.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow:has(.day-flow-progress) { grid-template-areas: "main main" "ring avisos" "list list"; }
+  html.planify-brand-ready body .planify-day-flow .day-flow-main { padding: 16px; }
+}
+
 
 /* "Ver mi jornada de hoy": el contenido aparece suave (180 ms) solo cuando la persona la abre.
    Si se restauró abierta tras volver a dibujar la tarjeta (is-restored) no se anima de nuevo. */

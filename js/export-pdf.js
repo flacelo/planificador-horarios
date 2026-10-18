@@ -308,6 +308,11 @@
     }
 
     if (opcion.tipo === 'semanal') {
+      // En el celular la pantalla muestra un solo día y oculta los otros con display:none en línea;
+      // la copia del PDF debe llevar los siete (solo se cambia la copia, no la pantalla).
+      Array.prototype.forEach.call(clon.querySelectorAll('th, td'), function(celda) {
+        if (celda.style.display === 'none') celda.style.removeProperty('display');
+      });
       var tablaSemanal = clon.querySelector('#view-table');
       if (tablaSemanal && opcion.compactWeekly) {
         var tablaCompletaCompacta = tablaSemanal.querySelector('table');

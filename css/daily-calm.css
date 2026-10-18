@@ -249,3 +249,11 @@ body.tema-claro #view-diario.daily-calm-ready .routine-checkboxes input[type="ch
   #view-diario.daily-calm-ready .notebook-col { display: grid !important; }
   #view-diario.daily-calm-ready .notebook-grid { grid-template-columns: 1fr 1fr !important; }
 }
+
+/* "Más para tu día": las tarjetas aparecen suave (180 ms) al abrir. Al cerrar no hay animación.
+   Sin relleno de animación (nunca queda invisible) y sin animación al imprimir o con "reducir movimiento". */
+@keyframes planifyMoreIn { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  #view-diario.daily-calm-ready .daily-more[open] > .notebook-col { animation: planifyMoreIn 0.18s ease-out; }
+}
+@media print { #view-diario.daily-calm-ready .daily-more > .notebook-col { animation: none !important; } }

@@ -75,3 +75,11 @@ body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .d
 @media (prefers-reduced-motion: no-preference) {
   .planify-day-flow .day-flow-bar > i { transition: width 0.4s ease; }
 }
+
+/* "Ver mi jornada de hoy": el contenido aparece suave (180 ms) solo cuando la persona la abre.
+   Si se restauró abierta tras volver a dibujar la tarjeta (is-restored) no se anima de nuevo. */
+@keyframes planifyListIn { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .planify-day-flow .day-flow-list:not(.is-restored)[open] > ul { animation: planifyListIn 0.18s ease-out; }
+}
+@media print { .planify-day-flow .day-flow-list > ul { animation: none !important; } }

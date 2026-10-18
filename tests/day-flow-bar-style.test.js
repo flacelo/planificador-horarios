@@ -6,7 +6,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const css = fs.readFileSync(path.join(__dirname, "..", "css/day-flow.css"), "utf8");
-const block = css.slice(css.indexOf('/* Barra "Tu día"'));
+const start = css.indexOf('/* Barra "Tu día"');
+const end = css.indexOf("\n/* ", start + 5);
+const block = css.slice(start, end < 0 ? undefined : end);
 
 function luminance(hex) {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));

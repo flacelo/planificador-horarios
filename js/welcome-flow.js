@@ -1886,6 +1886,11 @@
     });
   }
 
+  // Solo se guardan los roles si la persona vio y respondió la pregunta de ocupación; si no, quedan vacíos.
+  function rolesToSave() {
+    return state.rolesSeen ? state.roles.slice() : [];
+  }
+
   function open(preferredMode) {
     var existingOverlay = document.getElementById("welcome-flow-overlay");
     if (!existingOverlay || !existingOverlay.contains(document.activeElement)) welcomeReturnFocus = document.activeElement;
@@ -2064,7 +2069,7 @@
       if (state.userName) localStorage.setItem("planify_nombre", state.userName);
       localStorage.setItem(profileKey, JSON.stringify({
         name: state.userName,
-        roles: state.roles,
+        roles: rolesToSave(),
         occupation: state.occupation,
         occupationOther: state.occupationOther,
         career: state.career,
@@ -2916,7 +2921,7 @@
   }
 
   window.PLANIFY_WELCOME = { open: open, requestChange: openScheduleAssistant };
-  if (window.__PLANIFY_START_TEST__) window.__PLANIFY_START_TEST_HOOKS__ = { state: state, applyStartAnswers: applyStartAnswers, buildProposal: buildProposal, minutesToTime: minutesToTime, startMoments: startMoments, franjaHours: franjaHours };
+  if (window.__PLANIFY_START_TEST__) window.__PLANIFY_START_TEST_HOOKS__ = { state: state, applyStartAnswers: applyStartAnswers, buildProposal: buildProposal, rolesToSave: rolesToSave, minutesToTime: minutesToTime, startMoments: startMoments, franjaHours: franjaHours };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();

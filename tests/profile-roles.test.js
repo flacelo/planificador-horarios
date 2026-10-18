@@ -35,3 +35,28 @@ test("'Ver ejemplo' no cuenta como elección de la persona", () => {
   assert.match(example, /state\.roles = \["study", "work", "entrepreneur"\]/);
   assert.doesNotMatch(example, /rolesSeen = true/);
 });
+
+test("rolesToSave(): sin ver la pregunta se guarda lista vacía; viéndola, lo respondido", () => {
+  const hooks = loadHooks();
+  assert.deepEqual(Array.from(hooks.rolesToSave()), [], "por defecto no se guarda 'study'");
+  hooks.state.roles = ["study", "work"];
+  assert.deepEqual(Array.from(hooks.rolesToSave()), [], "sin marca, aunque haya roles en el estado");
+  hooks.state.rolesSeen = true;
+  assert.deepEqual(Array.from(hooks.rolesToSave()), ["study", "work"]);
+  hooks.state.roles = [];
+  assert.deepEqual(Array.from(hooks.rolesToSave()), [], "la persona pudo desmarcar todo");
+});
+
+test("el perfil guardado conserva exactamente los mismos campos y la misma clave", () => {
+  const block = source.slice(source.indexOf("localStorage.setItem(profileKey, JSON.stringify({"), source.indexOf("technique: state.technique") + 30);
+  assert.match(source, /var profileKey = "planify_personalizacion_v1";/);
+  assert.match(block, /roles: rolesToSave\(\),/);
+  const fields = Array.from(block.matchAll(/^\s+(\w+): state\.\w+,?$/gm)).map((m) => m[1]);
+  assert.deepEqual(fields.filter((name) => name !== "roles"), ["name", "roles", "occupation", "occupationOther", "career", "careerOther", "specialty", "specialtyOther", "studyContext", "jobRole", "ventures", "goal", "meals", "snacksPerDay", "foodProfile", "foodNotes", "hydration", "caffeineCutoff", "commuteMinutes", "preparationMinutes", "sleepChallenge", "movementStyle", "movementMinutes", "reminders", "waterEvery", "medicineName", "medicineTime", "customReminder", "customReminderTime", "technique"].filter((name) => name !== "roles"));
+});
+
+test("el panel no cambia: sigue leyendo roles y no migra perfiles ya guardados", () => {
+  const panel = fs.readFileSync(require.resolve("../js/panel-redesign.js"), "utf8");
+  assert.match(panel, /var roles = Array\.isArray\(welcome\.roles\) \? welcome\.roles : \[\];/);
+  assert.match(panel, /if \(!saved\) saved = profileFromWelcome\(\);/);
+});

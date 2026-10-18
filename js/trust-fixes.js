@@ -751,13 +751,13 @@
       var style = document.createElement("link");
       style.id = "planify-daily-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/daily-calm.css?v=2";
+      style.href = "css/daily-calm.css?v=4";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-daily-calm-script")) {
       var script = document.createElement("script");
       script.id = "planify-daily-calm-script";
-      script.src = "js/daily-calm.js?v=2";
+      script.src = "js/daily-calm.js?v=3";
       script.defer = true;
       document.head.appendChild(script);
     }

@@ -188,7 +188,38 @@ body.light-mode #view-diario.daily-calm-ready #planner-date { color-scheme: ligh
 #view-diario.daily-calm-ready .star-rating .star[role="radio"]:focus-visible { outline: 2px solid var(--daily-accent); outline-offset: 2px; }
 #view-diario.daily-calm-ready .star-rating .star.active { color: #f3bc55; }
 
+/* "Más para tu día": tarjetas opcionales plegadas debajo de la meta y las tareas. */
+#view-diario.daily-calm-ready .daily-more {
+  grid-column: 1 / -1;
+  border: 1px solid var(--daily-border);
+  border-radius: 13px;
+  background: var(--daily-card);
+}
+#view-diario.daily-calm-ready .daily-more > summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-height: 48px;
+  padding: 12px 17px;
+  border-radius: 13px;
+  color: var(--daily-text);
+  cursor: pointer;
+}
+#view-diario.daily-calm-ready .daily-more-title { font-size: .92rem; font-weight: 750; }
+#view-diario.daily-calm-ready .daily-more > summary small { color: var(--daily-muted); font-size: .78rem; }
+#view-diario.daily-calm-ready .daily-more > summary:focus-visible { outline: 2px solid var(--daily-accent); outline-offset: 2px; }
+#view-diario.daily-calm-ready .daily-more > .notebook-col {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px !important;
+  width: auto !important;
+  padding: 0 12px 12px;
+  background: transparent !important;
+}
+
 @media (max-width: 700px) {
+  #view-diario.daily-calm-ready .daily-more > .notebook-col { grid-template-columns: minmax(0, 1fr); }
   #view-diario.daily-calm-ready .planner-notebook { padding: 17px !important; }
   #view-diario.daily-calm-ready .notebook-header { align-items: flex-start !important; flex-direction: column !important; }
   #view-diario.daily-calm-ready .header-controls,

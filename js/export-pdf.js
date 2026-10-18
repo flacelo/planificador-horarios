@@ -277,6 +277,10 @@
     clon.classList.add('planify-print-view', 'planify-print-' + opcion.tipo);
 
     if (opcion.tipo === 'diaria') {
+      // "Más para tu día" puede estar plegado en pantalla; en el PDF siempre sale abierto.
+      Array.prototype.forEach.call(clon.querySelectorAll('details.daily-more'), function(plegado) {
+        plegado.setAttribute('open', '');
+      });
       var fechaSeleccionada = clon.querySelector('#planner-date, input[type="date"]');
       var resumenDeHoy = clon.querySelector('.planify-day-flow');
       var ahora = new Date();

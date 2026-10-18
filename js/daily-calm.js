@@ -49,18 +49,46 @@
       .observe(group, { subtree: true, attributes: true, attributeFilter: ["class"] });
   }
 
+  // Se abre solo si la fecha elegida ya tiene algo guardado en esas tarjetas; no recuerda si quedó abierto.
+  function hasMoreData(view) {
+    var text = ["#grateful-input", "#affirmations-input"].some(function (selector) {
+      var field = view.querySelector(selector);
+      return !!(field && field.value.trim());
+    });
+    return text || !!view.querySelector('.routine-checkboxes input:checked, .mood-btn.active, .sleep-clouds .cloud-btn.active, #star-rating .star.active');
+  }
+
+  function syncMoreOpen(view, more) {
+    var update = function () { more.open = hasMoreData(view); };
+    // El diario guardado se restaura en otro módulo: se revisa al cargar y justo después de cambiar la fecha.
+    update();
+    setTimeout(update, 0);
+    setTimeout(update, 400);
+    window.addEventListener("load", update, { once: true });
+    view.addEventListener("change", function (event) {
+      if (event.target && event.target.id === "planner-date") setTimeout(update, 30);
+    });
+  }
+
   function init() {
     var view = document.getElementById("view-diario");
     var grid = view && view.querySelector(".notebook-grid");
     var columns = grid && grid.querySelectorAll(":scope > .notebook-col");
     if (!view || !grid || !columns || columns.length !== 2 || view.classList.contains("daily-calm-ready")) return;
 
-    var primary = [".goals-section", ".todo-section", ".morning-section", ".mood-section"];
-    var secondary = [".sleep-section", ".productivity-section", ".grateful-section", ".affirmations-section"];
+    // Una acción principal: la meta y las tareas quedan arriba; el resto se pliega en "Más para tu día".
+    var primary = [".goals-section", ".todo-section"];
+    var secondary = [".morning-section", ".mood-section", ".sleep-section", ".productivity-section", ".grateful-section", ".affirmations-section"];
     if (primary.concat(secondary).some(function (selector) { return !grid.querySelector(selector); })) return;
 
     primary.forEach(function (selector) { columns[0].appendChild(grid.querySelector(selector)); });
     secondary.forEach(function (selector) { columns[1].appendChild(grid.querySelector(selector)); });
+    var more = document.createElement("details");
+    more.className = "daily-more";
+    more.innerHTML = '<summary><span class="daily-more-title">Más para tu día</span><small>Rutina, ánimo, sueño y más · opcional</small></summary>';
+    grid.appendChild(more);
+    more.appendChild(columns[1]);
+    syncMoreOpen(view, more);
 
     var date = view.querySelector("#planner-date");
     var dateLabel = view.querySelector(".date-picker-container label");

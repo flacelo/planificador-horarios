@@ -8,7 +8,7 @@ const indexHtml = fs.readFileSync(require.resolve("../index.html"), "utf8");
 const report = fs.readFileSync(require.resolve("../js/honest-report.js"), "utf8");
 
 test("el reporte es local, ofrece descarga y no simula el envío de correo", () => {
-  const appIndex = indexHtml.indexOf('src="js/app.js?v=39.0"');
+  const appIndex = indexHtml.indexOf('src="js/app.js?v=40.0"');
   const reportIndex = indexHtml.indexOf('src="js/honest-report.js?v=1.1"');
   assert.ok(appIndex >= 0);
   assert.ok(reportIndex > appIndex);

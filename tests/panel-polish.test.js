@@ -59,3 +59,13 @@ test("A5: 'recomendado' es una etiqueta propia (ámbar) y no se parece a la tarj
   assert.match(css, /\.welcome-flow-mode\.is-selected \{ border-color: #2a9e89; background: #eaf7f1;/);
   assert.doesNotMatch(badge.slice(0, badge.indexOf("}")), /#2a9e89|#176e61|#eaf7f1/);
 });
+
+test("Avance: sin porcentaje no se repite 'sin datos' debajo; con porcentaje se conserva la línea de abajo", () => {
+  const trust = read("js/trust-fixes.js");
+  assert.doesNotMatch(trust, /sin datos para estas fechas/);
+  assert.match(trust, /\(metrics\.hasHistory \? "<span>de los momentos registrados<\/span>" : ""\)/);
+  // El resto de textos de esa tarjeta se conserva.
+  assert.match(trust, /Aún no hay marcas para estas fechas/);
+  assert.match(trust, /Las marcas antiguas no tenían una fecha asociada, así que no cuentan para este periodo\./);
+  assert.match(trust, /"Sin datos aún"/);
+});

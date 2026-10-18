@@ -42,6 +42,18 @@ test("el PDF del Diario abre 'Más para tu día' en su copia (no cambia la panta
   assert.match(js, /clon\.querySelectorAll\('details\.daily-more'\), function\(plegado\) \{\s*plegado\.setAttribute\('open', ''\);/);
 });
 
+test("PDF: mismo reparto que antes (Rutina y Ánimo vuelven a la primera columna) y sin el título del plegable", () => {
+  const js = read("js/export-pdf.js");
+  assert.match(js, /\['\.morning-section', '\.mood-section'\]\.forEach/);
+  assert.match(js, /rejilla\.replaceChild\(columnaOpcional, plegado\);/);
+});
+
+test("imprimir desde el navegador abre 'Más para tu día' y luego lo deja como estaba", () => {
+  const js = read("js/daily-calm.js");
+  assert.match(js, /addEventListener\("beforeprint", function \(\) \{ openBeforePrint = more\.open; more\.open = true; \}\);/);
+  assert.match(js, /addEventListener\("afterprint", function \(\) \{\s*if \(openBeforePrint !== null\) more\.open = openBeforePrint;/);
+});
+
 test("las tarjetas dentro de 'Más para tu día' usan todo el ancho y el fondo de la tarjeta", () => {
   const css = read("css/daily-calm.css");
   const rule = css.slice(css.indexOf("#view-diario.daily-calm-ready .daily-more > .notebook-col {"));

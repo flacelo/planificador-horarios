@@ -68,6 +68,13 @@
     view.addEventListener("change", function (event) {
       if (event.target && event.target.id === "planner-date") setTimeout(update, 30);
     });
+    // Al imprimir desde el navegador se muestra abierto y luego vuelve a como estaba.
+    var openBeforePrint = null;
+    window.addEventListener("beforeprint", function () { openBeforePrint = more.open; more.open = true; });
+    window.addEventListener("afterprint", function () {
+      if (openBeforePrint !== null) more.open = openBeforePrint;
+      openBeforePrint = null;
+    });
   }
 
   function init() {

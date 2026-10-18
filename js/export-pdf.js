@@ -277,9 +277,19 @@
     clon.classList.add('planify-print-view', 'planify-print-' + opcion.tipo);
 
     if (opcion.tipo === 'diaria') {
-      // "Más para tu día" puede estar plegado en pantalla; en el PDF siempre sale abierto.
+      // "Más para tu día" puede estar plegado en pantalla; en el PDF siempre sale abierto
+      // y con el reparto de antes: cuatro tarjetas por columna, sin el título del plegable.
       Array.prototype.forEach.call(clon.querySelectorAll('details.daily-more'), function(plegado) {
         plegado.setAttribute('open', '');
+        var rejilla = plegado.parentNode;
+        var columnaOpcional = plegado.querySelector(':scope > .notebook-col');
+        var columnaPrincipal = rejilla && rejilla.querySelector(':scope > .notebook-col');
+        if (!rejilla || !columnaOpcional || !columnaPrincipal) return;
+        ['.morning-section', '.mood-section'].forEach(function(selector) {
+          var tarjeta = columnaOpcional.querySelector(':scope > ' + selector);
+          if (tarjeta) columnaPrincipal.appendChild(tarjeta);
+        });
+        rejilla.replaceChild(columnaOpcional, plegado);
       });
       var fechaSeleccionada = clon.querySelector('#planner-date, input[type="date"]');
       var resumenDeHoy = clon.querySelector('.planify-day-flow');

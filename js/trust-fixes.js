@@ -757,7 +757,7 @@
     if (!document.getElementById("planify-daily-calm-script")) {
       var script = document.createElement("script");
       script.id = "planify-daily-calm-script";
-      script.src = "js/daily-calm.js?v=3";
+      script.src = "js/daily-calm.js?v=4";
       script.defer = true;
       document.head.appendChild(script);
     }

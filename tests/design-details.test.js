@@ -12,7 +12,7 @@ test("celular: al tocar una pestaña, la vista queda debajo del ⚙ (no tapa la 
   const css = block(read("css/brand-system.css"), "/* Detalles: el ⚙ del celular");
   assert.match(css, /@media \(max-width: 600px\) \{\s*\.planify-brand-ready :is\(#view-diario, #view-semanal, #view-mensual, #vista-anual-metas\) \{ scroll-margin-top: 72px !important; \}/);
   // La pestaña sigue desplazando la vista con scrollIntoView (que respeta scroll-margin-top).
-  assert.match(read("js/brand-home.js"), /view\.scrollIntoView\(\{ behavior: "smooth", block: "start" \}\);/);
+  assert.match(read("js/brand-home.js"), /view\.scrollIntoView\(\{ behavior: \(window\.matchMedia && window\.matchMedia\("\(prefers-reduced-motion: reduce\)"\)\.matches \? "auto" : "smooth"\), block: "start" \}\);/);
 });
 
 test("anillo de foco del teclado: menta en oscuro y verde azulado en claro (ya no amarillo)", () => {

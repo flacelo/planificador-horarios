@@ -142,7 +142,7 @@
       if (viewName === "dashboard") return;
       window.requestAnimationFrame(function () {
         var view = document.getElementById("view-" + viewName);
-        if (view) view.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (view) view.scrollIntoView({ behavior: (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"), block: "start" });
       });
     });
     var dashboardWasOpen = false;
@@ -288,14 +288,14 @@
       var hub = document.querySelector(".trust-start-hub");
       if (hub) {
         hub.classList.add("is-expanded");
-        hub.scrollIntoView({ behavior: "smooth", block: "start" });
+        hub.scrollIntoView({ behavior: (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"), block: "start" });
       }
     }
     if (action === "week") {
       var tab = document.querySelector('.bottom-nav [data-tab="semanal"]');
       if (tab) tab.click();
       var week = document.getElementById("view-semanal");
-      if (week) week.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (week) week.scrollIntoView({ behavior: (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"), block: "start" });
     }
   });
 

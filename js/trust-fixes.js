@@ -351,7 +351,7 @@
     if (target && target.getClientRects().length) {
       target.classList.add("trust-tutorial-highlight");
       var bounds = target.getBoundingClientRect();
-      if (bounds.top < 0 || bounds.bottom > window.innerHeight) target.scrollIntoView({ block: "center", behavior: "smooth" });
+      if (bounds.top < 0 || bounds.bottom > window.innerHeight) target.scrollIntoView({ block: "center", behavior: (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth") });
     }
     overlay.querySelector(".trust-tutorial-icon").textContent = step.icon;
     overlay.querySelector(".trust-tutorial-title").textContent = step.title;
@@ -582,7 +582,7 @@
     if (!document.getElementById("planify-day-flow-script")) {
       var script = document.createElement("script");
       script.id = "planify-day-flow-script";
-      script.src = "js/day-flow.js?v=13";
+      script.src = "js/day-flow.js?v=14";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -672,7 +672,7 @@
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=19";
+      script.src = "js/brand-home.js?v=20";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -809,7 +809,7 @@
     if (!document.getElementById("planify-mobile-coach-script")) {
       var script = document.createElement("script");
       script.id = "planify-mobile-coach-script";
-      script.src = "js/mobile-coach.js?v=5";
+      script.src = "js/mobile-coach.js?v=6";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -894,7 +894,7 @@
       var actionName = trustAction.getAttribute("data-trust-action");
       if (actionName === "goal") {
         var goal = document.querySelector(".goals-section textarea,.goals-section input");
-        if (goal) { goal.scrollIntoView({ behavior: "smooth", block: "center" }); goal.focus(); }
+        if (goal) { goal.scrollIntoView({ behavior: (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"), block: "center" }); goal.focus(); }
       }
       if (actionName === "change") {
         var changeButton = document.getElementById("schedule-change-open");

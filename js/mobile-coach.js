@@ -36,7 +36,7 @@
     if (view === "semanal") return openPanelPersonalizar();
     if (view === "diario") {
       var goal = document.querySelector(".goals-section textarea,.goals-section input");
-      if (goal) { goal.scrollIntoView({ behavior: "smooth", block: "center" }); goal.focus(); }
+      if (goal) { goal.scrollIntoView({ behavior: (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"), block: "center" }); goal.focus(); }
       return;
     }
     if (view === "dashboard") {

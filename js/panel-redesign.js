@@ -223,6 +223,8 @@
       if (languageCard) languageCard.classList.add("panel-language-card");
     }
     if (titles[1]) titles[1].textContent = "Tu plan para llevar";
+    var excelButton = document.getElementById("btn-export-excel");
+    if (excelButton && excelButton.parentElement) excelButton.parentElement.setAttribute("data-export-actions", "");
     if (titles[1] && !data.querySelector(".panel-card-hint")) {
       var hint = document.createElement("p");
       hint.className = "panel-card-hint";

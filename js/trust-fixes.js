@@ -683,13 +683,13 @@
       var style = document.createElement("link");
       style.id = "planify-panel-redesign-style";
       style.rel = "stylesheet";
-      style.href = "css/panel-redesign.css?v=16";
+      style.href = "css/panel-redesign.css?v=17";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-panel-redesign-script")) {
       var script = document.createElement("script");
       script.id = "planify-panel-redesign-script";
-      script.src = "js/panel-redesign.js?v=13";
+      script.src = "js/panel-redesign.js?v=14";
       script.defer = true;
       document.head.appendChild(script);
     }

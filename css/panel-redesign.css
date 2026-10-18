@@ -384,6 +384,20 @@ html.planify-panel-redesign-ready #side-panel #tab-personalizar .panel-apply-hou
   gap: 8px;
 }
 .planify-panel-redesign-ready #side-panel .config-actions button { width: 100%; margin: 0 !important; }
+/* Descargas: Excel y PDF con la misma altura de toque, letra y separación; el PDF sigue como botón principal. */
+.planify-panel-redesign-ready #side-panel .config-actions[data-export-actions] {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+.planify-panel-redesign-ready #side-panel .config-actions #btn-export-excel,
+.planify-panel-redesign-ready #side-panel .config-actions #btn-export-pdf {
+  min-height: 44px !important;
+  font-size: 14px !important;
+  padding: 10px 16px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
 .planify-panel-redesign-ready #side-panel .config-actions #btn-export-pdf {
   border-color: #a5ebbd !important;
   background: #a5ebbd !important;

@@ -576,7 +576,7 @@
       var style = document.createElement("link");
       style.id = "planify-day-flow-style";
       style.rel = "stylesheet";
-      style.href = "css/day-flow.css?v=2";
+      style.href = "css/day-flow.css?v=3";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-day-flow-script")) {
@@ -657,7 +657,7 @@
     var style = document.createElement("link");
     style.id = "planify-interface-polish";
     style.rel = "stylesheet";
-    style.href = "css/interface-polish.css?v=2";
+    style.href = "css/interface-polish.css?v=3";
     document.head.appendChild(style);
   }
 
@@ -666,7 +666,7 @@
       var style = document.createElement("link");
       style.id = "planify-brand-style";
       style.rel = "stylesheet";
-      style.href = "css/brand-system.css?v=8";
+      style.href = "css/brand-system.css?v=9";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-brand-script")) {
@@ -786,7 +786,7 @@
       var style = document.createElement("link");
       style.id = "planify-pwa-style";
       style.rel = "stylesheet";
-      style.href = "css/pwa-experience.css?v=2";
+      style.href = "css/pwa-experience.css?v=3";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-pwa-script")) {
@@ -803,7 +803,7 @@
       var style = document.createElement("link");
       style.id = "planify-mobile-coach-style";
       style.rel = "stylesheet";
-      style.href = "css/mobile-coach.css?v=1";
+      style.href = "css/mobile-coach.css?v=2";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-mobile-coach-script")) {

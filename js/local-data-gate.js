@@ -377,8 +377,8 @@
   }
 
   function loadPublicAssets() {
-    [["planify-public-trust-style", "css/trust-fixes.css?v=1.11"],
-     ["planify-brand-style", "css/brand-system.css?v=8"]].forEach(function (asset) {
+    [["planify-public-trust-style", "css/trust-fixes.css?v=1.12"],
+     ["planify-brand-style", "css/brand-system.css?v=9"]].forEach(function (asset) {
       if (document.getElementById(asset[0])) return;
       var link = document.createElement("link");
       link.id = asset[0];

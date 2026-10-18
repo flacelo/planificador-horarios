@@ -126,25 +126,25 @@
 .planify-trust-ready #side-panel .card-section{box-shadow:0 5px 15px rgba(15,23,42,.025)!important}
 
 body.dark .planify-trust-ready .app>.header-actions,
-body.tema-estelar:not(.light-mode) .planify-trust-ready .app>.header-actions{
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-trust-ready .app>.header-actions{
   background:rgba(15,26,45,.82)!important;
   border-color:rgba(104,129,163,.48)!important;
   box-shadow:0 14px 34px rgba(0,0,0,.28)!important;
 }
 body.dark .planify-trust-ready #schedule-change-open,
-body.tema-estelar:not(.light-mode) .planify-trust-ready #schedule-change-open{color:#d7d4ff!important}
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-trust-ready #schedule-change-open{color:#d7d4ff!important}
 body.dark .planify-trust-ready #planify-focus-open,
-body.tema-estelar:not(.light-mode) .planify-trust-ready #planify-focus-open{color:#98f0e4!important}
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-trust-ready #planify-focus-open{color:#98f0e4!important}
 body.dark .trust-start-destinations,
-body.tema-estelar:not(.light-mode) .trust-start-destinations{border-color:rgba(148,163,184,.22)!important}
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .trust-start-destinations{border-color:rgba(148,163,184,.22)!important}
 body.dark .trust-start-destinations>span,
-body.tema-estelar:not(.light-mode) .trust-start-destinations>span{color:#bdcadc!important}
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .trust-start-destinations>span{color:#bdcadc!important}
 body.dark .trust-friendly-guide button:first-child,
-body.tema-estelar:not(.light-mode) .trust-friendly-guide button:first-child{background:rgba(129,140,248,.2)!important;color:#eeeefe!important;border-color:#818cf8!important}
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .trust-friendly-guide button:first-child{background:rgba(129,140,248,.2)!important;color:#eeeefe!important;border-color:#818cf8!important}
 body.dark .planify-trust-ready #side-panel,
-body.tema-estelar:not(.light-mode) .planify-trust-ready #side-panel{background:linear-gradient(180deg,#101a2e,#111d31)!important;border-color:#354964!important}
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-trust-ready #side-panel{background:linear-gradient(180deg,#101a2e,#111d31)!important;border-color:#354964!important}
 body.dark .planify-trust-ready #side-panel .panel-tabs,
-body.tema-estelar:not(.light-mode) .planify-trust-ready #side-panel .panel-tabs{background:#101a2e!important}
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-trust-ready #side-panel .panel-tabs{background:#101a2e!important}
 
 @media (max-width:820px){
   .planify-trust-ready .app>#main-title{margin-top:17px!important;font-size:1.55rem!important}

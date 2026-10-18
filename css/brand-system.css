@@ -277,25 +277,25 @@
 .planify-brand-ready .trust-start-destinations { border-color: #e4ebeb !important; color: #677b87 !important; }
 .planify-brand-ready .trust-start-destinations > b { background: #f1f6f3 !important; border-color: #e0eae6 !important; color: #3d5961 !important; }
 
-.planify-brand-ready body.tema-estelar:not(.light-mode):not(.tema-claro) .trust-start-hub,
+.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-hub,
 .planify-brand-ready body.dark .trust-start-hub {
   background: #172534 !important; border-color: #34505a !important; color: #ecf8f5 !important;
 }
-.planify-brand-ready body.tema-estelar:not(.light-mode):not(.tema-claro) .trust-start-heading h2,
+.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-heading h2,
 .planify-brand-ready body.dark .trust-start-heading h2 { color: #f5fcfa !important; }
-.planify-brand-ready body.tema-estelar:not(.light-mode):not(.tema-claro) .trust-start-heading p,
+.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-heading p,
 .planify-brand-ready body.dark .trust-start-heading p { color: #b9ced1 !important; }
-.planify-brand-ready body.tema-estelar:not(.light-mode):not(.tema-claro) .trust-start-options > button,
+.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-options > button,
 .planify-brand-ready body.dark .trust-start-options > button { background: #1d3040 !important; border-color: #3a5660 !important; color: #f1fcf7 !important; }
-.planify-brand-ready body.tema-estelar:not(.light-mode):not(.tema-claro) .trust-start-options > button.is-recommended,
+.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-options > button.is-recommended,
 .planify-brand-ready body.dark .trust-start-options > button.is-recommended { background: #20463f !important; border-color: #65b79e !important; }
-.planify-brand-ready body.tema-estelar:not(.light-mode):not(.tema-claro) .trust-start-options strong,
+.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-options strong,
 .planify-brand-ready body.dark .trust-start-options strong { color: #f2fbf6 !important; }
-.planify-brand-ready body.tema-estelar:not(.light-mode):not(.tema-claro) .trust-start-options small,
+.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-options small,
 .planify-brand-ready body.dark .trust-start-options small { color: #c0d2d3 !important; }
-.planify-brand-ready body.tema-estelar:not(.light-mode):not(.tema-claro) .trust-start-options em,
+.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-options em,
 .planify-brand-ready body.dark .trust-start-options em { color: #93ddbc !important; }
-.planify-brand-ready body.tema-estelar:not(.light-mode):not(.tema-claro) .trust-start-destinations > b,
+.planify-brand-ready body.tema-estelar:not(.light-mode):where(:not(.tema-claro)):not(.tema-claro) .trust-start-destinations > b,
 .planify-brand-ready body.dark .trust-start-destinations > b { background: #223947 !important; border-color: #3b5861 !important; color: #dcefe8 !important; }
 
 .planify-brand-ready .main-card-container { width: min(1320px, calc(100% - 24px)) !important; margin-inline: auto !important; border-radius: 25px !important; }

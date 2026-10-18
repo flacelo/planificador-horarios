@@ -126,6 +126,26 @@
     return "en " + hours + " h" + (remainder ? " " + remainder + " min" : "");
   }
 
+  // Primera palabra del nombre que la app ya guarda (perfil o nombre del inicio); no se escribe nada nuevo.
+  function firstName() {
+    var name = "";
+    try {
+      var profile = JSON.parse(localStorage.getItem("planify_personalizacion_v1") || "null") || {};
+      name = String(profile.name || "");
+    } catch (error) { name = ""; }
+    if (!name.trim()) {
+      try { name = String(localStorage.getItem("planify_nombre") || ""); } catch (error) { name = ""; }
+    }
+    return name.trim().split(/\s+/)[0] || "";
+  }
+
+  function greetingText(now) {
+    var hour = now.getHours();
+    var base = hour >= 5 && hour < 12 ? "Buenos días" : hour >= 12 && hour < 19 ? "Buenas tardes" : "Buenas noches";
+    var name = firstName();
+    return name ? base + ", " + name : base;
+  }
+
   function flowMarkup(now, items) {
     var currentMinutes = now.getHours() * 60 + now.getMinutes();
     var current = items.find(function (item) { return item.start <= currentMinutes && item.end > currentMinutes && !item.done; });
@@ -155,7 +175,8 @@
       return '<li class="' + status + '"><time>' + formatTime(item.start) + '</time><span>' + escapeHtml(item.title) + '</span>' + (item.done ? '<b>✓</b>' : "") + '</li>';
     }).join("");
     return '<section class="planify-day-flow" aria-label="Tu jornada de hoy">' +
-      '<div class="day-flow-main"><div class="day-flow-kicker">HOY · ' + escapeHtml(now.toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long" })) + '</div>' +
+      '<div class="day-flow-main"><div class="day-flow-greeting"><strong class="day-flow-hello">' + escapeHtml(greetingText(now)) + '</strong>' +
+      '<div class="day-flow-date">Hoy · ' + escapeHtml(now.toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long" })) + '</div></div>' +
       '<div class="day-flow-head"><span class="day-flow-icon">' + (current ? "⏳" : next ? "🎯" : "☀️") + '</span><div><strong>' + headline + '</strong>' +
       (activity ? '<h3>' + escapeHtml(activity.title) + '</h3><small>' + escapeHtml(activity.category) + " · " + escapeHtml(detail) + '</small>' : '<p>' + escapeHtml(detail) + '</p>') + '</div></div>' +
       '<div class="day-flow-actions">' + action + '</div></div>' +

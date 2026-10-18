@@ -576,13 +576,13 @@
       var style = document.createElement("link");
       style.id = "planify-day-flow-style";
       style.rel = "stylesheet";
-      style.href = "css/day-flow.css?v=5";
+      style.href = "css/day-flow.css?v=6";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-day-flow-script")) {
       var script = document.createElement("script");
       script.id = "planify-day-flow-script";
-      script.src = "js/day-flow.js?v=10";
+      script.src = "js/day-flow.js?v=11";
       script.defer = true;
       document.head.appendChild(script);
     }

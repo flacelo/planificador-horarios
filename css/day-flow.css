@@ -34,3 +34,21 @@ body.dark .planify-day-flow .day-flow-glance :is(span, small),
 body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-glance :is(span, small) { color: #b4c3d6; }
 body.dark .planify-day-flow .day-flow-list time,
 body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-list time { color: #9be8d3; }
+
+/* Saludo y fecha: el nombre sale de lo que la app ya guarda; si es largo se corta con "…". */
+.planify-day-flow .day-flow-greeting { margin-bottom: 10px; min-width: 0; }
+.planify-day-flow .day-flow-hello {
+  display: block;
+  overflow: hidden;
+  font-size: 1.15rem;
+  color: #17333b;
+  font-weight: 800;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.planify-day-flow .day-flow-date { margin-top: 2px; font-size: 12px; color: #4f5d70; font-weight: 600; }
+body.dark .planify-day-flow .day-flow-hello,
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-hello { color: #f3f7ff; }
+body.dark .planify-day-flow .day-flow-date,
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-date { color: #b4c3d6; }

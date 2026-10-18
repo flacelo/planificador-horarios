@@ -683,7 +683,7 @@
       var style = document.createElement("link");
       style.id = "planify-panel-redesign-style";
       style.rel = "stylesheet";
-      style.href = "css/panel-redesign.css?v=19";
+      style.href = "css/panel-redesign.css?v=20";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-panel-redesign-script")) {
@@ -786,7 +786,7 @@
       var style = document.createElement("link");
       style.id = "planify-pwa-style";
       style.rel = "stylesheet";
-      style.href = "css/pwa-experience.css?v=3";
+      style.href = "css/pwa-experience.css?v=4";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-pwa-script")) {

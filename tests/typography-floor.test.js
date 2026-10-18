@@ -21,3 +21,10 @@ test("tarjeta Hoy: AVANCE/AVISOS y la hora de la jornada llegan a contraste 4,5 
   assert.match(css, /body\.tema-estelar:not\(\.light-mode\):where\(:not\(\.tema-claro\)\) \.planify-day-flow \.day-flow-glance :is\(span, small\) \{ color: #b4c3d6; \}/);
   assert.match(css, /body\.tema-estelar:not\(\.light-mode\):where\(:not\(\.tema-claro\)\) \.planify-day-flow \.day-flow-list time \{ color: #9be8d3; \}/);
 });
+
+test("panel y aviso de instalar: ningún texto baja de 12 px", () => {
+  const panel = block(read("css/panel-redesign.css"), "/* Tipografía mínima");
+  assert.match(panel, /\.planify-panel-redesign-ready #side-panel :is\(\.sp-title small, \.panel-section-intro > span, \.panel-rebuild-hint, \.panel-advanced summary span, \.merge-info, \.sp-hint, \.panel-backup summary small, #planify-previous-week-caption, \.planify-pwa-settings-card small\) \{ font-size: 12px !important; \}/);
+  const pwa = block(read("css/pwa-experience.css"), "/* Tipografía mínima");
+  assert.match(pwa, /\.planify-mobile-app-hint small \{ font-size: 12px !important; \}/);
+});

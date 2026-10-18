@@ -820,3 +820,6 @@ html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card button 
 .planify-panel-redesign-ready #side-panel button.trust-panel-close:hover { background: rgba(127, 217, 194, .16) !important; }
 .planify-panel-redesign-ready body.tema-claro #side-panel button.trust-panel-close { border-color: #c8ddd3 !important; color: #234a42 !important; }
 .planify-panel-redesign-ready body.tema-claro #side-panel button.trust-panel-close:hover { background: rgba(8, 126, 115, .1) !important; }
+
+/* Tipografía mínima: ningún texto del panel baja de 12 px. */
+.planify-panel-redesign-ready #side-panel :is(.sp-title small, .panel-section-intro > span, .panel-rebuild-hint, .panel-advanced summary span, .merge-info, .sp-hint, .panel-backup summary small, #planify-previous-week-caption, .planify-pwa-settings-card small) { font-size: 12px !important; }

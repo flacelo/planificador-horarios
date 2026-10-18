@@ -25,3 +25,12 @@ body.dark .day-flow-list summary:hover,body.tema-estelar:not(.light-mode):where(
 }
 .planify-day-flow .day-flow-primary:hover { background: #6fcfb6 !important; }
 .planify-day-flow :is(.day-flow-secondary, .day-flow-check) { min-height: 44px !important; }
+
+/* Tipografía mínima: ningún texto de la tarjeta Hoy baja de 12 px y todos llegan a contraste 4,5. */
+.planify-day-flow :is(.day-flow-kicker, .day-flow-head strong, .day-flow-head small, .day-flow-head p, .day-flow-glance span, .day-flow-glance small, .day-flow-actions button, .day-flow-list summary, .day-flow-list li, .day-flow-list time) { font-size: 12px !important; }
+.planify-day-flow .day-flow-glance :is(span, small) { color: #4f5d70; }
+.planify-day-flow .day-flow-list time { color: #4b40b8; }
+body.dark .planify-day-flow .day-flow-glance :is(span, small),
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-glance :is(span, small) { color: #b4c3d6; }
+body.dark .planify-day-flow .day-flow-list time,
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-list time { color: #9be8d3; }

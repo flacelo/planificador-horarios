@@ -700,13 +700,13 @@
       var style = document.createElement("link");
       style.id = "planify-weekly-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/weekly-calm.css?v=14";
+      style.href = "css/weekly-calm.css?v=15";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-weekly-calm-script")) {
       var script = document.createElement("script");
       script.id = "planify-weekly-calm-script";
-      script.src = "js/weekly-calm.js?v=9";
+      script.src = "js/weekly-calm.js?v=10";
       script.defer = true;
       document.head.appendChild(script);
     }

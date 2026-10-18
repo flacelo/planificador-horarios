@@ -12,9 +12,8 @@
 
     var intro = document.createElement("header");
     intro.className = "weekly-calm-intro";
-    intro.innerHTML = '<span class="weekly-calm-eyebrow">TU TIEMPO, A TU MANERA</span>' +
-      '<h2>Tu semana, de un vistazo</h2>' +
-      '<p>Cada espacio de la tabla se puede editar. Ajusta tus planes cuando cambie tu día.</p>';
+    // Cabecera breve para que la tabla aparezca antes; cómo editar ya lo explica la ayuda junto a la tabla.
+    intro.innerHTML = '<h2>Tu semana</h2>';
     view.insertBefore(intro, nav);
     nav.setAttribute("aria-label", "Cambiar de semana");
     var previous = document.getElementById("btn-prev-sem");
@@ -26,7 +25,7 @@
     gridBar.className = "weekly-calm-grid-bar";
     var heading = document.createElement("div");
     heading.className = "weekly-calm-grid-title";
-    heading.innerHTML = '<span>MI HORARIO</span><h3>Actividades de la semana</h3>';
+    heading.innerHTML = '<h3>Actividades de la semana</h3>';
     gridBar.appendChild(heading);
 
     var more = document.createElement("details");

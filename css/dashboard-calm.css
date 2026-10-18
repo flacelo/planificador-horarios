@@ -124,6 +124,12 @@ html.planify-dashboard-open body { overflow: hidden !important; }
   line-height: 1;
   letter-spacing: -.06em;
 }
+.planify-dashboard-v2 .dashboard-calm-percent strong.is-empty {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
 .planify-dashboard-v2 .dashboard-calm-percent span { margin-top: 4px; font-size: 13px; }
 .planify-dashboard-v2 .dashboard-calm-stats {
   display: grid;

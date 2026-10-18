@@ -205,7 +205,7 @@
       '<p>' + escapeHtml(progressText) + '</p>' +
       '<div class="dashboard-calm-progress" role="progressbar" aria-label="Momentos marcados en la semana" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + metrics.percent + '"><span style="width:' + metrics.percent + '%"></span></div>' +
       '<small class="dashboard-calm-history-note">' + (metrics.hasHistory ? "El avance corresponde solo a las fechas registradas; los datos anteriores no se inventaron." : "Las marcas antiguas no tenían una fecha asociada, así que no cuentan para este periodo.") + '</small></div>' +
-      '<div class="dashboard-calm-percent"><strong>' + (metrics.hasHistory ? metrics.percent + "%" : "—") + '</strong><span>' + (metrics.hasHistory ? "de los momentos registrados" : "sin datos para estas fechas") + '</span></div></section>';
+      '<div class="dashboard-calm-percent"><strong class="' + (metrics.hasHistory ? "" : "is-empty") + '">' + (metrics.hasHistory ? metrics.percent + "%" : "Sin datos aún") + '</strong><span>' + (metrics.hasHistory ? "de los momentos registrados" : "sin datos para estas fechas") + '</span></div></section>';
   }
 
   function dashboardCard(label, value, note, color) {
@@ -648,7 +648,7 @@
     var style = document.createElement("link");
     style.id = "planify-dashboard-calm";
     style.rel = "stylesheet";
-    style.href = "css/dashboard-calm.css?v=5";
+    style.href = "css/dashboard-calm.css?v=6";
     document.head.appendChild(style);
   }
 

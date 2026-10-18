@@ -35,3 +35,13 @@ test("A7: el contenedor de las descargas se marca desde el panel", () => {
   assert.match(panel, /data-export-actions/);
   assert.match(panel, /btn-export-excel/);
 });
+
+test("A8: donde falta el porcentaje se lee 'Sin datos aún' y no una raya sola", () => {
+  const trust = read("js/trust-fixes.js");
+  assert.match(trust, /<strong class="' \+ \(metrics\.hasHistory \? "" : "is-empty"\) \+ '">' \+ \(metrics\.hasHistory \? metrics\.percent \+ "%" : "Sin datos aún"\) \+ '<\/strong>/);
+  // Las barras por día conservan su raya: ahí significa "sin registro" junto a cada día.
+  assert.match(trust, /recorded \? completed \+ '\/' \+ count : "—"/);
+  const css = read("css/dashboard-calm.css");
+  assert.match(css, /\.dashboard-calm-percent strong\.is-empty \{[^}]*font-size: 22px/);
+  assert.match(css, /\.dashboard-calm-percent strong\.is-empty \{[^}]*letter-spacing: 0/);
+});

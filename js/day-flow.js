@@ -196,6 +196,31 @@
       '</section>';
   }
 
+  // La tarjeta se vuelve a dibujar cada 30 s y al marcar "Hecho"; esto conserva lo que la persona ya tenía:
+  // "Ver mi jornada de hoy" sigue abierta (sin animarse de nuevo) y la barra crece desde donde estaba solo si el avance cambió.
+  function barFill(card) {
+    var bar = card && card.querySelector(".day-flow-bar");
+    return bar ? bar.firstElementChild : null;
+  }
+
+  function carryState(old, next) {
+    var oldList = old.querySelector(".day-flow-list");
+    var newList = next.querySelector(".day-flow-list");
+    if (oldList && newList && oldList.open) {
+      newList.setAttribute("open", "");
+      newList.classList.add("is-restored");
+    }
+    var before = barFill(old);
+    var after = barFill(next);
+    if (!before || !after) return;
+    var from = parseFloat(before.style.width);
+    var to = after.style.width;
+    if (isNaN(from) || from + "%" === to) return;
+    after.style.width = from + "%";
+    void after.offsetWidth;
+    after.style.width = to;
+  }
+
   function render() {
     var daily = document.getElementById("view-diario");
     if (!daily) return;
@@ -208,7 +233,7 @@
     var next = section.firstElementChild;
     // Acción principal según el momento: si hay un momento en curso o pendiente, manda la tarjeta Hoy; si no, la meta.
     if (daily.dataset) daily.dataset.dayMoment = items.some(function (item) { return !item.done && item.end > minutes; }) ? "activity" : "free";
-    if (old) old.replaceWith(next);
+    if (old) { old.replaceWith(next); carryState(old, next); }
     else {
       var guide = daily.querySelector(".trust-friendly-guide");
       if (guide) guide.insertAdjacentElement("afterend", next);
@@ -234,6 +259,8 @@
   }
 
   document.addEventListener("click", function (event) {
+    var summary = event.target.closest(".day-flow-list > summary");
+    if (summary && summary.parentNode) summary.parentNode.classList.remove("is-restored");
     var button = event.target.closest("[data-day-flow-action]");
     if (!button) return;
     event.preventDefault();

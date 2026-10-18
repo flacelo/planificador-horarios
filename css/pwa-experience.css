@@ -9,3 +9,14 @@ body.dark .planify-mobile-app-hint,body.tema-estelar:not(.light-mode):where(:not
 
 /* Tipografía mínima: el aviso de instalar no baja de 12 px. */
 .planify-mobile-app-hint small { font-size: 12px !important; }
+
+/* Aviso de instalar en una fila (solo con plan): la línea explicativa se queda para lectores de pantalla
+   y el botón mide 44 px. Quien empieza de cero lo sigue viendo completo. */
+.planify-has-schedule .planify-mobile-app-hint { margin: 0 auto 10px; padding: 8px 10px; }
+.planify-has-schedule .planify-mobile-app-hint > div { position: relative; }
+.planify-has-schedule .planify-mobile-app-hint small { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); border: 0; white-space: nowrap; }
+.planify-has-schedule .planify-mobile-app-hint button { min-height: 44px; }
+@media (max-width: 360px) {
+  .planify-has-schedule .planify-mobile-app-hint { display: flex; }
+  .planify-has-schedule .planify-mobile-app-hint button { grid-column: auto; }
+}

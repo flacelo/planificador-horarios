@@ -786,7 +786,7 @@
       var style = document.createElement("link");
       style.id = "planify-pwa-style";
       style.rel = "stylesheet";
-      style.href = "css/pwa-experience.css?v=4";
+      style.href = "css/pwa-experience.css?v=5";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-pwa-script")) {

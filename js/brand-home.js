@@ -57,15 +57,18 @@
     hero.setAttribute("aria-labelledby", "brand-hero-title");
     hero.innerHTML =
       '<div class="brand-hero-copy">' +
-        '<span class="brand-eyebrow"><span aria-hidden="true"></span> PLANEA A TU MANERA</span>' +
+        (returning ? '' : '<span class="brand-eyebrow"><span aria-hidden="true"></span> PLANEA A TU MANERA</span>') +
         '<h2 id="brand-hero-title">' + (returning ? 'Tu plan te espera.<br><em>Continúa a tu ritmo.</em>' : 'Pon tu meta. Te armo la semana.<br><em>Estudiar, entrenar, descansar.</em>') + '</h2>' +
-        '<p>' + (returning ? 'Tu espacio está listo. Añade o mueve actividades y sigue con tu semana.' : 'Crea un primer borrador en pocos pasos, planifica desde cero o personaliza cada detalle. Siempre podrás cambiarlo.') + '</p>' +
+        (returning ? '' : '<p>Crea un primer borrador en pocos pasos, planifica desde cero o personaliza cada detalle. Siempre podrás cambiarlo.</p>') +
         '<div class="brand-hero-actions">' +
           (returning
             ? '<button type="button" class="brand-primary" data-brand-action="week">Ver mi semana <span aria-hidden="true">↗</span></button><button type="button" class="brand-secondary" data-brand-action="paths">Crear otro horario</button><button type="button" class="brand-link" data-brand-action="others">Otras formas de empezar</button>'
             : '<button type="button" class="brand-primary" data-brand-action="paths">Elegir cómo empezar <span aria-hidden="true">↗</span></button>') +
         '</div>' +
-        '<p class="brand-data-note"><span aria-hidden="true">🔒</span> Tu plan se guarda en este navegador. Para llevarlo a otro dispositivo: ⚙️ → Descargas → Copia de seguridad.</p>' +
+        // Con plan, la nota ocupa una línea y se abre al tocarla (mismo texto); sin plan se muestra completa como siempre.
+        (returning
+          ? '<details class="brand-data-note"><summary><span aria-hidden="true">🔒</span> Tu plan se guarda en este navegador.</summary><p>Para llevarlo a otro dispositivo: ⚙️ → Descargas → Copia de seguridad.</p></details>'
+          : '<p class="brand-data-note"><span aria-hidden="true">🔒</span> Tu plan se guarda en este navegador. Para llevarlo a otro dispositivo: ⚙️ → Descargas → Copia de seguridad.</p>') +
       '</div>' +
       (returning ? '' : '<div class="brand-hero-preview" aria-label="Ejemplo ilustrativo de un día organizado">' +
         '<div class="brand-preview-top"><span class="brand-preview-icon" aria-hidden="true">✦</span><div><small>UN EJEMPLO, A TU MEDIDA</small><strong>Un día con intención</strong></div><span class="brand-preview-dots" aria-hidden="true">•••</span></div>' +

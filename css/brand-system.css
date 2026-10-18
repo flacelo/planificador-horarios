@@ -788,3 +788,34 @@ html.planify-brand-ready.planify-home-new:not(.planify-home-entered) .main-card-
   .planify-brand-ready .brand-nav-slot > .bottom-nav .tab-btn,
   .planify-brand-ready .brand-nav-slot > .bottom-nav .tab-btn span { font-size: .68rem !important; }
 }
+
+/* Cabecera compacta: solo para quien ya tiene plan (.is-returning). Quien empieza de cero conserva el hero grande.
+   El título va en una línea más chica, los botones en fila y la nota 🔒 en una línea que se abre al tocarla.
+   El contenido de cada vista empieza unos 200 px más arriba en celular y unos 146 px en escritorio. */
+.planify-brand-ready .brand-hero.is-returning { min-height: 0 !important; margin-bottom: 10px !important; padding: 14px 16px !important; gap: 8px !important; border-radius: 20px !important; }
+.planify-brand-ready .brand-hero.is-returning h2 { margin: 0 0 10px !important; font-size: 1.3rem !important; line-height: 1.2 !important; }
+.planify-brand-ready .brand-hero.is-returning h2 br { display: none; }
+.planify-brand-ready .brand-hero.is-returning h2 em { margin-left: .3em; }
+.planify-brand-ready .brand-hero.is-returning .brand-hero-actions { gap: 8px !important; margin-top: 0 !important; }
+.planify-brand-ready .brand-hero.is-returning .brand-hero-actions button { min-height: 44px !important; }
+.planify-brand-ready .brand-hero.is-returning .brand-primary,
+.planify-brand-ready .brand-hero.is-returning .brand-secondary { flex: 1 1 140px; }
+.planify-brand-ready .brand-hero.is-returning details.brand-data-note { display: block !important; max-width: none !important; margin: 8px 0 0 !important; font-size: 12px !important; }
+.planify-brand-ready .brand-hero.is-returning details.brand-data-note summary { display: flex; align-items: center; gap: 6px; width: fit-content; max-width: 100%; min-height: 44px; cursor: pointer; list-style: none; }
+.planify-brand-ready .brand-hero.is-returning details.brand-data-note summary::-webkit-details-marker { display: none; }
+.planify-brand-ready .brand-hero.is-returning details.brand-data-note summary::after { content: "▾"; color: #9ee9c6; }
+.planify-brand-ready .brand-hero.is-returning details.brand-data-note[open] summary::after { content: "▴"; }
+.planify-brand-ready .brand-hero.is-returning details.brand-data-note summary:focus-visible { outline: 3px solid #7fd9c2; outline-offset: 3px; border-radius: 8px; }
+.planify-brand-ready .brand-hero.is-returning details.brand-data-note p { margin: 0 0 6px !important; font-size: 12px !important; line-height: 1.45; }
+@media (min-width: 701px) {
+  .planify-brand-ready .brand-hero.is-returning { margin-bottom: 14px !important; padding: 16px 32px !important; }
+  .planify-brand-ready .brand-hero.is-returning h2 { margin: 0 0 4px !important; font-size: 1.6rem !important; }
+  .planify-brand-ready .brand-hero.is-returning details.brand-data-note { margin-top: 0 !important; }
+  .planify-brand-ready .brand-hero.is-returning details.brand-data-note summary { min-height: 32px; }
+}
+@media (min-width: 921px) {
+  .planify-brand-ready .brand-hero.is-returning .brand-hero-copy { grid-template-columns: minmax(0, 1fr) auto !important; column-gap: 24px !important; }
+  .planify-brand-ready .brand-hero.is-returning .brand-hero-actions { grid-column: 2 !important; grid-row: 1 / 3 !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; }
+  .planify-brand-ready .brand-hero.is-returning .brand-hero-actions button { flex: 0 0 auto !important; }
+  .planify-brand-ready .brand-hero.is-returning details.brand-data-note { grid-column: 1 !important; margin: 0 !important; }
+}

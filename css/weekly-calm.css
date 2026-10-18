@@ -300,7 +300,10 @@ body.tema-claro #view-semanal.weekly-calm-ready .weekly-calm-intro {
     background: var(--weekly-accent);
     color: #123c3a;
   }
-  #view-semanal.weekly-calm-ready .weekly-calm-day-button[aria-pressed="true"] .weekly-calm-day-count { color: #174f4b; }
+  #view-semanal.weekly-calm-ready .weekly-calm-day-button[aria-pressed="true"] .weekly-calm-day-count { color: #174f4b !important; }
+  #view-semanal.weekly-calm-ready .weekly-calm-day-button[aria-pressed="true"] .weekly-calm-day-label { color: #123c3a !important; }
+  body.tema-claro #view-semanal.weekly-calm-ready .weekly-calm-day-button[aria-pressed="true"] { color: #fff; }
+  body.tema-claro #view-semanal.weekly-calm-ready .weekly-calm-day-button[aria-pressed="true"] :is(.weekly-calm-day-label, .weekly-calm-day-count) { color: #fff !important; }
   #view-semanal.weekly-calm-ready .weekly-calm-day-button:focus-visible {
     outline: 2px solid var(--weekly-accent);
     outline-offset: 2px;
@@ -548,6 +551,8 @@ body.light-mode #view-semanal.weekly-calm-ready #tabla td.hora-cell input,
 body.tema-claro #view-semanal.weekly-calm-ready #tabla td.hora-cell input { color: #24464a !important; }
 body.light-mode #view-semanal.weekly-calm-ready #tabla td.celda,
 body.tema-claro #view-semanal.weekly-calm-ready #tabla td.celda {
+  --weekly-cell-fill: #eef7f4;
+  --weekly-cell-accent: #5fb5a2;
   border-color: #d7e5e1 !important;
   background: var(--weekly-cell-fill, #fff) !important;
   color: #203a3e !important;

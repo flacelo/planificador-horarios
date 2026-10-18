@@ -33,3 +33,21 @@ test("la clase del modo claro sigue siendo tema-claro en la app", () => {
   assert.match(app, /classList\.toggle\("tema-claro"\)/);
   assert.match(app, /localStorage\.setItem\("planify_theme",\w+\?"light":"dark"\)/);
 });
+
+test("Semanal en claro: las celdas sin categoría usan relleno claro (no el oscuro por defecto)", () => {
+  const css = read("css/weekly-calm.css");
+  const base = css.slice(css.indexOf("body.tema-claro #view-semanal.weekly-calm-ready #tabla td.celda {"));
+  const rule = base.slice(0, base.indexOf("}"));
+  assert.match(rule, /--weekly-cell-fill: #eef7f4;/);
+  assert.match(rule, /--weekly-cell-accent: #5fb5a2;/);
+  assert.match(rule, /color: #203a3e !important;/);
+  // Las categorías (más específicas) conservan sus propios colores.
+  assert.match(css, /td\.celda\.weekly-kind-focus \{ --weekly-cell-fill: #edf7ff;/);
+});
+
+test("Semanal en celular: el día elegido se lee en oscuro (menta) y en claro (verde azulado)", () => {
+  const css = read("css/weekly-calm.css");
+  assert.match(css, /\.weekly-calm-day-button\[aria-pressed="true"\] \.weekly-calm-day-label \{ color: #123c3a !important; \}/);
+  assert.match(css, /body\.tema-claro #view-semanal\.weekly-calm-ready \.weekly-calm-day-button\[aria-pressed="true"\] \{ color: #fff; \}/);
+  assert.match(css, /body\.tema-claro #view-semanal\.weekly-calm-ready \.weekly-calm-day-button\[aria-pressed="true"\] :is\(\.weekly-calm-day-label, \.weekly-calm-day-count\) \{ color: #fff !important; \}/);
+});

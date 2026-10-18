@@ -723,7 +723,7 @@ html.planify-brand-ready.planify-home-new:not(.planify-home-entered) .main-card-
 .planify-brand-ready .brand-nav-slot > .bottom-nav,
 .planify-brand-ready .main-card-container > .bottom-nav {
   border-color: rgba(153, 218, 202, .22) !important;
-  background: rgba(19, 39, 51, .74) !important;
+  background: rgba(19, 39, 51, .88) !important;
   box-shadow: 0 10px 28px rgba(3, 20, 29, .22) !important;
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   backdrop-filter: blur(14px) saturate(1.2);
@@ -733,7 +733,7 @@ html.planify-brand-ready.planify-home-new:not(.planify-home-entered) .main-card-
 .planify-brand-ready body.light-mode .main-card-container > .bottom-nav,
 .planify-brand-ready body.tema-claro .main-card-container > .bottom-nav {
   border-color: rgba(24, 58, 53, .12) !important;
-  background: rgba(255, 255, 255, .78) !important;
+  background: rgba(255, 255, 255, .9) !important;
   box-shadow: 0 8px 24px rgba(24, 58, 53, .1) !important;
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -744,3 +744,17 @@ html.planify-brand-ready.planify-home-new:not(.planify-home-entered) .main-card-
   .planify-brand-ready body.light-mode .main-card-container > .bottom-nav,
   .planify-brand-ready body.tema-claro .main-card-container > .bottom-nav { background: rgba(255, 255, 255, .96) !important; }
 }
+.planify-brand-ready .bottom-nav .tab-btn:not(.active):not([aria-current="page"]) {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #b9d0d2 !important;
+}
+.planify-brand-ready .bottom-nav .tab-btn:not(.active):not([aria-current="page"]):hover {
+  background: rgba(127, 217, 194, .16) !important;
+  color: #e6f4f1 !important;
+}
+.planify-brand-ready body.light-mode .bottom-nav .tab-btn:not(.active):not([aria-current="page"]),
+.planify-brand-ready body.tema-claro .bottom-nav .tab-btn:not(.active):not([aria-current="page"]) { color: #364f59 !important; }
+.planify-brand-ready body.light-mode .bottom-nav .tab-btn:not(.active):not([aria-current="page"]):hover,
+.planify-brand-ready body.tema-claro .bottom-nav .tab-btn:not(.active):not([aria-current="page"]):hover { background: rgba(8, 126, 115, .1) !important; color: #123c3a !important; }

@@ -190,3 +190,18 @@ body.tema-claro .pwa-settings-card small, body.tema-claro [data-pwa-status] { co
 .btn-mark.done { color: #0b3b30 !important; }
 .btn-mark.undo { background: linear-gradient(135deg, #d9453d, #b8322b) !important; }
 #merge-badge.merge-badge.show { color: #fff !important; }
+
+/* Aparición suave (160 ms, solo transparencia: nada se mueve) al cambiar de pestaña, de sección del panel y al abrir Avance.
+   Se usa filter: opacity() porque main.css fija la opacidad de las vistas con !important y eso anularía una animación de opacity.
+   Semanal y su tabla se dejan como están. En Mensual y Avance reemplaza el rebote de 0,7 s de sus encabezados.
+   Sin relleno de animación: al terminar, el elemento vuelve a su estilo normal (nunca queda invisible). */
+@keyframes planifyTabFade { from { filter: opacity(0); } to { filter: opacity(1); } }
+@media (prefers-reduced-motion: no-preference) {
+  .view-content.active:not(#view-semanal, #view-table),
+  #side-panel .tab-content.active,
+  .trust-dashboard-inner { animation: planifyTabFade 0.16s ease-out; }
+  #view-mensual .monthly-calm-intro,
+  #view-mensual .cal-grid,
+  .trust-dashboard-header { animation: planifyTabFade 0.16s ease-out !important; }
+}
+@media print { .view-content, #side-panel .tab-content, .trust-dashboard-inner { animation: none !important; } }

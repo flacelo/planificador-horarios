@@ -657,7 +657,7 @@
     var style = document.createElement("link");
     style.id = "planify-interface-polish";
     style.rel = "stylesheet";
-    style.href = "css/interface-polish.css?v=5";
+    style.href = "css/interface-polish.css?v=7";
     document.head.appendChild(style);
   }
 

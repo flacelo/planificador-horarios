@@ -11,3 +11,6 @@ body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-mobile-coac
 
 /* Detalles: en el Diario la acción principal es la meta destacada, así que la ayuda no repite «Anotar una meta». */
 .planify-mobile-coach[data-view="diario"] .mobile-coach-action { display: none !important; }
+
+/* Tipografía mínima: el botón de la ayuda a 12 px. */
+.planify-mobile-coach .mobile-coach-action { font-size: 12px !important; }

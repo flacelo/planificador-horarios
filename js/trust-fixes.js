@@ -666,7 +666,7 @@
       var style = document.createElement("link");
       style.id = "planify-brand-style";
       style.rel = "stylesheet";
-      style.href = "css/brand-system.css?v=16";
+      style.href = "css/brand-system.css?v=17";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-brand-script")) {
@@ -717,7 +717,7 @@
       var style = document.createElement("link");
       style.id = "planify-monthly-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/monthly-calm.css?v=10";
+      style.href = "css/monthly-calm.css?v=11";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-monthly-calm-script")) {
@@ -734,7 +734,7 @@
       var style = document.createElement("link");
       style.id = "planify-annual-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/annual-calm.css?v=2";
+      style.href = "css/annual-calm.css?v=3";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-annual-calm-script")) {
@@ -803,7 +803,7 @@
       var style = document.createElement("link");
       style.id = "planify-mobile-coach-style";
       style.rel = "stylesheet";
-      style.href = "css/mobile-coach.css?v=4";
+      style.href = "css/mobile-coach.css?v=5";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-mobile-coach-script")) {

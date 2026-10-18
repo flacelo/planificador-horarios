@@ -290,3 +290,6 @@ body.tema-claro #view-mensual.monthly-calm-ready .monthly-calm-intro {
 }
 
 body.tema-claro #view-mensual.monthly-calm-ready .monthly-calm-eyebrow { color: #06695f !important; }
+
+/* Tipografía mínima: rótulo y sugerencias del Mensual a 12 px (las casillas del calendario son excepción). */
+#view-mensual.monthly-calm-ready :is(.monthly-calm-eyebrow, .monthly-calm-ideas > summary small) { font-size: 12px !important; }

@@ -33,3 +33,16 @@ test("Avance: ningún texto baja de 12 px", () => {
   const css = block(read("css/dashboard-calm.css"), "/* Tipografía mínima");
   assert.match(css, /\.planify-dashboard-v2 :is\(\.trust-dashboard-eyebrow, \.dashboard-view-nav button span, \.dashboard-calm-kicker, \.dashboard-calm-history-note, \.trust-bar-value, \.trust-bar-label, \.dashboard-calm-chart-legend span, \.dashboard-calm-disclaimer\) \{ font-size: 12px !important; \}/);
 });
+
+test("Anual y Mensual: rótulos y sugerencias a 12 px (el calendario y sus casillas son excepción)", () => {
+  assert.match(block(read("css/annual-calm.css"), "/* Tipografía mínima"), /#vista-anual-metas\.annual-calm-ready :is\(\.annual-calm-eyebrow, \.annual-calm-quarter, \.annual-calm-ideas > summary small\) \{ font-size: 12px !important; \}/);
+  assert.match(block(read("css/monthly-calm.css"), "/* Tipografía mínima"), /#view-mensual\.monthly-calm-ready :is\(\.monthly-calm-eyebrow, \.monthly-calm-ideas > summary small\) \{ font-size: 12px !important; \}/);
+  assert.match(block(read("css/trust-fixes.css"), "/* Tipografía mínima"), /\.trust-personal-guidance :is\(small, li\) \{ font-size: 12px !important; \}/);
+  // Excepciones: no se tocan las casillas del calendario mensual.
+  assert.doesNotMatch(read("css/monthly-calm.css"), /Tipografía mínima[\s\S]*cal-dia/);
+});
+
+test("cabecera y ayuda del celular a 12 px", () => {
+  assert.match(block(read("css/brand-system.css"), "/* Tipografía mínima"), /\.planify-brand-ready \.brand-hero \.brand-eyebrow \{ font-size: 12px !important; \}/);
+  assert.match(block(read("css/mobile-coach.css"), "/* Tipografía mínima"), /\.planify-mobile-coach \.mobile-coach-action \{ font-size: 12px !important; \}/);
+});

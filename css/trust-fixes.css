@@ -94,3 +94,6 @@ body.tema-claro .trust-personal-guidance small, body.tema-claro .trust-guidance-
 /* Un solo color de acción: el botón principal del tutorial usa menta con texto oscuro. */
 .trust-primary { background: #7fd9c2; color: #103a38; }
 .trust-primary:hover { background: #6fcfb6; }
+
+/* Tipografía mínima: las sugerencias de Mensual y Anual a 12 px. */
+.trust-personal-guidance :is(small, li) { font-size: 12px !important; }

@@ -162,3 +162,6 @@ body.light-mode #vista-anual-metas.annual-calm-ready .encabezado-anual {
 }
 
 body.tema-claro #vista-anual-metas.annual-calm-ready .annual-calm-eyebrow { color: #06695f !important; }
+
+/* Tipografía mínima: rótulos y sugerencias del Anual a 12 px. */
+#vista-anual-metas.annual-calm-ready :is(.annual-calm-eyebrow, .annual-calm-quarter, .annual-calm-ideas > summary small) { font-size: 12px !important; }

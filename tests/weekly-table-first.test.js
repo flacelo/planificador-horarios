@@ -34,3 +34,14 @@ test("'Resumen de hoy' se ve debajo de la tabla solo por orden visual (CSS), sin
   // El orden real no cambia: el PDF y el resto del código siguen leyendo lo mismo.
   assert.doesNotMatch(read("js/weekly-calm.js"), /day-summary/);
 });
+
+test("'Tu semana se puede editar' se ve debajo de todo solo en Semanal, sin moverlo en la página", () => {
+  const css = read("css/weekly-calm.css");
+  assert.match(css, /#view-semanal\.weekly-calm-ready\.active \{\s*display: flex !important;\s*flex-direction: column;/);
+  assert.match(css, /#view-semanal\.weekly-calm-ready\.active > \* \{ min-width: 0; \}/);
+  assert.match(css, /#view-semanal\.weekly-calm-ready\.active > \.planify-mobile-coach \{ order: 1; margin: 14px auto 0; \}/);
+  // Solo cuando Semanal está activa: si no, sigue oculta como antes.
+  assert.doesNotMatch(css, /#view-semanal\.weekly-calm-ready \{\s*display: flex/);
+  // El código de la ayuda no cambia: se sigue colocando después de la cabecera en el orden real.
+  assert.match(read("js/mobile-coach.js"), /if \(intro\) intro\.insertAdjacentElement\("afterend", coach\);/);
+});

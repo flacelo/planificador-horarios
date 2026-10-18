@@ -90,6 +90,15 @@
     flex-direction: column;
   }
 }
+@media screen {
+  /* Solo con Semanal activa: la ayuda "Tu semana se puede editar" se ve al final; el orden real no cambia. */
+  #view-semanal.weekly-calm-ready.active {
+    display: flex !important;
+    flex-direction: column;
+  }
+  #view-semanal.weekly-calm-ready.active > * { min-width: 0; }
+  #view-semanal.weekly-calm-ready.active > .planify-mobile-coach { order: 1; margin: 14px auto 0; }
+}
 #view-semanal.weekly-calm-ready #view-table > * { min-width: 0; }
 #view-semanal.weekly-calm-ready #view-table > #day-summary { order: 1; margin: 14px 0 0 !important; }
 #view-semanal.weekly-calm-ready #view-table > .weekly-calm-legend { order: 2; }

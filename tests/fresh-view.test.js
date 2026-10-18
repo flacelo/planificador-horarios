@@ -155,8 +155,8 @@ test("el script va primero: antes del protector de datos y de app.js", () => {
 test("no toca las claves de los datos reales ni escribe en localStorage por su cuenta", () => {
   assert.doesNotMatch(source, /localStorage\.(setItem|removeItem|clear)\(/);
   assert.doesNotMatch(source, /"planify-backup"|backupFormat/);
-  // Las únicas claves nuevas son dos de sessionStorage.
-  assert.deepEqual([...source.matchAll(/"(planify_vista_nueva[a-z_0-9]*)"/g)].map((m) => m[1]).filter((v, i, a) => a.indexOf(v) === i).sort(), ["planify_vista_nueva_datos_v1", "planify_vista_nueva_v1"]);
+  // Las únicas claves nuevas son tres de sessionStorage (marca, datos temporales y aviso oculto).
+  assert.deepEqual([...source.matchAll(/"(planify_vista_nueva[a-z_0-9]*)"/g)].map((m) => m[1]).filter((v, i, a) => a.indexOf(v) === i).sort(), ["planify_vista_nueva_aviso_oculto_v1", "planify_vista_nueva_datos_v1", "planify_vista_nueva_v1"]);
 });
 
 // ---- Pantalla (textos y reglas; el comportamiento se prueba en el navegador) ----
@@ -214,4 +214,64 @@ test("los clics se atienden en la fase de captura y se detienen: app.js frena to
 
 test("la ventana de confirmación se centra en la pantalla (la app reinicia los márgenes de <dialog>)", () => {
   assert.match(source, /#planify-fresh-dialog\{position:fixed;inset:0;margin:auto;height:fit-content;/);
+});
+
+// ---- "Quedarme aquí" ----
+test("'Quedarme aquí' oculta el aviso en esta pestaña con una marca de sessionStorage y no toca los datos", () => {
+  const { local, sess, api } = setup({ real: REAL, session: { planify_vista_nueva_v1: "1" } });
+  local.setItem("planify_nombre", "Persona nueva");
+  const realAntes = JSON.stringify([...local.map.entries()]);
+  const memoriaAntes = sess.getItem("planify_vista_nueva_datos_v1");
+  assert.equal(api.isNoticeHidden(), false);
+  api.hideNotice();
+  assert.equal(api.isNoticeHidden(), true);
+  assert.equal(sess.getItem("planify_vista_nueva_aviso_oculto_v1"), "1");
+  assert.equal(sess.getItem("planify_vista_nueva_datos_v1"), memoriaAntes);
+  assert.equal(JSON.stringify([...local.map.entries()]), realAntes);
+  assert.equal(local.getItem("planify_nombre"), "Persona nueva");
+});
+
+test("recargar con el aviso oculto sigue en la vista y sigue oculto, con los datos temporales", () => {
+  const first = setup({ real: REAL, session: { planify_vista_nueva_v1: "1" } });
+  first.local.setItem("planify_nombre", "Persona nueva");
+  first.api.hideNotice();
+  const second = setup({ real: REAL, session: Object.fromEntries(first.sess.map) });
+  assert.equal(second.api.active, true);
+  assert.equal(second.api.isNoticeHidden(), true);
+  assert.equal(second.local.getItem("planify_nombre"), "Persona nueva");
+});
+
+test("la marca de aviso oculto no vale fuera de la vista y 'ocultar' no hace nada fuera de ella", () => {
+  const outside = setup({ real: REAL, session: { planify_vista_nueva_aviso_oculto_v1: "1" } });
+  assert.equal(outside.api.active, false);
+  assert.equal(outside.api.isNoticeHidden(), false);
+  outside.api.hideNotice();
+  assert.equal(outside.sess.getItem("planify_vista_nueva_aviso_oculto_v1"), "1");
+  assert.equal(outside.local.map.size, 3);
+});
+
+test("salir y empezar limpian la marca del aviso (no queda oculto la próxima vez)", () => {
+  const inView = setup({ real: REAL, session: { planify_vista_nueva_v1: "1", planify_vista_nueva_aviso_oculto_v1: "1" } });
+  inView.api.exit();
+  assert.equal(inView.sess.getItem("planify_vista_nueva_aviso_oculto_v1"), null);
+  assert.equal(inView.sess.getItem("planify_vista_nueva_v1"), null);
+  const fresh = setup({ real: REAL, session: { planify_vista_nueva_aviso_oculto_v1: "1" } });
+  fresh.api.start();
+  assert.equal(fresh.sess.getItem("planify_vista_nueva_aviso_oculto_v1"), null);
+  assert.equal(fresh.sess.getItem("planify_vista_nueva_v1"), "1");
+});
+
+test("textos y reglas de 'Quedarme aquí': botón, prefijo del título, puntito en ⚙️ y aviso siempre visible en la pantalla de inicio", () => {
+  assert.ok(source.includes('"Quedarme aquí"'));
+  assert.ok(source.includes('"Vista nueva · "'));
+  assert.match(source, /if \(noticeHidden && !gate\) \{/);
+  assert.match(source, /stayButton\.hidden = Boolean\(gate\);/);
+  assert.match(source, /#cloud-btn\.planify-fresh-on::after/);
+  assert.match(source, /gear\.classList\.toggle\("planify-fresh-on", marked\)/);
+  assert.match(source, /data-fresh-action", "hide"/);
+});
+
+test("la tarjeta de ⚙️ → Descargas sigue ofreciendo 'Volver a mi plan' dentro de la vista, con el aviso oculto o no", () => {
+  assert.match(source, /var button = make\("button", "", active \? TEXT\.back : TEXT\.start\);/);
+  assert.match(source, /button\.setAttribute\("data-fresh-action", active \? "leave" : "start"\);/);
 });

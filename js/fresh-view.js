@@ -7,6 +7,7 @@
 
   var FLAG_KEY = "planify_vista_nueva_v1";
   var DATA_KEY = "planify_vista_nueva_datos_v1";
+  var HIDE_KEY = "planify_vista_nueva_aviso_oculto_v1";
   // Claves donde la persona deja contenido propio (el resto son ajustes que la app escribe sola).
   var CONTENT_KEYS = [
     "horario_data_semanal", "horario_data_anual", "horario_actividades", "planify_nombre",
@@ -30,6 +31,8 @@
   function sessionRemove(key) { try { original.removeItem.call(session, key); } catch (error) { /* ignorar */ } }
 
   var active = sessionGet(FLAG_KEY) === "1";
+  // "Quedarme aquí": el aviso fijo se oculta en esta pestaña (la vista y sus datos temporales siguen igual).
+  var noticeHidden = active && sessionGet(HIDE_KEY) === "1";
   var memory = Object.create(null);
   var leaving = false;
 
@@ -98,6 +101,7 @@
       return { ok: false, message: "Este navegador no permite abrir esta vista." };
     }
     sessionRemove(DATA_KEY);
+    sessionRemove(HIDE_KEY);
     window.location.reload();
     return { ok: true };
   }
@@ -107,11 +111,20 @@
     leaving = true;
     sessionRemove(FLAG_KEY);
     sessionRemove(DATA_KEY);
+    sessionRemove(HIDE_KEY);
     window.location.reload();
     return { ok: true };
   }
 
-  window.PLANIFY_FRESH_VIEW = { active: active, start: start, exit: exit, hasContent: hasContent };
+  function hideNotice() {
+    if (!active || leaving) return;
+    noticeHidden = true;
+    sessionSet(HIDE_KEY, "1");
+    if (typeof window.setTimeout === "function") window.setTimeout(function () { if (api.refresh) api.refresh(); }, 0);
+  }
+
+  var api = { active: active, start: start, exit: exit, hasContent: hasContent, hideNotice: hideNotice, isNoticeHidden: function () { return noticeHidden; } };
+  window.PLANIFY_FRESH_VIEW = api;
 
   // ---------- Pantalla: tarjeta en ⚙️ → Descargas, aviso fijo, confirmaciones e importar desactivado ----------
   var TEXT = {
@@ -128,6 +141,9 @@
     leaveTitle: "Volver a mi plan",
     leaveText: "Se descartará lo que hiciste en esta vista.",
     stay: "Seguir aquí",
+    stayHere: "Quedarme aquí",
+    titlePrefix: "Vista nueva · ",
+    gearLabel: "Abrir el panel. Estás en la vista como si fuera nuevo.",
     importOff: "Cargar un respaldo no está disponible en esta vista."
   };
 
@@ -154,7 +170,10 @@
       "#planify-fresh-banner{position:sticky;top:0;z-index:900;display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap;box-sizing:border-box;width:100%;padding:10px 64px 10px 16px;background:#0b5f58;color:#fff;font:600 14px/1.4 inherit;box-shadow:0 2px 12px rgba(0,0,0,.25)}" +
       "#planify-fresh-banner span{flex:1 1 220px;min-width:0}" +
       "#planify-fresh-banner button,.planify-fresh-card button,#planify-fresh-dialog button{min-height:44px;padding:8px 14px;border-radius:10px;font:700 14px/1.2 inherit;cursor:pointer}" +
+      "#planify-fresh-banner .planify-fresh-banner-actions{display:flex;flex-wrap:wrap;gap:8px}" +
       "#planify-fresh-banner button{border:1px solid #7fd9c2;background:#7fd9c2;color:#103a38}" +
+      "#planify-fresh-banner button.is-secondary{background:transparent;color:#fff;border-color:#fff}" +
+      "#cloud-btn.planify-fresh-on::after{content:\"\";position:absolute;top:3px;right:3px;width:11px;height:11px;border-radius:50%;background:#7fd9c2;box-shadow:0 0 0 2px #0b5f58}" +
       ".planify-fresh-card{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding:12px;border:1px solid rgba(20,184,166,.32);border-radius:13px;background:linear-gradient(135deg,rgba(240,253,250,.9),rgba(238,242,255,.85))}" +
       ".planify-fresh-card>div{display:grid;gap:2px;min-width:0;flex:1}.planify-fresh-card strong{font-size:14px;color:#21304b}.planify-fresh-card small{font-size:12px;line-height:1.4;color:#4b5b72}" +
       ".planify-fresh-card button{flex:0 0 auto;max-width:150px;border:1px solid #14b8a6;background:#fff;color:#0f766e}" +
@@ -224,22 +243,57 @@
     confirmDialog({ title: TEXT.leaveTitle, text: TEXT.leaveText, yes: TEXT.back, no: TEXT.stay, onYes: exit });
   }
 
+  // El aviso se muestra siempre en la pantalla de inicio (protector de datos abierto) para que la salida esté a la vista;
+  // en el resto de la app, "Quedarme aquí" lo oculta en esta pestaña.
   function ensureBanner() {
     if (!active) return;
+    var gate = document.getElementById("planify-local-data-gate");
+    if (noticeHidden && !gate) {
+      if (banner && banner.parentNode) banner.parentNode.removeChild(banner);
+      return;
+    }
     if (!banner) {
       banner = make("div");
       banner.id = "planify-fresh-banner";
       banner.setAttribute("role", "status");
       banner.appendChild(make("span", "", TEXT.banner));
+      var actions = make("div", "planify-fresh-banner-actions");
       var back = make("button", "", TEXT.back);
       back.type = "button";
       back.setAttribute("data-fresh-action", "leave");
-      banner.appendChild(back);
+      var stay = make("button", "is-secondary", TEXT.stayHere);
+      stay.type = "button";
+      stay.setAttribute("data-fresh-action", "hide");
+      actions.appendChild(back);
+      actions.appendChild(stay);
+      banner.appendChild(actions);
     }
+    var stayButton = banner.querySelector('[data-fresh-action="hide"]');
+    if (stayButton) stayButton.hidden = Boolean(gate);
     var parent = host();
     if (banner.parentNode !== parent || parent.firstChild !== banner) parent.insertBefore(banner, parent.firstChild);
     if (banner.inert) banner.inert = false;
     if (banner.getAttribute("aria-hidden")) banner.removeAttribute("aria-hidden");
+  }
+
+  // Con el aviso oculto, la vista se sigue notando: puntito en ⚙️ y prefijo en el título de la pestaña.
+  function applyMarks() {
+    var marked = active && noticeHidden;
+    var gear = document.getElementById("cloud-btn");
+    if (gear) {
+      gear.classList.toggle("planify-fresh-on", marked);
+      if (marked && !gear.hasAttribute("data-fresh-label")) {
+        gear.setAttribute("data-fresh-label", gear.getAttribute("aria-label") || "");
+        gear.setAttribute("aria-label", TEXT.gearLabel);
+      } else if (!marked && gear.hasAttribute("data-fresh-label")) {
+        var before = gear.getAttribute("data-fresh-label");
+        if (before) gear.setAttribute("aria-label", before); else gear.removeAttribute("aria-label");
+        gear.removeAttribute("data-fresh-label");
+      }
+    }
+    var title = String(document.title || "");
+    if (marked && title.indexOf(TEXT.titlePrefix) !== 0) document.title = TEXT.titlePrefix + title;
+    else if (!marked && title.indexOf(TEXT.titlePrefix) === 0) document.title = title.slice(TEXT.titlePrefix.length);
   }
 
   function ensureCard() {
@@ -281,6 +335,7 @@
     syncTimer = 0;
     addStyles();
     ensureBanner();
+    applyMarks();
     ensureCard();
     lockImport();
   }
@@ -297,12 +352,19 @@
     var action = target.getAttribute("data-fresh-action");
     if (action === "start") askStart();
     else if (action === "leave") askLeave();
-    else if (action === "cancel") closeDialog();
+    else if (action === "hide") {
+      hideNotice();
+      sync();
+      var gearButton = document.getElementById("cloud-btn");
+      if (gearButton && typeof gearButton.focus === "function") gearButton.focus({ preventScroll: true });
+    } else if (action === "cancel") closeDialog();
     else if (action === "confirm" && pending) {
       var result = pending.onYes();
       if (result && result.ok === false) pending.error.textContent = result.message || "";
     }
   }, true);
+
+  api.refresh = sync;
 
   function init() {
     sync();

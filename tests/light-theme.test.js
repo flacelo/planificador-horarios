@@ -64,3 +64,10 @@ test("Mensual y Anual en claro: el rótulo superior usa un verde azulado más os
   assert.match(read("css/monthly-calm.css"), /body\.tema-claro #view-mensual\.monthly-calm-ready \.monthly-calm-eyebrow \{ color: #06695f !important; \}/);
   assert.match(read("css/annual-calm.css"), /body\.tema-claro #vista-anual-metas\.annual-calm-ready \.annual-calm-eyebrow \{ color: #06695f !important; \}/);
 });
+
+test("Ideas de Mensual, Anual y Avance en claro: tarjetas claras con texto oscuro", () => {
+  const css = read("css/trust-fixes.css");
+  assert.match(css, /body\.tema-claro \.trust-personal-guidance li \{ background: #fff; border-color: #d5e5e2; color: #35505a; \}/);
+  assert.match(css, /body\.tema-claro \.trust-personal-guidance li:before \{ color: #087e73; \}/);
+  assert.match(css, /body\.tema-claro \.trust-personal-guidance small, body\.tema-claro \.trust-guidance-heading small \{ color: #4d6670; \}/);
+});

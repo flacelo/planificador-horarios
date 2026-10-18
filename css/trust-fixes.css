@@ -84,3 +84,9 @@ body.planify-nav-pinned { padding-bottom: 96px; }
 .planify-brand-ready .trust-start-hub.is-secondary .trust-start-options > button > span { font-size: 1.2rem !important; }
 .planify-brand-ready .trust-start-hub.is-secondary .trust-start-options small { font-size: .72rem !important; }
 .planify-brand-ready .trust-start-hub.is-secondary .trust-start-options em { display: none !important; }
+
+/* Tema claro: las ideas de Mensual, Anual y Avance dejan de verse grises sobre fondo turbio. */
+body.tema-claro .trust-friendly-guide, body.tema-claro .trust-personal-guidance { border-color: #cfe0e6; background: linear-gradient(135deg, #f3f9ff, #eef9f5); color: #24414a; }
+body.tema-claro .trust-personal-guidance li { background: #fff; border-color: #d5e5e2; color: #35505a; }
+body.tema-claro .trust-personal-guidance li:before { color: #087e73; }
+body.tema-claro .trust-personal-guidance small, body.tema-claro .trust-guidance-heading small { color: #4d6670; }

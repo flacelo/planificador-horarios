@@ -33,6 +33,7 @@
     userName: "",
     priority: "study",
     roles: ["study"],
+    rolesSeen: false,
     occupation: "study",
     occupationOther: "",
     career: "engineering",
@@ -390,6 +391,7 @@
     var quickGoal = overlay.querySelector("#welcome-quick-goal");
     if (quickGoal) state.goal = scheduleText(quickGoal.value, 160);
     if (overlay.querySelector("input[name='welcome-role']")) {
+      state.rolesSeen = true;
       state.roles = Array.from(overlay.querySelectorAll("input[name='welcome-role']:checked")).map(function (input) { return input.value; });
       syncOccupationFromRoles();
     }
@@ -1892,6 +1894,7 @@
     state.startedFromHub = Boolean(preferredMode && preferredMode !== "manual");
     state.userName = localStorage.getItem("planify_nombre") || "";
     state.priority = "study";
+    state.rolesSeen = false;
     state.roles = ["study"];
     state.occupation = "study";
     state.occupationOther = "";
@@ -2312,6 +2315,7 @@
         if (studyRole) studyRole.checked = event.target.checked;
         if (workRole) workRole.checked = event.target.checked;
         state.roles = roles;
+        state.rolesSeen = true;
         syncOccupationFromRoles();
         getDraftFromForm();
         render();

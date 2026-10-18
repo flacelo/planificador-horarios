@@ -52,3 +52,26 @@ body.dark .planify-day-flow .day-flow-hello,
 body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-hello { color: #f3f7ff; }
 body.dark .planify-day-flow .day-flow-date,
 body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-date { color: #b4c3d6; }
+
+/* Barra "Tu día": 8 px, menta de la marca; la animación solo corre si la persona no pidió reducir movimiento. */
+.planify-day-flow .day-flow-glance > .day-flow-progress { flex: 2 1 150px; min-width: 150px; }
+.planify-day-flow .day-flow-bar {
+  height: 8px;
+  margin: 6px 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d5e6df;
+}
+.planify-day-flow .day-flow-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #087e73;
+}
+body.dark .planify-day-flow .day-flow-bar,
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-bar { background: #38546d; }
+body.dark .planify-day-flow .day-flow-bar > i,
+body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-day-flow .day-flow-bar > i { background: #7fd9c2; }
+@media (prefers-reduced-motion: no-preference) {
+  .planify-day-flow .day-flow-bar > i { transition: width 0.4s ease; }
+}

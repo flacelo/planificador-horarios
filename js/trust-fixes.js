@@ -576,7 +576,7 @@
       var style = document.createElement("link");
       style.id = "planify-day-flow-style";
       style.rel = "stylesheet";
-      style.href = "css/day-flow.css?v=6";
+      style.href = "css/day-flow.css?v=7";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-day-flow-script")) {

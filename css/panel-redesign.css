@@ -691,7 +691,9 @@ html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card button 
   border-color: #c8dcd2 !important;
 }
 .planify-panel-redesign-ready body.tema-claro #side-panel input::placeholder { color: #697f79 !important; }
-.planify-panel-redesign-ready body.tema-claro #side-panel .sp-hint { color: #657f78 !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .sp-hint { color: #4d665f !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .panel-section-intro > span { color: #1d6b5c !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel .merge-info { color: #4f6670 !important; }
 .planify-panel-redesign-ready body.tema-claro #side-panel .panel-rebuild-hint { color: #5b756e; }
 .planify-panel-redesign-ready body.tema-claro #side-panel .panel-save-hint { color: #5b756e; }
 .planify-panel-redesign-ready body.tema-claro #side-panel .planify-pwa-settings-card {

@@ -160,3 +160,5 @@ body.light-mode #vista-anual-metas.annual-calm-ready .encabezado-anual {
   #vista-anual-metas.annual-calm-ready .annual-calm-ideas { display: none !important; }
   #vista-anual-metas.annual-calm-ready { padding: 0 !important; }
 }
+
+body.tema-claro #vista-anual-metas.annual-calm-ready .annual-calm-eyebrow { color: #06695f !important; }

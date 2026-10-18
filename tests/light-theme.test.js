@@ -51,3 +51,16 @@ test("Semanal en celular: el día elegido se lee en oscuro (menta) y en claro (v
   assert.match(css, /body\.tema-claro #view-semanal\.weekly-calm-ready \.weekly-calm-day-button\[aria-pressed="true"\] \{ color: #fff; \}/);
   assert.match(css, /body\.tema-claro #view-semanal\.weekly-calm-ready \.weekly-calm-day-button\[aria-pressed="true"\] :is\(\.weekly-calm-day-label, \.weekly-calm-day-count\) \{ color: #fff !important; \}/);
 });
+
+test("Panel en claro: títulos pequeños y ayudas con contraste suficiente", () => {
+  const css = read("css/panel-redesign.css");
+  assert.match(css, /body\.tema-claro #side-panel \.panel-section-intro > span \{ color: #1d6b5c !important; \}/);
+  assert.match(css, /body\.tema-claro #side-panel \.sp-hint \{ color: #4d665f !important; \}/);
+  assert.match(css, /body\.tema-claro #side-panel \.merge-info \{ color: #4f6670 !important; \}/);
+  assert.doesNotMatch(css, /sp-hint \{ color: #657f78/);
+});
+
+test("Mensual y Anual en claro: el rótulo superior usa un verde azulado más oscuro", () => {
+  assert.match(read("css/monthly-calm.css"), /body\.tema-claro #view-mensual\.monthly-calm-ready \.monthly-calm-eyebrow \{ color: #06695f !important; \}/);
+  assert.match(read("css/annual-calm.css"), /body\.tema-claro #vista-anual-metas\.annual-calm-ready \.annual-calm-eyebrow \{ color: #06695f !important; \}/);
+});

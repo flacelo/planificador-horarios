@@ -182,3 +182,11 @@ body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-trust-ready
   .trust-panel-intro>div{grid-template-columns:1fr!important}
   .trust-panel-intro button{min-height:38px!important;text-align:left!important;padding:8px 10px!important}
 }
+
+/* Contraste: textos pequeños y botones que se leían con dificultad. */
+body.tema-claro .btn-ideas-sugerencias { color: #0b5f7a !important; }
+body.tema-claro .day-flow-glance span, body.tema-claro .day-flow-glance small { color: #4f6670; }
+body.tema-claro .pwa-settings-card small, body.tema-claro [data-pwa-status] { color: #4d6670 !important; }
+.btn-mark.done { color: #0b3b30 !important; }
+.btn-mark.undo { background: linear-gradient(135deg, #d9453d, #b8322b) !important; }
+#merge-badge.merge-badge.show { color: #fff !important; }

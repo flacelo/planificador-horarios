@@ -71,3 +71,13 @@ test("Ideas de Mensual, Anual y Avance en claro: tarjetas claras con texto oscur
   assert.match(css, /body\.tema-claro \.trust-personal-guidance li:before \{ color: #087e73; \}/);
   assert.match(css, /body\.tema-claro \.trust-personal-guidance small, body\.tema-claro \.trust-guidance-heading small \{ color: #4d6670; \}/);
 });
+
+test("Diario y botones pequeños: contraste suficiente en claro (y en oscuro para los botones de marcar)", () => {
+  const css = read("css/interface-polish.css");
+  assert.match(css, /body\.tema-claro \.btn-ideas-sugerencias \{ color: #0b5f7a !important; \}/);
+  assert.match(css, /body\.tema-claro \.day-flow-glance span, body\.tema-claro \.day-flow-glance small \{ color: #4f6670; \}/);
+  assert.match(css, /body\.tema-claro .pwa-settings-card small, body\.tema-claro \[data-pwa-status\] \{ color: #4d6670 !important; \}/);
+  assert.match(css, /\.btn-mark\.done \{ color: #0b3b30 !important; \}/);
+  assert.match(css, /\.btn-mark\.undo \{ background: linear-gradient\(135deg, #d9453d, #b8322b\) !important; \}/);
+  assert.match(css, /#merge-badge\.merge-badge\.show \{ color: #fff !important; \}/);
+});

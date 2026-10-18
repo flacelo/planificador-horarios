@@ -33,6 +33,7 @@
     userName: "",
     priority: "study",
     roles: ["study"],
+    rolesSeen: false,
     occupation: "study",
     occupationOther: "",
     career: "engineering",
@@ -390,6 +391,7 @@
     var quickGoal = overlay.querySelector("#welcome-quick-goal");
     if (quickGoal) state.goal = scheduleText(quickGoal.value, 160);
     if (overlay.querySelector("input[name='welcome-role']")) {
+      state.rolesSeen = true;
       state.roles = Array.from(overlay.querySelectorAll("input[name='welcome-role']:checked")).map(function (input) { return input.value; });
       syncOccupationFromRoles();
     }
@@ -1884,6 +1886,11 @@
     });
   }
 
+  // Solo se guardan los roles si la persona vio y respondió la pregunta de ocupación; si no, quedan vacíos.
+  function rolesToSave() {
+    return state.rolesSeen ? state.roles.slice() : [];
+  }
+
   function open(preferredMode) {
     var existingOverlay = document.getElementById("welcome-flow-overlay");
     if (!existingOverlay || !existingOverlay.contains(document.activeElement)) welcomeReturnFocus = document.activeElement;
@@ -1892,6 +1899,7 @@
     state.startedFromHub = Boolean(preferredMode && preferredMode !== "manual");
     state.userName = localStorage.getItem("planify_nombre") || "";
     state.priority = "study";
+    state.rolesSeen = false;
     state.roles = ["study"];
     state.occupation = "study";
     state.occupationOther = "";
@@ -2061,7 +2069,7 @@
       if (state.userName) localStorage.setItem("planify_nombre", state.userName);
       localStorage.setItem(profileKey, JSON.stringify({
         name: state.userName,
-        roles: state.roles,
+        roles: rolesToSave(),
         occupation: state.occupation,
         occupationOther: state.occupationOther,
         career: state.career,
@@ -2312,6 +2320,7 @@
         if (studyRole) studyRole.checked = event.target.checked;
         if (workRole) workRole.checked = event.target.checked;
         state.roles = roles;
+        state.rolesSeen = true;
         syncOccupationFromRoles();
         getDraftFromForm();
         render();
@@ -2912,7 +2921,7 @@
   }
 
   window.PLANIFY_WELCOME = { open: open, requestChange: openScheduleAssistant };
-  if (window.__PLANIFY_START_TEST__) window.__PLANIFY_START_TEST_HOOKS__ = { state: state, applyStartAnswers: applyStartAnswers, buildProposal: buildProposal, minutesToTime: minutesToTime, startMoments: startMoments, franjaHours: franjaHours };
+  if (window.__PLANIFY_START_TEST__) window.__PLANIFY_START_TEST_HOOKS__ = { state: state, applyStartAnswers: applyStartAnswers, buildProposal: buildProposal, rolesToSave: rolesToSave, minutesToTime: minutesToTime, startMoments: startMoments, franjaHours: franjaHours };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();

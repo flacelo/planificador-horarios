@@ -961,7 +961,7 @@
     if (!document.getElementById("welcome-flow-script")) {
       var welcomeScript = document.createElement("script");
       welcomeScript.id = "welcome-flow-script";
-      welcomeScript.src = "js/welcome-flow.js?v=1.42";
+      welcomeScript.src = "js/welcome-flow.js?v=1.44";
       welcomeScript.defer = true;
       document.head.appendChild(welcomeScript);
     }

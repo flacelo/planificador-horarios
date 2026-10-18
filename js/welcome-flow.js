@@ -572,7 +572,7 @@
   function renderModeStep() {
     var modes = [
       ["manual", "✍️", "Quiero planificar por mi cuenta", "Irás directo al planificador vacío con todas las herramientas para construir y editar tu horario.", "Control total · puedes pedir ayuda después"],
-      ["quick", "🧩", "Crear mi horario rápido", "Elige tus días y horas; después podrás revisar y editar un borrador inicial.", "Solo lo esencial · recomendado"],
+      ["quick", "🧩", "Crear mi horario rápido", "Elige tus días y horas; después podrás revisar y editar un borrador inicial.", "Solo lo esencial · <b class=\"welcome-flow-recommended\">recomendado</b>"],
       ["guided", "🗓️", "Ayúdame paso a paso", "Incluye tus compromisos fijos y recibe un borrador editable.", "Más detalle"],
       ["detailed", "✨", "Personalizar a fondo", "Incluye estudios, trabajos, emprendimientos, energía, bienestar y recordatorios.", "Más preguntas"]
     ];

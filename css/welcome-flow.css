@@ -54,6 +54,18 @@
 .welcome-flow-primary { background: #146f68; box-shadow: 0 6px 16px rgba(20, 111, 104, .18); }
 .welcome-flow-mode.is-selected { border-color: #2a9e89; background: #eaf7f1; box-shadow: 0 0 0 2px rgba(42, 158, 137, .12); }
 .welcome-flow-mode.is-selected > i, .welcome-flow-mode em { color: #176e61; }
+/* "recomendado" es una etiqueta propia (ámbar): no debe parecer la opción elegida (verde). */
+.welcome-flow-mode .welcome-flow-recommended {
+  display: inline-block;
+  padding: 1px 8px;
+  border: 1px solid #c58a1f;
+  border-radius: 999px;
+  background: #fff3d6;
+  color: #6b4300;
+  font-size: .66rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
 .welcome-flow-core-name { display: grid !important; gap: 6px; }
 .welcome-flow-core-name input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #bfcfd1; border-radius: 10px; background: #fff; color: #1e293b; font: inherit; font-size: .9rem; }
 .welcome-flow-card :is(button, input, select, textarea):focus-visible { outline: 3px solid #167b70; outline-offset: 2px; }

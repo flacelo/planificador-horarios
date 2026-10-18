@@ -45,3 +45,17 @@ test("A8: donde falta el porcentaje se lee 'Sin datos aún' y no una raya sola",
   assert.match(css, /\.dashboard-calm-percent strong\.is-empty \{[^}]*font-size: 22px/);
   assert.match(css, /\.dashboard-calm-percent strong\.is-empty \{[^}]*letter-spacing: 0/);
 });
+
+test("A5: 'recomendado' es una etiqueta propia (ámbar) y no se parece a la tarjeta elegida (verde)", () => {
+  const flow = read("js/welcome-flow.js");
+  assert.match(flow, /"Solo lo esencial · <b class=\\"welcome-flow-recommended\\">recomendado<\/b>"/);
+  const css = read("css/welcome-flow.css");
+  const badge = css.slice(css.indexOf(".welcome-flow-mode .welcome-flow-recommended {"));
+  assert.match(badge, /border: 1px solid #c58a1f;/);
+  assert.match(badge, /background: #fff3d6;/);
+  assert.match(badge, /color: #6b4300;/);
+  assert.match(badge, /border-radius: 999px;/);
+  // La tarjeta elegida sigue verde y la etiqueta no usa ese verde.
+  assert.match(css, /\.welcome-flow-mode\.is-selected \{ border-color: #2a9e89; background: #eaf7f1;/);
+  assert.doesNotMatch(badge.slice(0, badge.indexOf("}")), /#2a9e89|#176e61|#eaf7f1/);
+});

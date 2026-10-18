@@ -198,7 +198,8 @@ html.planify-brand-ready body .brand-site-header #welcome-flow-open {
   box-shadow: 0 6px 22px rgba(116, 227, 192, 0.3) !important;
 }
 html.planify-brand-ready body .brand-site-header #welcome-flow-open:hover { background: #9af0d4 !important; color: var(--au-mint-ink) !important; }
-html.planify-brand-ready body .brand-site-header .header-actions .icon-btn:last-child { width: 44px !important; }
+html.planify-brand-ready body .brand-site-header .header-actions .icon-btn:last-child,
+html.planify-brand-ready body .brand-site-header #btn-tema { width: 44px !important; min-width: 44px !important; }
 html.planify-brand-ready body .brand-site-header h1#main-title,
 html.planify-brand-ready body .brand-site-header h1.planify-public-title { color: var(--au-text) !important; font-family: var(--au-font-display) !important; }
 

@@ -45,7 +45,7 @@ test("la menta es el único color de acción: cielo y violeta no aparecen en bot
 
 test("cabecera: botones de 44 px en píldora, y no se toca la marca ni el título", () => {
   assert.match(phase2, /\.header-actions button:not\(#welcome-flow-open\),[^{]*\{\s*min-height: 44px !important;\s*border-radius: 999px !important;/);
-  assert.match(phase2, /\.icon-btn:last-child \{ width: 44px !important; \}/);
+  assert.match(phase2, /#btn-tema \{ width: 44px !important; min-width: 44px !important; \}/);
   assert.doesNotMatch(phase2, /brand-mark|icon\.svg|logo/);
 });
 

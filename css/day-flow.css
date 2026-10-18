@@ -143,6 +143,7 @@ html.planify-brand-ready body .planify-day-flow .day-flow-list {
   background: var(--au-tile);
   box-shadow: var(--au-shadow-sm);
 }
+html.planify-brand-ready body .planify-day-flow .day-flow-list summary { display: flex; align-items: center; min-height: 44px; }
 html.planify-brand-ready body .planify-day-flow .day-flow-hello { font: 700 var(--au-t-h2)/1.15 var(--au-font-display, "Outfit", sans-serif); }
 html.planify-brand-ready body .planify-day-flow .day-flow-head h3 { font: 700 1.3rem/1.2 var(--au-font-display, "Outfit", sans-serif); }
 @media (max-width: 700px) {

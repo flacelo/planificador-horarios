@@ -68,6 +68,10 @@ test("mosaico: ficha grande de vidrio con respaldo opaco, fichas del anillo y de
   assert.match(mosaic, /grid-template-areas: "main main" "ring avisos" "list list";/);
 });
 
+test("'Ver mi jornada de hoy' mide 44 px de alto", () => {
+  assert.match(mosaic, /\.day-flow-list summary \{ display: flex; align-items: center; min-height: 44px; \}/);
+});
+
 test("el mosaico no trae animaciones y no toca Semanal, el PDF ni planify_*", () => {
   assert.doesNotMatch(mosaic, /animation|transition|@keyframes/);
   assert.doesNotMatch(mosaic, /#tabla|weekly|planify_|planify-backup/);

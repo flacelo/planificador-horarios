@@ -55,7 +55,7 @@ async function main() {
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.2', resolve); });
   const origin = 'http://127.0.0.2:' + server.address().port;
   try {
-    for (const route of ['/index.html', '/?vista=semanal', '/manifest.json', '/icon.svg', '/sw.js', '/js/trust-fixes.js?v=4.103']) {
+    for (const route of ['/index.html', '/?vista=semanal', '/manifest.json', '/icon.svg', '/sw.js', '/js/trust-fixes.js?v=4.104']) {
       const result = await request(origin, route);
       if (result.status !== 200) throw new Error(route + ' respondió HTTP ' + result.status);
       if (route.startsWith('/js/') && !result.type.startsWith('text/javascript')) throw new Error('MIME JavaScript incorrecto para ' + route);

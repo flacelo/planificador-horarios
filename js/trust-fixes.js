@@ -576,7 +576,7 @@
       var style = document.createElement("link");
       style.id = "planify-day-flow-style";
       style.rel = "stylesheet";
-      style.href = "css/day-flow.css?v=11";
+      style.href = "css/day-flow.css?v=12";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-day-flow-script")) {
@@ -672,7 +672,7 @@
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=23";
+      script.src = "js/brand-home.js?v=24";
       script.defer = true;
       document.head.appendChild(script);
     }

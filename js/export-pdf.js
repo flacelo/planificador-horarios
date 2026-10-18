@@ -392,7 +392,7 @@
       checkbox.type = 'checkbox';
       checkbox.checked = opcion.id === activa.id || (activa.id === 'vista-diaria' && opcion.id === 'vista-semanal');
       checkbox.setAttribute('data-planify-vista', opcion.id);
-      checkbox.style.cssText = 'width:17px;height:17px;accent-color:#6a1b9a;cursor:pointer;';
+      checkbox.style.cssText = 'width:17px;height:17px;accent-color:#087e73;cursor:pointer;';
       fila.appendChild(checkbox);
       var texto = document.createElement('span');
       texto.textContent = opcion.label;
@@ -409,7 +409,7 @@
     generar.type = 'button';
     generar.id = 'btn-generar-pdf';
     generar.textContent = 'Generar y descargar PDF';
-    generar.style.cssText = 'width:100%;margin-top:12px;padding:12px;border:0;border-radius:10px;background:linear-gradient(135deg,#7b1fa2,#4a148c);color:#fff;font-size:14.5px;font-weight:600;cursor:pointer;';
+    generar.style.cssText = 'width:100%;margin-top:12px;padding:12px;border:0;border-radius:10px;background:#7fd9c2;color:#103a38;font-size:14.5px;font-weight:600;cursor:pointer;';
     panel.appendChild(generar);
     var ayudaMovil = document.createElement('p');
     ayudaMovil.style.cssText = 'margin:9px 0 0;color:#64748b;font-size:11.5px;line-height:1.45;';

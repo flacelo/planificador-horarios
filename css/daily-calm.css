@@ -137,6 +137,9 @@ body.light-mode #view-diario.daily-calm-ready #planner-date { color-scheme: ligh
 }
 #view-diario.daily-calm-ready .routine-checkboxes label { min-height: 28px; color: var(--daily-text); }
 #view-diario.daily-calm-ready .routine-checkboxes input { accent-color: var(--daily-accent) !important; }
+/* Un solo color de acción: las casillas de la rutina usan el verde del Diario (main.css las pintaba violeta). */
+body #view-diario.daily-calm-ready .routine-checkboxes input[type="checkbox"],
+body.tema-claro #view-diario.daily-calm-ready .routine-checkboxes input[type="checkbox"] { accent-color: var(--daily-accent) !important; }
 #view-diario.daily-calm-ready .mood-options { gap: 8px !important; }
 #view-diario.daily-calm-ready .mood-btn {
   min-width: 43px;

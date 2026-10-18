@@ -90,3 +90,7 @@ body.tema-claro .trust-friendly-guide, body.tema-claro .trust-personal-guidance 
 body.tema-claro .trust-personal-guidance li { background: #fff; border-color: #d5e5e2; color: #35505a; }
 body.tema-claro .trust-personal-guidance li:before { color: #087e73; }
 body.tema-claro .trust-personal-guidance small, body.tema-claro .trust-guidance-heading small { color: #4d6670; }
+
+/* Un solo color de acción: el botón principal del tutorial usa menta con texto oscuro. */
+.trust-primary { background: #7fd9c2; color: #103a38; }
+.trust-primary:hover { background: #6fcfb6; }

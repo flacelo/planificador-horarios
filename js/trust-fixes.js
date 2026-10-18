@@ -751,7 +751,7 @@
       var style = document.createElement("link");
       style.id = "planify-daily-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/daily-calm.css?v=5";
+      style.href = "css/daily-calm.css?v=6";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-daily-calm-script")) {

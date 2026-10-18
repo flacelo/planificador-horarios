@@ -582,7 +582,7 @@
     if (!document.getElementById("planify-day-flow-script")) {
       var script = document.createElement("script");
       script.id = "planify-day-flow-script";
-      script.src = "js/day-flow.js?v=9";
+      script.src = "js/day-flow.js?v=10";
       script.defer = true;
       document.head.appendChild(script);
     }

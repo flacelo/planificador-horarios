@@ -84,3 +84,14 @@ test("la meta se destaca solo cuando no hay un momento en curso o próximo", () 
   assert.match(css, /#view-diario\.daily-calm-ready:not\(\[data-day-moment="activity"\]\) \.card-section\.goals-section \{[^}]*border: 2px solid var\(--daily-accent\) !important;/);
   assert.match(css, /\.daily-goal-hint \{[^}]*color: var\(--daily-muted\);/);
 });
+
+test("tarjeta Hoy sin momentos: textos aprobados, un solo botón 'Crear mi día con ayuda' y sin 'Anotar mi meta'", () => {
+  const flow = read("js/day-flow.js");
+  assert.match(flow, /detail = "Empieza por tu meta de hoy\. Si quieres, también puedes crear tu día con ayuda\.";/);
+  assert.match(flow, /action = '<button type="button" class="day-flow-secondary" data-day-flow-action="create">Crear mi día con ayuda<\/button>';/);
+  assert.doesNotMatch(flow, /Anotar mi meta/);
+  assert.doesNotMatch(flow, /✨ Crear mi día</);
+  // El botón sigue abriendo el asistente de 3 pantallas y los estados con momentos no cambian.
+  assert.match(flow, /action === "create" && window\.PLANIFY_WELCOME[\s\S]*?PLANIFY_WELCOME\.open\("inicio"\)/);
+  assert.match(flow, /data-day-flow-action="schedule">Ver horario<\/button>/);
+});

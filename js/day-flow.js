@@ -146,9 +146,9 @@
       detail = completed === items.length ? "Ya completaste todo lo que estaba planificado para hoy. Disfruta tu cierre del día." : "No queda una actividad pendiente con hora para hoy. Revisa tu horario si quieres reorganizar algo.";
       action = '<button type="button" class="day-flow-primary" data-day-flow-action="schedule">Ver mi horario</button>';
     } else {
-      detail = "Aún no hay momentos para hoy. Puedes crear un borrador guiado o anotar una sola meta para comenzar.";
-      action = '<button type="button" class="day-flow-primary" data-day-flow-action="create">✨ Crear mi día</button>' +
-        '<button type="button" class="day-flow-secondary" data-day-flow-action="goal">Anotar mi meta</button>';
+      // Sin momentos, la acción principal es la meta del día (justo debajo); aquí solo queda la ayuda opcional.
+      detail = "Empieza por tu meta de hoy. Si quieres, también puedes crear tu día con ayuda.";
+      action = '<button type="button" class="day-flow-secondary" data-day-flow-action="create">Crear mi día con ayuda</button>';
     }
     var list = items.slice(0, 4).map(function (item) {
       var status = item.done ? " is-done" : (current && item.row === current.row ? " is-current" : "");

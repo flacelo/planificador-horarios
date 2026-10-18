@@ -7,7 +7,8 @@ const read = (file) => fs.readFileSync(path.join(__dirname, "..", file), "utf8")
 
 test("Día usa 'momentos' y 'borrador' en lugar de 'bloques' y 'propuesta'", () => {
   const day = read("js/day-flow.js");
-  assert.match(day, /Aún no hay momentos para hoy\. Puedes crear un borrador guiado/);
+  // Mejora de diseño 3: el estado sin momentos invita a la meta del día y ofrece "Crear mi día con ayuda".
+  assert.match(day, /Empieza por tu meta de hoy\. Si quieres, también puedes crear tu día con ayuda\./);
   assert.match(day, /<small>momentos hechos<\/small>/);
   assert.doesNotMatch(day, /bloques completados|propuesta guiada|Aún no hay bloques/);
   assert.match(read("js/mobile-coach.js"), /Revisa tu siguiente momento, anota una meta/);

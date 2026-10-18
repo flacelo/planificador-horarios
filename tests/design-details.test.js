@@ -30,3 +30,10 @@ test("nota del inicio: separada del botón, letra más pequeña y un candado en 
   assert.match(css, /\.planify-brand-ready \.brand-hero \.brand-data-note \{[^}]*margin-top: 16px !important;[^}]*font-size: \.82rem !important;/);
   assert.match(css, /\.planify-brand-ready \.brand-hero \.brand-data-note span \{ font-size: \.95rem; \}/);
 });
+
+test("× del panel: botón liviano (transparente con borde suave), 44 px y legible en claro y oscuro", () => {
+  const css = block(read("css/panel-redesign.css"), "/* Detalles: × del panel");
+  assert.match(css, /\.planify-panel-redesign-ready #side-panel button\.trust-panel-close \{[^}]*width: 44px !important;[^}]*height: 44px !important;[^}]*background: transparent !important;[^}]*border: 1px solid rgba\(158, 241, 197, \.35\) !important;[^}]*color: #e8f7f3 !important;[^}]*font-size: 22px !important;/);
+  assert.match(css, /body\.tema-claro #side-panel button\.trust-panel-close \{[^}]*border-color: #c8ddd3 !important;[^}]*color: #234a42 !important;/);
+  assert.match(css, /button\.trust-panel-close:hover \{ background: rgba\(127, 217, 194, \.16\) !important; \}/);
+});

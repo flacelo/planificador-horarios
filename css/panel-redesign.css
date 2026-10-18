@@ -802,3 +802,21 @@ html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card button 
 .planify-panel-redesign-ready #side-panel .panel-exploring-list li { min-width: 0; display: grid; gap: 2px; overflow-wrap: anywhere; }
 .planify-panel-redesign-ready #side-panel .panel-exploring-list strong { color: #e6f2f0; font-size: 13px; }
 .planify-panel-redesign-ready #side-panel .panel-exploring-list span { color: #acc6c5; font-size: 12px; line-height: 1.45; }
+
+/* Detalles: × del panel liviano. main.css pinta todos los botones del panel de gris oscuro con !important. */
+.planify-panel-redesign-ready #side-panel button.trust-panel-close {
+  width: 44px !important;
+  height: 44px !important;
+  flex: 0 0 44px !important;
+  padding: 0 !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+  border: 1px solid rgba(158, 241, 197, .35) !important;
+  color: #e8f7f3 !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+.planify-panel-redesign-ready #side-panel button.trust-panel-close:hover { background: rgba(127, 217, 194, .16) !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel button.trust-panel-close { border-color: #c8ddd3 !important; color: #234a42 !important; }
+.planify-panel-redesign-ready body.tema-claro #side-panel button.trust-panel-close:hover { background: rgba(8, 126, 115, .1) !important; }

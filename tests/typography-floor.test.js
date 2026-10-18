@@ -28,3 +28,8 @@ test("panel y aviso de instalar: ningún texto baja de 12 px", () => {
   const pwa = block(read("css/pwa-experience.css"), "/* Tipografía mínima");
   assert.match(pwa, /\.planify-mobile-app-hint small \{ font-size: 12px !important; \}/);
 });
+
+test("Avance: ningún texto baja de 12 px", () => {
+  const css = block(read("css/dashboard-calm.css"), "/* Tipografía mínima");
+  assert.match(css, /\.planify-dashboard-v2 :is\(\.trust-dashboard-eyebrow, \.dashboard-view-nav button span, \.dashboard-calm-kicker, \.dashboard-calm-history-note, \.trust-bar-value, \.trust-bar-label, \.dashboard-calm-chart-legend span, \.dashboard-calm-disclaimer\) \{ font-size: 12px !important; \}/);
+});

@@ -648,7 +648,7 @@
     var style = document.createElement("link");
     style.id = "planify-dashboard-calm";
     style.rel = "stylesheet";
-    style.href = "css/dashboard-calm.css?v=6";
+    style.href = "css/dashboard-calm.css?v=7";
     document.head.appendChild(style);
   }
 

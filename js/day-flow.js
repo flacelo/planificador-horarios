@@ -146,6 +146,16 @@
     return name ? base + ", " + name : base;
   }
 
+  // Barra "Tu día": sale del avance que ya se guarda (momentos hechos / momentos de hoy); sin momentos no se muestra.
+  function progressMarkup(completed, total) {
+    if (!total) return "";
+    var label = completed + " de " + total + " momentos hechos";
+    var percent = Math.round((completed / total) * 100);
+    return '<div class="day-flow-progress"><span>Tu día</span>' +
+      '<div class="day-flow-bar" role="progressbar" aria-label="Progreso de tu día: ' + label + '" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + completed + '"><i style="width:' + percent + '%"></i></div>' +
+      '<small>' + (completed === total ? "¡Día completo! " : "") + label + '</small></div>';
+  }
+
   function flowMarkup(now, items) {
     var currentMinutes = now.getHours() * 60 + now.getMinutes();
     var current = items.find(function (item) { return item.start <= currentMinutes && item.end > currentMinutes && !item.done; });
@@ -180,7 +190,7 @@
       '<div class="day-flow-head"><span class="day-flow-icon">' + (current ? "⏳" : next ? "🎯" : "☀️") + '</span><div><strong>' + headline + '</strong>' +
       (activity ? '<h3>' + escapeHtml(activity.title) + '</h3><small>' + escapeHtml(activity.category) + " · " + escapeHtml(detail) + '</small>' : '<p>' + escapeHtml(detail) + '</p>') + '</div></div>' +
       '<div class="day-flow-actions">' + action + '</div></div>' +
-      '<aside class="day-flow-glance"><div><span>AVANCE</span><strong>' + completed + "/" + items.length + '</strong><small>momentos hechos</small></div>' +
+      '<aside class="day-flow-glance">' + progressMarkup(completed, items.length) +
       '<div><span>AVISOS</span><strong>' + reminders.length + '</strong><small>' + (reminders.length ? "para hoy" : "sin avisos") + '</small></div></aside>' +
       (items.length ? '<details class="day-flow-list"><summary>Ver mi jornada de hoy</summary><ul>' + list + '</ul></details>' : "") +
       '</section>';

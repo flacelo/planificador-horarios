@@ -146,7 +146,7 @@ test("hasContent distingue contenido de la persona de los ajustes que la app esc
 });
 
 test("el script va primero: antes del protector de datos y de app.js", () => {
-  const fresh = indexHtml.indexOf('src="js/fresh-view.js?v=1.3"');
+  const fresh = indexHtml.indexOf('src="js/fresh-view.js?v=1.4"');
   const gate = indexHtml.indexOf('src="js/local-data-gate.js');
   const app = indexHtml.indexOf('src="js/app.js');
   assert.ok(fresh >= 0 && fresh < gate && gate < app);
@@ -318,4 +318,83 @@ test("los botones de la tarjeta, del aviso y de la confirmación miden 44 px aun
   assert.match(source, /#planify-fresh-banner button,\.planify-fresh-card button,#planify-fresh-dialog button\{min-height:44px!important;/);
   // Las reglas del panel (#side-panel .sp-container .card-section button) son más específicas: la tarjeta necesita la suya.
   assert.match(source, /#side-panel \.sp-container section\.planify-fresh-card button\{min-height:44px!important;height:auto!important\}/);
+});
+
+// ───────── Enlace del dueño: ?vista=nueva ─────────
+function setupLink(search, extra = {}) {
+  const local = new FakeStorage();
+  const sess = new FakeStorage();
+  Object.keys(REAL).forEach((key) => local.setItem(key, REAL[key]));
+  Object.keys(extra).forEach((key) => sess.setItem(key, extra[key]));
+  const replaced = [];
+  const reloads = [];
+  const window = {
+    Storage: FakeStorage, localStorage: local, sessionStorage: sess,
+    location: { search, pathname: "/index.html", hash: "#x", reload() { reloads.push(1); } },
+    history: { state: { s: 1 }, replaceState(state, title, url) { replaced.push(url); } }
+  };
+  vm.runInNewContext(source, { window, document: { readyState: "loading", addEventListener() {} }, Object, JSON, String, Array }, { filename: "fresh-view.js" });
+  return { window, local, sess, replaced, reloads, api: window.PLANIFY_FRESH_VIEW };
+}
+
+test("el enlace ?vista=nueva se reconoce solo con ese valor exacto", () => {
+  const { api } = setup({ real: REAL });
+  assert.equal(api.parseLink("?vista=nueva").requested, true);
+  assert.equal(api.parseLink("vista=nueva").requested, true);
+  assert.equal(api.parseLink("?a=1&vista=nueva&b=2").requested, true);
+  ["", "?", "?vista=semanal", "?vista=Nueva", "?vista=nuevas", "?vista=", "?xvista=nueva", "?vista=nueva2", "?otra=vista=nueva"].forEach((search) => {
+    assert.equal(api.parseLink(search).requested, false, search);
+  });
+});
+
+test("el enlace se quita de la dirección y se conservan los otros parámetros", () => {
+  const { api } = setup({ real: REAL });
+  assert.equal(api.parseLink("?vista=nueva").search, "");
+  assert.equal(api.parseLink("?a=1&vista=nueva&b=2").search, "?a=1&b=2");
+  assert.equal(api.parseLink("?vista=semanal").search, "?vista=semanal");
+});
+
+test("al abrir el enlace: se limpia la dirección, NO se entra a la vista sola y no se toca ningún dato", () => {
+  const { api, local, sess, replaced, reloads } = setupLink("?vista=nueva&a=1");
+  assert.equal(api.linkRequested, true);
+  assert.equal(api.active, false);
+  assert.deepEqual(replaced, ["/index.html?a=1#x"]);
+  assert.equal(reloads.length, 0);
+  assert.equal(sess.getItem("planify_vista_nueva_v1"), null);
+  assert.equal(local.map.size, 3);
+  assert.equal(local.getItem("planify_nombre"), "Flavio");
+});
+
+test("sin el enlace no se pide nada ni se cambia la dirección", () => {
+  const { api, replaced } = setupLink("?vista=semanal");
+  assert.equal(api.linkRequested, false);
+  assert.deepEqual(replaced, []);
+});
+
+test("el enlace con la vista ya activa solo limpia la dirección (no vuelve a pedir entrar)", () => {
+  const { api, replaced } = setupLink("?vista=nueva", { planify_vista_nueva_v1: "1" });
+  assert.equal(api.active, true);
+  assert.deepEqual(replaced, ["/index.html#x"]);
+});
+
+test("la entrada por enlace siempre pasa por la confirmación (askStart) y solo entra con 'Empezar'", () => {
+  assert.match(source, /if \(linkRequested && !active\) askForLink\(\);/);
+  assert.match(source, /if \(ready \|\| waited >= 5000\) \{ sync\(\); askStart\(\); return; \}/);
+  assert.match(source, /confirmDialog\(\{ title: TEXT\.confirmTitle, text: TEXT\.confirmText, yes: TEXT\.confirmYes, no: TEXT\.cancel, onYes: start, kind: "start" \}\)/);
+  // start() solo se llama desde la confirmación y desde el botón de la tarjeta (que también pregunta).
+  assert.equal((source.replace("function start()", "").match(/[^.\w]start\(\)/g) || []).length, 0);
+  assert.equal((source.match(/onYes: start/g) || []).length, 1);
+});
+
+test("si la confirmación se abrió antes que el protector de datos y quedó inerte, se vuelve a abrir dentro de él", () => {
+  assert.match(source, /dialog\.inert \|\| dialog\.parentNode !== host\(\)/);
+  assert.match(source, /pending\.kind === "start"/);
+});
+
+test("los textos de la confirmación, del aviso y de los botones no cambian", () => {
+  assert.match(source, /confirmTitle: "Empezar como si fuera nuevo"/);
+  assert.match(source, /confirmText: "Vas a ver Liberday como la primera vez\. Tus datos no se borran ni se modifican: solo quedan ocultos mientras estés en esta vista\."/);
+  assert.match(source, /banner: "Estás viendo Liberday como si fuera nuevo\. Tus datos están a salvo y no se guardará nada de lo que hagas aquí\."/);
+  assert.match(source, /back: "Volver a mi plan"/);
+  assert.match(source, /stayHere: "Quedarme aquí"/);
 });

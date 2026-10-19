@@ -30,6 +30,27 @@
   function sessionSet(key, value) { try { original.setItem.call(session, key, value); return true; } catch (error) { return false; } }
   function sessionRemove(key) { try { original.removeItem.call(session, key); } catch (error) { /* ignorar */ } }
 
+  // Enlace del dueño: ?vista=nueva pide entrar a la vista (con confirmación). Se quita de la dirección apenas se lee,
+  // para que recargar o salir no lo vuelva a pedir. Cualquier otro valor o parámetro se ignora y se conserva.
+  var LINK_PATTERN = /^vista=nueva$/;
+  function parseLink(search) {
+    var text = String(search || "");
+    if (text.charAt(0) === "?") text = text.slice(1);
+    if (!text) return { requested: false, search: "" };
+    var parts = text.split("&");
+    var kept = parts.filter(function (part) { return !LINK_PATTERN.test(part); });
+    return { requested: kept.length !== parts.length, search: kept.length ? "?" + kept.join("&") : "" };
+  }
+
+  var linkRequested = false;
+  try {
+    var linkInfo = parseLink(window.location && window.location.search);
+    linkRequested = linkInfo.requested;
+    if (linkRequested && window.history && typeof window.history.replaceState === "function") {
+      window.history.replaceState(window.history.state, "", String(window.location.pathname || "/") + linkInfo.search + String(window.location.hash || ""));
+    }
+  } catch (error) { /* si no se puede limpiar la dirección, la confirmación igual se pide una sola vez por carga */ }
+
   var active = sessionGet(FLAG_KEY) === "1";
   // "Quedarme aquí": el aviso fijo se oculta en esta pestaña (la vista y sus datos temporales siguen igual).
   var noticeHidden = active && sessionGet(HIDE_KEY) === "1";
@@ -245,7 +266,7 @@
     actions.appendChild(yes);
     actions.appendChild(no);
     [title, text, error, actions].forEach(function (part) { dialog.appendChild(part); });
-    pending = { onYes: options.onYes, error: error };
+    pending = { onYes: options.onYes, error: error, kind: options.kind || "" };
     // Escape cierra solo esta ventana; no debe llegar al protector de datos.
     dialog.addEventListener("keydown", function (event) { if (event.key === "Escape") event.stopPropagation(); });
     dialog.addEventListener("close", function () { if (dialog.parentNode) dialog.remove(); });
@@ -255,7 +276,7 @@
   }
 
   function askStart() {
-    confirmDialog({ title: TEXT.confirmTitle, text: TEXT.confirmText, yes: TEXT.confirmYes, no: TEXT.cancel, onYes: start });
+    confirmDialog({ title: TEXT.confirmTitle, text: TEXT.confirmText, yes: TEXT.confirmYes, no: TEXT.cancel, onYes: start, kind: "start" });
   }
 
   function askLeave() {
@@ -355,8 +376,15 @@
     if (input) input.disabled = true;
   }
 
+  // Si la confirmación de entrada se abrió antes que el protector de datos, éste la deja inerte: se vuelve a abrir dentro de él.
+  function rescueStartDialog() {
+    var dialog = document.getElementById("planify-fresh-dialog");
+    if (dialog && pending && pending.kind === "start" && (dialog.inert || dialog.parentNode !== host())) askStart();
+  }
+
   function sync() {
     syncTimer = 0;
+    rescueStartDialog();
     addStyles();
     ensureBanner();
     applyMarks();
@@ -390,6 +418,8 @@
 
   api.refresh = sync;
   api.registerTap = registerTap;
+  api.parseLink = parseLink;
+  api.linkRequested = linkRequested;
   api.isRevealed = function () { return revealed; };
 
   document.addEventListener("click", function (event) {
@@ -402,8 +432,21 @@
     if (card && typeof card.scrollIntoView === "function") card.scrollIntoView({ block: "nearest" });
   });
 
+  // Con el enlace, la confirmación se pide cuando la pantalla de inicio ya decidió cómo mostrarse (o a los 5 segundos).
+  function askForLink() {
+    var waited = 0;
+    function attempt() {
+      var ready = document.documentElement && document.documentElement.classList && document.documentElement.classList.contains("planify-brand-ready");
+      if (ready || waited >= 5000) { sync(); askStart(); return; }
+      waited += 100;
+      window.setTimeout(attempt, 100);
+    }
+    attempt();
+  }
+
   function init() {
     sync();
+    if (linkRequested && !active) askForLink();
     if (typeof MutationObserver === "function") new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });

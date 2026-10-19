@@ -27,7 +27,7 @@
     { icon: "🗓️", title: "Abre tu semana", text: "Toca Semanal en la barra inferior. Allí puedes revisar los días y escribir una actividad directamente en una celda.", target: ".bottom-nav [data-tab='semanal']", where: "Semanal, en la barra fija inferior." },
     { icon: "✍️", title: "Escribe en el horario", text: "En la tabla semanal, pulsa una celda y escribe. Para cambiar el texto, vuelve a tocarlo; no necesitas abrir una ventana de edición.", target: "#tabla tbody td", where: "Cualquier celda de actividad dentro de la cuadrícula semanal." },
     { icon: "📝", title: "Organiza también tu día", text: "Diario/Notas está en la misma barra inferior. Toca ese botón para escribir tus notas y revisar tu día.", target: ".bottom-nav [data-tab='diario']", where: "Diario/Notas, en la barra fija inferior." },
-    { icon: "⚙️", title: "Ajustes y exportación", text: "Abre el engranaje para entrar al Panel de control. En la pestaña Descargas encontrarás las opciones para descargar tu horario. Ahí mismo puedes ver Liberday como si fuera nuevo, sin tocar tus datos.", target: "#cloud-btn", where: "Botón ⚙️ flotante del Panel de control." }
+    { icon: "⚙️", title: "Ajustes y exportación", text: "Abre el engranaje para entrar al Panel de control. En la pestaña Descargas encontrarás las opciones para descargar tu horario.", target: "#cloud-btn", where: "Botón ⚙️ flotante del Panel de control." }
   ];
 
   function escapeHtml(value) {

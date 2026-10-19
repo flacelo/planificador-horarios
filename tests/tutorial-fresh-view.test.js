@@ -7,8 +7,9 @@ const fs = require("node:fs");
 const trust = fs.readFileSync(require.resolve("../js/trust-fixes.js"), "utf8");
 const steps = trust.slice(trust.indexOf("var TUTORIAL_STEPS = ["), trust.indexOf("function escapeHtml"));
 
-test("el último paso del tutorial menciona ⚙️ → Descargas y la vista 'como si fuera nuevo'", () => {
-  assert.match(steps, /title: "Ajustes y exportación", text: "Abre el engranaje para entrar al Panel de control\. En la pestaña Descargas encontrarás las opciones para descargar tu horario\. Ahí mismo puedes ver Liberday como si fuera nuevo, sin tocar tus datos\.", target: "#cloud-btn"/);
+test("el último paso del tutorial habla de ⚙️ → Descargas y ya no menciona la vista 'como si fuera nuevo' (es solo para el dueño)", () => {
+  assert.match(steps, /title: "Ajustes y exportación", text: "Abre el engranaje para entrar al Panel de control\. En la pestaña Descargas encontrarás las opciones para descargar tu horario\.", target: "#cloud-btn"/);
+  assert.doesNotMatch(steps, /como si fuera nuevo|vista nueva|sin tocar tus datos/i);
 });
 
 test("no se agregó ningún paso ni se cambió a qué señala cada uno: siguen siendo 5, con las mismas anclas", () => {

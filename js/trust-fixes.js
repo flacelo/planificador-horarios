@@ -734,7 +734,7 @@
       var style = document.createElement("link");
       style.id = "planify-annual-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/annual-calm.css?v=3";
+      style.href = "css/annual-calm.css?v=4";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-annual-calm-script")) {

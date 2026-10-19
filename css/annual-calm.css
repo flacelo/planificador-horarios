@@ -165,3 +165,48 @@ body.tema-claro #vista-anual-metas.annual-calm-ready .annual-calm-eyebrow { colo
 
 /* Tipografía mínima: rótulos y sugerencias del Anual a 12 px. */
 #vista-anual-metas.annual-calm-ready :is(.annual-calm-eyebrow, .annual-calm-quarter, .annual-calm-ideas > summary small) { font-size: 12px !important; }
+
+/* Cristal y luz (fase 2): Anual. La tarjeta de presentación está en css/aurora.css. Los 12 meses siguen en 3 columnas en escritorio
+   (1 en celular, regla de arriba); aquí solo cambia su aspecto. Todo en @media screen: el PDF y la impresión no cambian. */
+@media screen {
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .encabezado-anual h3 {
+    margin: 7px 0 5px !important;
+    color: var(--au-text) !important;
+    font: 700 var(--au-t-h1)/1.05 var(--au-font-display) !important;
+    letter-spacing: var(--au-track-display);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .encabezado-anual p {
+    color: var(--au-text-soft) !important;
+    font-size: var(--au-t-lead) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos {
+    border: 1px solid var(--au-tile-line) !important;
+    border-radius: var(--au-r-md) !important;
+    background: var(--au-tile) !important;
+    box-shadow: var(--au-shadow-sm) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos:focus-within {
+    border-color: var(--au-ring-a) !important;
+    box-shadow: var(--au-glow) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos.annual-calm-filled {
+    border-color: var(--au-ring-a) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .annual-calm-quarter {
+    color: var(--au-ring-a);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos h4 {
+    border-bottom: 1px solid var(--au-tile-line) !important;
+    color: var(--au-text) !important;
+    font: 700 1.1rem/1.2 var(--au-font-display) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos textarea {
+    color: var(--au-text) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .annual-calm-ideas {
+    border: 1px solid var(--au-tile-line);
+    border-radius: var(--au-r-md);
+    background: var(--au-tile);
+    box-shadow: var(--au-shadow-sm);
+  }
+}

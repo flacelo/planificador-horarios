@@ -91,3 +91,21 @@ test("Mensual: sin desenfoque propio, todo en @media screen, sin cielo ni violet
   assert.match(strip(monthlyBlock).trim(), /^@media screen \{/);
   assert.doesNotMatch(strip(monthlyBlock), /backdrop-filter|--au-sky|--au-violet|animation|transition|planify-export|planify_/);
 });
+
+// ───────── Anual ─────────
+const annual = read("css/annual-calm.css");
+const annualBlock = annual.slice(annual.indexOf("/* Cristal y luz (fase 2): Anual"));
+
+test("Anual: título grande y los 12 meses en fichas neutras; siguen en 3 columnas en escritorio y 1 en celular", () => {
+  assert.match(annualBlock, /\.encabezado-anual h3 \{[^}]*font: 700 var\(--au-t-h1\)\/1\.05 var\(--au-font-display\) !important;/);
+  assert.match(annualBlock, /\.tarjeta-mes-objetivos \{[^}]*border-radius: var\(--au-r-md\) !important;[^}]*background: var\(--au-tile\) !important;/);
+  assert.match(annualBlock, /\.tarjeta-mes-objetivos:focus-within \{[^}]*border-color: var\(--au-ring-a\) !important;/);
+  assert.match(annual, /\.grid-12-meses \{\s*display: grid !important;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\) !important;/);
+  assert.match(annual, /@media \(max-width: 740px\) \{[\s\S]*?\.grid-12-meses \{ grid-template-columns: minmax\(0, 1fr\) !important;/);
+  assert.doesNotMatch(strip(annualBlock), /grid-template-columns/);
+});
+
+test("Anual: sin desenfoque propio, todo en @media screen, sin cielo ni violeta y sin tocar el PDF ni los cuadros de texto", () => {
+  assert.match(strip(annualBlock).trim(), /^@media screen \{/);
+  assert.doesNotMatch(strip(annualBlock), /backdrop-filter|--au-sky|--au-violet|animation|transition|planify-export|planify_|resize|min-height/);
+});

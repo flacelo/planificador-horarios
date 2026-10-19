@@ -109,3 +109,34 @@ test("Anual: sin desenfoque propio, todo en @media screen, sin cielo ni violeta 
   assert.match(strip(annualBlock).trim(), /^@media screen \{/);
   assert.doesNotMatch(strip(annualBlock), /backdrop-filter|--au-sky|--au-violet|animation|transition|planify-export|planify_|resize|min-height/);
 });
+
+// ───────── Avance ─────────
+const dash = read("css/dashboard-calm.css");
+const dashBlock = dash.slice(dash.indexOf("/* Cristal y luz (fase 2): Avance"));
+
+test("Avance: fondo con malla, título grande, número grande y barra con degradado (sin anillo)", () => {
+  assert.match(dashBlock, /\.planify-dashboard-v2 \{\s*--dash-surface: var\(--au-tile\);[\s\S]*?background: var\(--au-mesh\), var\(--au-bg\) !important;/);
+  assert.match(dashBlock, /\.trust-dashboard-header h2 \{\s*font: 700 var\(--au-t-h1\)\/1\.05 var\(--au-font-display\);/);
+  assert.match(dashBlock, /\.dashboard-calm-percent strong:not\(\.is-empty\) \{[^}]*font: 700 clamp\(56px, 9vw, 104px\)\/1 var\(--au-font-display\);/);
+  assert.match(dashBlock, /\.dashboard-calm-progress span \{\s*background: linear-gradient\(90deg, var\(--au-ring-a\), var\(--au-ring-b\)\);/);
+  assert.doesNotMatch(strip(dashBlock), /conic-gradient|<svg|stroke-dasharray/);
+});
+
+test("Avance: una sola superficie de vidrio (la tarjeta principal) con respaldo opaco; lo tapado deja de desenfocar mientras está abierto", () => {
+  const css = strip(dashBlock);
+  assert.equal((css.match(/(?<!-webkit-)backdrop-filter: blur\(14px\)/g) || []).length, 1);
+  assert.match(css, /dashboard-calm-lead,\s*html body:is\([^)]*\) \.planify-dashboard-v2 \.dashboard-calm-empty \{\s*border: 1px solid var\(--au-glass-line\);[^}]*background: var\(--au-glass-solid\);/);
+  assert.match(css, /@media screen and \(prefers-reduced-transparency: reduce\) \{[\s\S]*?backdrop-filter: none;/);
+  assert.match(css, /html\.planify-dashboard-open body \.brand-hero\.au-glass,[\s\S]*?\.day-flow-main,\s*html\.planify-dashboard-open body #tabla \.hora-cell \{\s*-webkit-backdrop-filter: none !important;\s*backdrop-filter: none !important;/);
+});
+
+test("Avance: la menta es el único color de acción en botones y pestaña actual; botones y pestañas de 44 px", () => {
+  assert.match(dashBlock, /\.dashboard-view-nav button\[aria-current="page"\],[\s\S]*?\{\s*border-color: transparent;\s*background: var\(--au-mint\);\s*color: var\(--au-mint-ink\);/);
+  assert.match(dashBlock, /\.dashboard-view-nav button \{\s*min-height: 44px;\s*border-radius: 999px;/);
+  assert.match(dashBlock, /\.dashboard-week-nav button \{ min-width: 44px; \}/);
+  assert.doesNotMatch(strip(dashBlock), /--au-sky|--au-violet|#6fb8ff|#9a8cff/);
+});
+
+test("Avance: todo en @media screen y sin tocar el PDF (Avance no entra al PDF) ni las claves", () => {
+  assert.doesNotMatch(strip(dashBlock), /planify-export|planify_|planify-backup|animation|transition/);
+});

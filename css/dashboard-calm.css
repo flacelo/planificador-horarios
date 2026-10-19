@@ -464,3 +464,118 @@ body.tema-claro .planify-dashboard-v2 .trust-dashboard-eyebrow { color: #277452;
 
 /* Tipografía mínima: ningún texto de Avance baja de 12 px. */
 .planify-dashboard-v2 :is(.trust-dashboard-eyebrow, .dashboard-view-nav button span, .dashboard-calm-kicker, .dashboard-calm-history-note, .trust-bar-value, .trust-bar-label, .dashboard-calm-chart-legend span, .dashboard-calm-disclaimer) { font-size: 12px !important; }
+
+/* Cristal y luz (fase 2): Avance. Número grande y barra con degradado (sin anillo). Una sola superficie de vidrio: la tarjeta principal.
+   Mientras Avance está abierto, lo que queda tapado detrás deja de desenfocar (incluidas las celdas de hora de Semanal, que
+   así no se ven afectadas: están cubiertas por completo). Todo en @media screen. */
+@media screen {
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 {
+    --dash-surface: var(--au-tile);
+    --dash-surface-soft: var(--au-tile-2);
+    --dash-line: var(--au-tile-line);
+    --dash-text: var(--au-text);
+    --dash-muted: var(--au-text-soft);
+    --dash-bar-pending: var(--au-ring-track);
+    background: var(--au-mesh), var(--au-bg) !important;
+    font-family: var(--au-font-body);
+  }
+  html.planify-dashboard-open body .brand-hero.au-glass,
+  html.planify-dashboard-open body .bottom-nav,
+  html.planify-dashboard-open body .weekly-calm-intro,
+  html.planify-dashboard-open body .monthly-calm-intro,
+  html.planify-dashboard-open body .encabezado-anual,
+  html.planify-dashboard-open body .day-flow-main,
+  html.planify-dashboard-open body #tabla .hora-cell {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .trust-dashboard-header h2 {
+    font: 700 var(--au-t-h1)/1.05 var(--au-font-display);
+    letter-spacing: var(--au-track-display);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .trust-dashboard-header button,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-week-nav button {
+    min-height: 44px;
+    border: 1px solid var(--au-tile-line);
+    border-radius: 999px;
+    background: var(--au-tile);
+    box-shadow: var(--au-shadow-sm);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-week-nav button { min-width: 44px; }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-week-nav {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    border-radius: var(--au-r-lg);
+    box-shadow: var(--au-shadow-sm);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-view-nav {
+    border-radius: 999px;
+    box-shadow: var(--au-shadow-sm);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-view-nav button {
+    min-height: 44px;
+    border-radius: 999px;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-view-nav button[aria-current="page"],
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-idea button,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-empty button {
+    border-color: transparent;
+    background: var(--au-mint);
+    color: var(--au-mint-ink);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-idea button,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-empty button {
+    min-height: 44px;
+    border-radius: 999px;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-lead,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-empty {
+    border: 1px solid var(--au-glass-line);
+    border-radius: var(--au-r-xl);
+    background: var(--au-glass-solid);
+    box-shadow: var(--au-shadow-md);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-percent strong:not(.is-empty) {
+    color: var(--au-ring-a);
+    font: 700 clamp(56px, 9vw, 104px)/1 var(--au-font-display);
+    letter-spacing: -0.05em;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-progress {
+    height: 14px;
+    background: var(--au-ring-track);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-progress span {
+    background: linear-gradient(90deg, var(--au-ring-a), var(--au-ring-b));
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-stats .trust-metric,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .trust-chart,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-more {
+    border: 1px solid var(--au-tile-line);
+    border-radius: var(--au-r-md);
+    background: var(--au-tile);
+    box-shadow: var(--au-shadow-sm);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-idea {
+    border: 1px solid var(--au-tile-line);
+    border-radius: var(--au-r-md);
+    background: var(--au-tile-2);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-stats .trust-metric strong {
+    font: 700 clamp(28px, 3.4vw, 42px)/1.1 var(--au-font-display);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-section-heading h3 {
+    font: 700 var(--au-t-h2)/1.15 var(--au-font-display);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .trust-bar-completed {
+    background: linear-gradient(180deg, var(--au-ring-b), var(--au-ring-a));
+  }
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  @media screen {
+    html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-lead,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-empty { background: var(--au-glass); -webkit-backdrop-filter: blur(14px) saturate(1.25); backdrop-filter: blur(14px) saturate(1.25); }
+  }
+}
+@media screen and (prefers-reduced-transparency: reduce) {
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-lead,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) .planify-dashboard-v2 .dashboard-calm-empty { background: var(--au-glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}

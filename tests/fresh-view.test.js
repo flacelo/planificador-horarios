@@ -146,7 +146,7 @@ test("hasContent distingue contenido de la persona de los ajustes que la app esc
 });
 
 test("el script va primero: antes del protector de datos y de app.js", () => {
-  const fresh = indexHtml.indexOf('src="js/fresh-view.js?v=1.0"');
+  const fresh = indexHtml.indexOf('src="js/fresh-view.js?v=1.3"');
   const gate = indexHtml.indexOf('src="js/local-data-gate.js');
   const app = indexHtml.indexOf('src="js/app.js');
   assert.ok(fresh >= 0 && fresh < gate && gate < app);
@@ -274,4 +274,48 @@ test("textos y reglas de 'Quedarme aquí': botón, prefijo del título, puntito 
 test("la tarjeta de ⚙️ → Descargas sigue ofreciendo 'Volver a mi plan' dentro de la vista, con el aviso oculto o no", () => {
   assert.match(source, /var button = make\("button", "", active \? TEXT\.back : TEXT\.start\);/);
   assert.match(source, /button\.setAttribute\("data-fresh-action", active \? "leave" : "start"\);/);
+});
+
+// ───────── La opción es solo para el dueño: tarjeta escondida y gesto de 5 toques ─────────
+test("sin el gesto y sin la vista activa, la tarjeta no se muestra (código de ensureCard)", () => {
+  assert.match(source, /if \(!active && !revealed\) \{\s*if \(card && card\.parentNode\) card\.parentNode\.removeChild\(card\);\s*return;\s*\}/);
+});
+
+test("gesto oculto: 5 toques en menos de 3 segundos muestran la tarjeta; 4 no", () => {
+  const { api } = setup({ real: REAL });
+  assert.equal(api.isRevealed(), false);
+  [0, 400, 800, 1200].forEach((t) => assert.equal(api.registerTap(t), false));
+  assert.equal(api.isRevealed(), false);
+  assert.equal(api.registerTap(1600), true);
+  assert.equal(api.isRevealed(), true);
+});
+
+test("gesto oculto: toques lentos no cuentan (el quinto llega a más de 3 segundos del primero)", () => {
+  const { api } = setup({ real: REAL });
+  [0, 1000, 2000, 3000].forEach((t) => api.registerTap(t));
+  assert.equal(api.registerTap(3001), false);
+  assert.equal(api.isRevealed(), false);
+  // Los toques viejos se descartan: una ráfaga nueva de 5 sí cuenta.
+  [10000, 10200, 10400, 10600].forEach((t) => assert.equal(api.registerTap(t), false));
+  assert.equal(api.registerTap(10800), true);
+});
+
+test("el gesto no guarda nada: ni en los datos reales ni en la memoria de la pestaña", () => {
+  const { api, local, sess } = setup({ real: REAL });
+  const antes = JSON.stringify([[...local.map.entries()], [...sess.map.entries()]]);
+  [0, 100, 200, 300, 400].forEach((t) => api.registerTap(t));
+  assert.equal(api.isRevealed(), true);
+  assert.equal(JSON.stringify([[...local.map.entries()], [...sess.map.entries()]]), antes);
+});
+
+test("el gesto va en el título del panel (no en el cuadrito de marca) y abre Descargas", () => {
+  assert.match(source, /closest\("#side-panel \.sp-title"\)/);
+  assert.doesNotMatch(source, /panel-brand-mark|brand-mark/);
+  assert.match(source, /querySelector\('#side-panel \[data-tab="tab-ajustes"\]'\)/);
+});
+
+test("los botones de la tarjeta, del aviso y de la confirmación miden 44 px aunque el panel diga otra cosa", () => {
+  assert.match(source, /#planify-fresh-banner button,\.planify-fresh-card button,#planify-fresh-dialog button\{min-height:44px!important;/);
+  // Las reglas del panel (#side-panel .sp-container .card-section button) son más específicas: la tarjeta necesita la suya.
+  assert.match(source, /#side-panel \.sp-container section\.planify-fresh-card button\{min-height:44px!important;height:auto!important\}/);
 });

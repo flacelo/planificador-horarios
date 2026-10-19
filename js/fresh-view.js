@@ -151,6 +151,25 @@
   var syncTimer = 0;
   var pending = null;
 
+  // La tarjeta de ⚙️ → Descargas es solo para el dueño: no se muestra al público.
+  // Aparece si la vista está activa o si se hace el gesto oculto (5 toques en el título del panel, en menos de 3 segundos).
+  // El gesto no guarda nada: la tarjeta queda visible hasta que se recargue la página.
+  var TAPS_NEEDED = 5;
+  var TAPS_WINDOW_MS = 3000;
+  var revealed = false;
+  var taps = [];
+
+  function registerTap(now) {
+    taps.push(now);
+    while (taps.length > TAPS_NEEDED) taps.shift();
+    if (taps.length === TAPS_NEEDED && now - taps[0] <= TAPS_WINDOW_MS) {
+      taps = [];
+      revealed = true;
+      return true;
+    }
+    return false;
+  }
+
   function make(tag, className, text) {
     var node = document.createElement(tag);
     if (className) node.className = className;
@@ -169,12 +188,13 @@
     style.textContent =
       "#planify-fresh-banner{position:sticky;top:0;z-index:900;display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap;box-sizing:border-box;width:100%;padding:10px 64px 10px 16px;background:#0b5f58;color:#fff;font:600 14px/1.4 inherit;box-shadow:0 2px 12px rgba(0,0,0,.25)}" +
       "#planify-fresh-banner span{flex:1 1 220px;min-width:0}" +
-      "#planify-fresh-banner button,.planify-fresh-card button,#planify-fresh-dialog button{min-height:44px;padding:8px 14px;border-radius:10px;font:700 14px/1.2 inherit;cursor:pointer}" +
+      "#planify-fresh-banner button,.planify-fresh-card button,#planify-fresh-dialog button{min-height:44px!important;padding:8px 14px;border-radius:10px;font:700 14px/1.2 inherit;cursor:pointer}" +
       "#planify-fresh-banner .planify-fresh-banner-actions{display:flex;flex-wrap:wrap;gap:8px}" +
       "#planify-fresh-banner button{border:1px solid #7fd9c2;background:#7fd9c2;color:#103a38}" +
       "#planify-fresh-banner button.is-secondary{background:transparent;color:#fff;border-color:#fff}" +
       "#cloud-btn.planify-fresh-on::after{content:\"\";position:absolute;top:3px;right:3px;width:11px;height:11px;border-radius:50%;background:#7fd9c2;box-shadow:0 0 0 2px #0b5f58}" +
       ".planify-fresh-card{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding:12px;border:1px solid rgba(20,184,166,.32);border-radius:13px;background:linear-gradient(135deg,rgba(240,253,250,.9),rgba(238,242,255,.85))}" +
+      "#side-panel .sp-container section.planify-fresh-card button{min-height:44px!important;height:auto!important}" +
       ".planify-fresh-card>div{display:grid;gap:2px;min-width:0;flex:1}.planify-fresh-card strong{font-size:14px;color:#21304b}.planify-fresh-card small{font-size:12px;line-height:1.4;color:#4b5b72}" +
       ".planify-fresh-card button{flex:0 0 auto;max-width:150px;border:1px solid #14b8a6;background:#fff;color:#0f766e}" +
       "body.dark .planify-fresh-card,body.tema-estelar:not(.light-mode):where(:not(.tema-claro)) .planify-fresh-card{background:linear-gradient(135deg,#13283a,#172441);border-color:rgba(45,212,191,.32)}" +
@@ -300,6 +320,10 @@
     var tab = document.getElementById("tab-ajustes");
     if (!tab) return;
     var card = tab.querySelector(".planify-fresh-card");
+    if (!active && !revealed) {
+      if (card && card.parentNode) card.parentNode.removeChild(card);
+      return;
+    }
     if (!card) {
       card = make("section", "planify-fresh-card");
       var copy = make("div");
@@ -365,6 +389,18 @@
   }, true);
 
   api.refresh = sync;
+  api.registerTap = registerTap;
+  api.isRevealed = function () { return revealed; };
+
+  document.addEventListener("click", function (event) {
+    var title = event.target && event.target.closest ? event.target.closest("#side-panel .sp-title") : null;
+    if (!title || !registerTap(Date.now())) return;
+    sync();
+    var tabButton = document.querySelector('#side-panel [data-tab="tab-ajustes"]');
+    if (tabButton && typeof tabButton.click === "function") tabButton.click();
+    var card = document.querySelector("#tab-ajustes .planify-fresh-card");
+    if (card && typeof card.scrollIntoView === "function") card.scrollIntoView({ block: "nearest" });
+  });
 
   function init() {
     sync();

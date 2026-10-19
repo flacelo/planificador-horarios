@@ -700,7 +700,7 @@
       var style = document.createElement("link");
       style.id = "planify-weekly-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/weekly-calm.css?v=20";
+      style.href = "css/weekly-calm.css?v=21";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-weekly-calm-script")) {

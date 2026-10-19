@@ -51,3 +51,26 @@ test("todo lo nuevo va en @media screen (la impresión conserva lo de siempre) y
 test("no toca la tabla de Semanal, el PDF ni las claves", () => {
   assert.doesNotMatch(base, /#tabla|#table-wrap|#view-table|hora-cell|planify-export|planify_|planify-backup|brand-mark|icon\.svg/);
 });
+
+// ───────── Semanal ─────────
+const weekly = read("css/weekly-calm.css");
+const weeklyBlock = weekly.slice(weekly.indexOf("/* Cristal y luz (fase 2): Semanal"));
+
+test("Semanal: título grande y fichas neutras sin desenfoque alrededor de la tabla", () => {
+  assert.match(weeklyBlock, /\.weekly-calm-intro h2 \{[^}]*font: 700 var\(--au-t-h1\)\/1\.05 var\(--au-font-display\);/);
+  assert.match(weeklyBlock, /\.weekly-calm-grid-title h3 \{[^}]*font: 700 var\(--au-t-h2\)\/1\.15 var\(--au-font-display\);/);
+  assert.match(weeklyBlock, /#day-summary\.show,[\s\S]*?\.weekly-calm-selected-day \{[^}]*background: var\(--au-tile\) !important;[^}]*backdrop-filter: none !important;/);
+  assert.match(weeklyBlock, /\.weekly-calm-more > summary \{\s*min-height: 44px;[^}]*border-radius: 999px;/);
+  assert.match(weeklyBlock, /\.weekly-calm-day-button:not\(\[aria-pressed="true"\]\) \{[^}]*border-radius: var\(--au-r-sm\);/);
+});
+
+test("Semanal: la tabla no se toca (ni su HTML, ni sus reglas, ni el desenfoque de las celdas de hora: excepción anotada)", () => {
+  assert.doesNotMatch(strip(weeklyBlock), /#tabla|#table-wrap|#view-table|hora-cell|planify-export|th:first-child/);
+  // Quitar el desenfoque de .hora-cell cambia hasta 3/255 de color en unos 10 000 píxeles de la columna de horas: no es idéntico al píxel, así que se deja.
+  assert.match(read("css/grid.css"), /\.hora-cell\{background:rgba\(255,255,255,0\.5\);backdrop-filter:blur\(4px\)/);
+});
+
+test("Semanal: todo lo nuevo va en @media screen y sin colores de acción distintos de la menta", () => {
+  assert.match(strip(weeklyBlock).trim(), /^@media screen \{/);
+  assert.doesNotMatch(strip(weeklyBlock), /--au-sky|--au-violet|#6fb8ff|#9a8cff|animation|transition/);
+});

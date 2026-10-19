@@ -822,3 +822,50 @@ body.tema-claro .weekly-calm-undo { border-color: #86cabc; background: #e9faf5; 
 
 /* Tipografía mínima: días del celular, resumen de hoy, leyenda y opciones a 12 px. La tabla (#tabla) es excepción y no se toca. */
 #view-semanal.weekly-calm-ready :is(.weekly-calm-day-label, .weekly-calm-day-count, .weekly-calm-selected-count, .weekly-calm-legend span, .weekly-calm-more > summary, .weekly-calm-more > summary span, .merge-badge, #day-summary .ds-stat, #day-summary .ds-stat strong, #day-summary .ds-actions button) { font-size: 12px !important; }
+
+/* Cristal y luz (fase 2): Semanal. Solo lo que rodea a la tabla; la tabla (#tabla y #table-wrap) no se toca.
+   La tarjeta de presentación y la barra de fecha están en css/aurora.css. Todo en @media screen: el PDF y la impresión no cambian. */
+@media screen {
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-intro h2 {
+    color: var(--au-text);
+    font: 700 var(--au-t-h1)/1.05 var(--au-font-display);
+    letter-spacing: var(--au-track-display);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-grid-title h3 {
+    color: var(--au-text);
+    font: 700 var(--au-t-h2)/1.15 var(--au-font-display);
+    letter-spacing: -0.02em;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready #day-summary.show,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready #empty-state,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-legend,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-selected-day {
+    border: 1px solid var(--au-tile-line) !important;
+    border-radius: var(--au-r-md) !important;
+    background: var(--au-tile) !important;
+    box-shadow: var(--au-shadow-sm) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-more > summary {
+    min-height: 44px;
+    border: 1px solid var(--au-tile-line);
+    border-radius: 999px;
+    background: var(--au-tile);
+    color: var(--au-text);
+    box-shadow: var(--au-shadow-sm);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-more .table-actions {
+    border: 1px solid var(--au-glass-line);
+    border-radius: var(--au-r-md);
+    background: var(--au-glass-solid);
+    box-shadow: var(--au-shadow-md);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-day-button:not([aria-pressed="true"]) {
+    border: 1px solid var(--au-tile-line);
+    border-radius: var(--au-r-sm);
+    background: var(--au-tile);
+    color: var(--au-text);
+    box-shadow: var(--au-shadow-sm);
+  }
+}

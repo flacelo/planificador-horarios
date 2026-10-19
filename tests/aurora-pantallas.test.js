@@ -74,3 +74,20 @@ test("Semanal: todo lo nuevo va en @media screen y sin colores de acción distin
   assert.match(strip(weeklyBlock).trim(), /^@media screen \{/);
   assert.doesNotMatch(strip(weeklyBlock), /--au-sky|--au-violet|#6fb8ff|#9a8cff|animation|transition/);
 });
+
+// ───────── Mensual ─────────
+const monthly = read("css/monthly-calm.css");
+const monthlyBlock = monthly.slice(monthly.indexOf("/* Cristal y luz (fase 2): Mensual"));
+
+test("Mensual: título grande, calendario en ficha y días en fichas pequeñas; hoy resaltado en menta", () => {
+  assert.match(monthlyBlock, /\.monthly-calm-intro h2 \{[^}]*font: 700 var\(--au-t-h1\)\/1\.05 var\(--au-font-display\);/);
+  assert.match(monthlyBlock, /#cal-container \{[^}]*border-radius: var\(--au-r-lg\);[^}]*background: var\(--au-tile\);/);
+  assert.match(monthlyBlock, /#cal-grid \.cal-dia \{[^}]*border-radius: var\(--au-r-sm\) !important;[^}]*background: var\(--au-tile-2\) !important;/);
+  assert.match(monthlyBlock, /\.cal-dia\.hoy \{[^}]*border: 2px solid var\(--au-ring-a\) !important;/);
+  assert.match(monthlyBlock, /\.cal-dia\.hoy \.cal-numero \{\s*color: var\(--au-ring-a\) !important;/);
+});
+
+test("Mensual: sin desenfoque propio, todo en @media screen, sin cielo ni violeta y sin tocar el PDF", () => {
+  assert.match(strip(monthlyBlock).trim(), /^@media screen \{/);
+  assert.doesNotMatch(strip(monthlyBlock), /backdrop-filter|--au-sky|--au-violet|animation|transition|planify-export|planify_/);
+});

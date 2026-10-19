@@ -39,7 +39,8 @@ test("Anual y Mensual: rótulos y sugerencias a 12 px (el calendario y sus casil
   assert.match(block(read("css/monthly-calm.css"), "/* Tipografía mínima"), /#view-mensual\.monthly-calm-ready :is\(\.monthly-calm-eyebrow, \.monthly-calm-ideas > summary small\) \{ font-size: 12px !important; \}/);
   assert.match(block(read("css/trust-fixes.css"), "/* Tipografía mínima"), /\.trust-personal-guidance :is\(small, li\) \{ font-size: 12px !important; \}/);
   // Excepciones: no se tocan las casillas del calendario mensual.
-  assert.doesNotMatch(read("css/monthly-calm.css"), /Tipografía mínima[\s\S]*cal-dia/);
+  const monthlyFloor = block(read("css/monthly-calm.css"), "/* Tipografía mínima");
+  assert.doesNotMatch(monthlyFloor.slice(0, monthlyFloor.indexOf("/* Cristal y luz (fase 2)")), /cal-dia/);
 });
 
 test("cabecera y ayuda del celular a 12 px", () => {

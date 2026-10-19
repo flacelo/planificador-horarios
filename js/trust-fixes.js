@@ -717,7 +717,7 @@
       var style = document.createElement("link");
       style.id = "planify-monthly-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/monthly-calm.css?v=11";
+      style.href = "css/monthly-calm.css?v=12";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-monthly-calm-script")) {

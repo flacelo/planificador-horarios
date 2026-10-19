@@ -293,3 +293,49 @@ body.tema-claro #view-mensual.monthly-calm-ready .monthly-calm-eyebrow { color: 
 
 /* Tipografía mínima: rótulo y sugerencias del Mensual a 12 px (las casillas del calendario son excepción). */
 #view-mensual.monthly-calm-ready :is(.monthly-calm-eyebrow, .monthly-calm-ideas > summary small) { font-size: 12px !important; }
+
+/* Cristal y luz (fase 2): Mensual. La tarjeta de presentación y la barra de fecha están en css/aurora.css.
+   Todo en @media screen: el PDF y la impresión no cambian. */
+@media screen {
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready .monthly-calm-intro h2 {
+    color: var(--au-text);
+    font: 700 var(--au-t-h1)/1.05 var(--au-font-display);
+    letter-spacing: var(--au-track-display);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready .monthly-calm-intro p {
+    color: var(--au-text-soft);
+    font-size: var(--au-t-lead);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #cal-container {
+    border: 1px solid var(--au-tile-line);
+    border-radius: var(--au-r-lg);
+    background: var(--au-tile);
+    box-shadow: var(--au-shadow-sm);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #cal-grid .cal-dia {
+    border: 1px solid var(--au-tile-line) !important;
+    border-radius: var(--au-r-sm) !important;
+    background: var(--au-tile-2) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #cal-grid .cal-dia:hover {
+    border-color: var(--au-ring-a) !important;
+    background: var(--au-tile-2) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #cal-grid .cal-dia.hoy {
+    border: 2px solid var(--au-ring-a) !important;
+    box-shadow: var(--au-glow) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #cal-grid .cal-dia.hoy .cal-numero {
+    color: var(--au-ring-a) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #cal-grid .cal-evento-contenedor {
+    border-radius: var(--au-r-sm);
+    background: var(--au-tile);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready .monthly-calm-ideas {
+    border: 1px solid var(--au-tile-line);
+    border-radius: var(--au-r-md);
+    background: var(--au-tile);
+    box-shadow: var(--au-shadow-sm);
+  }
+}

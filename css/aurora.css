@@ -223,3 +223,73 @@ html.planify-brand-ready body .trust-start-hub .trust-start-options > button.is-
   border-color: var(--au-ring-a) !important;
   box-shadow: var(--au-glow) !important;
 }
+
+/* ───────── Pantallas (fase 2) · base compartida ─────────
+   Semanal, Mensual y Anual comparten la tarjeta de presentación (vidrio con respaldo opaco) y los botones de fecha en píldora de 44 px.
+   Todo va dentro de @media screen: la impresión del navegador y el PDF conservan sus reglas de siempre (el PDF no usa estos estilos). */
+@media screen {
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-intro,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready .monthly-calm-intro,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .encabezado-anual {
+    border: 1px solid var(--au-glass-line);
+    background: var(--au-glass-solid);
+    box-shadow: var(--au-shadow-md);
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-intro,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready .monthly-calm-intro {
+    border-radius: var(--au-r-lg) var(--au-r-lg) 0 0;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .encabezado-anual {
+    border-radius: var(--au-r-lg);
+  }
+  /* La barra de fecha continúa la tarjeta: mismo tinte, pero sin su propio desenfoque (así la tarjeta cuenta como una sola superficie de vidrio). */
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready #nav-bar-semanal,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #nav-bar-mensual {
+    border: 1px solid var(--au-glass-line) !important;
+    border-top: 0 !important;
+    border-radius: 0 0 var(--au-r-lg) var(--au-r-lg) !important;
+    background: var(--au-glass-solid) !important;
+    box-shadow: var(--au-shadow-sm) !important;
+    color: var(--au-text) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready #nav-bar-semanal .btn-nav-fecha,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #nav-bar-mensual .btn-nav-fecha {
+    flex: 0 0 auto;
+    width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--au-tile-line) !important;
+    border-radius: 999px !important;
+    background: var(--au-tile) !important;
+    color: var(--au-text) !important;
+    box-shadow: var(--au-shadow-sm) !important;
+  }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready #label-fecha-semanal,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #label-fecha-mensual {
+    color: var(--au-text) !important;
+    font-size: 1rem !important;
+    font-weight: 700;
+  }
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  @media screen {
+    html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-intro,
+    html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready .monthly-calm-intro,
+    html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .encabezado-anual { background: var(--au-glass); -webkit-backdrop-filter: blur(14px) saturate(1.25); backdrop-filter: blur(14px) saturate(1.25); }
+    html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready #nav-bar-semanal,
+    html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #nav-bar-mensual { background: var(--au-glass) !important; }
+  }
+}
+
+@media screen and (prefers-reduced-transparency: reduce) {
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready .weekly-calm-intro,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready .monthly-calm-intro,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .encabezado-anual { background: var(--au-glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready #nav-bar-semanal,
+  html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #nav-bar-mensual { background: var(--au-glass-solid) !important; }
+}
+
+/* Impresión del navegador: sin malla de fondo ni vidrio (lo de la maqueta no debe llegar a la hoja). */
+@media print {
+  html.planify-brand-ready body, html.planify-brand-ready body.tema-claro, html.planify-brand-ready body.light-mode { background-image: none !important; }
+  .au-glass, html.planify-brand-ready .brand-hero.au-glass { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: none !important; }
+}

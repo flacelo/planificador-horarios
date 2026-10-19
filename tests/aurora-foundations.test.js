@@ -92,6 +92,8 @@ test("el panel cerrado no desenfoca y las estrellas se pausan (menos trabajo en 
 });
 
 test("sin animaciones ni transiciones en esta base; no toca la tabla de Semanal, el PDF, el ícono ni el logo", () => {
-  assert.doesNotMatch(css, /animation|transition|@keyframes/);
-  assert.doesNotMatch(css, /#tabla|#view-table|weekly|planify-export|brand-mark|\.brand-identity|icon\.svg/);
+  // Solo la parte de la maqueta (las pantallas de la fase 2 tienen su propia prueba: tests/aurora-pantallas.test.js).
+  const maqueta = css.slice(0, css.indexOf("/* ───────── Pantallas (fase 2)"));
+  assert.doesNotMatch(maqueta, /animation|transition|@keyframes/);
+  assert.doesNotMatch(maqueta, /#tabla|#view-table|weekly|planify-export|brand-mark|\.brand-identity|icon\.svg/);
 });

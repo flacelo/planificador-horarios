@@ -7,7 +7,7 @@ const path = require("node:path");
 
 const read = (file) => fs.readFileSync(path.join(__dirname, "..", file), "utf8");
 const css = read("css/aurora.css");
-const phase2 = css.slice(css.indexOf("Fase 2 · Inicio y cabecera"));
+const phase2 = css.slice(css.indexOf("Fase 2 · Inicio y cabecera"), css.indexOf("/* ───────── Pantallas (fase 2)"));
 const brand = read("js/brand-home.js");
 
 test("el hero es una superficie de vidrio con respaldo opaco y sin desenfoque si se pide menos transparencia", () => {

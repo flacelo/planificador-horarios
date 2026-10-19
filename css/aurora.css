@@ -48,6 +48,7 @@ body {
   --au-shadow-md: 0 18px 48px rgba(2, 10, 20, 0.34);
   --au-glow: 0 0 0 1px rgba(116, 227, 192, 0.18), 0 12px 40px rgba(116, 227, 192, 0.1);
   --au-ring-a: #74e3c0;
+  --au-accent-text: #74e3c0;
   --au-ring-b: #6fb8ff;
   --au-ring-track: rgba(255, 255, 255, 0.14);
   --au-mesh:
@@ -72,6 +73,7 @@ body.light-mode {
   --au-shadow-md: 0 18px 48px rgba(21, 35, 54, 0.12);
   --au-glow: 0 0 0 1px rgba(10, 127, 117, 0.14), 0 12px 40px rgba(10, 127, 117, 0.08);
   --au-ring-a: #0a7f75;
+  --au-accent-text: #06695f;
   --au-ring-b: #2f6fd0;
   --au-ring-track: #d5e6df;
   --au-mesh:
@@ -255,7 +257,8 @@ html.planify-brand-ready body .trust-start-hub .trust-start-options > button.is-
   html body:is(.tema-estelar, .tema-claro, .light-mode) #view-semanal.weekly-calm-ready #nav-bar-semanal .btn-nav-fecha,
   html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #nav-bar-mensual .btn-nav-fecha {
     flex: 0 0 auto;
-    width: 44px;
+    width: 44px !important;
+    min-width: 44px !important;
     min-height: 44px;
     border: 1px solid var(--au-tile-line) !important;
     border-radius: 999px !important;

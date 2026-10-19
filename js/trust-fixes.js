@@ -672,7 +672,7 @@
     if (!document.getElementById("planify-brand-script")) {
       var script = document.createElement("script");
       script.id = "planify-brand-script";
-      script.src = "js/brand-home.js?v=25";
+      script.src = "js/brand-home.js?v=27";
       script.defer = true;
       document.head.appendChild(script);
     }
@@ -683,7 +683,7 @@
       var style = document.createElement("link");
       style.id = "planify-panel-redesign-style";
       style.rel = "stylesheet";
-      style.href = "css/panel-redesign.css?v=20";
+      style.href = "css/panel-redesign.css?v=22";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-panel-redesign-script")) {
@@ -717,7 +717,7 @@
       var style = document.createElement("link");
       style.id = "planify-monthly-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/monthly-calm.css?v=12";
+      style.href = "css/monthly-calm.css?v=13";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-monthly-calm-script")) {
@@ -734,7 +734,7 @@
       var style = document.createElement("link");
       style.id = "planify-annual-calm-style";
       style.rel = "stylesheet";
-      style.href = "css/annual-calm.css?v=4";
+      style.href = "css/annual-calm.css?v=5";
       document.head.appendChild(style);
     }
     if (!document.getElementById("planify-annual-calm-script")) {

@@ -327,7 +327,7 @@
     var link = document.createElement("link");
     link.id = "planify-aurora-style";
     link.rel = "stylesheet";
-    link.href = "css/aurora.css?v=4";
+    link.href = "css/aurora.css?v=6";
     document.head.appendChild(link);
   }
 

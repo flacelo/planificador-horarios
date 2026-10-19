@@ -326,7 +326,8 @@ body.tema-claro #view-mensual.monthly-calm-ready .monthly-calm-eyebrow { color: 
     box-shadow: var(--au-glow) !important;
   }
   html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #cal-grid .cal-dia.hoy .cal-numero {
-    color: var(--au-ring-a) !important;
+    color: var(--au-accent-text) !important;
+    opacity: 1 !important;
   }
   html body:is(.tema-estelar, .tema-claro, .light-mode) #view-mensual.monthly-calm-ready #cal-grid .cal-evento-contenedor {
     border-radius: var(--au-r-sm);

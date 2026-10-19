@@ -823,3 +823,83 @@ html.planify-panel-redesign-ready #side-panel .planify-pwa-settings-card button 
 
 /* Tipografía mínima: ningún texto del panel baja de 12 px. */
 .planify-panel-redesign-ready #side-panel :is(.sp-title small, .panel-section-intro > span, .panel-rebuild-hint, .panel-advanced summary span, .merge-info, .sp-hint, .panel-backup summary small, #planify-previous-week-caption, .planify-pwa-settings-card small) { font-size: 12px !important; }
+
+/* Cristal y luz (fase 2): panel ⚙️. Fondo plano del tema (la barra de pestañas fija necesita fondo opaco, así que sin malla), cabecera de vidrio
+   solo mientras el panel está abierto, pestañas en píldora de 44 px y secciones en fichas neutras. La capa oscura de atrás ya no desenfoca
+   (solo oscurece), y mientras el panel está abierto lo que queda detrás deja de desenfocar: así hay una sola superficie de vidrio.
+   El cuadrito de marca del panel (.panel-brand-mark) no se toca. Todo en @media screen. */
+@media screen {
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel {
+    background: var(--au-bg) !important;
+    border-right: 1px solid var(--au-glass-line) !important;
+  }
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel.open .sp-header {
+    border-bottom: 1px solid var(--au-glass-line) !important;
+    background: var(--au-glass-solid) !important;
+  }
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel .panel-tabs {
+    background: var(--au-bg) !important;
+  }
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel :is(.panel-tabs .tab-btn, .sp-btn.sp-btn-sm, .sp-lang-btn, .sp-action-btn) {
+    min-height: 44px !important;
+  }
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel .panel-tabs .tab-btn {
+    min-height: 44px;
+    border: 1px solid var(--au-tile-line) !important;
+    border-radius: 999px !important;
+    background: var(--au-tile) !important;
+    color: var(--au-text) !important;
+    box-shadow: var(--au-shadow-sm);
+  }
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel .panel-tabs .tab-btn.active {
+    border-color: transparent !important;
+    background: var(--au-mint) !important;
+    color: var(--au-mint-ink) !important;
+  }
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel .trust-panel-close {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--au-tile-line) !important;
+    border-radius: 999px !important;
+    background: var(--au-tile) !important;
+    color: var(--au-text) !important;
+  }
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel .panel-section-intro h3 {
+    color: var(--au-text) !important;
+    font: 700 var(--au-t-h2)/1.15 var(--au-font-display);
+    letter-spacing: -0.02em;
+  }
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel .card-section,
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel .panel-advanced,
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel .panel-backup {
+    border: 1px solid var(--au-tile-line) !important;
+    border-radius: var(--au-r-md) !important;
+    background: var(--au-tile) !important;
+    box-shadow: var(--au-shadow-sm) !important;
+  }
+  html.planify-panel-redesign-ready body #side-overlay {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html.planify-panel-redesign-ready body #side-overlay.open {
+    background: rgba(2, 10, 20, .6);
+  }
+  html body:has(#side-panel.open) .brand-hero.au-glass,
+  html body:has(#side-panel.open) .bottom-nav,
+  html body:has(#side-panel.open) .weekly-calm-intro,
+  html body:has(#side-panel.open) .monthly-calm-intro,
+  html body:has(#side-panel.open) .encabezado-anual,
+  html body:has(#side-panel.open) .day-flow-main {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  @media screen {
+    html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel.open .sp-header { background: var(--au-glass) !important; -webkit-backdrop-filter: blur(14px) saturate(1.25); backdrop-filter: blur(14px) saturate(1.25); }
+  }
+}
+@media screen and (prefers-reduced-transparency: reduce) {
+  html.planify-panel-redesign-ready body:is(.tema-estelar, .tema-claro, .light-mode) #side-panel.open .sp-header { background: var(--au-glass-solid) !important; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}

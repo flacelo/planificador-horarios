@@ -37,7 +37,7 @@ test("la barra de fecha continúa la tarjeta sin su propio desenfoque (una sola 
 });
 
 test("botones de fecha: píldora de 44 px, neutros (la menta es la única acción)", () => {
-  assert.match(base, /\.btn-nav-fecha,[\s\S]*?\.btn-nav-fecha \{\s*flex: 0 0 auto;\s*width: 44px;\s*min-height: 44px;[^}]*border-radius: 999px !important;[^}]*background: var\(--au-tile\) !important;/);
+  assert.match(base, /\.btn-nav-fecha,[\s\S]*?\.btn-nav-fecha \{\s*flex: 0 0 auto;\s*width: 44px !important;\s*min-width: 44px !important;\s*min-height: 44px;[^}]*border-radius: 999px !important;[^}]*background: var\(--au-tile\) !important;/);
   assert.doesNotMatch(base, /--au-sky|--au-violet|#6fb8ff|#9a8cff/);
 });
 
@@ -84,7 +84,7 @@ test("Mensual: título grande, calendario en ficha y días en fichas pequeñas; 
   assert.match(monthlyBlock, /#cal-container \{[^}]*border-radius: var\(--au-r-lg\);[^}]*background: var\(--au-tile\);/);
   assert.match(monthlyBlock, /#cal-grid \.cal-dia \{[^}]*border-radius: var\(--au-r-sm\) !important;[^}]*background: var\(--au-tile-2\) !important;/);
   assert.match(monthlyBlock, /\.cal-dia\.hoy \{[^}]*border: 2px solid var\(--au-ring-a\) !important;/);
-  assert.match(monthlyBlock, /\.cal-dia\.hoy \.cal-numero \{\s*color: var\(--au-ring-a\) !important;/);
+  assert.match(monthlyBlock, /\.cal-dia\.hoy \.cal-numero \{\s*color: var\(--au-accent-text\) !important;\s*opacity: 1 !important;/);
 });
 
 test("Mensual: sin desenfoque propio, todo en @media screen, sin cielo ni violeta y sin tocar el PDF", () => {
@@ -139,4 +139,42 @@ test("Avance: la menta es el único color de acción en botones y pestaña actua
 
 test("Avance: todo en @media screen y sin tocar el PDF (Avance no entra al PDF) ni las claves", () => {
   assert.doesNotMatch(strip(dashBlock), /planify-export|planify_|planify-backup|animation|transition/);
+});
+
+// ───────── Panel ⚙️ ─────────
+const panel = read("css/panel-redesign.css");
+const panelBlock = panel.slice(panel.indexOf("/* Cristal y luz (fase 2): panel"));
+
+test("Panel: pestañas en píldora de 44 px con la menta en la activa, cierre de 44 px y secciones en fichas neutras", () => {
+  assert.match(panelBlock, /\.panel-tabs \.tab-btn \{\s*min-height: 44px;[^}]*border-radius: 999px !important;[^}]*background: var\(--au-tile\) !important;/);
+  assert.match(panelBlock, /\.panel-tabs \.tab-btn\.active \{[^}]*background: var\(--au-mint\) !important;\s*color: var\(--au-mint-ink\) !important;/);
+  assert.match(panelBlock, /:is\(\.panel-tabs \.tab-btn, \.sp-btn\.sp-btn-sm, \.sp-lang-btn, \.sp-action-btn\) \{\s*min-height: 44px !important;/);
+  assert.match(panelBlock, /\.trust-panel-close \{\s*flex: 0 0 44px;\s*width: 44px;\s*height: 44px;/);
+  assert.match(panelBlock, /\.card-section,[\s\S]*?\.panel-backup \{[^}]*border-radius: var\(--au-r-md\) !important;[^}]*background: var\(--au-tile\) !important;/);
+});
+
+test("Panel: la cabecera es la única superficie de vidrio (solo abierto, con respaldo opaco); la capa oscura no desenfoca y lo de atrás tampoco", () => {
+  const css = strip(panelBlock);
+  assert.equal((css.match(/(?<!-webkit-)backdrop-filter: blur\(14px\)/g) || []).length, 1);
+  assert.match(css, /#side-panel\.open \.sp-header \{\s*border-bottom: 1px solid var\(--au-glass-line\) !important;\s*background: var\(--au-glass-solid\) !important;/);
+  assert.match(css, /@media screen and \(prefers-reduced-transparency: reduce\) \{[\s\S]*?backdrop-filter: none;/);
+  assert.match(css, /#side-overlay \{\s*-webkit-backdrop-filter: none !important;\s*backdrop-filter: none !important;/);
+  assert.match(css, /body:has\(#side-panel\.open\) \.brand-hero\.au-glass,[\s\S]*?\.day-flow-main \{\s*-webkit-backdrop-filter: none !important;\s*backdrop-filter: none !important;/);
+});
+
+test("Panel: sin tocar el cuadrito de marca ni el ícono; todo en @media screen; la menta como única acción", () => {
+  assert.doesNotMatch(strip(panelBlock), /panel-brand-mark|brand-mark|icon\.svg|--au-sky|--au-violet|animation|transition|planify_|planify-backup/);
+  assert.match(strip(panelBlock).trim(), /^@media screen \{/);
+});
+
+// ───────── Color de texto de acento ─────────
+test("el texto de acento (número de hoy, trimestre) llega a contraste 4,5 sobre las fichas en claro y en oscuro", () => {
+  const lum = (hex) => { const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4))); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+  const light = aurora.slice(aurora.indexOf("body.tema-claro,\nbody.light-mode {"));
+  const darkText = aurora.match(/--au-accent-text:\s*(#[0-9a-f]{6})/i)[1];
+  const lightText = light.match(/--au-accent-text:\s*(#[0-9a-f]{6})/i)[1];
+  ["#ffffff", "#f1f6f4"].forEach((bg) => assert.ok(ratio(lightText, bg) >= 4.5, "claro " + bg));
+  assert.ok(ratio(darkText, "#172a40") >= 4.5);
+  assert.match(strip(annualBlock), /\.annual-calm-quarter \{\s*color: var\(--au-accent-text\);/);
 });

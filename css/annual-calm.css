@@ -193,7 +193,7 @@ body.tema-claro #vista-anual-metas.annual-calm-ready .annual-calm-eyebrow { colo
     border-color: var(--au-ring-a) !important;
   }
   html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .annual-calm-quarter {
-    color: var(--au-ring-a);
+    color: var(--au-accent-text);
   }
   html body:is(.tema-estelar, .tema-claro, .light-mode) #vista-anual-metas.annual-calm-ready .tarjeta-mes-objetivos h4 {
     border-bottom: 1px solid var(--au-tile-line) !important;
